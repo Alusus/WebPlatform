@@ -1,0 +1,20 @@
+@merge module WebPlatform {
+    function dispatchEvents {
+        while 1 {
+            def jsonStr: ptr[array[Char]] = fetchNextEvent();
+            if jsonStr == 0 break;
+            def json: Json(jsonStr);
+            def widget: ref[Widget];
+            widget~ptr = json.getInt("elementPtr")~cast[ptr[Widget]];
+            widget.onEvent(json.getString("eventName"), json);
+        }
+    }
+    
+    function runEventLoop {
+        while 1 {
+            waitForEvent();
+            dispatchEvents();
+        }
+    }
+}
+

@@ -1,0 +1,122 @@
+@merge module WebPlatform {
+    type UiEndpoint {
+        def uri: String;
+        def filename: String;
+        def title: String;
+        handler this~init() {}
+        handler this~init(uri: String, filename: String, title: String) this.set(uri, filename, title);
+        handler this~init(ref[UiEndpoint]) this.set(value.uri, value.filename, value.title);
+        handler this=ref[UiEndpoint] this.set(value.uri, value.filename, value.title);
+        func set (uri: String, filename: String, title: String) {
+            this.uri = uri;
+            this.filename = filename;
+            this.title = title;
+        }
+    }
+    def uiEndpoints: Array[UiEndpoint];
+    def htmlTemplate: String;
+
+    func getElementName (obj: ref[Core.Basic.TiObject]): String {
+        def node: ref[Core.Data.Node](castRef[obj, Core.Data.Node]);
+        def d: ref[Core.Data.Ast.Definition](castRef[node.owner, Core.Data.Ast.Definition]);
+        def binding: ref[Core.Data.Binding](Core.Basic.getInterface[d, Core.Data.Binding]);
+        def name: ref[Core.Basic.TiStr](castRef[binding.getMember("name"), Core.Basic.TiStr]);
+        return name.value;
+    }
+
+    func addUiEndpoints (parent: ref[Core.Basic.TiObject]) {
+        def elements: Array[ref[Core.Basic.TiObject]] = Spp.astMgr.findElements(
+            ast { modifier == "uiEndpoint" },
+            parent,
+            Spp.SeekerFlags.SKIP_OWNERS | Spp.SeekerFlags.SKIP_USES | Spp.SeekerFlags.SKIP_CHILDREN
+        );
+        def i: Int;
+        for i = 0, i < elements.getLength(), ++i {
+            def modifier: ref[Core.Basic.TiObject](Spp.astMgr.findModifierForElement(elements(i), "uiEndpoint"));
+            def endpointParams: Array[String];
+            if !Spp.astMgr.getModifierStringParams(modifier, endpointParams)
+                || endpointParams.getLength() < 2 {
+                System.fail(1, "Invalid UI endpoint params");
+            }
+            addUiEndpoint(elements(i), endpointParams(0), endpointParams(1));
+        }
+    }
+
+    func addUiEndpoint (fn: ref[Core.Basic.TiObject], uri: String, title: String) {
+        def binding: ref[Core.Data.Binding](Core.Basic.getInterface[fn, Core.Data.Binding]);
+        binding.setMember("name", Core.Basic.TiStr("wasmStart"));
+        def wasm: Build.Wasm(fn, "/tmp/endpoint.wasm");
+        wasm.addDependency(webPlatformPath + String("/stdlib-min.wasm"));
+        wasm.addFlags({ String("--export=malloc"), String("--export=realloc") });
+        wasm.generate();
+        def wasmFilename: String = String("/") + getElementName(fn) + ".wasm";
+        if System.exec(
+            webPlatformPath + "/Tools/bin/wasm-opt -O --asyncify /tmp/endpoint.wasm -o /tmp" + wasmFilename
+        ) != 0 {
+            System.fail(1, "Post-build pass failed\n");
+        }
+        uiEndpoints.add(UiEndpoint(uri, wasmFilename, title));
+    }
+
+    func startServer(optsCount: Int, opts: ...CharsPtr) {
+        addUiEndpoints(Root~ast);
+        if uiEndpoints.getLength() == 0 {
+            System.fail(1, "No UI endpoints found\n");
+        }
+        htmlTemplate = Fs.readFile(webPlatformPath + "/wasm.html");
+
+        def options: Array[CharsPtr];
+        while optsCount-- > 0 options.add(opts~next_arg[CharsPtr]);
+        options.add(0);
+
+        def context: ptr[Http.Context] = Http.createServer(callbackRequest~ptr, options);
+        Console.print("Server started.\npress enter to close server: ");
+        Console.getChar(); // stop proccess here waiting user to press enter
+        Http.closeServer(context); // stop the server
+    }
+
+    func callbackRequest(connection: ptr[Http.Connection]): Int {
+        def requestInfo: ptr[Http.RequestInfo] = Http.getRequestInfo(connection);
+        def uri: ptr[array[Char]] = requestInfo~cnt.requestUri;
+
+        if String.isEqual(requestInfo~cnt.requestMethod, "GET") {
+            if String.isEqual(uri, "/api.js") {
+                Http.sendFile(connection, webPlatformPath + "/api.js");
+                return 1;
+            }
+
+            def i: Int;
+            for i = 0, i < uiEndpoints.getLength(), ++i {
+                if uiEndpoints(i).uri == uri {
+                    sendHtmlTemplate(connection, uiEndpoints(i).title, uiEndpoints(i).filename);
+                    return 1;
+                } else if uiEndpoints(i).filename == uri {
+                    Http.sendFile(connection, String("/tmp") + uri);
+                    return 1;
+                }
+            }
+        }
+
+        def content: array[Char, 1024];
+        String.assign(content~ptr, "<h1>404 - Not Found</h1><p> you are in \"%s\"", requestInfo~cnt.localUri);
+        Http.print(connection, "HTTP/1.1 404 Not Found\r\n");
+        Http.print(connection, "Content-Type: text/html\r\n");
+        Http.print(connection, "Content-Length: %d\r\n\r\n", String.getLength(content~ptr));
+        Http.print(connection, content~ptr);
+
+        return 1;
+    }
+
+    func sendHtmlTemplate (connection: ptr[Http.Connection], title: ptr[array[Char]], wasmFilename: ptr[array[Char]]) {
+        def content: String = String.format(htmlTemplate, title, wasmFilename);
+        def responseTemplate:
+            "HTTP/1.1 200 OK\r\n"
+            "Content-Type: text/html\r\n"
+            "Content-Length: %d\r\n"
+            "Connection: close\r\n"
+            "Accept-Ranges: bytes\r\n\r\n"
+            "%s";
+        Http.print(connection, responseTemplate, content.getLength(), content.buf);
+    }
+}
+

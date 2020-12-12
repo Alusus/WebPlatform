@@ -1,0 +1,28 @@
+import "Srl/Console";
+import "Srl/String";
+import "Srl/System";
+import "Srl/Fs";
+import "Srl/refs";
+import "Core/Data";
+import "Spp";
+import "Build";
+import "Apm";
+Apm.importFile("Alusus/Http");
+Apm.importFile("xlmnxp/Json");
+
+import "WebPlatform/server";
+import "WebPlatform/browser_api";
+import "WebPlatform/signals";
+import "WebPlatform/ui";
+import "WebPlatform/main";
+
+@merge module WebPlatform {
+    use Srl;
+
+    function getDirectoryFromPath (path: ptr[array[Char]]): Srl.String {
+        return Srl.String(path, Srl.String.findLast(path, '/')~cast[ArchInt] - path~cast[ArchInt]);
+    }
+
+    def webPlatformPath: Srl.String = getDirectoryFromPath(getThisSourceFullPath[]);
+}
+

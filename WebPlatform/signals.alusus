@@ -1,0 +1,47 @@
+@merge module WebPlatform {
+    type Signal [ownerType: type, payloadType: type] {
+        def owner: ref[ownerType];
+        def slots: Array[Slot[ownerType, payloadType]];
+
+        function emit(payload: ref[payloadType]) {
+            def i: Int;
+            for i = 0, i < this.slots.getLength(), ++i {
+                this.slots(i).fn(this.owner, payload, this.slots(i).extra);
+            }
+        }
+        
+        function connect(fn: Slot[ownerType, payloadType].FnPtr, extra: ptr) {
+            def i: Int;
+            for i = 0, i < this.slots.getLength(), ++i {
+                if this.slots(i).fn == fn && this.slots(i).extra == extra return;
+            }
+            def slot: Slot[ownerType, payloadType];
+            slot.fn = fn;
+            slot.extra = extra;
+            this.slots.add(slot);
+            this.owner.onSignalConnectionsChanged(this~ptr, this.slots.getLength());
+        }
+
+        function disconnect(fn: Slot[ownerType, payloadType].FnPtr, extra: ptr) {
+            def i: Int;
+            for i = 0, i < this.slots.getLength(), ++i {
+                if this.slots(i).fn == fn && this.slots(i).extra == extra {
+                    this.slots.remove(i);
+                    this.owner.onSignalConnectionsChanged(this~ptr, this.slots.getLength());
+                    return;
+                }
+            }
+        }
+        
+        function getConnectionCount (): Int {
+            return this.slots.getLength();
+        }
+    }
+
+    type Slot [widgetType: type, payloadType: type] {
+        def FnPtr: alias ptr[@shared @no_bind function (widget: ref[widgetType], payload: ref[payloadType], extra: ptr)];
+        def fn: FnPtr;
+        def extra: ptr;
+    }
+}
+

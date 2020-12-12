@@ -1,0 +1,139 @@
+import "Srl/System";
+import "Srl/Console";
+import "Srl/Net";
+import "Srl/String";
+import "Srl/Fs";
+import "Core/Data";
+import "Spp";
+import "Zip";
+
+use Srl;
+
+function downloadPackage (url: ptr[array[Char]], targetDir: ptr[array[Char]]) {
+    def result: ptr[array[Char]];
+    def size: Int;
+    if !Net.get(url, "/tmp/package.zip") {
+      System.fail(1, String("Failed to download ") + url);
+    };
+
+    if Zip.extractFromFile("/tmp/package.zip", targetDir, 0, 0) != 0 {
+      System.fail(1, String("Failed to extract downloaded package ") + url);
+    }
+}
+
+function getDirectoryFromPath (path: ptr[array[Char]]): Srl.String {
+    return Srl.String(path, Srl.String.findLast(path, '/')~cast[ArchInt] - path~cast[ArchInt]);
+}
+
+def rootPath: Srl.String = getDirectoryFromPath(getThisSourceFullPath[]) + "/..";
+def buildPath: Srl.String = rootPath + "/Builds";
+
+System.exec(String.format("mkdir -p %s", buildPath.buf));
+
+// Build wabt
+def wabtVersion: "1.0.20";
+if !Fs.exists(String.format("%s/wabt-%s/bin/wat2wasm", buildPath.buf, wabtVersion)) {
+    Console.print("<<<< Building wabt >>>>\n\n");
+    System.exec(String.format("rm -rf %s/wabt-%s", buildPath.buf, wabtVersion));
+    downloadPackage(String("https://github.com/WebAssembly/wabt/archive/") + wabtVersion + ".zip", buildPath + "/");
+    System.exec(String.format(
+        "mkdir -p %s/wabt-%s/build && cd %s/wabt-%s/build && cmake -DBUILD_TESTS=OFF -DBUILD_LIBWASM=OFF .. && cmake --build .",
+        buildPath.buf, wabtVersion, buildPath.buf, wabtVersion
+    ));
+} else {
+    Console.print("<<<< wabt already available, skipping... >>>>\n\n");
+}
+
+// Build binaryen
+def binaryenVersion: "version_98";
+if !Fs.exists(String.format("%s/binaryen-%s/bin/wasm-opt", buildPath.buf, binaryenVersion)) {
+    Console.print("<<<< Building binaryen >>>>\n\n");
+    System.exec(String.format("rm -rf %s/binaryen-%s", buildPath.buf, binaryenVersion));
+    downloadPackage(String("https://github.com/WebAssembly/binaryen/archive/") + binaryenVersion + ".zip", buildPath + "/");
+    System.exec(String.format("cd %s/binaryen-%s/ && cmake . && make", buildPath.buf, binaryenVersion));
+} else {
+    Console.print("<<<< binaryen already available, skipping... >>>>\n\n");
+}
+
+function getFilenameFromPath (path: ptr[array[Char]]): String {
+    return String((String.findLast(path, '/') + 1)~cast[CharsPtr]);
+}
+
+// Build stdlib
+def stdlibPath: Srl.String = buildPath + "/wasm-stdlib-hack-master";
+def clangCmd: "clang-10 --target=wasm32-unknown-unknown-wasm -Iinclude/libc -Oz";
+def disableWarn: "-Wno-bitwise-op-parentheses -Wno-shift-op-parentheses";
+def mallocOpts: "-DMORECORE_CANNOT_TRIM=1 -DHAVE_MMAP=0 -DHAVE_MREMAP=0 -DLACKS_TIME_H=1 -DNO_MALLOC_STATS=1 "
+    "-Dmalloc_getpagesize=65536 -Wno-expansion-to-defined";
+if !Fs.exists(String.format("%s/dist/stdlib-min.wasm", stdlibPath.buf)) {
+    Console.print("<<<< Building wasm-stdlib-hack >>>>\n\n");
+    System.exec(String.format("rm -rf %s", stdlibPath.buf));
+    downloadPackage("https://github.com/guybedford/wasm-stdlib-hack/archive/master.zip", buildPath + "/");
+
+    System.exec(String.format("mkdir -p %s/lib", stdlibPath.buf));
+
+    // Build stdlib-base
+    System.exec(String.format(
+        "cd %s && ../wabt-%s/bin/wat2wasm -r -o lib/stdlib-base.wasm src/stdlib-base.wast", stdlibPath.buf, wabtVersion
+    ));
+    // Build malloc.wasm
+    System.exec(String.format(
+        "cd %s && %s -c src/dlmalloc.c -o lib/malloc.wasm %s %s", stdlibPath.buf, clangCmd, mallocOpts, disableWarn
+    ));
+    // Build other functions.
+    def fnFilenames: Array[String]({
+        String("string/memcpy"),
+        String("string/memset"),
+        String("string/memrchr"),
+        String("string/memcmp"),
+        String("string/stpcpy"),
+        String("string/stpncpy"),
+        String("string/strchr"),
+        String("string/memchr"),
+        String("string/strrchr"),
+        String("string/strstr"),
+        String("string/strcmp"),
+        String("string/strncmp"),
+        String("string/strcpy"),
+        String("string/strncpy"),
+        String("string/strcat"),
+        String("string/strncat"),
+        String("string/strlen"),
+        String("string/strchrnul")
+    });
+    def i: Int;
+    for i = 0, i < fnFilenames.getLength(), ++i {
+        System.exec(String.format(
+            "cd %s && %s -Isrc/internal/ -fvisibility=hidden -c src/%s.c -o lib/%s.wasm %s",
+            stdlibPath.buf, clangCmd, fnFilenames(i).buf, getFilenameFromPath(fnFilenames(i)).buf, disableWarn
+        ));
+    }
+    
+    // Link into stdlib-min.wasm
+    def cmd: String = String.format(
+        "cd %s && wasm-ld-10 --no-entry --export-dynamic -r lib/stdlib-base.wasm lib/malloc.wasm", stdlibPath.buf
+    );
+    for i = 0, i < fnFilenames.getLength(), ++i {
+        cmd += " lib/";
+        cmd += getFilenameFromPath(fnFilenames(i));
+        cmd += ".wasm";
+    }
+    cmd += " -o dist/stdlib-min.wasm";
+    System.exec(cmd);
+} else {
+    Console.print("<<<< wasm-stdlib-hack already available, skipping... >>>>\n\n");
+}
+
+// Copy needed files.
+Console.print("<<<< Installing generated files >>>>\n\n");
+System.exec(String.format("mkdir -p %s/Tools/bin && mkdir -p %s/Tools/lib", rootPath.buf, rootPath.buf));
+System.exec(
+    String.format("cp %s/binaryen-%s/bin/wasm-opt %s/Tools/bin/", buildPath.buf, binaryenVersion, rootPath.buf)
+);
+System.exec(
+    String.format("cp %s/binaryen-%s/lib/libbinaryen.so %s/Tools/lib/", buildPath.buf, binaryenVersion, rootPath.buf)
+);
+System.exec(String.format("cp %s/dist/stdlib-min.wasm %s", stdlibPath.buf, rootPath.buf));
+
+Console.print("<<<< Build successful >>>>\n\n");
+
