@@ -55,16 +55,75 @@ func testGet {
     setElementAttribute("myText", "innerHTML", getElementAttribute("myInput", "value"));
 }
 
+func createHeader (): SrdRef[Widget] {
+    def label: SrdRef[Label] = Label.new(String("أمثلة منصة ويب الأسس - الدردشة"));
+    label.setFontColor(Color(255, 255, 255));
+    label.setFontSize(30.0);
+    label.setWidth(String("100%"));
+    label.setHeight(String("100%"));
+    label.setBackgroundColor(Color(0, 70, 100));
+
+    def box: SrdRef[Box] = Box.new({ label });
+    box.setWidth(String("100%"));
+    box.setHeight(String("60"));
+    box.setPadding(Quad(5));
+    box.setBackgroundColor(Color(0, 70, 100));
+    box.setBorderColor(Color(0, 70, 100));
+    box.setBorder(Quad(1.5));
+
+    return box~cast[SrdRef[Widget]];
+}
+
 @uiEndpoint["/testui", "WebPlatform Example - Test UI Widgets"]
 func testUi {
     def label: SrdRef[Label] = Label.new(String("السلام عليكم"));
-    def button: SrdRef[Button] = Button.new(String("انطلق"));
-    button.onClick.connect(onButtonClicked~ptr, label.obj~ptr);
-    setView(Box.new({
-        Box.new({ label }),
-        button
-    }));
+    label.setFontColor(Color(50, 50, 50));
+    label.setFontSize(20.0);
+    label.setWidth(String("100%"));
+    label.setHeight(String("100%"));
+
+    def textInput: SrdRef[TextInput] = TextInput.new();
+    textInput.setWidth(String("100%"));
+    textInput.setHeight(String("100%"));
+    textInput.setFontSize(12.0);
+    textInput.onKeyUp.connect(onKeyUp~ptr, label.obj~ptr);
+
+    def button: SrdRef[Button] = Button.new(String("أرسل"));
+    def bcPayload: ButtonClickPayload;
+    bcPayload.label~no_deref = label.obj;
+    bcPayload.textInput~no_deref = textInput.obj;
+    button.onClick.connect(onButtonClicked~ptr, bcPayload~ptr);
+    button.setFontSize(16.0);
+    button.setHeight(String("100%"));
+    button.setBackgroundColor(Color(200, 200, 200));
+    button.setWidth(String("50pt"));
+
+    def displayBox: SrdRef[Box] = Box.new({ label });
+    displayBox.setWidth(String("100%"));
+    displayBox.setHeight(String("100%"));
+    displayBox.setBorder(Quad(1.5));
+    displayBox.setBorderColor(Color(0, 0, 0));
+    displayBox.setPadding(Quad(5));
+
+    def inputBox: SrdRef[Box] = Box.new({ textInput, button });
+    inputBox.setWidth(String("100%"));
+    inputBox.setHeight(String("50pt"));
+    inputBox.setLayout(String("row"));
+    inputBox.setBorder(Quad(1.5));
+    inputBox.setBorderColor(Color(0, 0, 0));
+    inputBox.setPadding(Quad(5));
+
+    def box: SrdRef[Box] = Box.new({ createHeader(), displayBox, inputBox });
+    box.setHeight(String("100%"));
+    box.setPadding(Quad(0, 50));
+
+    setView(box);
     runEventLoop();
+}
+
+type ButtonClickPayload {
+    def label: ref[Label];
+    def textInput: ref[TextInput];
 }
 
 macro prepCastedArg [varName, varType, argName] {
@@ -73,9 +132,17 @@ macro prepCastedArg [varName, varType, argName] {
 }
 
 func onButtonClicked (widget: ref[Button], payload: ref[Int], extra: ptr) {
+    prepCastedArg[bcPayload, ButtonClickPayload, extra];
+    bcPayload.label.setText(bcPayload.label.getText() + "<br>" + bcPayload.textInput.getText().replace("\n", "<br>"));
+    bcPayload.textInput.setText(String());
+}
+
+func onKeyUp (widget: ref[TextInput], payload: ref[String], extra: ptr) {
     prepCastedArg[label, Label, extra];
-    @shared def count: Int(0);
-    label.setText(String.format("نُقر الزر %i مرة/مرات", ++count));
+    if payload == "Shift+Enter" {
+        label.setText(label.getText() + "<br>" + widget.getText().replace("\n", "<br>"));
+        widget.setText(String());
+    }
 }
 
 @uiEndpoint["/about", "WebPlatform Example - About"]

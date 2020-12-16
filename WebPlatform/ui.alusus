@@ -1,4 +1,7 @@
 @merge module WebPlatform {
+    //==========================================================================
+    // Functions and Macros
+
     def view: SrdRef[Widget];
     function setView(v: SrdRef[Widget]) {
         unsetView();
@@ -16,151 +19,74 @@
         return String("id") + (++counter);
     }
 
-    type Widget {
-        def id: String;
-        def owner: ref[Widget];
-        def children: Array[SrdRef[Widget]];
-
-        def buildThis: ptr[function (ownerId: String)];
-        def onEvent: ptr[function (eventName: String, data: ref[Json])];
-
-        function addChildren (count: Int, children: ...temp_ref[SrdRef[Widget]]) {
-            while count-- > 0 {
-                def child: ref[SrdRef[Widget]](children~next_arg[ref[SrdRef[Widget]]]);
-                this.children.add(child);
-                if this.id.getLength() > 0 child.build(this.id);
-            }
+    macro defProp [propName, upperCasePropName, propType] {
+        def propName: propType;
+        func set__upperCasePropName__ (val: temp_ref[propType]) {
+            this.propName = val;
+            this.update();
         }
+        func get__upperCasePropName__ (): ref[propType] {
+            return this.propName;
+        }
+    }
+
+
+    //==========================================================================
+    // Quad
+    // A tuple of four float values used for the four sides of a rectangle. This
+    // is used for things like border thickness or padding.
+    type Quad {
+        def top: Float = 0;
+        def right: Float = 0;
+        def bottom: Float = 0;
+        def left: Float = 0;
         
-        function removeChildren (count: Int, children: ...temp_ref[SrdRef[Widget]]) {
-            while count-- > 0 {
-                def child: ref[SrdRef[Widget]](children~next_arg[ref[SrdRef[Widget]]]);
-                def i: Int;
-                for i = 0, i < this.children.getLength(), ++i {
-                    if this.children(i).obj~ptr == child.obj~ptr {
-                        child.unbuild();
-                        this.children.remove(i);
-                        return;
-                    }
-                }
-            }
+        handler this~init() {}
+        handler this~init(Float) {
+            this.top = this.right = this.bottom = this.left = value;
         }
+        handler this~init(v: Float, h: Float) {
+            this.top = this.bottom = v;
+            this.right = this.left = h;
+        }
+        handler this~init(t: Float, r: Float, b: Float, l: Float) {
+            this.top = t;
+            this.right = r;
+            this.bottom = b;
+            this.left = l;
+        }
+        handler this~init(temp_ref[Quad]) {
+            this = value;
+        }
+        handler this = temp_ref[Quad] {
+            this.top = value.top;
+            this.right = value.right;
+            this.bottom = value.bottom;
+            this.left = value.left;
+        }
+    }
 
-        function build (ownerId: String) {
-            this.id = getNewId();
-            this.buildThis(ownerId);
-            def i: Int;
-            for i = 0, i < this.children.getLength(), ++i {
-                this.children(i).build(this.id);
-            }
-        }
+    //==========================================================================
+    // Color
+    type Color {
+        def red: Int = 0;
+        def green: Int = 0;
+        def blue: Int = 0;
         
-        function unbuild {
-            def i: Int;
-            for i = 0, i < this.children.getLength(), ++i {
-                this.children(i).unbuild();
-            }
-            if this.id.getLength() > 0 {
-                deleteElement(this.id);
-                this.id = String();
-            }
+        handler this~init() {}
+        handler this~init(r: Int, g: Int, b: Int) {
+            this.red = r;
+            this.green = g;
+            this.blue = b;
+        }
+        handler this~init(temp_ref[Color]) {
+            this = value;
+        }
+        handler this = temp_ref[Color] {
+            this.red = value.red;
+            this.green = value.green;
+            this.blue = value.blue;
         }
     }
-
-    type Box {
-        @injection def widget: Widget;
-        
-        function buildThisImpl (ownerId: String) {
-            createElement("div", this.id, ownerId);
-        }
-        buildThis = buildThisImpl~ptr~cast[Widget.buildThis~type];
-        
-        @shared function new (count: Int, args: ...temp_ref[SrdRef[Widget]]): SrdRef[Box] {
-            def r: SrdRef[Box];
-            r.alloc()~init();
-            while count-- > 0 r.addChildren({ args~next_arg[ref[SrdRef[Widget]]] });
-            return r;
-        }
-    }
-
-    type Label {
-        @injection def widget: Widget;
-        def text: String;
-
-        handler this~init(t: String) this.text = t;
-
-        function setText (t: String) {
-            this.text = t;
-            if this.id.getLength() > 0 setElementAttribute(this.id, "innerHTML", this.text);            
-        }
-
-        function buildThisImpl (ownerId: String) {
-            createElement("span", this.id, ownerId);
-            setElementAttribute(this.id, "innerHTML", this.text);
-        }
-        buildThis = buildThisImpl~ptr~cast[Widget.buildThis~type];
-
-        @shared function new (t: String): SrdRef[Label] {
-            def r: SrdRef[Label];
-            r.alloc()~init(t);
-            return r;
-        }
-    }
-
-    type Button {
-        @injection def widget: Widget;
-        def text: String;
-        def onClick: Signal[Button, Int];
-
-        handler this~init(t: String) {
-            this.onClick.owner~no_deref = this;
-            this.text = t;
-        }
-
-        function setText (t: String) {
-            this.text = t;
-            if this.id.getLength() > 0 setElementAttribute(this.id, "innerHTML", this.text);            
-        }
-
-        function onSignalConnectionsChanged(signal: ptr[Signal[Button, Int]], connectionCount: Int) {
-            if this.id.getLength() > 0 {
-                if signal == this.onClick~ptr {
-                    if connectionCount > 0 registerEventHandler(this.id, "click", this~ptr)
-                    else unregisterEventHandler(this.id, "click");
-                }
-            }
-        }
-
-        function buildThisImpl (ownerId: String) {
-            createElement("button", this.id, ownerId);
-            setElementAttribute(this.id, "innerHTML", this.text);
-            if this.onClick.getConnectionCount() > 0 registerEventHandler(this.id, "click", this~ptr);
-        }
-        buildThis = buildThisImpl~ptr~cast[Widget.buildThis~type];
-
-        function onEventImpl (eventName: String, data: ref[Json]) {
-            if eventName == "click" this.onClick.emit(Int(0));
-        }
-        onEvent = onEventImpl~ptr~cast[Widget.onEvent~type];
-
-        @shared function new (t: String): SrdRef[Button] {
-            def r: SrdRef[Button];
-            r.alloc()~init(t);
-            return r;
-        }
-    }
-
-    macro defSrdRefCast [tpName] {
-        def __tpName__SrdRef: alias SrdRef[WebPlatform.tpName];
-        @merge type __tpName__SrdRef {
-            handler this~cast[SrdRef[WebPlatform.Widget]] return SrdRef[WebPlatform.Widget](this.refCounter, this.widget);
-        }
-    }
-}
-
-@merge module Srl {
-    WebPlatform.defSrdRefCast[Box];
-    WebPlatform.defSrdRefCast[Label];
-    WebPlatform.defSrdRefCast[Button];
 }
 

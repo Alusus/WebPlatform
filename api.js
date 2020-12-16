@@ -24,6 +24,8 @@ wasmApi.setElementAttribute = (elementName, propName, value) => {
   const prop = toJsString(propName);
   if (prop === 'innerHTML') {
     document.getElementById(toJsString(elementName)).innerHTML = toJsString(value);
+  } else if (prop === 'value') {
+    document.getElementById(toJsString(elementName)).value = toJsString(value);
   } else {
     document.getElementById(toJsString(elementName)).setAttribute(prop, toJsString(value));
   }
@@ -101,9 +103,9 @@ wasmApi.waitForEvent = () => {
 }
 
 function stringifyEvent(event) {
-  const obj = {};
-  for (let k in event) {
-    obj[k] = event[k];
+  const obj = { elementPtr: event.elementPtr, eventName: event.eventName, eventData: {} };
+  for (let k in event.eventData) {
+    obj.eventData[k] = event.eventData[k];
   }
   return JSON.stringify(obj, (k, v) => {
     if (v instanceof Node) return 'Node';
@@ -113,7 +115,7 @@ function stringifyEvent(event) {
 }
 
 function onEvent (elementPtr, eventName, event) {
-  eventsQueue.push({ elementPtr, eventName, eventData: stringifyEvent(event) });
+  eventsQueue.push({ elementPtr, eventName, eventData: event });
 
   // Unblock wasm if it's waiting for events.
   if (eventWaiting) {

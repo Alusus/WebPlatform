@@ -1,0 +1,448 @@
+@merge module WebPlatform {
+    //==========================================================================
+    // Widget
+    // The base class of all widgets.
+    type Widget {
+        def id: String;
+        def owner: ref[Widget];
+
+        // Styles
+        defProp[width, Width, String];
+        defProp[height, Height, String];
+        defProp[backgroundColor, BackgroundColor, Color];
+
+        handler this~init() {
+            this.backgroundColor~init(255, 255, 255);
+        }
+
+        def build: ptr[function (ownerId: String)];
+        def unbuild: ptr[function];
+        def update: ptr[function];
+        def onEvent: ptr[function (eventName: String, data: ref[Json])];
+    }
+
+    //==========================================================================
+    // Box
+    // A rectangular area that contains other widgets.
+    type Box {
+        @injection def widget: Widget;
+        def children: Array[SrdRef[Widget]];
+
+        //-----------
+        // Properties
+
+        defProp[padding, Padding, Quad];
+        defProp[border, Border, Quad];
+        defProp[borderColor, BorderColor, Color];
+        defProp[layout, Layout, String];
+        defProp[direction, Direction, String];
+
+        //---------
+        // Handlers
+
+        handler this~init() {
+            this.borderColor~init(255, 255, 255);
+            this.layout = "column";
+            this.direction = "rtl";
+        }
+
+        function addChildren (count: Int, children: ...temp_ref[SrdRef[Widget]]) {
+            while count-- > 0 {
+                def child: ref[SrdRef[Widget]](children~next_arg[ref[SrdRef[Widget]]]);
+                this.children.add(child);
+                if this.id.getLength() > 0 child.build(this.id);
+            }
+        }
+        
+        function removeChildren (count: Int, children: ...temp_ref[SrdRef[Widget]]) {
+            while count-- > 0 {
+                def child: ref[SrdRef[Widget]](children~next_arg[ref[SrdRef[Widget]]]);
+                def i: Int;
+                for i = 0, i < this.children.getLength(), ++i {
+                    if this.children(i).obj~ptr == child.obj~ptr {
+                        child.unbuild();
+                        this.children.remove(i);
+                        return;
+                    }
+                }
+            }
+        }
+
+        //-------------------
+        // Function Overrides
+
+        function buildImpl (ownerId: String) {
+            this.id = getNewId();
+            createElement("div", this.id, ownerId);
+            this.update();
+
+            def i: Int;
+            for i = 0, i < this.children.getLength(), ++i {
+                this.children(i).build(this.id);
+            }
+        }
+        build = buildImpl~ptr~cast[Widget.build~type];
+
+        function unbuildImpl {
+            if this.id.getLength() > 0 {
+                deleteElement(this.id);
+
+                def i: Int;
+                for i = 0, i < this.children.getLength(), ++i {
+                    this.children(i).unbuild();
+                }
+
+                this.id = String();
+            }
+        }
+        unbuild = unbuildImpl~ptr~cast[Widget.unbuild~type];
+
+        function updateImpl {
+            if this.id.getLength() > 0 {
+                setElementAttribute(
+                    this.id, "style",
+                    String.format(
+                        "width:%s;"
+                        "height:%s;"
+                        "padding:%fpt %fpt %fpt %fpt;"
+                        "border-style:solid;"
+                        "border-width:%fpt %fpt %fpt %fpt;"
+                        "border-color:rgb(%i, %i, %i);"
+                        "background-color:rgb(%i, %i, %i);"
+                        "display:flex;flex-direction:%s;justify-content:space-around;"
+                        "direction:%s;",
+                        this.width.buf, this.height.buf,
+                        this.padding.top, this.padding.right, this.padding.bottom, this.padding.left,
+                        this.border.top, this.border.right, this.border.bottom, this.border.left,
+                        this.borderColor.red, this.borderColor.green, this.borderColor.blue,
+                        this.backgroundColor.red, this.backgroundColor.green, this.backgroundColor.blue,
+                        this.layout.buf,
+                        this.direction.buf
+                    )
+                );
+            }
+        }
+        update = updateImpl~ptr~cast[Widget.update~type];
+
+        //-----------------
+        // Shared Functions
+
+        @shared function new (count: Int, args: ...temp_ref[SrdRef[Widget]]): SrdRef[Box] {
+            def r: SrdRef[Box];
+            r.alloc()~init();
+            while count-- > 0 r.addChildren({ args~next_arg[ref[SrdRef[Widget]]] });
+            return r;
+        }
+    }
+
+    //==========================================================================
+    // Label
+    type Label {
+        @injection def widget: Widget;
+
+        //-----------
+        // Properties
+
+        defProp[text, Text, String];
+        defProp[fontSize, FontSize, Float];
+        defProp[fontColor, FontColor, Color];
+        defProp[textAlign, TextAlign, String];
+        defProp[textDirection, TextDirection, String];
+
+        //----------
+        // Handleres
+
+        handler this~init(t: String) {
+            this.text = t;
+            this.fontSize = 10;
+            this.textAlign = "right";
+            this.textDirection = "rtl";
+        }
+
+        //-------------------
+        // Function Overrides
+
+        function buildImpl (ownerId: String) {
+            this.id = getNewId();
+            createElement("span", this.id, ownerId);
+            this.update();
+        }
+        build = buildImpl~ptr~cast[Widget.build~type];
+
+        function unbuildImpl {
+            if this.id.getLength() > 0 {
+                deleteElement(this.id);
+                this.id = String();
+            }
+        }
+        unbuild = unbuildImpl~ptr~cast[Widget.unbuild~type];
+
+        function updateImpl {
+            if this.id.getLength() > 0 {
+                setElementAttribute(this.id, "innerHTML", this.text);
+                setElementAttribute(
+                    this.id, "style",
+                    String.format(
+                        "width:%s;"
+                        "height:%s;"
+                        "background-color:rgb(%i, %i, %i);"
+                        "color:rgb(%i, %i, %i);"
+                        "font-size:%fpt;"
+                        "text-align:%s;"
+                        "direction:%s",
+                        this.width.buf, this.height.buf,
+                        this.backgroundColor.red, this.backgroundColor.green, this.backgroundColor.blue,
+                        this.fontColor.red, this.fontColor.green, this.fontColor.blue,
+                        this.fontSize,
+                        this.textAlign.buf,
+                        this.textDirection.buf
+                    )
+                );
+            }
+        }
+        update = updateImpl~ptr~cast[Widget.update~type];
+
+        //-----------------
+        // Shared Functions
+
+        @shared function new (t: String): SrdRef[Label] {
+            def r: SrdRef[Label];
+            r.alloc()~init(t);
+            return r;
+        }
+    }
+
+    //==========================================================================
+    // Button
+    type Button {
+        @injection def widget: Widget;
+
+        //-----------------------
+        // Properties and Signals
+
+        defProp[text, Text, String];
+        defProp[fontSize, FontSize, Float];
+        defProp[fontColor, FontColor, Color];
+        defProp[textAlign, TextAlign, String];
+        defProp[textDirection, TextDirection, String];
+        def onClick: Signal[Button, Int];
+
+        //---------
+        // Handlers
+
+        handler this~init(t: String) {
+            this.onClick.owner~no_deref = this;
+            this.text = t;
+            this.fontSize = 10;
+            this.textAlign = "right";
+            this.textDirection = "rtl";
+        }
+
+        //-----------------
+        // Member Functions
+
+        function onSignalConnectionsChanged(signal: ptr[Signal[Button, Int]], connectionCount: Int) {
+            if this.id.getLength() > 0 {
+                if signal == this.onClick~ptr {
+                    if connectionCount > 0 registerEventHandler(this.id, "click", this~ptr)
+                    else unregisterEventHandler(this.id, "click");
+                }
+            }
+        }
+
+        //-------------------
+        // Function Overrides
+
+        function buildImpl (ownerId: String) {
+            this.id = getNewId();
+            createElement("button", this.id, ownerId);
+            this.update();
+            if this.onClick.getConnectionCount() > 0 registerEventHandler(this.id, "click", this~ptr);
+        }
+        build = buildImpl~ptr~cast[Widget.build~type];
+
+        function unbuildImpl {
+            deleteElement(this.id);
+            this.id = String();
+        }
+        unbuild = unbuildImpl~ptr~cast[Widget.unbuild~type];
+
+        function updateImpl {
+            if this.id.getLength() > 0 {
+                setElementAttribute(this.id, "innerHTML", this.text);
+                setElementAttribute(
+                    this.id, "style",
+                    String.format(
+                        "width: %s;"
+                        "height: %s;"
+                        "background-color: rgb(%i, %i, %i);"
+                        "color:rgb(%i, %i, %i);"
+                        "font-size:%fpt;"
+                        "text-align:%s;"
+                        "direction:%s",
+                        this.width.buf, this.height.buf,
+                        this.backgroundColor.red, this.backgroundColor.green, this.backgroundColor.blue,
+                        this.fontColor.red, this.fontColor.green, this.fontColor.blue,
+                        this.fontSize,
+                        this.textAlign.buf,
+                        this.textDirection.buf
+                    )
+                );
+            }
+        }
+        update = updateImpl~ptr~cast[Widget.update~type];
+
+        function onEventImpl (eventName: String, data: ref[Json]) {
+            if eventName == "click" this.onClick.emit(Int(0));
+        }
+        onEvent = onEventImpl~ptr~cast[Widget.onEvent~type];
+
+        //-----------------
+        // Shared Functions
+
+        @shared function new (t: String): SrdRef[Button] {
+            def r: SrdRef[Button];
+            r.alloc()~init(t);
+            return r;
+        }
+    }
+
+    //==========================================================================
+    // TextInput
+    // A multi-line text entry.
+    type TextInput {
+        @injection def widget: Widget;
+
+        //-----------------------
+        // Properties and Signals
+
+        defProp[fontSize, FontSize, Float];
+        defProp[fontColor, FontColor, Color];
+        defProp[textAlign, TextAlign, String];
+        defProp[textDirection, TextDirection, String];
+        def onChanged: Signal[TextInput, Int];
+        def onKeyPress: Signal[TextInput, String];
+        def onKeyUp: Signal[TextInput, String];
+
+        //---------
+        // Handlers
+
+        handler this~init() {
+            this.onChanged.owner~no_deref = this;
+            this.onKeyPress.owner~no_deref = this;
+            this.onKeyUp.owner~no_deref = this;
+            this.fontSize = 10;
+            this.textAlign = "right";
+            this.textDirection = "rtl";
+        }
+
+        //-----------------
+        // Member Functions
+
+        function onSignalConnectionsChanged(signal: ptr[Signal[TextInput, Int]], connectionCount: Int) {
+            if this.id.getLength() > 0 {
+                if signal == this.onChanged~ptr {
+                    if connectionCount > 0 registerEventHandler(this.id, "change", this~ptr)
+                    else unregisterEventHandler(this.id, "change");
+                }
+            }
+        }
+
+        function onSignalConnectionsChanged(signal: ptr[Signal[TextInput, String]], connectionCount: Int) {
+            if this.id.getLength() > 0 {
+                if signal == this.onKeyPress~ptr {
+                    if connectionCount > 0 registerEventHandler(this.id, "keypress", this~ptr)
+                    else unregisterEventHandler(this.id, "keypress");
+                } else if signal == this.onKeyUp~ptr {
+                    if connectionCount > 0 registerEventHandler(this.id, "keyup", this~ptr)
+                    else unregisterEventHandler(this.id, "keyup");
+                }
+            }
+        }
+
+        function setText (t: String) {
+            if this.id.getLength() > 0 setElementAttribute(this.id, "value", t);
+        }
+        function getText (): String {
+            if this.id.getLength() == 0 return String();
+            return String(getElementAttribute(this.id, "value"));
+        }
+
+        //-------------------
+        // Function Overrides
+
+        function buildImpl (ownerId: String) {
+            this.id = getNewId();
+            createElement("textarea", this.id, ownerId);
+            this.update();
+            if this.onChanged.getConnectionCount() > 0 registerEventHandler(this.id, "change", this~ptr);
+            if this.onKeyPress.getConnectionCount() > 0 registerEventHandler(this.id, "keypress", this~ptr);
+            if this.onKeyUp.getConnectionCount() > 0 registerEventHandler(this.id, "keyup", this~ptr);
+        }
+        build = buildImpl~ptr~cast[Widget.build~type];
+
+        function unbuildImpl {
+            deleteElement(this.id);
+            this.id = String();
+        }
+        unbuild = unbuildImpl~ptr~cast[Widget.unbuild~type];
+
+        function updateImpl {
+            if this.id.getLength() > 0 {
+                setElementAttribute(
+                    this.id, "style",
+                    String.format(
+                        "resize:none;"
+                        "width:%s;"
+                        "height:%s;"
+                        "background-color:rgb(%i, %i, %i);"
+                        "color:rgb(%i, %i, %i);"
+                        "font-size:%fpt;"
+                        "text-align:%s;"
+                        "direction:%s",
+                        this.width.buf, this.height.buf,
+                        this.backgroundColor.red, this.backgroundColor.green, this.backgroundColor.blue,
+                        this.fontColor.red, this.fontColor.green, this.fontColor.blue,
+                        this.fontSize,
+                        this.textAlign.buf,
+                        this.textDirection.buf
+                    )
+                );
+            }
+        }
+        update = updateImpl~ptr~cast[Widget.update~type];
+
+        function onEventImpl (eventName: String, data: ref[Json]) {
+            if eventName == "change" this.onChanged.emit(Int(0))
+            else if eventName == "keypress" {
+                def payload: String;
+                if data.getBool("shiftKey") payload += "Shift+";
+                payload += data.getString("code");
+                this.onKeyPress.emit(payload);
+            } else if eventName == "keyup" {
+                def payload: String;
+                if data.getBool("shiftKey") payload += "Shift+";
+                payload += data.getString("code");
+                this.onKeyUp.emit(payload);
+            }
+        }
+        onEvent = onEventImpl~ptr~cast[Widget.onEvent~type];
+
+        //-----------------
+        // Shared Functions
+
+        @shared function new (): SrdRef[TextInput] {
+            def r: SrdRef[TextInput];
+            r.alloc()~init();
+            return r;
+        }
+    }
+}
+
+@merge module Srl {
+    WebPlatform.defSrdRefCast[Box];
+    WebPlatform.defSrdRefCast[Label];
+    WebPlatform.defSrdRefCast[Button];
+    WebPlatform.defSrdRefCast[TextInput];
+}
+

@@ -1,4 +1,8 @@
 @merge module WebPlatform {
+    //==========================================================================
+    // Signal
+    // A signal that can be subscribed to for handling events. It can have
+    // multiple subscriptions.
     type Signal [ownerType: type, payloadType: type] {
         def owner: ref[ownerType];
         def slots: Array[Slot[ownerType, payloadType]];
@@ -38,6 +42,10 @@
         }
     }
 
+    //==========================================================================
+    // Slot
+    // Represent a single subscription to an event. It contains extra data in
+    // addition to the function pointer.
     type Slot [widgetType: type, payloadType: type] {
         def FnPtr: alias ptr[@shared @no_bind function (widget: ref[widgetType], payload: ref[payloadType], extra: ptr)];
         def fn: FnPtr;
