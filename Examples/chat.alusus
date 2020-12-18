@@ -1,0 +1,179 @@
+import "Apm";
+Apm.importFile("Alusus/WebPlatform");
+
+use Srl;
+use WebPlatform;
+
+//==============================================================================
+// Backend
+
+def messages: String;
+
+@beEndpoint["POST", "/messages"]
+func postMessages (conn: ptr[Http.Connection]) {
+    def postData: array[Char, 1024];
+    Http.read(conn, postData~ptr, postData~size);
+    if messages.getLength() > 0 messages += "<br>";
+    messages += postData~ptr;
+    Http.print(conn, "HTTP/1.1 200 Ok\r\n\r\n");
+}
+
+@beEndpoint["GET", "/messages"]
+func getMessages (conn: ptr[Http.Connection]) {
+    Http.print(conn, "HTTP/1.1 200 Ok\r\n");
+    Http.print(conn, "Content-Type: text/plain\r\n");
+    Http.print(conn, "Content-Length: %d\r\n\r\n", messages.getLength());
+    Http.print(conn, messages.buf);
+}
+
+//==============================================================================
+// Frontend
+
+func createHeader (): SrdRef[Widget] {
+    def label: SrdRef[Label] = Label.new(String("أمثلة منصة ويب الأسس - الدردشة"));
+    label.setFontColor(Color(255, 255, 255));
+    label.setFontSize(30.0);
+    label.setWidth(String("100%"));
+    label.setHeight(String("100%"));
+    label.setBackgroundColor(Color(0, 70, 100));
+
+    def mainLinkLabel: SrdRef[Label] = Label.new(String("الرئيسية"));
+    mainLinkLabel.setFontSize(16.0);
+    mainLinkLabel.setFontColor(Color(255, 255, 255));
+    mainLinkLabel.setBackgroundColor(Color(0, 70, 100));
+    def aboutLinkLabel: SrdRef[Label] = Label.new(String("عن البرنامج"));
+    aboutLinkLabel.setFontSize(16.0);
+    aboutLinkLabel.setFontColor(Color(255, 255, 255));
+    aboutLinkLabel.setBackgroundColor(Color(0, 70, 100));
+
+    def menuBox: SrdRef[Box] = Box.new({
+        Hyperlink.new(String("/"), mainLinkLabel),
+        Hyperlink.new(String("/about"), aboutLinkLabel)
+    });
+    menuBox.setWidth(String("200pt"));
+    menuBox.setLayout(String("row"));
+    menuBox.setBackgroundColor(Color(0, 70, 100));
+
+    def box: SrdRef[Box] = Box.new({ label, menuBox });
+    box.setWidth(String("100%"));
+    box.setHeight(String("80pt"));
+    box.setPadding(Quad(5));
+    box.setBackgroundColor(Color(0, 70, 100));
+    box.setBorderColor(Color(0, 70, 100));
+    box.setBorder(Quad(1.5));
+
+    return box~cast[SrdRef[Widget]];
+}
+
+@uiEndpoint["/", "WebPlatform Example - Test UI Widgets"]
+func main {
+    def label: SrdRef[Label] = Label.new(String());
+    label.setFontColor(Color(50, 50, 50));
+    label.setFontSize(20.0);
+    label.setWidth(String("100%"));
+    label.setHeight(String("100%"));
+
+    def textInput: SrdRef[TextInput] = TextInput.new();
+    textInput.setWidth(String("100%"));
+    textInput.setHeight(String("100%"));
+    textInput.setFontSize(12.0);
+    textInput.onKeyUp.connect(onKeyUp~ptr, label.obj~ptr);
+
+    def button: SrdRef[Button] = Button.new(String("أرسل"));
+    def bcPayload: ButtonClickPayload;
+    bcPayload.label~no_deref = label.obj;
+    bcPayload.textInput~no_deref = textInput.obj;
+    button.onClick.connect(onButtonClicked~ptr, bcPayload~ptr);
+    button.setFontSize(16.0);
+    button.setHeight(String("100%"));
+    button.setBackgroundColor(Color(200, 200, 200));
+    button.setWidth(String("50pt"));
+
+    def displayBox: SrdRef[Box] = Box.new({ label });
+    displayBox.setWidth(String("100%"));
+    displayBox.setHeight(String("100%"));
+    displayBox.setBorder(Quad(1.5));
+    displayBox.setBorderColor(Color(0, 0, 0));
+    displayBox.setPadding(Quad(5));
+
+    def inputBox: SrdRef[Box] = Box.new({ textInput, button });
+    inputBox.setWidth(String("100%"));
+    inputBox.setHeight(String("50pt"));
+    inputBox.setLayout(String("row"));
+    inputBox.setBorder(Quad(1.5));
+    inputBox.setBorderColor(Color(0, 0, 0));
+    inputBox.setPadding(Quad(5));
+
+    def box: SrdRef[Box] = Box.new({ createHeader(), displayBox, inputBox });
+    box.setHeight(String("100%"));
+    box.setPadding(Quad(0, 50));
+
+    setView(box);
+
+    def slot: Slot[Void, Json];
+    slot.fn = onTimer~ptr;
+    slot.extra = label.obj~ptr;
+    startTimer(500000, slot~ptr);
+
+    runEventLoop();
+}
+
+type ButtonClickPayload {
+    def label: ref[Label];
+    def textInput: ref[TextInput];
+}
+
+macro prepCastedArg [varName, varType, argName] {
+    def varName: ref[varType];
+    varName~ptr = argName~cast[ptr[varType]];
+}
+
+func onButtonClicked (widget: ref[Button], payload: ref[Int], extra: ptr) {
+    prepCastedArg[bcPayload, ButtonClickPayload, extra];
+    def newData: String = bcPayload.textInput.getText().replace("\n", "<br>");
+    bcPayload.textInput.setText(String());
+    sendRequest("POST", "/messages", "Content-Type: application/text", newData, 0);
+}
+
+func onKeyUp (widget: ref[TextInput], payload: ref[String], extra: ptr) {
+    prepCastedArg[label, Label, extra];
+    if payload == "Shift+Enter" {
+        def newData: String = widget.getText().replace("\n", "<br>");
+        widget.setText(String());
+        sendRequest("POST", "/messages", "Content-Type: application/text", newData, 0);
+    }
+}
+
+func onTimer (dummy: ref[Void], payload: ref[Json], extra: ptr) {
+  @shared def slot: Slot[Void, Json];
+  slot.fn = onResponse~ptr;
+  slot.extra = extra;
+  sendRequest("GET", "/messages", 0, 0, slot~ptr);  
+}
+
+func onResponse (dummy: ref[Void], payload: ref[Json], extra: ptr) {
+    prepCastedArg[label, Label, extra];
+    def data: String = payload.getObject("eventData").getString("body");
+    label.setText(data);
+}
+
+@uiEndpoint["/about", "WebPlatform Example - Test UI Widgets"]
+func about {
+    def label1: SrdRef[Label] = Label.new(String("مثال الدردشة"));
+    label1.setFontColor(Color(0, 0, 0));
+    label1.setFontSize(30.0);
+
+    def label2: SrdRef[Label] = Label.new(String("طُور باستخدام منصة ويب الأسس"));
+    label2.setFontColor(Color(0, 0, 0));
+    label2.setFontSize(20.0);
+
+    def box: SrdRef[Box] = Box.new({ createHeader(), label1, label2 })
+    box.setPadding(Quad(0, 50));
+    setView(box);
+
+    runEventLoop();
+}
+
+Console.print("Starting server on port 8080...\nURL: http://localhost:8080/\n");
+startServer({ "listening_ports", "8080", "static_file_max_age", "0" });
+
