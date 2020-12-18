@@ -449,6 +449,71 @@
             return r;
         }
     }
+
+    //==========================================================================
+    // Hyperlink
+    type Hyperlink {
+        @injection def widget: Widget;
+        def child: SrdRef[Widget];
+
+        //-----------
+        // Properties
+
+        defProp[url, Url, String];
+
+        //---------
+        // Handlers
+
+        handler this~init(url: String) {
+            this.url = url;
+        }
+
+        function setChild (child: temp_ref[SrdRef[Widget]]) {
+            if this.child.obj~ptr != 0 this.child.unbuild();
+            this.child = child;
+            if this.child.obj~ptr != 0 && this.id.getLength() > 0 this.child.build(this.id);
+        }
+
+        //-------------------
+        // Function Overrides
+
+        function buildImpl (ownerId: String) {
+            this.id = getNewId();
+            createElement("a", this.id, ownerId);
+            this.update();
+
+            if this.child.obj~ptr != 0 this.child.build(this.id);
+        }
+        build = buildImpl~ptr~cast[Widget.build~type];
+
+        function unbuildImpl {
+            if this.id.getLength() > 0 {
+                deleteElement(this.id);
+
+                if this.child.obj~ptr != 0 this.child.unbuild();
+
+                this.id = String();
+            }
+        }
+        unbuild = unbuildImpl~ptr~cast[Widget.unbuild~type];
+
+        function updateImpl {
+            if this.id.getLength() > 0 {
+                setElementAttribute(this.id, "href", this.url);
+            }
+        }
+        update = updateImpl~ptr~cast[Widget.update~type];
+
+        //-----------------
+        // Shared Functions
+
+        @shared function new (url: String, child: temp_ref[SrdRef[Widget]]): SrdRef[Hyperlink] {
+            def r: SrdRef[Hyperlink];
+            r.alloc()~init(url);
+            r.setChild(child);
+            return r;
+        }
+    }
 }
 
 @merge module Srl {
@@ -456,5 +521,6 @@
     WebPlatform.defSrdRefCast[Label];
     WebPlatform.defSrdRefCast[Button];
     WebPlatform.defSrdRefCast[TextInput];
+    WebPlatform.defSrdRefCast[Hyperlink];
 }
 
