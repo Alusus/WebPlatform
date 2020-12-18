@@ -18,7 +18,6 @@
         def build: ptr[function (ownerId: String)];
         def unbuild: ptr[function];
         def update: ptr[function];
-        def onEvent: ptr[function (eventName: String, data: ref[Json])];
     }
 
     //==========================================================================
@@ -216,6 +215,7 @@
     // Button
     type Button {
         @injection def widget: Widget;
+        def eventsSlot: Slot[Void, Json];
 
         //-----------------------
         // Properties and Signals
@@ -236,6 +236,8 @@
             this.fontSize = 10;
             this.textAlign = "right";
             this.textDirection = "rtl";
+            this.eventsSlot.extra = this~ptr;
+            this.eventsSlot.fn = Button.onEvent~ptr;
         }
 
         //-----------------
@@ -244,7 +246,7 @@
         function onSignalConnectionsChanged(signal: ptr[Signal[Button, Int]], connectionCount: Int) {
             if this.id.getLength() > 0 {
                 if signal == this.onClick~ptr {
-                    if connectionCount > 0 registerEventHandler(this.id, "click", this~ptr)
+                    if connectionCount > 0 registerEventHandler(this.id, "click", this.eventsSlot~ptr)
                     else unregisterEventHandler(this.id, "click");
                 }
             }
@@ -257,7 +259,7 @@
             this.id = getNewId();
             createElement("button", this.id, ownerId);
             this.update();
-            if this.onClick.getConnectionCount() > 0 registerEventHandler(this.id, "click", this~ptr);
+            if this.onClick.getConnectionCount() > 0 registerEventHandler(this.id, "click", this.eventsSlot~ptr);
         }
         build = buildImpl~ptr~cast[Widget.build~type];
 
@@ -292,13 +294,15 @@
         }
         update = updateImpl~ptr~cast[Widget.update~type];
 
-        function onEventImpl (eventName: String, data: ref[Json]) {
-            if eventName == "click" this.onClick.emit(Int(0));
-        }
-        onEvent = onEventImpl~ptr~cast[Widget.onEvent~type];
-
         //-----------------
         // Shared Functions
+
+        @shared function onEvent (dummy: ref[Void], payload: ref[Json], extra: ptr) {
+            def button: ref[Button];
+            button~ptr = extra~cast[ptr[Button]];
+            def eventName: String = payload.getString("eventName");
+            if eventName == "click" button.onClick.emit(Int(0));
+        }
 
         @shared function new (t: String): SrdRef[Button] {
             def r: SrdRef[Button];
@@ -312,6 +316,7 @@
     // A multi-line text entry.
     type TextInput {
         @injection def widget: Widget;
+        def eventsSlot: Slot[Void, Json];
 
         //-----------------------
         // Properties and Signals
@@ -334,6 +339,8 @@
             this.fontSize = 10;
             this.textAlign = "right";
             this.textDirection = "rtl";
+            this.eventsSlot.extra = this~ptr;
+            this.eventsSlot.fn = TextInput.onEvent~ptr;
         }
 
         //-----------------
@@ -342,7 +349,7 @@
         function onSignalConnectionsChanged(signal: ptr[Signal[TextInput, Int]], connectionCount: Int) {
             if this.id.getLength() > 0 {
                 if signal == this.onChanged~ptr {
-                    if connectionCount > 0 registerEventHandler(this.id, "change", this~ptr)
+                    if connectionCount > 0 registerEventHandler(this.id, "change", this.eventsSlot~ptr)
                     else unregisterEventHandler(this.id, "change");
                 }
             }
@@ -351,10 +358,10 @@
         function onSignalConnectionsChanged(signal: ptr[Signal[TextInput, String]], connectionCount: Int) {
             if this.id.getLength() > 0 {
                 if signal == this.onKeyPress~ptr {
-                    if connectionCount > 0 registerEventHandler(this.id, "keypress", this~ptr)
+                    if connectionCount > 0 registerEventHandler(this.id, "keypress", this.eventsSlot~ptr)
                     else unregisterEventHandler(this.id, "keypress");
                 } else if signal == this.onKeyUp~ptr {
-                    if connectionCount > 0 registerEventHandler(this.id, "keyup", this~ptr)
+                    if connectionCount > 0 registerEventHandler(this.id, "keyup", this.eventsSlot~ptr)
                     else unregisterEventHandler(this.id, "keyup");
                 }
             }
@@ -375,9 +382,9 @@
             this.id = getNewId();
             createElement("textarea", this.id, ownerId);
             this.update();
-            if this.onChanged.getConnectionCount() > 0 registerEventHandler(this.id, "change", this~ptr);
-            if this.onKeyPress.getConnectionCount() > 0 registerEventHandler(this.id, "keypress", this~ptr);
-            if this.onKeyUp.getConnectionCount() > 0 registerEventHandler(this.id, "keyup", this~ptr);
+            if this.onChanged.getConnectionCount() > 0 registerEventHandler(this.id, "change", this.eventsSlot~ptr);
+            if this.onKeyPress.getConnectionCount() > 0 registerEventHandler(this.id, "keypress", this.eventsSlot~ptr);
+            if this.onKeyUp.getConnectionCount() > 0 registerEventHandler(this.id, "keyup", this.eventsSlot~ptr);
         }
         build = buildImpl~ptr~cast[Widget.build~type];
 
@@ -412,24 +419,29 @@
         }
         update = updateImpl~ptr~cast[Widget.update~type];
 
-        function onEventImpl (eventName: String, data: ref[Json]) {
-            if eventName == "change" this.onChanged.emit(Int(0))
-            else if eventName == "keypress" {
-                def payload: String;
-                if data.getBool("shiftKey") payload += "Shift+";
-                payload += data.getString("code");
-                this.onKeyPress.emit(payload);
-            } else if eventName == "keyup" {
-                def payload: String;
-                if data.getBool("shiftKey") payload += "Shift+";
-                payload += data.getString("code");
-                this.onKeyUp.emit(payload);
-            }
-        }
-        onEvent = onEventImpl~ptr~cast[Widget.onEvent~type];
-
         //-----------------
         // Shared Functions
+
+        @shared function onEvent (dummy: ref[Void], payload: ref[Json], extra: ptr) {
+            def textInput: ref[TextInput];
+            textInput~ptr = extra~cast[ptr[TextInput]];
+            def eventName: String = payload.getString("eventName");
+
+            if eventName == "change" textInput.onChanged.emit(Int(0))
+            else if eventName == "keypress" {
+                def data: Json = payload.getObject("eventData");
+                def outPayload: String;
+                if data.getBool("shiftKey") outPayload += "Shift+";
+                outPayload += data.getString("code");
+                textInput.onKeyPress.emit(outPayload);
+            } else if eventName == "keyup" {
+                def data: Json = payload.getObject("eventData");
+                def outPayload: String;
+                if data.getBool("shiftKey") outPayload += "Shift+";
+                outPayload += data.getString("code");
+                textInput.onKeyUp.emit(outPayload);
+            }
+        }
 
         @shared function new (): SrdRef[TextInput] {
             def r: SrdRef[TextInput];

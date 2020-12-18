@@ -4,8 +4,16 @@
     @expname[setElementAttribute] function setElementAttribute (name: ptr[Char], prop: ptr[Char], value: ptr[Char]);
     @expname[getElementAttribute] function getElementAttribute (name: ptr[Char], prop: ptr[Char]): ptr[array[Char]];
     @expname[fetchNextEvent] function fetchNextEvent (): ptr[array[Char]];
-    @expname[registerEventHandler] function registerEventHandler (elementName: ptr[Char], eventName: ptr[Char], elementPtr: ptr);
+    @expname[registerEventHandler] function registerEventHandler (
+      elementName: ptr[Char], eventName: ptr[Char], slotPtr: ptr[Slot[Void, Json]]
+    );
     @expname[unregisterEventHandler] function unregisterEventHandler (elementName: ptr[Char], eventName: ptr[Char]);
     @expname[waitForEvent] function waitForEvent;
+    @expname[sendRequest] function sendRequest (
+        method: ptr[Char], uri: ptr[Char], headers: ptr[Char], body: ptr[Char], slotPtr: ptr[Slot[Void, Json]]
+    );
+    @expname[startTimer] function startTimer (duration: Word, slotPtr: ptr[Slot[Void, Json]]): Word;
+    @expname[stopTimer] function stopTimer (id: Word);
+    @expname[setTimeout] function setTimeout (duration: Word, slotPtr: ptr[Slot[Void, Json]]);
 }
 

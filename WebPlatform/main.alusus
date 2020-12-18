@@ -4,9 +4,9 @@
             def jsonStr: ptr[array[Char]] = fetchNextEvent();
             if jsonStr == 0 break;
             def json: Json(jsonStr);
-            def widget: ref[Widget];
-            widget~ptr = json.getInt("elementPtr")~cast[ptr[Widget]];
-            widget.onEvent(json.getString("eventName"), json.getObject("eventData"));
+            def slot: ref[Slot[Void, Json]];
+            slot~ptr = json.getInt("slotPtr")~cast[ptr[Slot[Void, Json]]];
+            if slot~ptr != 0 slot.fn(nullRef[Void], json, slot.extra);
         }
     }
     

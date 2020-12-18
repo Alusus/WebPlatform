@@ -46,8 +46,8 @@
     // Slot
     // Represent a single subscription to an event. It contains extra data in
     // addition to the function pointer.
-    type Slot [widgetType: type, payloadType: type] {
-        def FnPtr: alias ptr[@shared @no_bind function (widget: ref[widgetType], payload: ref[payloadType], extra: ptr)];
+    type Slot [ownerType: type, payloadType: type] {
+        def FnPtr: alias ptr[@shared @no_bind function (owner: ref[ownerType], payload: ref[payloadType], extra: ptr)];
         def fn: FnPtr;
         def extra: ptr;
     }

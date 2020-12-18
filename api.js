@@ -47,11 +47,11 @@ wasmApi.fetchNextEvent = () => {
     return toWasmString(result);
 }
 
-wasmApi.registerEventHandler = (elementName, eventName, elementPtr) => {
+wasmApi.registerEventHandler = (elementName, eventName, slotPtr) => {
     const jsElementName = toJsString(elementName);
     const jsEventName = toJsString(eventName);
     document.getElementById(jsElementName)[`on${jsEventName}`] = (event) => {
-      onEvent(elementPtr, jsEventName, event);
+      onEvent(slotPtr, jsEventName, event);
     };
 }
 
@@ -102,8 +102,53 @@ wasmApi.waitForEvent = () => {
   }
 }
 
+wasmApi.sendRequest = (method, uri, headers, body, slotPtr) => {
+  const controller = new AbortController();
+  const signal = controller.signal;
+  // 10 seconds timeout.
+  const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+  fetch(toJsString(uri), {
+    method: toJsString(method),
+    headers: (toJsString(headers) || "").split('\n').reduce((result, header) => {
+      header = header.trim();
+      if (header == '') return result;
+      const pair = header.split(':');
+      if (pair.length != 2) return result;
+      return { ...result, [pair[0].trim()]: pair[1].trim() };
+    }, {}),
+    body: toJsString(body),
+    signal
+  }).then(response => {
+    return response.text().then(bodyText => {
+      clearTimeout(timeoutId);
+      onEvent(slotPtr, 'sendRequest', {
+        status: response.staus,
+        headers: Object.fromEntries(response.headers.entries()),
+        body: bodyText
+      });
+    });
+  });
+}
+
+wasmApi.startTimer = (duration, slotPtr) => {
+  return setInterval(() => {
+    onEvent(slotPtr, 'timer', {});
+  }, duration/1000);
+}
+
+wasmApi.stopTimer = (id) => {
+  clearInterval(id);
+}
+
+wasmApi.setTimeout = (duration, slotPtr) => {
+  setTimeout(() => {
+    onEvent(slotPtr, 'timer', {});
+  }, duration/1000);
+}
+
 function stringifyEvent(event) {
-  const obj = { elementPtr: event.elementPtr, eventName: event.eventName, eventData: {} };
+  const obj = { slotPtr: event.slotPtr, eventName: event.eventName, eventData: {} };
   for (let k in event.eventData) {
     obj.eventData[k] = event.eventData[k];
   }
@@ -114,8 +159,8 @@ function stringifyEvent(event) {
   }, ' ');
 }
 
-function onEvent (elementPtr, eventName, event) {
-  eventsQueue.push({ elementPtr, eventName, eventData: event });
+function onEvent (slotPtr, eventName, event) {
+  eventsQueue.push({ slotPtr, eventName, eventData: event });
 
   // Unblock wasm if it's waiting for events.
   if (eventWaiting) {
@@ -127,6 +172,7 @@ function onEvent (elementPtr, eventName, event) {
 }
 
 function toJsString(strPtr) {
+  if (strPtr == 0) return null;
   let view = new Uint8Array(wasmMemory.buffer, strPtr);
   const nul = view.indexOf(0);
   if (nul !== -1) view = view.subarray(0, nul);
@@ -134,6 +180,7 @@ function toJsString(strPtr) {
 }
 
 function toWasmString(str) {
+  if (str === null || str === undefined) return 0;
   const encoder = new TextEncoder();
   const buffer = encoder.encode(str);
   wasmStrPtr = program.instance.exports.realloc(wasmStrPtr, buffer.length + 1);
