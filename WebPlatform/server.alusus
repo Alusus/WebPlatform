@@ -58,6 +58,35 @@
         uiEndpoints.add(UiEndpoint(uri, wasmFilename, title));
     }
 
+    func addBeEndpoints (parent: ref[Core.Basic.TiObject]) {
+        def elements: Array[ref[Core.Basic.TiObject]] = Spp.astMgr.findElements(
+            ast { modifier == "beEndpoint" },
+            parent,
+            Spp.SeekerFlags.SKIP_OWNERS | Spp.SeekerFlags.SKIP_USES | Spp.SeekerFlags.SKIP_CHILDREN
+        );
+        def i: Int;
+        for i = 0, i < elements.getLength(), ++i {
+            def modifier: ref[Core.Basic.TiObject](Spp.astMgr.findModifierForElement(elements(i), "beEndpoint"));
+            def endpointParams: Array[String];
+            if !Spp.astMgr.getModifierStringParams(modifier, endpointParams)
+                || endpointParams.getLength() < 2 {
+                System.fail(1, "Invalid BE endpoint params");
+            }
+            Spp.astMgr.insertAst(
+                ast {
+                    if String.isEqual(method, "{{endpointMethod}}") && String.isEqual(uri, "{{endpointUri}}" ) {
+                        __funcName__(connection);
+                        return 1;
+                    }
+                },
+                Srl.Map[Srl.String, ref[Core.Basic.TiObject]]()
+                    .set(Srl.String("endpointMethod"), Core.Basic.TiStr(endpointParams(0)))
+                    .set(Srl.String("endpointUri"), Core.Basic.TiStr(endpointParams(1)))
+                    .set(Srl.String("funcName"), Core.Basic.TiStr(getElementName(elements(i))))
+            );
+        }
+    }
+
     func startServer(optsCount: Int, opts: ...CharsPtr) {
         addUiEndpoints(Root~ast);
         if uiEndpoints.getLength() == 0 {
@@ -78,8 +107,9 @@
     func callbackRequest(connection: ptr[Http.Connection]): Int {
         def requestInfo: ptr[Http.RequestInfo] = Http.getRequestInfo(connection);
         def uri: ptr[array[Char]] = requestInfo~cnt.requestUri;
+        def method: ptr[array[Char]] = requestInfo~cnt.requestMethod;
 
-        if String.isEqual(requestInfo~cnt.requestMethod, "GET") {
+        if String.isEqual(method, "GET") {
             if String.isEqual(uri, "/api.js") {
                 Http.sendFile(connection, webPlatformPath + "/api.js");
                 return 1;
@@ -96,6 +126,8 @@
                 }
             }
         }
+
+        eval { addBeEndpoints(Root~ast) };
 
         def content: array[Char, 1024];
         String.assign(content~ptr, "<h1>404 - Not Found</h1><p> you are in \"%s\"", requestInfo~cnt.localUri);
