@@ -1,6 +1,6 @@
 import "Apm";
-Apm.importFile("Alusus/WebPlatform");
-
+// Apm.importFile("Alusus/WebPlatform");
+import "../WebPlatform"
 use Srl;
 use WebPlatform;
 
@@ -22,44 +22,57 @@ func postMessages (conn: ptr[Http.Connection]) {
 func getMessages (conn: ptr[Http.Connection]) {
     Http.print(conn, "HTTP/1.1 200 Ok\r\n");
     Http.print(conn, "Content-Type: text/plain\r\n");
+    Http.print(conn, "Cache-Control: no-cache\r\n");
     Http.print(conn, "Content-Length: %d\r\n\r\n", messages.getLength());
     Http.print(conn, messages.buf);
 }
 
 //==============================================================================
 // Frontend
+def PrimeryColor: Color  = Color("8e50ef");
+def LightColor: Color = Color("c380ff");
+def DarkColor: Color = Color("5820bb");
+
+func isTheColorAvilable() {
+    Console.print("PrimeryColor RGB: %d, %d, %d\n", PrimeryColor.red, PrimeryColor.green, PrimeryColor.blue);
+    Console.print("LightColor RGB: %d, %d, %d\n", LightColor.red, LightColor.green, LightColor.blue);
+    Console.print("DarkColor RGB: %d, %d, %d\n", DarkColor.red, DarkColor.green, LightColor.blue);
+}
 
 func createHeader (): SrdRef[Widget] {
+    setElementAttribute("body", "style", "padding: 0; margin: 0;");
     def label: SrdRef[Label] = Label.new(String("أمثلة منصة ويب الأسس - الدردشة"));
-    label.setFontColor(Color(255, 255, 255));
-    label.setFontSize(30.0);
+    label.setFontColor(Color("fff"));
+    label.setFontSize(21.0);
     label.setWidth(String("100%"));
     label.setHeight(String("100%"));
-    label.setBackgroundColor(Color(0, 70, 100));
+    label.setBackgroundColor(PrimeryColor);
 
     def mainLinkLabel: SrdRef[Label] = Label.new(String("الرئيسية"));
     mainLinkLabel.setFontSize(16.0);
-    mainLinkLabel.setFontColor(Color(255, 255, 255));
-    mainLinkLabel.setBackgroundColor(Color(0, 70, 100));
+    mainLinkLabel.setFontColor(Color("fff"));
+    mainLinkLabel.setPadding(Quad(3));
+    mainLinkLabel.setBackgroundColor(LightColor);
     def aboutLinkLabel: SrdRef[Label] = Label.new(String("عن البرنامج"));
     aboutLinkLabel.setFontSize(16.0);
-    aboutLinkLabel.setFontColor(Color(255, 255, 255));
-    aboutLinkLabel.setBackgroundColor(Color(0, 70, 100));
+    aboutLinkLabel.setFontColor(Color("fff"));
+    aboutLinkLabel.setPadding(Quad(3));
+    aboutLinkLabel.setBackgroundColor(LightColor);
 
     def menuBox: SrdRef[Box] = Box.new({
         Hyperlink.new(String("/"), mainLinkLabel),
         Hyperlink.new(String("/about"), aboutLinkLabel)
     });
-    menuBox.setWidth(String("200pt"));
     menuBox.setLayout(String("row"));
-    menuBox.setBackgroundColor(Color(0, 70, 100));
+    menuBox.setJustify(String("space-between"));
+    menuBox.setBackgroundColor(PrimeryColor);
 
     def box: SrdRef[Box] = Box.new({ label, menuBox });
     box.setWidth(String("100%"));
     box.setHeight(String("80pt"));
-    box.setPadding(Quad(5));
-    box.setBackgroundColor(Color(0, 70, 100));
-    box.setBorderColor(Color(0, 70, 100));
+    box.setPadding(Quad(5, 0));
+    box.setBackgroundColor(PrimeryColor);
+    box.setBorderColor(PrimeryColor);
     box.setBorder(Quad(1.5));
 
     return box~cast[SrdRef[Widget]];
@@ -92,21 +105,22 @@ func main {
     def displayBox: SrdRef[Box] = Box.new({ label });
     displayBox.setWidth(String("100%"));
     displayBox.setHeight(String("100%"));
-    displayBox.setBorder(Quad(1.5));
+    displayBox.setBorder(Quad(1));
     displayBox.setBorderColor(Color(0, 0, 0));
-    displayBox.setPadding(Quad(5));
+    // displayBox.setPadding(Quad(5));
 
     def inputBox: SrdRef[Box] = Box.new({ textInput, button });
     inputBox.setWidth(String("100%"));
     inputBox.setHeight(String("50pt"));
     inputBox.setLayout(String("row"));
     inputBox.setBorder(Quad(1.5));
-    inputBox.setBorderColor(Color(0, 0, 0));
-    inputBox.setPadding(Quad(5));
+    inputBox.setBorderColor(PrimeryColor);
+    inputBox.setBackgroundColor(PrimeryColor);
+    // inputBox.setPadding(Quad(5));
 
     def box: SrdRef[Box] = Box.new({ createHeader(), displayBox, inputBox });
     box.setHeight(String("100%"));
-    box.setPadding(Quad(0, 50));
+    // box.setPadding(Quad(0, 50));
 
     setView(box);
 
@@ -148,7 +162,7 @@ func onTimer (dummy: ref[Void], payload: ref[Json], extra: ptr) {
   @shared def slot: Slot[Void, Json];
   slot.fn = onResponse~ptr;
   slot.extra = extra;
-  sendRequest("GET", "/messages", 0, 0, slot~ptr);  
+  sendRequest("GET", "/messages", null, null, slot~ptr);  
 }
 
 func onResponse (dummy: ref[Void], payload: ref[Json], extra: ptr) {
@@ -168,12 +182,11 @@ func about {
     label2.setFontSize(20.0);
 
     def box: SrdRef[Box] = Box.new({ createHeader(), label1, label2 })
-    box.setPadding(Quad(0, 50));
+    // box.setPadding(Quad(0, 50));
     setView(box);
 
     runEventLoop();
 }
 
-Console.print("Starting server on port 8080...\nURL: http://localhost:8080/\n");
-startServer({ "listening_ports", "8080", "static_file_max_age", "0" });
-
+Console.print("Starting server on port 8010...\nURL: http://localhost:8010/\n");
+startServer({ "listening_ports", "8010", "static_file_max_age", "0" });

@@ -1,0 +1,5 @@
+import "Srl/Console";
+
+use Srl;
+
+Console.print("%d\n", (conv('f')) * 16);

@@ -7,9 +7,9 @@
         def owner: ref[Widget];
 
         // Styles
-        defProp[width, Width, String];
-        defProp[height, Height, String];
-        defProp[backgroundColor, BackgroundColor, Color];
+        generateProperty[width, Width, String];
+        generateProperty[height, Height, String];
+        generateProperty[backgroundColor, BackgroundColor, Color];
 
         handler this~init() {
             this.backgroundColor~init(255, 255, 255);
@@ -30,11 +30,12 @@
         //-----------
         // Properties
 
-        defProp[padding, Padding, Quad];
-        defProp[border, Border, Quad];
-        defProp[borderColor, BorderColor, Color];
-        defProp[layout, Layout, String];
-        defProp[direction, Direction, String];
+        generateProperty[padding, Padding, Quad];
+        generateProperty[border, Border, Quad];
+        generateProperty[borderColor, BorderColor, Color];
+        generateProperty[layout, Layout, String];
+        generateProperty[justify, Justify, String];
+        generateProperty[direction, Direction, String];
 
         //---------
         // Handlers
@@ -42,6 +43,7 @@
         handler this~init() {
             this.borderColor~init(255, 255, 255);
             this.layout = "column";
+            this.justify = "space-around";
             this.direction = "rtl";
         }
 
@@ -108,14 +110,14 @@
                         "border-width:%fpt %fpt %fpt %fpt;"
                         "border-color:rgb(%i, %i, %i);"
                         "background-color:rgb(%i, %i, %i);"
-                        "display:flex;flex-direction:%s;justify-content:space-around;"
+                        "display:flex;flex-direction:%s;justify-content: %s;"
                         "direction:%s;",
                         this.width.buf, this.height.buf,
                         this.padding.top, this.padding.right, this.padding.bottom, this.padding.left,
                         this.border.top, this.border.right, this.border.bottom, this.border.left,
                         this.borderColor.red, this.borderColor.green, this.borderColor.blue,
                         this.backgroundColor.red, this.backgroundColor.green, this.backgroundColor.blue,
-                        this.layout.buf,
+                        this.layout.buf, this.justify.buf,
                         this.direction.buf
                     )
                 );
@@ -141,12 +143,12 @@
 
         //-----------
         // Properties
-
-        defProp[text, Text, String];
-        defProp[fontSize, FontSize, Float];
-        defProp[fontColor, FontColor, Color];
-        defProp[textAlign, TextAlign, String];
-        defProp[textDirection, TextDirection, String];
+        generateProperty[padding, Padding, Quad];
+        generateProperty[text, Text, String];
+        generateProperty[fontSize, FontSize, Float];
+        generateProperty[fontColor, FontColor, Color];
+        generateProperty[textAlign, TextAlign, String];
+        generateProperty[textDirection, TextDirection, String];
 
         //----------
         // Handleres
@@ -188,12 +190,14 @@
                         "color:rgb(%i, %i, %i);"
                         "font-size:%fpt;"
                         "text-align:%s;"
+                        "padding:%fpt %fpt %fpt %fpt;"
                         "direction:%s",
                         this.width.buf, this.height.buf,
                         this.backgroundColor.red, this.backgroundColor.green, this.backgroundColor.blue,
                         this.fontColor.red, this.fontColor.green, this.fontColor.blue,
                         this.fontSize,
                         this.textAlign.buf,
+                        this.padding.top, this.padding.right, this.padding.bottom, this.padding.left,
                         this.textDirection.buf
                     )
                 );
@@ -220,11 +224,11 @@
         //-----------------------
         // Properties and Signals
 
-        defProp[text, Text, String];
-        defProp[fontSize, FontSize, Float];
-        defProp[fontColor, FontColor, Color];
-        defProp[textAlign, TextAlign, String];
-        defProp[textDirection, TextDirection, String];
+        generateProperty[text, Text, String];
+        generateProperty[fontSize, FontSize, Float];
+        generateProperty[fontColor, FontColor, Color];
+        generateProperty[textAlign, TextAlign, String];
+        generateProperty[textDirection, TextDirection, String];
         def onClick: Signal[Button, Int];
 
         //---------
@@ -321,10 +325,10 @@
         //-----------------------
         // Properties and Signals
 
-        defProp[fontSize, FontSize, Float];
-        defProp[fontColor, FontColor, Color];
-        defProp[textAlign, TextAlign, String];
-        defProp[textDirection, TextDirection, String];
+        generateProperty[fontSize, FontSize, Float];
+        generateProperty[fontColor, FontColor, Color];
+        generateProperty[textAlign, TextAlign, String];
+        generateProperty[textDirection, TextDirection, String];
         def onChanged: Signal[TextInput, Int];
         def onKeyPress: Signal[TextInput, String];
         def onKeyUp: Signal[TextInput, String];
@@ -459,7 +463,7 @@
         //-----------
         // Properties
 
-        defProp[url, Url, String];
+        generateProperty[url, Url, String];
 
         //---------
         // Handlers
@@ -500,6 +504,7 @@
         function updateImpl {
             if this.id.getLength() > 0 {
                 setElementAttribute(this.id, "href", this.url);
+                setElementAttribute(this.id, "style", "text-decoration: none;");
             }
         }
         update = updateImpl~ptr~cast[Widget.update~type];
