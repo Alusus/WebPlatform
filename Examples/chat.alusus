@@ -29,9 +29,10 @@ func getMessages (conn: ptr[Http.Connection]) {
 
 //==============================================================================
 // Frontend
-def PrimeryColor: Color  = Color("8e50ef");
-def LightColor: Color = Color("c380ff");
-def DarkColor: Color = Color("5820bb");
+
+def PrimeryColor: Color("8e50ef");
+def LightColor: Color("c380ff");
+def DarkColor: Color("5820bb");
 
 func isTheColorAvilable() {
     Console.print("PrimeryColor RGB: %d, %d, %d\n", PrimeryColor.red, PrimeryColor.green, PrimeryColor.blue);
@@ -162,13 +163,15 @@ func onTimer (dummy: ref[Void], payload: ref[Json], extra: ptr) {
   @shared def slot: Slot[Void, Json];
   slot.fn = onResponse~ptr;
   slot.extra = extra;
-  sendRequest("GET", "/messages", null, null, slot~ptr);  
+  sendRequest("GET", "/messages", null, null, slot~ptr);
 }
 
 func onResponse (dummy: ref[Void], payload: ref[Json], extra: ptr) {
     prepCastedArg[label, Label, extra];
     def data: String = payload.getObject("eventData").getString("body");
-    label.setText(data);
+    if label.getText() != data {
+        label.setText(data);
+    }
 }
 
 @uiEndpoint["/about", "WebPlatform Example - Test UI Widgets"]

@@ -202,6 +202,12 @@ async function start(moduleName) {
 
   asyncifyDataPtr = program.instance.exports.malloc(STACK_SIZE + 8);
 
+  // Call global constructors.
+  const programConstructors=Object.keys(program.instance.exports).filter(name => name.match(/^__constructor__/));
+  programConstructors.forEach(name => {
+    program.instance.exports[name]()
+  });
+
   program.instance.exports.wasmStart();
   program.instance.exports.asyncify_stop_unwind();
 }
