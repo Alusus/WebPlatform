@@ -87,18 +87,29 @@
         }
     }
 
-    func startServer(optsCount: Int, opts: ...CharsPtr) {
+    func startServer(options: ref[Array[CharsPtr]]): ptr[Http.Context] {
         addUiEndpoints(Root~ast);
         if uiEndpoints.getLength() == 0 {
             System.fail(1, "No UI endpoints found\n");
         }
         htmlTemplate = Fs.readFile(webPlatformPath + "/wasm.html");
 
-        def options: Array[CharsPtr];
-        while optsCount-- > 0 options.add(opts~next_arg[CharsPtr]);
         options.add(0);
 
-        def context: ptr[Http.Context] = Http.createServer(callbackRequest~ptr, options);
+        return Http.createServer(callbackRequest~ptr, options);
+    }
+
+    func startServer(optsCount: Int, opts: ...CharsPtr): ptr[Http.Context] {
+        def options: Array[CharsPtr];
+        while optsCount-- > 0 options.add(opts~next_arg[CharsPtr]);
+        return startServer(options);
+    }
+
+    func runServer(optsCount: Int, opts: ...CharsPtr) {
+        def options: Array[CharsPtr];
+        while optsCount-- > 0 options.add(opts~next_arg[CharsPtr]);
+
+        def context: ptr[Http.Context] = startServer(options);
         Console.print("Server started.\npress enter to close server: ");
         Console.getChar(); // stop proccess here waiting user to press enter
         Http.closeServer(context); // stop the server
