@@ -138,7 +138,7 @@
             }
         }
 
-        eval { addBeEndpoints(Root~ast) };
+        preprocess { addBeEndpoints(Root~ast) };
 
         def content: array[Char, 1024];
         String.assign(content~ptr, "<h1>404 - Not Found</h1><p> you are in \"%s\"", requestInfo~cnt.localUri);
