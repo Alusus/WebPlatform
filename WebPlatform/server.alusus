@@ -19,7 +19,7 @@
     func getElementName (obj: ref[Core.Basic.TiObject]): String {
         def node: ref[Core.Data.Node](castRef[obj, Core.Data.Node]);
         def d: ref[Core.Data.Ast.Definition](castRef[node.owner, Core.Data.Ast.Definition]);
-        def binding: ref[Core.Data.Binding](Core.Basic.getInterface[d, Core.Data.Binding]);
+        def binding: ref[Core.Basic.Binding](Core.Basic.getInterface[d, Core.Basic.Binding]);
         def name: ref[Core.Basic.TiStr](castRef[binding.getMember("name"), Core.Basic.TiStr]);
         return name.value;
     }
@@ -43,7 +43,7 @@
     }
 
     func addUiEndpoint (fn: ref[Core.Basic.TiObject], uri: String, title: String) {
-        def binding: ref[Core.Data.Binding](Core.Basic.getInterface[fn, Core.Data.Binding]);
+        def binding: ref[Core.Basic.Binding](Core.Basic.getInterface[fn, Core.Basic.Binding]);
         binding.setMember("name", Core.Basic.TiStr("wasmStart"));
         def wasm: Build.Wasm(fn, "/tmp/endpoint.wasm");
         wasm.addDependency(webPlatformPath + String("/stdlib-min.wasm"));
