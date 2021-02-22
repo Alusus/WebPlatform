@@ -54,7 +54,7 @@
                 if this.id.getLength() > 0 child.build(this.id);
             }
         }
-        
+
         function removeChildren (count: Int, children: ...temp_ref[SrdRef[Widget]]) {
             while count-- > 0 {
                 def child: ref[SrdRef[Widget]](children~next_arg[ref[SrdRef[Widget]]]);
@@ -151,7 +151,7 @@
         generateProperty[textDirection, TextDirection, String];
 
         //----------
-        // Handleres
+        // Handlers
 
         handler this~init(t: String) {
             this.text = t;
