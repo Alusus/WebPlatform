@@ -84,6 +84,43 @@ wasmApi.usleep = (ms) => {
     sleeping = false;
   }
 }
+wasmApi.drawLine = ( name, x1, y1, x2, y2 )=>{
+var c = document.getElementById(toJsString(name));
+var ctx = c.getContext("2d");
+ctx.beginPath();
+ctx.moveTo(x1, y1);
+ctx.lineTo(x2, y2);
+ctx.stroke(); 
+}
+wasmApi.drawTriangle = (name, x1, y1, x2, y2 )=>{
+var triangle = document.getElementById(toJsString(name));
+var ctx = triangle.getContext("2d");
+ctx.beginPath();
+ctx.moveTo(x1, y1);
+ctx.lineTO(x2, y2);
+ctx.lineTO(x2, y2);
+ctx.lineTO(x2, y2);
+ctx.stroke();
+}
+wasmApi.drawPolygonal = (name, x1, y1, x2, y2, )=>{
+var polygonal = document.getElementById(toJsString(name));
+var ctx = polygonal.getContext("2d");
+ctx.beginPath();
+ctx.moveTo(x1, y1);
+ctx.lineTO(x2, y2);
+ctx.lineTO(x2, y2);
+ctx.lineTO(x2, y2);
+ctx.lineTo(x2, y2);
+ctx,stroke();
+}
+wasmApi.drawCircle = (name, x1, y1, x2, y2 )=>{
+var circle = document.getElementById(toJsString(name));
+var ctx = circle.getContext("2d");
+ctx.beginPath(); 
+ctx.arc(x1, y1, x2, 0, 2  *Math.PI);
+ctx.stroke();
+}
+
 
 wasmApi.waitForEvent = () => {
   const view = new Int32Array(wasmMemory.buffer, asyncifyDataPtr);
@@ -146,6 +183,8 @@ wasmApi.setTimeout = (duration, slotPtr) => {
     onEvent(slotPtr, 'timer', {});
   }, duration/1000);
 }
+
+
 
 function stringifyEvent(event) {
   const obj = { slotPtr: event.slotPtr, eventName: event.eventName, eventData: {} };

@@ -15,5 +15,9 @@
     @expname[startTimer] function startTimer (duration: Word, slotPtr: ptr[Slot[Void, Json]]): Word;
     @expname[stopTimer] function stopTimer (id: Word);
     @expname[setTimeout] function setTimeout (duration: Word, slotPtr: ptr[Slot[Void, Json]]);
+    @expname[drawLine] function drawLine (name: ptr[char], x1:int, y1:int, x2:int, y2:int);
+    @expname[drawTriangle] function drawTriangle (name: ptr[char], x1:int, y1:int, x2:int, y2:int);
+    @expname[drawPolygonal] function drawPolygonal (name: ptr[char], x1:int, y1:int, x2:int, y2:int);
+    @expname[drawCircle] function drawCircle (name: ptr[char], x1:int, y1:int, x2:int, y2:int);
 }
 
