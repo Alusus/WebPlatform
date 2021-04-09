@@ -97,21 +97,20 @@ var triangle = document.getElementById(toJsString(name));
 var ctx = triangle.getContext("2d");
 ctx.beginPath();
 ctx.moveTo(x1, y1);
-ctx.lineTO(x2, y2);
-ctx.lineTO(x2, y2);
-ctx.lineTO(x2, y2);
+ctx.lineTo(x2, y2);
+ctx.lineTo(x2, y2);
+ctx.lineTo(x2, y2);
 ctx.stroke();
 }
-wasmApi.drawPolygonal = (name, x1, y1, x2, y2, )=>{
+wasmApi.drawPolygonal = (name, pointCount, points )=>{
 var polygonal = document.getElementById(toJsString(name));
-var ctx = polygonal.getContext("2d");
-ctx.beginPath();
-ctx.moveTo(x1, y1);
-ctx.lineTO(x2, y2);
-ctx.lineTO(x2, y2);
-ctx.lineTO(x2, y2);
-ctx.lineTo(x2, y2);
-ctx,stroke();
+var pol = (math.PI * 2)\pointCount;
+for ( var i = 1; i< pointCount; i++){
+ctx.lineTo(points*Math.coc(a*i),points*Math.sin(a*i));
+}
+
+ctx.closePath().
+
 }
 wasmApi.drawCircle = (name, x1, y1, x2, y2 )=>{
 var circle = document.getElementById(toJsString(name));
@@ -120,7 +119,22 @@ ctx.beginPath();
 ctx.arc(x1, y1, x2, 0, 2  *Math.PI);
 ctx.stroke();
 }
+wasmApi.addcolors = (name,  x1, y1 )=>{
+var canvas = document.getElementById('');
+var ctx = canvas.Context("2d");
+var my_gradient = ctx.createLiearGraient(x1, y1);
+my_gradient.addColorStop(x1,"");
+my_gradient.addColorStop(y1,"");
+ctx.fillStyle = my_gradient;
+ctx.fillRect(x1, y1, x2, y2);
+}
 
+
+wasmApi.font = (value)=>{
+var str = "";
+var Size = str.fontsize(value);
+console.log(Size);
+}
 
 wasmApi.waitForEvent = () => {
   const view = new Int32Array(wasmMemory.buffer, asyncifyDataPtr);
