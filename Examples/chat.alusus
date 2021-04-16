@@ -182,13 +182,19 @@ func about {
     def label2: SrdRef[Label] = Label.new(String("طُور باستخدام منصة ويب الأسس"));
     label2.setFontColor(Color(0, 0, 0));
     label2.setFontSize(20.0);
-
-    def box: SrdRef[Box] = Box.new({ createHeader(), label1, label2 })
+    def canvas: SrdRef[Canvas] = Canvas.new({ })
+    def box: SrdRef[Box] = Box.new({ createHeader(), canvas ,label1, label2 })
     // box.setPadding(Quad(0, 50));
     setView(box);
-
+    drawLine(canvas.id, 0,0, 100,100);
+    drawCircle(canvas.id, 100,180, 90,0 );
+    def points: Array [Int]({50, 50, 100, 50, 100, 100, 50, 100,25,75});
+    setFillStyle(canvas.id , "black", "blue", 0,0 , 100,100   );
+    drawPolygon(canvas.id, 5, points.buf);
+    drawText(canvas.id, "HI", "30px Arial" ,  50,50);
     runEventLoop();
 }
+
 
 Console.print("Starting server on port 8010...\nURL: http://localhost:8010/\n");
 runServer({ "listening_ports", "8010", "static_file_max_age", "0" });
