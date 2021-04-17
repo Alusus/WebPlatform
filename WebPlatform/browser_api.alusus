@@ -15,10 +15,12 @@
     @expname[startTimer] function startTimer (duration: Word, slotPtr: ptr[Slot[Void, Json]]): Word;
     @expname[stopTimer] function stopTimer (id: Word);
     @expname[setTimeout] function setTimeout (duration: Word, slotPtr: ptr[Slot[Void, Json]]);
-    @expname[drawLine] function drawLine (name: ptr[char], x1:int, y1:int, x2:int, y2:int);
-    @expname[drawPolygon] function drawPolygon (name: ptr[char], pointCount: int, points: ref[array[int]]);
-    @expname[drawCircle] function drawCircle (name: ptr[char], x1:int, y1:int, x2:int, y2:int);
-    @expname[setFillStyle] function setFillStyle (name: ptr[char],c1:ptr[char], c2:ptr[char], x1:int, y1:int , x2:int, y2:int  );
-    @expname[drawText] function drawText (name: ptr[char], text:  ptr[char], font:  ptr[char], x:int , y:int );
-    
-    }
+    @expname[drawLine] function drawLine (name: ptr[Char], x1: Int, y1: Int, x2: Int, y2: Int);
+    @expname[drawPolygon] function drawPolygon (name: ptr[Char], pointCount: Int, points: ref[array[Int]]);
+    @expname[drawCircle] function drawCircle (name: ptr[Char], x1: Int, y1: Int, x2: Int, y2: Int);
+    @expname[setFillStyle] function setFillStyle (
+        name: ptr[Char],c1:ptr[Char], c2:ptr[Char], x1: Int, y1: Int, x2: Int, y2: Int
+    );
+    @expname[drawText] function drawText (name: ptr[Char], text: ptr[Char], font: ptr[Char], x: Int, y: Int);
+}
+

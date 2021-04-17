@@ -188,10 +188,10 @@ func about {
     setView(box);
     drawLine(canvas.id, 0,0, 100,100);
     drawCircle(canvas.id, 100,180, 90,0 );
-    def points: Array [Int]({50, 50, 100, 50, 100, 100, 50, 100,25,75});
-    setFillStyle(canvas.id , "black", "blue", 0,0 , 100,100   );
+    def points: Array [Int]({ 50, 50, 100, 50, 100, 100, 50, 100, 25, 75 });
+    setFillStyle(canvas.id , "black", "blue", 0, 0, 100, 100);
     drawPolygon(canvas.id, 5, points.buf);
-    drawText(canvas.id, "HI", "30px Arial" ,  50,50);
+    drawText(canvas.id, "HI", "30px Arial", 50, 50);
     runEventLoop();
 }
 

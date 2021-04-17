@@ -135,12 +135,10 @@
             return r;
         }
     }
-//=------------------------------------------------------------------------------
 
-
-
-// canvas
-    // A rectangular area that contains other widgets.
+    //==========================================================================
+    // Canvas
+    // A free form drawing area.
     type Canvas {
         @injection def widget: Widget;
         def children: Array[SrdRef[Widget]];
@@ -253,10 +251,6 @@
             return r;
         }
     }
-
-    
-
-
 
     //==========================================================================
     // Label
