@@ -135,6 +135,128 @@
             return r;
         }
     }
+//=------------------------------------------------------------------------------
+
+
+
+// canvas
+    // A rectangular area that contains other widgets.
+    type Canvas {
+        @injection def widget: Widget;
+        def children: Array[SrdRef[Widget]];
+
+        //-----------
+        // Properties
+
+        generateProperty[padding, Padding, Quad];
+        generateProperty[border, Border, Quad];
+        generateProperty[borderColor, BorderColor, Color];
+        generateProperty[layout, Layout, String];
+        generateProperty[justify, Justify, String];
+        generateProperty[direction, Direction, String];
+
+        //---------
+        // Handlers
+
+        handler this~init() {
+            this.borderColor~init(255, 255, 255);
+            this.layout = "column";
+            this.justify = "space-around";
+            this.direction = "rtl";
+        }
+
+        function addChildren (count: Int, children: ...temp_ref[SrdRef[Widget]]) {
+            while count-- > 0 {
+                def child: ref[SrdRef[Widget]](children~next_arg[ref[SrdRef[Widget]]]);
+                this.children.add(child);
+                if this.id.getLength() > 0 child.build(this.id);
+            }
+        }
+
+        function removeChildren (count: Int, children: ...temp_ref[SrdRef[Widget]]) {
+            while count-- > 0 {
+                def child: ref[SrdRef[Widget]](children~next_arg[ref[SrdRef[Widget]]]);
+                def i: Int;
+                for i = 0, i < this.children.getLength(), ++i {
+                    if this.children(i).obj~ptr == child.obj~ptr {
+                        child.unbuild();
+                        this.children.remove(i);
+                        return;
+                    }
+                }
+            }
+        }
+
+        //-------------------
+        // Function Overrides
+
+        function buildImpl (ownerId: String) {
+            this.id = getNewId();
+            createElement("canvas", this.id, ownerId);
+            this.update();
+
+            def i: Int;
+            for i = 0, i < this.children.getLength(), ++i {
+                this.children(i).build(this.id);
+            }
+        }
+        build = buildImpl~ptr~cast[Widget.build~type];
+
+        function unbuildImpl {
+            if this.id.getLength() > 0 {
+                deleteElement(this.id);
+
+                def i: Int;
+                for i = 0, i < this.children.getLength(), ++i {
+                    this.children(i).unbuild();
+                }
+
+                this.id = String();
+            }
+        }
+        unbuild = unbuildImpl~ptr~cast[Widget.unbuild~type];
+
+        function updateImpl {
+            if this.id.getLength() > 0 {
+                setElementAttribute(
+                    this.id, "style",
+                    String.format(
+                        "width:%s;"
+                        "height:%s;"
+                        "padding:%fpt %fpt %fpt %fpt;"
+                        "border-style:solid;"
+                        "border-width:%fpt %fpt %fpt %fpt;"
+                        "border-color:rgb(%i, %i, %i);"
+                        "background-color:rgb(%i, %i, %i);"
+                        "display:flex;flex-direction:%s;justify-content: %s;"
+                        "direction:%s;",
+                        this.width.buf, this.height.buf,
+                        this.padding.top, this.padding.right, this.padding.bottom, this.padding.left,
+                        this.border.top, this.border.right, this.border.bottom, this.border.left,
+                        this.borderColor.red, this.borderColor.green, this.borderColor.blue,
+                        this.backgroundColor.red, this.backgroundColor.green, this.backgroundColor.blue,
+                        this.layout.buf, this.justify.buf,
+                        this.direction.buf
+                    )
+                );
+            }
+        }
+        update = updateImpl~ptr~cast[Widget.update~type];
+
+        //-----------------
+        // Shared Functions
+
+        @shared function new (count: Int, args: ...temp_ref[SrdRef[Widget]]): SrdRef[Canvas] {
+            def r: SrdRef[Canvas];
+            r.alloc()~init();
+            while count-- > 0 r.addChildren({ args~next_arg[ref[SrdRef[Widget]]] });
+            return r;
+        }
+    }
+
+    
+
+
 
     //==========================================================================
     // Canvas

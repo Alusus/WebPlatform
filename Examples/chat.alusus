@@ -192,6 +192,7 @@ func about {
     setFillStyle(canvas.id , "black", "blue", 0, 0, 100, 100);
     drawPolygon(canvas.id, 5, points.buf);
     drawText(canvas.id, "HI", "30px Arial", 50, 50);
+
     runEventLoop();
 }
 
