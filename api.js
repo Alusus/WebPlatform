@@ -84,51 +84,6 @@ wasmApi.usleep = (ms) => {
     sleeping = false;
   }
 }
-wasmApi.drawLine = ( name, x1, y1, x2, y2 ) => {
-  var c = document.getElementById(toJsString(name));
-  var ctx = c.getContext("2d");
-    ctx.beginPath();
-    ctx.moveTo(x1, y1);
-    ctx.lineTo(x2, y2);
-    ctx.stroke(); 
-}
-
-wasmApi.drawPolygon = (name, pointCount, points ) => {
-   var canvas = document.getElementById(toJsString(name));
-   var ctx = canvas.getContext("2d");
-   const pointsArray = new Int32Array(wasmMemory.buffer, points, pointCount * 2);
-    ctx.moveTo(pointsArray[0], pointsArray[1]);
-   for  ( var i = 1; i< pointCount; i++ ){
-    ctx.lineTo(pointsArray[i*2], pointsArray[i*2+1]);
-}
-    ctx.closePath();
-    ctx.fill();
-}
-
-  
-wasmApi.drawText = (name, text,font , x , y) => {
-  var canvas = document.getElementById(toJsString(name));
-  var ctx = canvas.getContext("2d");
-    ctx.font = toJsString(font);
-    ctx.fillText(toJsString(text), x, y );
-} 
-
-wasmApi.drawCircle = (name, x1, y1, x2, y2 ) => {
-  var circle = document.getElementById(toJsString(name));
-  var ctx = circle.getContext("2d");
-    ctx.beginPath(); 
-    ctx.arc(x1, y1, x2, 0, 2 *Math.PI);
-    ctx.stroke();
-}
-
-wasmApi.setFillStyle = (name,  c1, c2 , x1, y1, x2 , y2 ) => {
-  var canvas = document.getElementById(toJsString(name));
-  var ctx = canvas.getContext("2d");
-  var my_gradient = ctx.createLinearGradient(x1, y1, x2 , y2);
-    my_gradient.addColorStop(0,toJsString(c1) );
-    my_gradient.addColorStop(1,toJsString(c2));
-    ctx.fillStyle = my_gradient;
-}
 
 wasmApi.drawLine = (name, x1, y1, x2, y2) => {
   var c = document.getElementById(toJsString(name));
