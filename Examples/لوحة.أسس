@@ -1,5 +1,8 @@
 import "Apm";
 Apm.importFile("Alusus/WebPlatform");
+اشمل "مـتم/سندات"؛ 
+اشمل "مـتم/مـصفوفة"؛
+ 
 use Srl;
 use WebPlatform;
 
@@ -173,29 +176,53 @@ func onResponse (dummy: ref[Void], payload: ref[Json], extra: ptr) {
     }
 }
 
+
+@دمج وحدة WebPlatform{
+
+عرف لـوحة: لقب Canvas;
+@دمج صنف Widget {
+عرف هوية: لقب id;
+}
+@دمج صنف لـوحة {
+عرف أنشئ: لقب new;
+}
+
+عرف صـندوق : لقب Box;
+عرف الـتسمية : لقب Label;
+@دمج صنف صـندوق {
+عرف أنشى: لقب new;
+}
+عرف حدد_المشهد: لقب setView;
+عرف ارسم_خط: لقب drawLine;
+عرف حدد_نمط_الملء: لقب setFillStyle;
+عرف ارسم_مضلع: لقب drawPolygon;
+عرف ارسم_كتابة: لقب drawText;
+عرف خط_الكتابة: "30px Arial" 
+}
+
+
 @uiEndpoint["/about", "WebPlatform Example - Test UI Widgets"]
-func about {
-    def label1: SrdRef[Label] = Label.new(String("مثال الدردشة"));
+دالة مثال_لوحة {  
+ def label1: SrdRef[Label] = Label.new(String("مثال الدردشة"));
     label1.setFontColor(Color(0, 0, 0));
     label1.setFontSize(30.0);
 
     def label2: SrdRef[Label] = Label.new(String("طُور باستخدام منصة ويب الأسس"));
     label2.setFontColor(Color(0, 0, 0));
     label2.setFontSize(20.0);
-    def canvas: SrdRef[Canvas] = Canvas.new({ })
-    def box: SrdRef[Box] = Box.new({ createHeader(), canvas ,label1, label2 })
-    // box.setPadding(Quad(0, 50));
-    setView(box);
-    drawLine(canvas.id, 0,0, 100,100);
-    drawCircle(canvas.id, 100,180, 90,0 );
-    def points: Array [Int]({ 50, 50, 100, 50, 100, 100, 50, 100, 25, 75 });
-    setFillStyle(canvas.id , "black", "blue", 0, 0, 100, 100);
-    drawPolygon(canvas.id, 5, points.buf);
-    drawText(canvas.id, "HI", "30px Arial", 50, 50);
-
-    runEventLoop();
+عرف لوحة:سـندنا[لـوحة] = لـوحة.أنشئ ({})؛
+عرف صندوق: سـندنا [صـندوق] = صـندوق.أنشى({ createHeader(), لوحة ,label1, label2 })
+حدد_المشهد(صندوق);
+ارسم_خط (لوحة.هوية, 100,180, 0,0 );
+    drawCircle(لوحة.هوية, 100,180, 90,0 );
+عرف نقاط: مـصفوفة [صحيح] ({ 50, 50, 100, 50, 100, 100, 50, 100, 25, 75 });
+ حدد_نمط_الملء (لوحة.هوية,"black", "blue", 0, 0, 100, 100);
+ ارسم_مضلع (لوحة.هوية, 5, نقاط.صوان);
+ ارسم_كتابة(لوحة.هوية, "اهلا", خط_الكتابة, 50, 50);
+ 
+     runEventLoop();
 }
-
 
 Console.print("Starting server on port 8010...\nURL: http://localhost:8010/\n");
 runServer({ "listening_ports", "8010", "static_file_max_age", "0" });
+
