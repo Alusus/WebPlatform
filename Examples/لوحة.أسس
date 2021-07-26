@@ -1,228 +1,357 @@
 import "Apm";
+
 Apm.importFile("Alusus/WebPlatform");
 اشمل "مـتم/سندات"؛ 
 اشمل "مـتم/مـصفوفة"؛
- 
+اشمل "مـتم/نـص";
+اشمل "مـتم/طـرفية";
 use Srl;
 use WebPlatform;
 
 //==============================================================================
 // Backend
 
-def messages: String;
+ 
 
+
+
+
+
+
+
+عرف رسالة : نـص; 
 @beEndpoint["POST", "/messages"]
-func postMessages (conn: ptr[Http.Connection]) {
-    def postData: array[Char, 1024];
-    Http.read(conn, postData~ptr, postData~size);
-    if messages.getLength() > 0 messages += "<br>";
-    messages += postData~ptr;
-    Http.print(conn, "HTTP/1.1 200 Ok\r\n\r\n");
+
+دالة ارسال_الرسالة (conn:مؤشر[Http.Connection]){
+    عرف ارسال_البيانات: مصفوفة[مـحرف,1024];
+   Http.read(conn, ارسال_البيانات~مؤشر, ارسال_البيانات~حجم);
+    إذا رسالة.هات_الطول() > 0 رسالة += "<br>";
+     رسالة +=  ارسال_البيانات~مؤشر;
+   Http.print(conn, "HTTP/1.1 200 Ok\r\n\r\n");
 }
 
 @beEndpoint["GET", "/messages"]
-func getMessages (conn: ptr[Http.Connection]) {
+
+دالة هات_الرسالة (conn: مؤشر[Http.Connection]) {
     Http.print(conn, "HTTP/1.1 200 Ok\r\n");
     Http.print(conn, "Content-Type: text/plain\r\n");
     Http.print(conn, "Cache-Control: no-cache\r\n");
-    Http.print(conn, "Content-Length: %d\r\n\r\n", messages.getLength());
-    Http.print(conn, messages.buf);
+    Http.print(conn, "Content-Length: %d\r\n\r\n", رسالة.هات_الطول());
+    Http.print(conn, رسالة.صوان);
+    
 }
-
-//==============================================================================
+//=============================================================================
 // Frontend
 
-def PrimeryColor: Color("8e50ef");
-def LightColor: Color("c380ff");
-def DarkColor: Color("5820bb");
+عرف لـون_اصلي: لقب PrimeryColor;
+عرف لـون_فاتح: لقب LightColor;
+عرف لـون_غامق: لقب DarkColor; 
 
-func isTheColorAvilable() {
-    Console.print("PrimeryColor RGB: %d, %d, %d\n", PrimeryColor.red, PrimeryColor.green, PrimeryColor.blue);
-    Console.print("LightColor RGB: %d, %d, %d\n", LightColor.red, LightColor.green, LightColor.blue);
-    Console.print("DarkColor RGB: %d, %d, %d\n", DarkColor.red, DarkColor.green, LightColor.blue);
+
+
+
+
+
+عرف لـون_اصلي: لـون("8e50ef");
+عرف لـون_فاتح: لـون("c380ff");
+عرف لـون_غامق: لـون ("5820bb");
+
+
+
+عرف احمر: لقب  red;
+عرف اخضر: لقب green;
+عرف ازرق: لقب blue;
+
+دالة الـون_المتاح(){
+    طـرفية.اطبع("لون_اصلي RGB: %d, %d, %d\n", لـون_اصلي.احمر, لون_اصلي.اخضر, لـون_اصلي.ازرق);
+    طـرفية.اطبع("لون_فاتح RGB: %d, %d, %d\n", لـون_فاتح.احمر, لون_فاتح.اخضر, لـون_فاتح.ازرق);
+    طـرفية.اطبع("لون_غامق RGB: %d, %d, %d\n", لـون_غامق.احمر, لون_غامق.اخضر, لون_غامق.ازرق);
 }
 
-func createHeader (): SrdRef[Widget] {
-    setElementAttribute("body", "style", "padding: 0; margin: 0;");
-    def label: SrdRef[Label] = Label.new(String("أمثلة منصة ويب الأسس - الدردشة"));
-    label.setFontColor(Color("fff"));
-    label.setFontSize(21.0);
-    label.setWidth(String("100%"));
-    label.setHeight(String("100%"));
-    label.setBackgroundColor(PrimeryColor);
+عرف حدد_عنصر_الصفة: لقب setElementAttribute;
+عرف الجسم: لقب body;
+عرف الشكل: لقب  style;
+عرف حشوة: لقب padding;
+عرف الحافة: لقب margin;
+عرف صف: لقب row;
+عرف مسافة: لقب مسافة;
+عرف بين: لقب between;
+عرف مفتاح_التشغيل: لقب onKeyUp; 
+عرف الاتصال: لقب connect;
+ 
 
-    def mainLinkLabel: SrdRef[Label] = Label.new(String("الرئيسية"));
-    mainLinkLabel.setFontSize(16.0);
-    mainLinkLabel.setFontColor(Color("fff"));
-    mainLinkLabel.setPadding(Quad(3));
-    mainLinkLabel.setBackgroundColor(LightColor);
-    def aboutLinkLabel: SrdRef[Label] = Label.new(String("عن البرنامج"));
-    aboutLinkLabel.setFontSize(16.0);
-    aboutLinkLabel.setFontColor(Color("fff"));
-    aboutLinkLabel.setPadding(Quad(3));
-    aboutLinkLabel.setBackgroundColor(LightColor);
-
-    def menuBox: SrdRef[Box] = Box.new({
-        Hyperlink.new(String("/"), mainLinkLabel),
-        Hyperlink.new(String("/about"), aboutLinkLabel)
+دالة أنشاء_مقدمة():سـندنا[Widget]{
+     حدد_عنصر_الصفة("الجسم", "الشكل", "حشوة: 0; الحافة: 0;");
+   عرف الـتسمية : سـندنا[الـتسمية] = الـتسمية.أنشى(نـص("أمثلة منصة ويب الأسس - الدردشة"));
+    الـتسمية.حدد_لون_الخط(لـون("fff"));
+    الـسمية.حدد_حجم_الخط(21.0);
+    الـتسمية.حدد_العرض(نـص("100%")); 
+    الـتسمية.حدد_الطوال(نـص("100%"));
+    الـتسمية.حدد_لون_الخلفية(لـون_اصلي);
+    
+    عرف الرابط_الاساسي: سـندنا[الـتسمية] = الـتسمية.أنشى(نـص("الرئيسية"));
+      الرابط_الاساسي.حدد_حجم_الخط(16.0);
+     الرابط_الاساسي.حدد_لون_الخط(لـون("fff"));
+     الرابط؛الاساسي.حدد_الحشوة(ربـاعية(3));
+     الرابط_الاساسي.حدد_لون_الخلفية(لـون_فاتح); 
+    عرف عن_الرابط: سـندنا[الـتسمية] = الـتسمية.أنشى(نـص("عن البرنامج"));
+    عن_الرابط.حدد_حجم_الخط(16.0);
+    عن_الرابط.حدد_لون_الخط(لـون("fff"));
+    عن_الرابط.حدد_الحشوة(ربـاعية(3));
+    عن_الرابط.حدد_لون_الخلفية(لـون_فاتح);
+    
+    عرف صندوق_القائمة: سـندنا[صـندوق] = صـندوق.أنشى({
+    ارتـباط_تشعبي.انشى(نـص("/"), الرابط_الاساسي),
+    ارتـباط_تشعبي.انشى(نـص("about"), عن_الرابط)
     });
-    menuBox.setLayout(String("row"));
-    menuBox.setJustify(String("space-between"));
-    menuBox.setBackgroundColor(PrimeryColor);
-
-    def box: SrdRef[Box] = Box.new({ label, menuBox });
-    box.setWidth(String("100%"));
-    box.setHeight(String("80pt"));
-    box.setPadding(Quad(5, 0));
-    box.setBackgroundColor(PrimeryColor);
-    box.setBorderColor(PrimeryColor);
-    box.setBorder(Quad(1.5));
-
-    return box~cast[SrdRef[Widget]];
+    صندوق_القائمة.حدد_النموذج(نـص("صف"));
+    صندوق_القائمة.حدد_التبرير(نـص("المسافة-بين"));
+    صندوق_القائمة.حدد_لون_الخلفية(لـون_اصلي);
+    
+    عرف صندوق: سـندنا[صـندوق] = صـندوق.أنشى({التسمية, صندوق_القائمة});
+    صندوق.حدد_العرض(نـص("100%"));
+    صندوق.حدد_الطوال(نـص("80pt"));
+    صندوق.حدد_الحشوة(ربـاعية(5, 0));
+    صندوق.حدد_لون_الخلفية(لـون_اصلي);
+    صندوق.حدد_لون_الحدود(لـون_اصلي);
+    صندوق.حدد_الحدود(ربـاعية(1.5));
+    
+    أرجع صندوق~مثل[سـندنا[Widget]];
+    
 }
-
 @uiEndpoint["/", "WebPlatform Example - Test UI Widgets"]
-func main {
-    def label: SrdRef[Label] = Label.new(String());
-    label.setFontColor(Color(50, 50, 50));
-    label.setFontSize(20.0);
-    label.setWidth(String("100%"));
-    label.setHeight(String("100%"));
 
-    def textInput: SrdRef[TextInput] = TextInput.new();
-    textInput.setWidth(String("100%"));
-    textInput.setHeight(String("100%"));
-    textInput.setFontSize(12.0);
-    textInput.onKeyUp.connect(onKeyUp~ptr, label.obj~ptr);
+دالة رئيسي {
+    عرف التسمية: سـندنا[الـتسمية] = الـتسمية.أنشئ(نـص());
+    التسمية.حدد_لون_الخط(لـون(50, 50, 50));
+    التسمية.حدد_حجم_الخط(20.0);
+    التسمية.حدد_العرض(نـص("100%"));
+    التسمية.حدد_الطوال(نـص("100%"));
+    
+   عرف أدخال_نص: سـندنا[أدخـال_نص] = أدخـال_نص.أنشئ(); 
+    أدخال_نص.حدد_العرض(نـص("100%"));
+    أدخال_نص.حدد_الطوال(نـص("100%"));
+    أدخال_نص.حدد_حجم_الخط(12.0);
+    أدخال_نص.مفتاح_التشغيل.الاتصال(عند_المفتاح~مؤشر, التسمية.كائن~مؤشر);
+ 
 
-    def button: SrdRef[Button] = Button.new(String("أرسل"));
-    def bcPayload: ButtonClickPayload;
-    bcPayload.label~no_deref = label.obj;
-    bcPayload.textInput~no_deref = textInput.obj;
-    button.onClick.connect(onButtonClicked~ptr, bcPayload~ptr);
-    button.setFontSize(16.0);
-    button.setHeight(String("100%"));
-    button.setBackgroundColor(Color(200, 200, 200));
-    button.setWidth(String("50pt"));
-
-    def displayBox: SrdRef[Box] = Box.new({ label });
-    displayBox.setWidth(String("100%"));
-    displayBox.setHeight(String("100%"));
-    displayBox.setBorder(Quad(1));
-    displayBox.setBorderColor(Color(0, 0, 0));
-    // displayBox.setPadding(Quad(5));
-
-    def inputBox: SrdRef[Box] = Box.new({ textInput, button });
-    inputBox.setWidth(String("100%"));
-    inputBox.setHeight(String("50pt"));
-    inputBox.setLayout(String("row"));
-    inputBox.setBorder(Quad(1.5));
-    inputBox.setBorderColor(PrimeryColor);
-    inputBox.setBackgroundColor(PrimeryColor);
-    // inputBox.setPadding(Quad(5));
-
-    def box: SrdRef[Box] = Box.new({ createHeader(), displayBox, inputBox });
-    box.setHeight(String("100%"));
-    // box.setPadding(Quad(0, 50));
-
-    setView(box);
-
-    def slot: Slot[Void, Json];
-    slot.fn = onTimer~ptr;
-    slot.extra = label.obj~ptr;
-    startTimer(500000, slot~ptr);
-
-    runEventLoop();
+   عرف الزر: سـندنا[الـزر] = الـزر.أنشى(نـص("أرسل"));
+   عرف انقر_فوق_الزر: انـقر_فوق_الزر;
+     انقر_فوق_الزر.التسمية~عطل_التتبع = التسمية.كائن;
+    انقر_فوق_الزر.أدخال_نص~عطل_التتبع = أدخال_نص.كائن; 
+    الزر.عند_الضغط.الاتصال(عند_ضغط_الزر~مؤشر, انقر_فوق_الزر~مؤشر);
+    الزر.حدد_حجم_الخط(16.0);
+    الزر.حدد_الطوال(نـص("100%")); 
+    الزر.حدد_لون_الخلفية(لـون(200, 200, 200)); 
+    الزر.حدد_العرض(نـص("50pt"));
+    
+    
+   عرف عرض_الصندوق: سـندنا[صـندوق] = صـندوق.أنشى({التسمية});
+    عرض_الصندوق.حدد_العرض(نـص("100%")); 
+    عرض_الصندوق.حدد_الطوال(نـص("100%"));
+    عرض_الصندوق.حدد_الحدود(ربـاعية(1));
+    عرض_الصندوق.حدد_لون_الحدود(لـون(0, 0, 0));
+    //عرض_الصندوق.حدد_الحشوة(ربـاعية(5));
+    
+  عرف صندوق_الادخال: سـندنا[صـندوق] = صـندوق.أنشى({صندوق_الادخال, الزر});
+    صندوق_الادخال.حدد_العرض(نـص("100%"));
+    صندوق_الادخال.حدد_الطوال(نـص("50pt"));
+    صندوق_الادخال.حدد_النموذج(نـص("row"));
+    صندوق_الادخال.حدد_الحدود(ربـاعية(1.5));
+    صندوق_الادخال.حدد_لون_الحدود(لـون_اصلي);
+    صندوق_الادخال.حدد_لون_الخلفية(لـون_اصلي);
+    //صندوق_الادخال.حدد_الحشوة(ربـاعية(5));
+    
+   عرف صندوق: سـندنا[صـندوق] = صـندوق.أنشى({أنشاء_مقدمة(), عرض_الصندوق, صندوق_الادخال});
+    صندوق.حدد_العرض(نـص("100%")); 
+    //صندوق.حدد_الحشوة(ربـاعية(0, 50)); 
+    
+    حدد_المشهد(صندوق);
+    
+   عرف مقبس: مـقبس[فـارغ,Json]; 
+    مقبس.fn = على_الوقت~مؤشر;
+    مقبس.أضافي = التسمية.كائن~مؤشر;
+    ابدا_العد(500000, مقبس~مؤشر);
+    
+     تشغيل_حدث_الحلقه();
+     
 }
 
-type ButtonClickPayload {
-    def label: ref[Label];
-    def textInput: ref[TextInput];
+
+
+صنف انـقر_فوق_الزر {
+    عرف التسمية: سند[الـتسمية];
+    عرف صندوق_الادخال: سند[صـندوق_الادخال];
 }
 
-macro prepCastedArg [varName, varType, argName] {
-    def varName: ref[varType];
-    varName~ptr = argName~cast[ptr[varType]];
+
+
+ماكرو مـسبوق_ارج [نوع_المتغير, اسم_النوع,اسم_المعطى]{
+    عرف اسم_المتغير: سند [نوع_المتغير];
+    اسم_المتغير~مؤشر = اسم_المعطى~مثل[مؤشر[نوع_المتغير]];
 }
 
-func onButtonClicked (widget: ref[Button], payload: ref[Int], extra: ptr) {
-    prepCastedArg[bcPayload, ButtonClickPayload, extra];
-    def newData: String = bcPayload.textInput.getText().replace("\n", "<br>");
-    bcPayload.textInput.setText(String());
-    sendRequest("POST", "/messages", "Content-Type: application/text", newData, 0);
+
+دالة عند_ضغط_الزر(القطعة: سند[الـزر], الحمولة: سند[صـحيح], اضافي: مؤشر) {
+    مسبوق_المعطى[انقر_فوق_الزر, انـقر_فوق_الزر, اضافي];
+    عرف بيانات_جديده: نـص = انقر_فوق_الزر.أدخال_النص.هات_النص().استبدل("\n", "<br>");
+    الحمولة.أدخال_النص.حدد_النص(نـص());
+    ارسال_طلب("POST", "/messages", "Content-Type: application/text", بيانات_جديده, 0);
 }
 
-func onKeyUp (widget: ref[TextInput], payload: ref[String], extra: ptr) {
-    prepCastedArg[label, Label, extra];
-    if payload == "Shift+Enter" {
-        def newData: String = widget.getText().replace("\n", "<br>");
-        widget.setText(String());
-        sendRequest("POST", "/messages", "Content-Type: application/text", newData, 0);
+
+دالة عند_المفتاح(القطعة: سند[أدخـال_نص], الحمولة: سند[نـص], اضافي: مؤشر) {
+    مسبوق_المعطى[التسمية,الـتسمية, اضافي];
+    إذا الحمولة == "Shift+Enter" {
+        عرف بيانات_جديده: نـص = الـقطعة.هات_نص().استبدال("\n", "<br>");
+        القطعة.حدد_النص(نـص());
+        ارسال_طلب("POST", "/messages", "Content-Type: application/text", بيانات_جديده, 0);
     }
 }
 
-func onTimer (dummy: ref[Void], payload: ref[Json], extra: ptr) {
-  @shared def slot: Slot[Void, Json];
-  slot.fn = onResponse~ptr;
-  slot.extra = extra;
-  sendRequest("GET", "/messages", null, null, slot~ptr);
+//func onTimer (dummy: ref[Void], payload: ref[Json], extra: ptr) 
+دالة على_الوقت(تمثال: سند[فـارغ], الحمولة: سند [Json], اضافي: مؤشر) {
+  @مشترك   عرف مقبس: مـقبس[فـارغ,Json]; 
+  مقبس.fn = عند_الطلب~مؤشر;
+  مقبس.اضافي = اضافي;
+
+  ارسال_طلب("GET", "/messages", null, null, فتحة~مؤشر);
 }
 
-func onResponse (dummy: ref[Void], payload: ref[Json], extra: ptr) {
-    prepCastedArg[label, Label, extra];
-    def data: String = payload.getObject("eventData").getString("body");
-    if label.getText() != data {
-        label.setText(data);
+
+دالة عند_الطلب (تمثال: سند[فـارغ], الحمولة: سند [Json], اضافي: مؤشر) {
+        مسبوق_المعطى[التسمية,الـتسمية, اضافي];
+    عرف البيانات : نـص = الحمولة.هات_كائن ("eventData").هات_نص("body");
+    إذا التسمية.هات_نص() != البيانات {
+        التسمية.حدد_النص(البيانات);
     }
 }
 
 
 @دمج وحدة WebPlatform{
+عرف لـون: لقب Color;
+عرف ارتـباط_تشعبي: لقب Hyperlink;
+عرف أدخـال_نص: لقب TextInput;
+عرف الـزر: لقب Button;
+
 
 عرف لـوحة: لقب Canvas;
-@دمج صنف Widget {
+عرف قـطعة: لقب Widget;
+@دمج صنف قـطعة {
 عرف هوية: لقب id;
+عرف حدد_العرض:لقب setWidth;
+عرف حدد_الطوال: لقب setHeight;
+عرف حدد_النص: لقب setText;
+
 }
+
+
+//@دمج صنف فـتحة{
+عرف على_الوقت: لقب onTimer;
+عرف ابدا_العد: لقب startTimer;
+عرف عند_الطلب: لقب onResponse;
+//}
+
+
 @دمج صنف لـوحة {
 عرف أنشئ: لقب new;
 }
 
+
+
+
+عرف مـقبس: لقب Slot;
 عرف صـندوق : لقب Box;
 عرف الـتسمية : لقب Label;
+@دمج صنف الـتسمية {
+عرف حدد_لون_الخلفية: لقب setBackgroundColor;
+عرف حدد_حجم_الخط: لقب setFontSize;
+عرف حدد_لون_الخط: لقب setFontColor;
+عرف حدد_العرض:لقب setWidth;
+عرف حدد_الطوال: لقب setHeight;
+عرف أنشئ: لقب new;
+عرف مسبوق_المعطى: لقب prepCastedArg;
+عرف حدد_النص: لقب setText;
+}
+
+
+@دمج صنف الـزر {
+عرف عند_الضغط: لقب onClick;
+عرف حدد_لون_الخط: لقب setFontColor;
+عرف أنشئ: لقب new;
+عرف الاتصال: لقب  connect;
+عرف عند_ضغط_الزر: لقب onButtonClicked;
+عرف حدد_العرض:لقب setWidth;
+عرف حدد_الطوال: لقب setHeight;
+عرف حدد_لون_الخلفية: لقب setBackgroundColor;
+عرف حدد_حجم_الخط: لقب setFontSize;
+عرف عند_الضغط: لقب onClick;
+
+}
+
 @دمج صنف صـندوق {
 عرف أنشى: لقب new;
+عرف لـون : لقب Color;
+عرف حدد_الحدود: لقب setBorder;
+عرف حدد_لون_الحدود: لقب setBorderColor;
+عرف حدد_العرض:لقب setWidth;
+عرف حدد_الطوال: لقب setHeight;
+عرف حدد_لون_الخلفية: لقب setBackgroundColor;
+عرف صـندوق_الادخال: لقب displayBox;
+عرف حدد_النموذج: لقب setLayout;
+عرف عرض_الصندوق: لقب displayBox;
+عرف ربـاعية: لقب Quad;
+
 }
+
+
+@دمج صنف أدخـال_نص {
+عرف حدد_العرض:لقب setWidth;
+عرف حدد_الطوال: لقب setHeight;
+عرف حدد_حجم_الخط: لقب setFontSize;
+عرف أنشئ: لقب new;
+
+}
+
+
 عرف حدد_المشهد: لقب setView;
 عرف ارسم_خط: لقب drawLine;
 عرف حدد_نمط_الملء: لقب setFillStyle;
+عرف حدد_حجم_الخط: لقب setFontColor;
+عرف حدد_الون: لقب setFontColor;
 عرف ارسم_مضلع: لقب drawPolygon;
 عرف ارسم_كتابة: لقب drawText;
-عرف خط_الكتابة: "30px Arial" 
+عرف خط_الكتابة: "30px Arial"; 
+عرف ارسم_دائرة: لقب drawCircle;
+عرف تشغيل_حدث_الحلقه: لقب runEventLoop;
+عرف تشغيل_الخادم: لقب runServer;
 }
+
+
+
 
 
 @uiEndpoint["/about", "WebPlatform Example - Test UI Widgets"]
 دالة مثال_لوحة {  
- def label1: SrdRef[Label] = Label.new(String("مثال الدردشة"));
-    label1.setFontColor(Color(0, 0, 0));
-    label1.setFontSize(30.0);
-
-    def label2: SrdRef[Label] = Label.new(String("طُور باستخدام منصة ويب الأسس"));
-    label2.setFontColor(Color(0, 0, 0));
-    label2.setFontSize(20.0);
-عرف لوحة:سـندنا[لـوحة] = لـوحة.أنشئ ({})؛
-عرف صندوق: سـندنا [صـندوق] = صـندوق.أنشى({ createHeader(), لوحة ,label1, label2 })
-حدد_المشهد(صندوق);
-ارسم_خط (لوحة.هوية, 100,180, 0,0 );
-    drawCircle(لوحة.هوية, 100,180, 90,0 );
-عرف نقاط: مـصفوفة [صحيح] ({ 50, 50, 100, 50, 100, 100, 50, 100, 25, 75 });
- حدد_نمط_الملء (لوحة.هوية,"black", "blue", 0, 0, 100, 100);
- ارسم_مضلع (لوحة.هوية, 5, نقاط.صوان);
- ارسم_كتابة(لوحة.هوية, "اهلا", خط_الكتابة, 50, 50);
- 
-     runEventLoop();
+    عرف الـتسمية1 : سـندنا [الـتسمية] = الـتسمية.أنشئ(نـص("مثال الدردشة"));
+    الـتسمية1.حدد_الون(لـون(0, 0, 0));
+    الـتسمية1.حدد_حجم_الخط(30, 0);
+    عرف الـتسمية2:سـندنا[الـتسمية] = الـتسمية.أنشئ (نـص("طُور باستخدام منصة ويب الأسس"));
+    الـتسمية2.حدد_الون(لـون(0, 0, 0));
+   الـتسمية2.حدد_حجم_الخط(30, 0); 
+   عرف لوحة:سـندنا[لـوحة] = لـوحة.أنشئ ({})؛
+   عرف صندوق: سـندنا [صـندوق] = صـندوق.أنشى({ createHeader(), لوحة ,label1, label2 })
+    حدد_المشهد(صندوق);
+    ارسم_خط (لوحة.هوية, 100,180, 0,0 );
+    ارسم_دائرة(لوحة.هوية, 100,180, 90,0 );
+   عرف نقاط: مـصفوفة [صحيح] ({ 50, 50, 100, 50, 100, 100, 50, 100, 25, 75 });
+    حدد_نمط_الملء (لوحة.هوية,"black", "blue", 0, 0, 100, 100);
+     ارسم_مضلع (لوحة.هوية, 5, نقاط.صوان);
+    ارسم_كتابة(لوحة.هوية, "اهلا", خط_الكتابة, 50, 50);
+    تشغيل_حدث_الحلقه();
 }
 
-Console.print("Starting server on port 8010...\nURL: http://localhost:8010/\n");
-runServer({ "listening_ports", "8010", "static_file_max_age", "0" });
+ طـرفية.اطبع("Starting server on port 8010...\nURL: http://localhost:8010/\n");
+
+تشغيل_الخادم ({ "listening_ports", "8010", "static_file_max_age", "0" });
 
