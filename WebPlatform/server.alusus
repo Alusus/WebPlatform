@@ -26,13 +26,14 @@
 
     func addUiEndpoints (parent: ref[Core.Basic.TiObject]) {
         def elements: Array[ref[Core.Basic.TiObject]] = Spp.astMgr.findElements(
-            ast { modifier == "uiEndpoint" },
+            ast { modifier == "uiEndpoint" || modifier == "منفذ_مرئي" },
             parent,
             Spp.SeekerFlags.SKIP_OWNERS | Spp.SeekerFlags.SKIP_USES | Spp.SeekerFlags.SKIP_CHILDREN
         );
         def i: Int;
         for i = 0, i < elements.getLength(), ++i {
             def modifier: ref[Core.Basic.TiObject](Spp.astMgr.findModifierForElement(elements(i), "uiEndpoint"));
+            if modifier~ptr == 0 modifier~no_deref = Spp.astMgr.findModifierForElement(elements(i), "منفذ_مرئي");
             def endpointParams: Array[String];
             if !Spp.astMgr.getModifierStringParams(modifier, endpointParams)
                 || endpointParams.getLength() < 2 {
@@ -60,13 +61,14 @@
 
     func addBeEndpoints (parent: ref[Core.Basic.TiObject]) {
         def elements: Array[ref[Core.Basic.TiObject]] = Spp.astMgr.findElements(
-            ast { modifier == "beEndpoint" },
+            ast { modifier == "beEndpoint" || modifier == "منفذ_بياني" },
             parent,
             Spp.SeekerFlags.SKIP_OWNERS | Spp.SeekerFlags.SKIP_USES | Spp.SeekerFlags.SKIP_CHILDREN
         );
         def i: Int;
         for i = 0, i < elements.getLength(), ++i {
             def modifier: ref[Core.Basic.TiObject](Spp.astMgr.findModifierForElement(elements(i), "beEndpoint"));
+            if modifier~ptr == 0 modifier~no_deref = Spp.astMgr.findModifierForElement(elements(i), "منفذ_بياني");
             def endpointParams: Array[String];
             if !Spp.astMgr.getModifierStringParams(modifier, endpointParams)
                 || endpointParams.getLength() < 2 {

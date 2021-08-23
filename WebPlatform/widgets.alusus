@@ -4,7 +4,6 @@
     // The base class of all widgets.
     type Widget {
         def id: String;
-        def owner: ref[Widget];
 
         // Styles
         generateProperty[width, Width, String];
@@ -136,13 +135,11 @@
         }
     }
     
-    
     //==========================================================================
     // Canvas
     // A free form drawing area.
     type Canvas {
         @injection def widget: Widget;
-        def children: Array[SrdRef[Widget]];
 
         //-----------
         // Properties
@@ -164,28 +161,6 @@
             this.direction = "rtl";
         }
 
-        function addChildren (count: Int, children: ...temp_ref[SrdRef[Widget]]) {
-            while count-- > 0 {
-                def child: ref[SrdRef[Widget]](children~next_arg[ref[SrdRef[Widget]]]);
-                this.children.add(child);
-                if this.id.getLength() > 0 child.build(this.id);
-            }
-        }
-
-        function removeChildren (count: Int, children: ...temp_ref[SrdRef[Widget]]) {
-            while count-- > 0 {
-                def child: ref[SrdRef[Widget]](children~next_arg[ref[SrdRef[Widget]]]);
-                def i: Int;
-                for i = 0, i < this.children.getLength(), ++i {
-                    if this.children(i).obj~ptr == child.obj~ptr {
-                        child.unbuild();
-                        this.children.remove(i);
-                        return;
-                    }
-                }
-            }
-        }
-
         //-------------------
         // Function Overrides
 
@@ -193,22 +168,12 @@
             this.id = getNewId();
             createElement("canvas", this.id, ownerId);
             this.update();
-
-            def i: Int;
-            for i = 0, i < this.children.getLength(), ++i {
-                this.children(i).build(this.id);
-            }
         }
         build = buildImpl~ptr~cast[Widget.build~type];
 
         function unbuildImpl {
             if this.id.getLength() > 0 {
                 deleteElement(this.id);
-
-                def i: Int;
-                for i = 0, i < this.children.getLength(), ++i {
-                    this.children(i).unbuild();
-                }
 
                 this.id = String();
             }
@@ -245,10 +210,9 @@
         //-----------------
         // Shared Functions
 
-        @shared function new (count: Int, args: ...temp_ref[SrdRef[Widget]]): SrdRef[Canvas] {
+        @shared function new (): SrdRef[Canvas] {
             def r: SrdRef[Canvas];
             r.alloc()~init();
-            while count-- > 0 r.addChildren({ args~next_arg[ref[SrdRef[Widget]]] });
             return r;
         }
     }
@@ -260,8 +224,8 @@
 
         //-----------
         // Properties
-        generateProperty[padding, Padding, Quad];
         generateProperty[text, Text, String];
+        generateProperty[padding, Padding, Quad];
         generateProperty[fontSize, FontSize, Float];
         generateProperty[fontColor, FontColor, Color];
         generateProperty[textAlign, TextAlign, String];
