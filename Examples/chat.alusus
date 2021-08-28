@@ -29,103 +29,7 @@ func getMessages (conn: ptr[Http.Connection]) {
 //==============================================================================
 // Frontend
 
-def PrimeryColor: Color("8e50ef");
-def LightColor: Color("c380ff");
-
-func createHeader (): SrdRef[Widget] {
-    setElementAttribute("body", "style", "padding: 0; margin: 0;");
-    def label: SrdRef[Label] = Label.new(String("أمثلة منصة ويب الأسس - الدردشة"));
-    label.setFontColor(Color("fff"));
-    label.setFontSize(21.0);
-    label.setWidth(String("100%"));
-    label.setHeight(String("100%"));
-    label.setBackgroundColor(PrimeryColor);
-
-    def mainLinkLabel: SrdRef[Label] = Label.new(String("الرئيسية"));
-    mainLinkLabel.setFontSize(16.0);
-    mainLinkLabel.setFontColor(Color("fff"));
-    mainLinkLabel.setPadding(Quad(3));
-    mainLinkLabel.setBackgroundColor(LightColor);
-    def aboutLinkLabel: SrdRef[Label] = Label.new(String("عن البرنامج"));
-    aboutLinkLabel.setFontSize(16.0);
-    aboutLinkLabel.setFontColor(Color("fff"));
-    aboutLinkLabel.setPadding(Quad(3));
-    aboutLinkLabel.setBackgroundColor(LightColor);
-
-    def menuBox: SrdRef[Box] = Box.new({
-        Hyperlink.new(String("/"), mainLinkLabel),
-        Hyperlink.new(String("/about"), aboutLinkLabel)
-    });
-    menuBox.setLayout(String("row"));
-    menuBox.setJustify(String("space-between"));
-    menuBox.setBackgroundColor(PrimeryColor);
-
-    def box: SrdRef[Box] = Box.new({ label, menuBox });
-    box.setWidth(String("100%"));
-    box.setHeight(String("80pt"));
-    box.setPadding(Quad(5, 0));
-    box.setBackgroundColor(PrimeryColor);
-    box.setBorderColor(PrimeryColor);
-    box.setBorder(Quad(1.5));
-
-    return box~cast[SrdRef[Widget]];
-}
-
-@uiEndpoint["/", "WebPlatform Example - Chat"]
-func main {
-    def label: SrdRef[Label] = Label.new(String());
-    label.setFontColor(Color(50, 50, 50));
-    label.setFontSize(20.0);
-    label.setWidth(String("100%"));
-    label.setHeight(String("100%"));
-
-    def textInput: SrdRef[TextInput] = TextInput.new();
-    textInput.setWidth(String("100%"));
-    textInput.setHeight(String("100%"));
-    textInput.setFontSize(12.0);
-    textInput.onKeyUp.connect(onKeyUp~ptr, label.obj~ptr);
-
-    def button: SrdRef[Button] = Button.new(String("أرسل"));
-    def bcPayload: ButtonClickPayload;
-    bcPayload.label~no_deref = label.obj;
-    bcPayload.textInput~no_deref = textInput.obj;
-    button.onClick.connect(onButtonClicked~ptr, bcPayload~ptr);
-    button.setFontSize(16.0);
-    button.setHeight(String("100%"));
-    button.setBackgroundColor(Color(200, 200, 200));
-    button.setWidth(String("50pt"));
-
-    def displayBox: SrdRef[Box] = Box.new({ label });
-    displayBox.setWidth(String("100%"));
-    displayBox.setHeight(String("100%"));
-    displayBox.setBorder(Quad(1));
-    displayBox.setBorderColor(Color(0, 0, 0));
-    // displayBox.setPadding(Quad(5));
-
-    def inputBox: SrdRef[Box] = Box.new({ textInput, button });
-    inputBox.setWidth(String("100%"));
-    inputBox.setHeight(String("50pt"));
-    inputBox.setLayout(String("row"));
-    inputBox.setBorder(Quad(1.5));
-    inputBox.setBorderColor(PrimeryColor);
-    inputBox.setBackgroundColor(PrimeryColor);
-    // inputBox.setPadding(Quad(5));
-
-    def box: SrdRef[Box] = Box.new({ createHeader(), displayBox, inputBox });
-    box.setHeight(String("100%"));
-    // box.setPadding(Quad(0, 50));
-
-    setView(box);
-
-    def slot: Slot[Void, Json];
-    slot.fn = onTimer~ptr;
-    slot.extra = label.obj~ptr;
-    startTimer(500000, slot~ptr);
-
-    runEventLoop();
-}
-
-type ButtonClickPayload {
+class ButtonClickPayload {
     def label: ref[Label];
     def textInput: ref[TextInput];
 }
@@ -135,35 +39,138 @@ macro prepCastedArg [varName, varType, argName] {
     varName~ptr = argName~cast[ptr[varType]];
 }
 
-func onButtonClicked (widget: ref[Button], payload: ref[Int], extra: ptr) {
-    prepCastedArg[bcPayload, ButtonClickPayload, extra];
-    def newData: String = bcPayload.textInput.getText().replace("\n", "<br>");
-    bcPayload.textInput.setText(String());
-    sendRequest("POST", "/messages", "Content-Type: application/text", newData, 0);
+def PrimeryColor: Color("8e50ef");
+def LightColor: Color("c380ff");
+
+func createHeader (): SrdRef[Widget] {
+    setElementAttribute("body", "style", "padding: 0; margin: 0;");
+
+    return Box.new({}).{
+        width = String("100%");
+        height = String("80pt");
+        padding = Quad(5, 0);
+        backgroundColor = PrimeryColor;
+        borderColor = PrimeryColor;
+        border = Quad(1.5);
+
+        addChildren({
+            Label.new(String("أمثلة منصة ويب الأسس - الدردشة")).{
+                fontColor = Color("fff");
+                fontSize = 21.0;
+                width = String("100%");
+                height = String("100%");
+                backgroundColor = PrimeryColor;
+            },
+            Box.new({}).{
+                layout = String("row");
+                justify = String("space-between");
+                backgroundColor = PrimeryColor;
+
+                addChildren({
+                    Hyperlink.new(String("/"), Label.new(String("الرئيسية")).{
+                        fontSize = 16.0;
+                        fontColor = Color("fff");
+                        padding = Quad(3);
+                        backgroundColor = LightColor;
+                    }),
+                    Hyperlink.new(String("/about"), Label.new(String("عن البرنامج")).{
+                        fontSize = 16.0;
+                        fontColor = Color("fff");
+                        padding = Quad(3);
+                        backgroundColor = LightColor;
+                    })
+                });
+            }
+        });
+    }~cast[SrdRef[Widget]];
 }
 
-func onKeyUp (widget: ref[TextInput], payload: ref[String], extra: ptr) {
-    prepCastedArg[label, Label, extra];
-    if payload == "Shift+Enter" {
-        def newData: String = widget.getText().replace("\n", "<br>");
-        widget.setText(String());
-        sendRequest("POST", "/messages", "Content-Type: application/text", newData, 0);
-    }
-}
+def slot: Slot[Void, Json];
 
-func onTimer (dummy: ref[Void], payload: ref[Json], extra: ptr) {
-  @shared def slot: Slot[Void, Json];
-  slot.fn = onResponse~ptr;
-  slot.extra = extra;
-  sendRequest("GET", "/messages", null, null, slot~ptr);
-}
+@uiEndpoint["/", "WebPlatform Example - Chat"]
+func main {
+    def bcPayload: ButtonClickPayload;
 
-func onResponse (dummy: ref[Void], payload: ref[Json], extra: ptr) {
-    prepCastedArg[label, Label, extra];
-    def data: String = payload.getObject("eventData").getString("body");
-    if label.getText() != data {
-        label.setText(data);
-    }
+    setView(Box.new({}).{
+        height = String("100%");
+        // padding = Quad(0, 50);
+        addChildren({
+            createHeader(),
+            Box.new({}).{
+                width = String("100%");
+                height = String("100%");
+                border = Quad(1);
+                borderColor = Color(0, 0, 0);
+                // padding = Quad(5);
+                addChildren({
+                    Label.new(String()).{
+                        bcPayload.label~no_deref = this.obj;
+                        width = String("100%");
+                        height = String("100%");
+                        fontColor = Color(50, 50, 50);
+                        fontSize = 20.0;
+                    };
+                });
+            },
+            Box.new({}).{
+                width = String("100%");
+                height = String("50pt");
+                layout = String("row");
+                border = Quad(1.5);
+                borderColor = PrimeryColor;
+                backgroundColor = PrimeryColor;
+                // padding = Quad(5);
+                addChildren({
+                    TextInput.new().{
+                        bcPayload.textInput~no_deref = this.obj;
+                        width = String("100%");
+                        height = String("100%");
+                        fontSize = 12.0;
+                        onKeyUp.connect(func (widget: ref[TextInput], payload: ref[String], extra: ptr) {
+                            prepCastedArg[label, Label, extra];
+                            if payload == "Shift+Enter" {
+                                def newData: String = widget.getText().replace("\n", "<br>");
+                                widget.setText(String());
+                                sendRequest("POST", "/messages", "Content-Type: application/text", newData, 0);
+                                slot.fn(nullRef[Void], Json(""), slot.extra)
+                            }
+                        }, bcPayload.label~ptr);
+                    },
+                    Button.new(String("أرسل")).{
+                        height = String("100%");
+                        width = String("50pt");
+                        backgroundColor = Color(200, 200, 200);
+                        fontSize = 16.0;
+                        onClick.connect(func (widget: ref[Button], payload: ref[Int], extra: ptr) {
+                            prepCastedArg[bcPayload, ButtonClickPayload, extra];
+                            def newData: String = bcPayload.textInput.getText().replace("\n", "<br>");
+                            bcPayload.textInput.setText(String());
+                            sendRequest("POST", "/messages", "Content-Type: application/text", newData, 0);
+                            slot.fn(nullRef[Void], Json(""), slot.extra)
+                        }, bcPayload~ptr);
+                    }
+                });
+            }
+        })
+    });
+
+    slot.fn = func (dummy: ref[Void], payload: ref[Json], extra: ptr) {
+        @shared def slot: Slot[Void, Json];
+        slot.fn = func (dummy: ref[Void], payload: ref[Json], extra: ptr) {
+            prepCastedArg[label, Label, extra];
+            def data: String = payload.getObject("eventData").getString("body");
+            if label.getText() != data {
+                label.setText(data);
+            }
+        };
+        slot.extra = extra;
+        sendRequest("GET", "/messages", null, null, slot~ptr);
+    };
+    slot.extra = bcPayload.label~ptr;
+    slot.fn(nullRef[Void], Json(""), slot.extra)
+    startTimer(500000, slot~ptr);
+
+    runEventLoop();
 }
 
 @uiEndpoint["/about", "WebPlatform Example - Chat"]

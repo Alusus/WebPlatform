@@ -20,13 +20,21 @@
     }
 
     macro generateProperty [propName, upperCasePropName, propType] {
-        def propName: propType;
-        func set__upperCasePropName__ (val: temp_ref[propType]) {
-            this.propName = val;
+        def v__propName__: propType;
+        handler this.set__upperCasePropName__ (val: temp_ref[propType]) {
+            this.v__propName__ = val;
             this.update();
         }
-        func get__upperCasePropName__ (): ref[propType] {
-            return this.propName;
+        handler this.get__upperCasePropName__ (): ref[propType] {
+            return this.v__propName__;
+        }
+        handler this.propName = (val: temp_ref[propType]) {
+            this.v__propName__ = val;
+            this.update();
+            return this.v__propName__;
+        }
+        handler this.propName: ref[propType] {
+            return this.v__propName__;
         }
     }
 
@@ -35,7 +43,7 @@
     // Quad
     // A tuple of four float values used for the four sides of a rectangle. This
     // is used for things like border thickness or padding.
-    type Quad {
+    class Quad {
         def top: Float = 0;
         def right: Float = 0;
         def bottom: Float = 0;
@@ -68,7 +76,7 @@
 
     //==========================================================================
     // Color
-    type Color {
+    class Color {
         def red: Int = 0;
         def green: Int = 0;
         def blue: Int = 0;
@@ -106,40 +114,11 @@
             this.blue = value.blue;
         }
 
-        func convertHexToDecimal(letter: Char): Int {
-            if ( letter == '0' ) 
-                return 0
-            else if ( letter == '1' ) 
-                return 1
-            else if ( letter == '2' ) 
-                return 2
-            else if ( letter == '3' ) 
-                return 3
-            else if ( letter == '4' ) 
-                return 4
-            else if ( letter == '5' ) 
-                return 5
-            else if ( letter == '6' ) 
-                return 6
-            else if ( letter == '7' ) 
-                return 7
-            else if ( letter == '8' ) 
-                return 8
-            else if ( letter == '9' ) 
-                return 9
-            else if ( letter == 'a' ) 
-                return 10
-            else if ( letter == 'b' ) 
-                return 11
-            else if ( letter == 'c' ) 
-                return 12
-            else if ( letter == 'd' ) 
-                return 13
-            else if ( letter == 'e' ) 
-                return 14
-            else if ( letter == 'f' ) 
-                return 15
-            else return 0
+        handler this.convertHexToDecimal(letter: Char): Int {
+            if letter >= '0' and letter <= '9' return letter - '0'
+            else if letter >= 'a' and letter <= 'f' return 10 + letter - 'a'
+            else if letter >= 'A' and letter <= 'F' return 10 + letter - 'A'
+            else return 0;
         }
     }
 }

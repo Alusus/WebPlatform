@@ -8,7 +8,7 @@ import "Spp";
 import "Build";
 import "Apm";
 Apm.importFile("Alusus/Http");
-Apm.importFile("xlmnxp/Json");
+Apm.importFile("Alusus/Json");
 
 import "WebPlatform/server";
 import "WebPlatform/browser_api";
@@ -28,7 +28,7 @@ import "WebPlatform/main";
 
     macro defSrdRefCast [tpName] {
         def __tpName__SrdRef: alias SrdRef[WebPlatform.tpName];
-        @merge type __tpName__SrdRef {
+        @merge class __tpName__SrdRef {
             handler this~cast[SrdRef[WebPlatform.Widget]] return SrdRef[WebPlatform.Widget](this.refCounter, this.widget);
         }
     }

@@ -1,5 +1,5 @@
 @merge module WebPlatform {
-    type UiEndpoint {
+    class UiEndpoint {
         def uri: String;
         def filename: String;
         def title: String;
@@ -7,7 +7,7 @@
         handler this~init(uri: String, filename: String, title: String) this.set(uri, filename, title);
         handler this~init(ref[UiEndpoint]) this.set(value.uri, value.filename, value.title);
         handler this=ref[UiEndpoint] this.set(value.uri, value.filename, value.title);
-        func set (uri: String, filename: String, title: String) {
+        handler this.set (uri: String, filename: String, title: String) {
             this.uri = uri;
             this.filename = filename;
             this.title = title;

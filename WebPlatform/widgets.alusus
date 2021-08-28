@@ -2,7 +2,7 @@
     //==========================================================================
     // Widget
     // The base class of all widgets.
-    type Widget {
+    class Widget {
         def id: String;
 
         // Styles
@@ -14,15 +14,15 @@
             this.backgroundColor~init(255, 255, 255);
         }
 
-        def build: ptr[function (ownerId: String)];
-        def unbuild: ptr[function];
-        def update: ptr[function];
+        handler this.build(ownerId: String) as_ptr;
+        handler this.unbuild() as_ptr;
+        handler this.update() as_ptr;
     }
 
     //==========================================================================
     // Box
     // A rectangular area that contains other widgets.
-    type Box {
+    class Box {
         @injection def widget: Widget;
         def children: Array[SrdRef[Widget]];
 
@@ -41,12 +41,12 @@
 
         handler this~init() {
             this.borderColor~init(255, 255, 255);
-            this.layout = "column";
-            this.justify = "space-around";
-            this.direction = "rtl";
+            this.layout = String("column");
+            this.justify = String("space-around");
+            this.direction = String("rtl");
         }
 
-        function addChildren (count: Int, children: ...temp_ref[SrdRef[Widget]]) {
+        handler this.addChildren (count: Int, children: ...temp_ref[SrdRef[Widget]]) {
             while count-- > 0 {
                 def child: ref[SrdRef[Widget]](children~next_arg[ref[SrdRef[Widget]]]);
                 this.children.add(child);
@@ -54,7 +54,7 @@
             }
         }
 
-        function removeChildren (count: Int, children: ...temp_ref[SrdRef[Widget]]) {
+        handler this.removeChildren (count: Int, children: ...temp_ref[SrdRef[Widget]]) {
             while count-- > 0 {
                 def child: ref[SrdRef[Widget]](children~next_arg[ref[SrdRef[Widget]]]);
                 def i: Int;
@@ -71,7 +71,7 @@
         //-------------------
         // Function Overrides
 
-        function buildImpl (ownerId: String) {
+        handler (this:Widget).build (ownerId: String) set_ptr {
             this.id = getNewId();
             createElement("div", this.id, ownerId);
             this.update();
@@ -81,9 +81,8 @@
                 this.children(i).build(this.id);
             }
         }
-        build = buildImpl~ptr~cast[Widget.build~type];
 
-        function unbuildImpl {
+        handler (this:Widget).unbuild() set_ptr {
             if this.id.getLength() > 0 {
                 deleteElement(this.id);
 
@@ -95,9 +94,8 @@
                 this.id = String();
             }
         }
-        unbuild = unbuildImpl~ptr~cast[Widget.unbuild~type];
 
-        function updateImpl {
+        handler (this:Widget).update() set_ptr {
             if this.id.getLength() > 0 {
                 setElementAttribute(
                     this.id, "style",
@@ -122,12 +120,11 @@
                 );
             }
         }
-        update = updateImpl~ptr~cast[Widget.update~type];
 
         //-----------------
         // Shared Functions
 
-        @shared function new (count: Int, args: ...temp_ref[SrdRef[Widget]]): SrdRef[Box] {
+        function new (count: Int, args: ...temp_ref[SrdRef[Widget]]): SrdRef[Box] {
             def r: SrdRef[Box];
             r.alloc()~init();
             while count-- > 0 r.addChildren({ args~next_arg[ref[SrdRef[Widget]]] });
@@ -138,7 +135,7 @@
     //==========================================================================
     // Canvas
     // A free form drawing area.
-    type Canvas {
+    class Canvas {
         @injection def widget: Widget;
 
         //-----------
@@ -156,31 +153,29 @@
 
         handler this~init() {
             this.borderColor~init(255, 255, 255);
-            this.layout = "column";
-            this.justify = "space-around";
-            this.direction = "rtl";
+            this.layout = String("column");
+            this.justify = String("space-around");
+            this.direction = String("rtl");
         }
 
         //-------------------
         // Function Overrides
 
-        function buildImpl (ownerId: String) {
+        handler (this:Widget).build (ownerId: String) set_ptr {
             this.id = getNewId();
             createElement("canvas", this.id, ownerId);
             this.update();
         }
-        build = buildImpl~ptr~cast[Widget.build~type];
 
-        function unbuildImpl {
+        handler (this:Widget).unbuild() set_ptr {
             if this.id.getLength() > 0 {
                 deleteElement(this.id);
 
                 this.id = String();
             }
         }
-        unbuild = unbuildImpl~ptr~cast[Widget.unbuild~type];
 
-        function updateImpl {
+        handler (this:Widget).update() set_ptr {
             if this.id.getLength() > 0 {
                 setElementAttribute(
                     this.id, "style",
@@ -205,12 +200,11 @@
                 );
             }
         }
-        update = updateImpl~ptr~cast[Widget.update~type];
 
         //-----------------
         // Shared Functions
 
-        @shared function new (): SrdRef[Canvas] {
+        function new (): SrdRef[Canvas] {
             def r: SrdRef[Canvas];
             r.alloc()~init();
             return r;
@@ -219,7 +213,7 @@
 
     //==========================================================================
     // Label
-    type Label {
+    class Label {
         @injection def widget: Widget;
 
         //-----------
@@ -236,30 +230,28 @@
 
         handler this~init(t: String) {
             this.text = t;
-            this.fontSize = 10;
-            this.textAlign = "right";
-            this.textDirection = "rtl";
+            this.fontSize = 10.0;
+            this.textAlign = String("right");
+            this.textDirection = String("rtl");
         }
 
         //-------------------
         // Function Overrides
 
-        function buildImpl (ownerId: String) {
+        handler (this:Widget).build (ownerId: String) set_ptr {
             this.id = getNewId();
             createElement("span", this.id, ownerId);
             this.update();
         }
-        build = buildImpl~ptr~cast[Widget.build~type];
 
-        function unbuildImpl {
+        handler (this:Widget).unbuild() set_ptr {
             if this.id.getLength() > 0 {
                 deleteElement(this.id);
                 this.id = String();
             }
         }
-        unbuild = unbuildImpl~ptr~cast[Widget.unbuild~type];
 
-        function updateImpl {
+        handler (this:Widget).update() set_ptr {
             if this.id.getLength() > 0 {
                 setElementAttribute(this.id, "innerHTML", this.text);
                 setElementAttribute(
@@ -284,12 +276,11 @@
                 );
             }
         }
-        update = updateImpl~ptr~cast[Widget.update~type];
 
         //-----------------
         // Shared Functions
 
-        @shared function new (t: String): SrdRef[Label] {
+        function new (t: String): SrdRef[Label] {
             def r: SrdRef[Label];
             r.alloc()~init(t);
             return r;
@@ -298,7 +289,7 @@
 
     //==========================================================================
     // Button
-    type Button {
+    class Button {
         @injection def widget: Widget;
         def eventsSlot: Slot[Void, Json];
 
@@ -318,9 +309,9 @@
         handler this~init(t: String) {
             this.onClick.owner~no_deref = this;
             this.text = t;
-            this.fontSize = 10;
-            this.textAlign = "right";
-            this.textDirection = "rtl";
+            this.fontSize = 10.0;
+            this.textAlign = String("right");
+            this.textDirection = String("rtl");
             this.eventsSlot.extra = this~ptr;
             this.eventsSlot.fn = Button.onEvent~ptr;
         }
@@ -328,7 +319,7 @@
         //-----------------
         // Member Functions
 
-        function onSignalConnectionsChanged(signal: ptr[Signal[Button, Int]], connectionCount: Int) {
+        handler this.onSignalConnectionsChanged(signal: ptr[Signal[Button, Int]], connectionCount: Int) {
             if this.id.getLength() > 0 {
                 if signal == this.onClick~ptr {
                     if connectionCount > 0 registerEventHandler(this.id, "click", this.eventsSlot~ptr)
@@ -340,21 +331,19 @@
         //-------------------
         // Function Overrides
 
-        function buildImpl (ownerId: String) {
+        handler (this:Widget).build (ownerId: String) set_ptr {
             this.id = getNewId();
             createElement("button", this.id, ownerId);
             this.update();
             if this.onClick.getConnectionCount() > 0 registerEventHandler(this.id, "click", this.eventsSlot~ptr);
         }
-        build = buildImpl~ptr~cast[Widget.build~type];
 
-        function unbuildImpl {
+        handler (this:Widget).unbuild() set_ptr {
             deleteElement(this.id);
             this.id = String();
         }
-        unbuild = unbuildImpl~ptr~cast[Widget.unbuild~type];
 
-        function updateImpl {
+        handler (this:Widget).update() set_ptr {
             if this.id.getLength() > 0 {
                 setElementAttribute(this.id, "innerHTML", this.text);
                 setElementAttribute(
@@ -377,19 +366,18 @@
                 );
             }
         }
-        update = updateImpl~ptr~cast[Widget.update~type];
 
         //-----------------
         // Shared Functions
 
-        @shared function onEvent (dummy: ref[Void], payload: ref[Json], extra: ptr) {
+        function onEvent (dummy: ref[Void], payload: ref[Json], extra: ptr) {
             def button: ref[Button];
             button~ptr = extra~cast[ptr[Button]];
             def eventName: String = payload.getString("eventName");
             if eventName == "click" button.onClick.emit(Int(0));
         }
 
-        @shared function new (t: String): SrdRef[Button] {
+        function new (t: String): SrdRef[Button] {
             def r: SrdRef[Button];
             r.alloc()~init(t);
             return r;
@@ -399,7 +387,7 @@
     //==========================================================================
     // TextInput
     // A multi-line text entry.
-    type TextInput {
+    class TextInput {
         @injection def widget: Widget;
         def eventsSlot: Slot[Void, Json];
 
@@ -421,9 +409,9 @@
             this.onChanged.owner~no_deref = this;
             this.onKeyPress.owner~no_deref = this;
             this.onKeyUp.owner~no_deref = this;
-            this.fontSize = 10;
-            this.textAlign = "right";
-            this.textDirection = "rtl";
+            this.fontSize = 10.0;
+            this.textAlign = String("right");
+            this.textDirection = String("rtl");
             this.eventsSlot.extra = this~ptr;
             this.eventsSlot.fn = TextInput.onEvent~ptr;
         }
@@ -431,7 +419,7 @@
         //-----------------
         // Member Functions
 
-        function onSignalConnectionsChanged(signal: ptr[Signal[TextInput, Int]], connectionCount: Int) {
+        handler this.onSignalConnectionsChanged(signal: ptr[Signal[TextInput, Int]], connectionCount: Int) {
             if this.id.getLength() > 0 {
                 if signal == this.onChanged~ptr {
                     if connectionCount > 0 registerEventHandler(this.id, "change", this.eventsSlot~ptr)
@@ -440,7 +428,7 @@
             }
         }
 
-        function onSignalConnectionsChanged(signal: ptr[Signal[TextInput, String]], connectionCount: Int) {
+        handler this.onSignalConnectionsChanged(signal: ptr[Signal[TextInput, String]], connectionCount: Int) {
             if this.id.getLength() > 0 {
                 if signal == this.onKeyPress~ptr {
                     if connectionCount > 0 registerEventHandler(this.id, "keypress", this.eventsSlot~ptr)
@@ -452,10 +440,10 @@
             }
         }
 
-        function setText (t: String) {
+        handler this.setText (t: String) {
             if this.id.getLength() > 0 setElementAttribute(this.id, "value", t);
         }
-        function getText (): String {
+        handler this.getText (): String {
             if this.id.getLength() == 0 return String();
             return String(getElementAttribute(this.id, "value"));
         }
@@ -463,7 +451,7 @@
         //-------------------
         // Function Overrides
 
-        function buildImpl (ownerId: String) {
+        handler (this:Widget).build (ownerId: String) set_ptr {
             this.id = getNewId();
             createElement("textarea", this.id, ownerId);
             this.update();
@@ -471,15 +459,13 @@
             if this.onKeyPress.getConnectionCount() > 0 registerEventHandler(this.id, "keypress", this.eventsSlot~ptr);
             if this.onKeyUp.getConnectionCount() > 0 registerEventHandler(this.id, "keyup", this.eventsSlot~ptr);
         }
-        build = buildImpl~ptr~cast[Widget.build~type];
 
-        function unbuildImpl {
+        handler (this:Widget).unbuild() set_ptr {
             deleteElement(this.id);
             this.id = String();
         }
-        unbuild = unbuildImpl~ptr~cast[Widget.unbuild~type];
 
-        function updateImpl {
+        handler (this:Widget).update() set_ptr {
             if this.id.getLength() > 0 {
                 setElementAttribute(
                     this.id, "style",
@@ -502,12 +488,11 @@
                 );
             }
         }
-        update = updateImpl~ptr~cast[Widget.update~type];
 
         //-----------------
         // Shared Functions
 
-        @shared function onEvent (dummy: ref[Void], payload: ref[Json], extra: ptr) {
+        function onEvent (dummy: ref[Void], payload: ref[Json], extra: ptr) {
             def textInput: ref[TextInput];
             textInput~ptr = extra~cast[ptr[TextInput]];
             def eventName: String = payload.getString("eventName");
@@ -528,7 +513,7 @@
             }
         }
 
-        @shared function new (): SrdRef[TextInput] {
+        function new (): SrdRef[TextInput] {
             def r: SrdRef[TextInput];
             r.alloc()~init();
             return r;
@@ -537,7 +522,7 @@
 
     //==========================================================================
     // Hyperlink
-    type Hyperlink {
+    class Hyperlink {
         @injection def widget: Widget;
         def child: SrdRef[Widget];
 
@@ -553,7 +538,7 @@
             this.url = url;
         }
 
-        function setChild (child: temp_ref[SrdRef[Widget]]) {
+        handler this.setChild (child: temp_ref[SrdRef[Widget]]) {
             if this.child.obj~ptr != 0 this.child.unbuild();
             this.child = child;
             if this.child.obj~ptr != 0 && this.id.getLength() > 0 this.child.build(this.id);
@@ -562,16 +547,15 @@
         //-------------------
         // Function Overrides
 
-        function buildImpl (ownerId: String) {
+        handler (this:Widget).build (ownerId: String) set_ptr {
             this.id = getNewId();
             createElement("a", this.id, ownerId);
             this.update();
 
             if this.child.obj~ptr != 0 this.child.build(this.id);
         }
-        build = buildImpl~ptr~cast[Widget.build~type];
 
-        function unbuildImpl {
+        handler (this:Widget).unbuild() set_ptr {
             if this.id.getLength() > 0 {
                 deleteElement(this.id);
 
@@ -580,20 +564,18 @@
                 this.id = String();
             }
         }
-        unbuild = unbuildImpl~ptr~cast[Widget.unbuild~type];
 
-        function updateImpl {
+        handler (this:Widget).update() set_ptr {
             if this.id.getLength() > 0 {
                 setElementAttribute(this.id, "href", this.url);
                 setElementAttribute(this.id, "style", "text-decoration: none;");
             }
         }
-        update = updateImpl~ptr~cast[Widget.update~type];
 
         //-----------------
         // Shared Functions
 
-        @shared function new (url: String, child: temp_ref[SrdRef[Widget]]): SrdRef[Hyperlink] {
+        function new (url: String, child: temp_ref[SrdRef[Widget]]): SrdRef[Hyperlink] {
             def r: SrdRef[Hyperlink];
             r.alloc()~init(url);
             r.setChild(child);
