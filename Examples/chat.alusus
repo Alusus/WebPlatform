@@ -31,11 +31,6 @@ func getMessages (conn: ptr[Http.Connection]) {
 //==============================================================================
 // Frontend
 
-macro prepCastedArg [varName, varType, argName] {
-    def varName: ref[varType];
-    varName~ptr = argName~cast[ptr[varType]];
-}
-
 def PrimeryColor: Color("8e50ef");
 def LightColor: Color("c380ff");
 
@@ -175,23 +170,19 @@ func main {
 
 @uiEndpoint["/about", "WebPlatform Example - Chat"]
 func about {
-    def label1: SrdRef[Label] = Label.new(String("مثال الدردشة"));
-    label1.setFontColor(Color(0, 0, 0));
-    label1.setFontSize(30.0);
-
-    def label2: SrdRef[Label] = Label.new(String("طُور باستخدام منصة ويب الأسس"));
-    label2.setFontColor(Color(0, 0, 0));
-    label2.setFontSize(20.0);
-    def canvas: SrdRef[Canvas] = Canvas.new();
-    def box: SrdRef[Box] = Box.new({ createHeader(), canvas ,label1, label2 });
-    // box.setPadding(Quad(0, 50));
-    setView(box);
-    drawLine(canvas.id, 0,0, 100,100);
-    drawCircle(canvas.id, 100,180, 90,0 );
-    def points: Array [Int]({ 50, 50, 100, 50, 100, 100, 50, 100, 25, 75 });
-    setFillStyle(canvas.id , "black", "blue", 0, 0, 100, 100);
-    drawPolygon(canvas.id, 5, points.buf);
-    drawText(canvas.id, "HI", "30px Arial", 50, 50);
+    setView(Box.new({}).{
+        addChildren({
+            createHeader(),
+            Label.new(String("مثال الدردشة")).{
+                fontColor = Color(0, 0, 0);
+                fontSize = 30.0;
+            },
+            Label.new(String("طُور باستخدام منصة ويب الأسس")).{
+                fontColor = Color(0, 0, 0);
+                fontSize = 20.0;
+            }
+        })
+    });
 
     runEventLoop();
 }

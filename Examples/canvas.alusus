@@ -1,0 +1,53 @@
+import "Apm";
+Apm.importFile("Alusus/WebPlatform");
+use Srl;
+use WebPlatform;
+
+//==============================================================================
+// Frontend
+
+def PrimeryColor: Color("8e50ef");
+def LightColor: Color("c380ff");
+
+func createHeader (): SrdRef[Widget] {
+    setElementAttribute("body", "style", "padding: 0; margin: 0;");
+
+    return Box.new({}).{
+        width = String("100%");
+        height = String("40pt");
+        padding = Quad(5, 0);
+        backgroundColor = PrimeryColor;
+        borderColor = PrimeryColor;
+        border = Quad(1.5);
+
+        addChildren({
+            Label.new(String("أمثلة منصة ويب الأسس - لوحة رسم")).{
+                fontColor = Color("fff");
+                fontSize = 21.0;
+                width = String("100%");
+                height = String("100%");
+                backgroundColor = PrimeryColor;
+            },
+        });
+    }~cast[SrdRef[Widget]];
+}
+
+@uiEndpoint["/", "WebPlatform Example - Canvas"]
+func main {
+    def canvas: SrdRef[Canvas] = Canvas.new();
+    setView(Box.new({ createHeader(), canvas }));
+
+    drawLine(canvas.id, 0,0, 100,100);
+    drawCircle(canvas.id, 100,180, 90,0 );
+    def points: Array [Int]({ 50, 50, 100, 50, 100, 100, 50, 100, 25, 75 });
+    setFillStyle(canvas.id , "black", "blue", 0, 0, 100, 100);
+    drawPolygon(canvas.id, 5, points.buf);
+    drawText(canvas.id, "HI", "30px Arial", 50, 50);
+
+    runEventLoop();
+}
+
+
+Console.print("Starting server on port 8010...\nURL: http://localhost:8010/\n");
+runServer({ "listening_ports", "8010", "static_file_max_age", "0" });
+
