@@ -1,12 +1,135 @@
 @merge module WebPlatform {
+    //==========================================================================
+    // Event Handlers
+
+    class EventHandler {
+        def cb: closure (Json);
+        def id: ArchInt;
+        def info: SrdRef[Void];
+        
+        handler this~init() {}
+        handler this~init(cb: closure(Json), id: ArchInt) {
+            this.cb = cb;
+            this.id = id;
+        }
+        handler this~init(that: ref[EventHandler]) this = that;
+        handler this = ref[EventHandler] {
+            this.cb = value.cb;
+            this.id = value.id;
+        }
+    }
+
+    def eventIdCounter: ArchInt(0);
+    def eventHandlers: Array[EventHandler];
+
+    function addEventHandler (cb: closure (Json)): ArchInt {
+        ++eventIdCounter;
+        eventHandlers.add(EventHandler(cb, eventIdCounter));
+        return eventHandlers.getLength() - 1;
+    }
+
+    function findEventHandlerIndex(id: ArchInt): ArchInt {
+        def start: ArchInt = 0;
+        def end: ArchInt = eventHandlers.getLength() - 1;
+        if end < 0 or id < eventHandlers(start).id or id > eventHandlers(end).id return -1;
+        if id == eventHandlers(start).id return start;
+        if id == eventHandlers(end).id return end;
+
+        while end > start + 1 {
+            def mid: ArchInt = (start + end) >> 1;
+            if id > eventHandlers(mid).id start = mid
+            else if id < eventHandlers(mid).id end = mid
+            else return mid;
+        }
+        return -1;
+    }
+
+    //==========================================================================
+    // DOM Element Events
+
+    class ElementEventIdentification {
+        def elementName: String;
+        def eventName: String;
+    }
+
+    function registerElementEventHandler (
+        elementName: ptr[array[Char]], eventName: ptr[array[Char]], cb: closure (Json)
+    ): ArchInt {
+        def index: ArchInt = addEventHandler(cb);
+        _registerElementEventHandler(elementName, eventName, eventHandlers(index).id);
+        def eventIdentification: SrdRef[ElementEventIdentification];
+        eventIdentification.construct();
+        eventIdentification.elementName = elementName;
+        eventIdentification.eventName = eventName;
+        eventHandlers(index).info = castSrdRef[eventIdentification, Void];
+        return eventHandlers(index).id;
+    }
+
+    function unregisterElementEventHandler (id: ArchInt) {
+        def i: ArchInt = findEventHandlerIndex(id);
+        if i == -1 return;
+        def eventIdentification: SrdRef[ElementEventIdentification] =
+            castSrdRef[eventHandlers(i).info, ElementEventIdentification];
+        _unregisterElementEventHandler(eventIdentification.elementName, eventIdentification.eventName);
+        eventHandlers.remove(i);
+    }
+
+    //==========================================================================
+    // Async Operations
+
+    function sendRequest (method: ptr[Char], uri: ptr[Char], headers: ptr[Char], body: ptr[Char], cb: closure (Json)) {
+        def index: ArchInt = addEventHandler(cb);
+        _sendRequest(method, uri, headers, body, eventHandlers(index).id);
+    }
+
+    function startTimer (duration: Word, cb: closure (Json)): ArchInt {
+        def index: ArchInt = addEventHandler(cb);
+        def timerInfo: SrdRef[Word];
+        timerInfo.construct();
+        timerInfo.obj = _startTimer(duration, eventHandlers(index).id);
+        eventHandlers(index).info = castSrdRef[timerInfo, Void];
+        return eventHandlers(index).id;
+    }
+
+    function stopTimer (id: ArchInt) {
+        def i: ArchInt = findEventHandlerIndex(id);
+        if i == -1 return;
+        def timerInfo: SrdRef[Word] = castSrdRef[eventHandlers(i).info, Word];
+        _stopTimer(timerInfo.obj);
+        eventHandlers.remove(i);
+    }
+
+    function setTimeout (duration: Word, cb: closure (Json)): ArchInt {
+        def index: ArchInt = addEventHandler(cb);
+        def timeoutInfo: SrdRef[Word];
+        timeoutInfo.construct();
+        timeoutInfo.obj = _setTimeout(duration, eventHandlers(index).id);
+        eventHandlers(index).info = castSrdRef[timeoutInfo, Void];
+        return eventHandlers(index).id;
+    }
+
+    function cancelTimeout (id: ArchInt) {
+        def i: ArchInt = findEventHandlerIndex(id);
+        if i == -1 return;
+        def timeoutInfo: SrdRef[Word] = castSrdRef[eventHandlers(i).info, Word];
+        _cancelTimeout(timeoutInfo.obj);
+        eventHandlers.remove(i);
+    }
+
+    //==========================================================================
+    // Event Loop
+
     function dispatchEvents {
         while 1 {
             def jsonStr: ptr[array[Char]] = fetchNextEvent();
             if jsonStr == 0 break;
             def json: Json(jsonStr);
-            def slot: ref[Slot[Void, Json]];
-            slot~ptr = json.getInt("slotPtr")~cast[ptr[Slot[Void, Json]]];
-            if slot~ptr != 0 slot.fn(nullRef[Void], json, slot.extra);
+            // TODO: Use (and implement) json.getArchInt("cbId").
+            def index: ArchInt = findEventHandlerIndex(json.getInt("cbId"));
+            if index != -1 {
+                eventHandlers(index).cb(json);
+                if !json.getBool("recurring") eventHandlers.remove(index);
+            }
         }
     }
     

@@ -4,17 +4,18 @@
     @expname[setElementAttribute] function setElementAttribute (name: ptr[Char], prop: ptr[Char], value: ptr[Char]);
     @expname[getElementAttribute] function getElementAttribute (name: ptr[Char], prop: ptr[Char]): ptr[array[Char]];
     @expname[fetchNextEvent] function fetchNextEvent (): ptr[array[Char]];
-    @expname[registerEventHandler] function registerEventHandler (
-      elementName: ptr[Char], eventName: ptr[Char], slotPtr: ptr[Slot[Void, Json]]
+    @expname[registerElementEventHandler] function _registerElementEventHandler (
+      elementName: ptr[Char], eventName: ptr[Char], cbId: ArchInt
     );
-    @expname[unregisterEventHandler] function unregisterEventHandler (elementName: ptr[Char], eventName: ptr[Char]);
+    @expname[unregisterElementEventHandler] function _unregisterElementEventHandler (elementName: ptr[Char], eventName: ptr[Char]);
     @expname[waitForEvent] function waitForEvent;
-    @expname[sendRequest] function sendRequest (
-        method: ptr[Char], uri: ptr[Char], headers: ptr[Char], body: ptr[Char], slotPtr: ptr[Slot[Void, Json]]
+    @expname[sendRequest] function _sendRequest (
+        method: ptr[Char], uri: ptr[Char], headers: ptr[Char], body: ptr[Char], cbId: ArchInt
     );
-    @expname[startTimer] function startTimer (duration: Word, slotPtr: ptr[Slot[Void, Json]]): Word;
-    @expname[stopTimer] function stopTimer (id: Word);
-    @expname[setTimeout] function setTimeout (duration: Word, slotPtr: ptr[Slot[Void, Json]]);
+    @expname[startTimer] function _startTimer (duration: Word, cbId: ArchInt): Word;
+    @expname[stopTimer] function _stopTimer (id: Word);
+    @expname[setTimeout] function _setTimeout (duration: Word, cbId: ArchInt): Word;
+    @expname[cancelTimeout] function _cancelTimeout (id: Word);
     @expname[drawLine] function drawLine (name: ptr[Char], x1: Int, y1: Int, x2: Int, y2: Int);
     @expname[drawPolygon] function drawPolygon (name: ptr[Char], pointCount: Int, points: ref[array[Int]]);
     @expname[drawCircle] function drawCircle (name: ptr[Char], x1: Int, y1: Int, x2: Int, y2: Int);
@@ -22,5 +23,6 @@
         name: ptr[Char],c1:ptr[Char], c2:ptr[Char], x1: Int, y1: Int, x2: Int, y2: Int
     );
     @expname[drawText] function drawText (name: ptr[Char], text: ptr[Char], font: ptr[Char], x: Int, y: Int);
+    @expname[logToConsole] function logToConsole (msg: ptr[Char]);
 }
 

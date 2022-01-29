@@ -61,7 +61,7 @@ function getFilenameFromPath (path: ptr[array[Char]]): String {
 
 // Build stdlib
 def stdlibPath: Srl.String = buildPath + "/wasm-stdlib-hack-master";
-def clangCmd: "clang-10 --target=wasm32-unknown-unknown-wasm -Iinclude/libc -Oz";
+def clangCmd: "clang-11 --target=wasm32-unknown-unknown-wasm -Iinclude/libc -Oz";
 def disableWarn: "-Wno-bitwise-op-parentheses -Wno-shift-op-parentheses";
 def mallocOpts: "-DMORECORE_CANNOT_TRIM=1 -DHAVE_MMAP=0 -DHAVE_MREMAP=0 -DLACKS_TIME_H=1 -DNO_MALLOC_STATS=1 "
     "-Dmalloc_getpagesize=65536 -Wno-expansion-to-defined";
@@ -86,6 +86,7 @@ if !Fs.exists(String.format("%s/dist/stdlib-min.wasm", stdlibPath.buf)) {
         String("string/memset"),
         String("string/memrchr"),
         String("string/memcmp"),
+        String("string/memmove"),
         String("string/stpcpy"),
         String("string/stpncpy"),
         String("string/strchr"),
@@ -111,7 +112,7 @@ if !Fs.exists(String.format("%s/dist/stdlib-min.wasm", stdlibPath.buf)) {
     
     // Link into stdlib-min.wasm
     def cmd: String = String.format(
-        "cd %s && wasm-ld-10 --no-entry --export-dynamic -r lib/stdlib-base.wasm lib/malloc.wasm", stdlibPath.buf
+        "cd %s && wasm-ld-11 --no-entry --export-dynamic -r lib/stdlib-base.wasm lib/malloc.wasm", stdlibPath.buf
     );
     for i = 0, i < fnFilenames.getLength(), ++i {
         cmd += " lib/";

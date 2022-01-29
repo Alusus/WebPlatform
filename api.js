@@ -47,15 +47,15 @@ wasmApi.fetchNextEvent = () => {
     return toWasmString(result);
 }
 
-wasmApi.registerEventHandler = (elementName, eventName, slotPtr) => {
+wasmApi.registerElementEventHandler = (elementName, eventName, cbId) => {
     const jsElementName = toJsString(elementName);
     const jsEventName = toJsString(eventName);
     document.getElementById(jsElementName)[`on${jsEventName}`] = (event) => {
-      onEvent(slotPtr, jsEventName, event);
+      onEvent(cbId, true, jsEventName, event);
     };
 }
 
-wasmApi.unregisterEventHandler = (elementName, eventName) => {
+wasmApi.unregisterElementEventHandler = (elementName, eventName) => {
     const jsElementName = toJsString(elementName);
     const jsEventName = toJsString(eventName);
     document.getElementById(jsElementName)[`on${jsEventName}`] = null;
@@ -147,7 +147,7 @@ wasmApi.waitForEvent = () => {
   }
 }
 
-wasmApi.sendRequest = (method, uri, headers, body, slotPtr) => {
+wasmApi.sendRequest = (method, uri, headers, body, cbId) => {
   const controller = new AbortController();
   const signal = controller.signal;
   // 10 seconds timeout.
@@ -167,7 +167,7 @@ wasmApi.sendRequest = (method, uri, headers, body, slotPtr) => {
   }).then(response => {
     return response.text().then(bodyText => {
       clearTimeout(timeoutId);
-      onEvent(slotPtr, 'sendRequest', {
+      onEvent(cbId, false, 'sendRequest', {
         status: response.staus,
         headers: Object.fromEntries(response.headers.entries()),
         body: bodyText
@@ -176,9 +176,9 @@ wasmApi.sendRequest = (method, uri, headers, body, slotPtr) => {
   });
 }
 
-wasmApi.startTimer = (duration, slotPtr) => {
+wasmApi.startTimer = (duration, cbId) => {
   return setInterval(() => {
-    onEvent(slotPtr, 'timer', {});
+    onEvent(cbId, true, 'timer', {});
   }, duration/1000);
 }
 
@@ -186,16 +186,23 @@ wasmApi.stopTimer = (id) => {
   clearInterval(id);
 }
 
-wasmApi.setTimeout = (duration, slotPtr) => {
-  setTimeout(() => {
-    onEvent(slotPtr, 'timer', {});
+wasmApi.setTimeout = (duration, cbId) => {
+  return setTimeout(() => {
+    onEvent(cbId, false, 'timer', {});
   }, duration/1000);
 }
 
+wasmApi.cancelTimeout = (id) => {
+  clearTimeout(id);
+}
+
+wasmApi.logToConsole = (msg) => {
+  console.log(toJsString(msg));
+}
 
 
 function stringifyEvent(event) {
-  const obj = { slotPtr: event.slotPtr, eventName: event.eventName, eventData: {} };
+  const obj = { cbId: event.cbId, recurring: event.recurring, eventName: event.eventName, eventData: {} };
   for (let k in event.eventData) {
     obj.eventData[k] = event.eventData[k];
   }
@@ -206,8 +213,8 @@ function stringifyEvent(event) {
   }, ' ');
 }
 
-function onEvent (slotPtr, eventName, event) {
-  eventsQueue.push({ slotPtr, eventName, eventData: event });
+function onEvent (cbId, recurring, eventName, event) {
+  eventsQueue.push({ cbId, recurring, eventName, eventData: event });
 
   // Unblock wasm if it's waiting for events.
   if (eventWaiting) {

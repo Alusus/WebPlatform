@@ -6,33 +6,30 @@ use WebPlatform;
 //==============================================================================
 // Backend
 
-def messages: String;
+def MAX_MESSAGES: 12;
+def messages: Array[String];
 
 @beEndpoint["POST", "/messages"]
 func postMessages (conn: ptr[Http.Connection]) {
     def postData: array[Char, 1024];
-    Http.read(conn, postData~ptr, postData~size);
-    if messages.getLength() > 0 messages += "<br>";
-    messages += postData~ptr;
+    def postDataSize: Int = Http.read(conn, postData~ptr, postData~size);
+    if messages.getLength() >= MAX_MESSAGES messages.remove(0);
+    messages.add(String(postData~ptr, postDataSize));
     Http.print(conn, "HTTP/1.1 200 Ok\r\n\r\n");
 }
 
 @beEndpoint["GET", "/messages"]
 func getMessages (conn: ptr[Http.Connection]) {
+    def response: String = String.merge(messages, "<br>");
     Http.print(conn, "HTTP/1.1 200 Ok\r\n");
     Http.print(conn, "Content-Type: text/plain\r\n");
     Http.print(conn, "Cache-Control: no-cache\r\n");
-    Http.print(conn, "Content-Length: %d\r\n\r\n", messages.getLength());
-    Http.print(conn, messages.buf);
+    Http.print(conn, "Content-Length: %d\r\n\r\n", response.getLength());
+    Http.print(conn, response.buf);
 }
 
 //==============================================================================
 // Frontend
-
-class ButtonClickPayload {
-    def label: ref[Label];
-    def textInput: ref[TextInput];
-}
 
 macro prepCastedArg [varName, varType, argName] {
     def varName: ref[varType];
@@ -85,11 +82,16 @@ func createHeader (): SrdRef[Widget] {
     }~cast[SrdRef[Widget]];
 }
 
-def slot: Slot[Void, Json];
+func encodeHtml(str: String): String {
+    return str
+        .replace("\n", "<br>")
+        .replace(",", "&comma;")
+        .replace("\"", "&quot;");
+}
 
 @uiEndpoint["/", "WebPlatform Example - Chat"]
 func main {
-    def bcPayload: ButtonClickPayload;
+    def onFetch: closure (json: Json);
 
     setView(Box.new({}).{
         height = String("100%");
@@ -104,12 +106,18 @@ func main {
                 // padding = Quad(5);
                 addChildren({
                     Label.new(String()).{
-                        bcPayload.label~no_deref = this.obj;
                         width = String("100%");
                         height = String("100%");
                         fontColor = Color(50, 50, 50);
                         fontSize = 20.0;
-                    };
+
+                        onFetch = closure (json: Json) {
+                            def data: String = json.getObject("eventData").getString("body");
+                            if this.getText() != data {
+                                this.setText(data);
+                            }
+                        };
+                    }
                 });
             },
             Box.new({}).{
@@ -120,55 +128,47 @@ func main {
                 borderColor = PrimeryColor;
                 backgroundColor = PrimeryColor;
                 // padding = Quad(5);
+                def textInput: SrdRef[TextInput];
                 addChildren({
                     TextInput.new().{
-                        bcPayload.textInput~no_deref = this.obj;
+                        textInput = this;
                         width = String("100%");
                         height = String("100%");
                         fontSize = 12.0;
-                        onKeyUp.connect(func (widget: ref[TextInput], payload: ref[String], extra: ptr) {
-                            prepCastedArg[label, Label, extra];
+                        onKeyUp.connect(closure (widget: ref[TextInput], payload: ref[String]) {
                             if payload == "Shift+Enter" {
-                                def newData: String = widget.getText().replace("\n", "<br>");
+                                def newData: String = encodeHtml(widget.getText());
                                 widget.setText(String());
-                                sendRequest("POST", "/messages", "Content-Type: application/text", newData, 0);
-                                slot.fn(nullRef[Void], Json(""), slot.extra)
+                                sendRequest(
+                                    "POST", "/messages", "Content-Type: application/text", newData, closure (Json) {}
+                                );
+                                sendRequest("GET", "/messages", null, null, onFetch);
                             }
-                        }, bcPayload.label~ptr);
+                        });
                     },
                     Button.new(String("أرسل")).{
                         height = String("100%");
                         width = String("50pt");
                         backgroundColor = Color(200, 200, 200);
                         fontSize = 16.0;
-                        onClick.connect(func (widget: ref[Button], payload: ref[Int], extra: ptr) {
-                            prepCastedArg[bcPayload, ButtonClickPayload, extra];
-                            def newData: String = bcPayload.textInput.getText().replace("\n", "<br>");
-                            bcPayload.textInput.setText(String());
-                            sendRequest("POST", "/messages", "Content-Type: application/text", newData, 0);
-                            slot.fn(nullRef[Void], Json(""), slot.extra)
-                        }, bcPayload~ptr);
+                        onClick.connect(closure (widget: ref[Button], payload: ref[Int]) {
+                            def newData: String = encodeHtml(textInput.getText());
+                            textInput.setText(String());
+                            sendRequest(
+                                "POST", "/messages", "Content-Type: application/text", newData, closure (Json) {}
+                            );
+                            sendRequest("GET", "/messages", null, null, onFetch);
+                        });
                     }
                 });
             }
         })
     });
 
-    slot.fn = func (dummy: ref[Void], payload: ref[Json], extra: ptr) {
-        @shared def slot: Slot[Void, Json];
-        slot.fn = func (dummy: ref[Void], payload: ref[Json], extra: ptr) {
-            prepCastedArg[label, Label, extra];
-            def data: String = payload.getObject("eventData").getString("body");
-            if label.getText() != data {
-                label.setText(data);
-            }
-        };
-        slot.extra = extra;
-        sendRequest("GET", "/messages", null, null, slot~ptr);
-    };
-    slot.extra = bcPayload.label~ptr;
-    slot.fn(nullRef[Void], Json(""), slot.extra)
-    startTimer(500000, slot~ptr);
+    startTimer(500000, closure (json: Json) {
+        sendRequest("GET", "/messages", null, null, onFetch);
+    });
+    sendRequest("GET", "/messages", null, null, onFetch);
 
     runEventLoop();
 }

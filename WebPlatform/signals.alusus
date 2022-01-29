@@ -5,31 +5,28 @@
     // multiple subscriptions.
     class Signal [ownerType: type, payloadType: type] {
         def owner: ref[ownerType];
-        def slots: Array[Slot[ownerType, payloadType]];
+        def slots: Array[closure (ref[ownerType], payload: ref[payloadType])];
 
         handler this.emit(payload: ref[payloadType]) {
             def i: Int;
             for i = 0, i < this.slots.getLength(), ++i {
-                this.slots(i).fn(this.owner, payload, this.slots(i).extra);
+                this.slots(i)(this.owner, payload);
             }
         }
         
-        handler this.connect(fn: Slot[ownerType, payloadType].FnPtr, extra: ptr) {
+        handler this.connect(slot: closure (ref[ownerType], payload: ref[payloadType])) {
             def i: Int;
             for i = 0, i < this.slots.getLength(), ++i {
-                if this.slots(i).fn == fn && this.slots(i).extra == extra return;
+                if this.slots(i) == slot return;
             }
-            def slot: Slot[ownerType, payloadType];
-            slot.fn = fn;
-            slot.extra = extra;
             this.slots.add(slot);
             this.owner.onSignalConnectionsChanged(this~ptr, this.slots.getLength());
         }
 
-        handler this.disconnect(fn: Slot[ownerType, payloadType].FnPtr, extra: ptr) {
+        handler this.disconnect(slot: closure (ref[ownerType], payload: ref[payloadType])) {
             def i: Int;
             for i = 0, i < this.slots.getLength(), ++i {
-                if this.slots(i).fn == fn && this.slots(i).extra == extra {
+                if this.slots(i) == slot {
                     this.slots.remove(i);
                     this.owner.onSignalConnectionsChanged(this~ptr, this.slots.getLength());
                     return;
@@ -40,16 +37,6 @@
         handler this.getConnectionCount (): Int {
             return this.slots.getLength();
         }
-    }
-
-    //==========================================================================
-    // Slot
-    // Represent a single subscription to an event. It contains extra data in
-    // addition to the function pointer.
-    class Slot [ownerType: type, payloadType: type] {
-        def FnPtr: alias ptr[function (owner: ref[ownerType], payload: ref[payloadType], extra: ptr)];
-        def fn: FnPtr;
-        def extra: ptr;
     }
 }
 
