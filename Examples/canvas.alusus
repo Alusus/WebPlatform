@@ -34,15 +34,40 @@ func createHeader (): SrdRef[Widget] {
 
 @uiEndpoint["/", "WebPlatform Example - Canvas"]
 func main {
-    def canvas: SrdRef[Canvas] = Canvas.new();
-    setView(Box.new({ createHeader(), canvas }));
+    def canvas: SrdRef[Canvas];
+    setView(Box.new({}).{
+        align = String("center");
+        addChildren({
+            createHeader(),
+            Canvas.new().{
+                canvas = this;
+                width = String("1280px");
+                height = String("800px");
+                bitmapWidth = String("1280px");
+                bitmapHeight = String("800px");
+                border = Quad(1, 1, 1, 1);
+                borderColor = Color(0, 0, 0);
+                backgroundColor = Color(220, 220, 220);
+            }
+        });
+    });
 
-    drawLine(canvas.id, 0,0, 100,100);
-    drawCircle(canvas.id, 100,180, 90,0 );
-    def points: Array [Int]({ 50, 50, 100, 50, 100, 100, 50, 100, 25, 75 });
-    setFillStyle(canvas.id , "black", "blue", 0, 0, 100, 100);
-    drawPolygon(canvas.id, 5, points.buf);
-    drawText(canvas.id, "HI", "30px Arial", 50, 50);
+    def img: ImageResource;
+    await(img.load("https://alusus.org/Resources/logo.svg"));
+
+    def x: Int = 0;
+    startTimer(10000, closure (x: by_ref, img: by_ref)&(json: Json) {
+        clearCanvas(canvas.id);
+        drawLine(canvas.id, 0,0, 100,100);
+        drawCircle(canvas.id, 100,180, 90,0 );
+        def points: Array [Int]({ 50, 50, 100, 50, 100, 100, 50, 100, 25, 75 });
+        setFillStyle(canvas.id , "black", "blue", 0, 0, 100, 100);
+        drawPolygon(canvas.id, 5, points.buf);
+        drawText(canvas.id, "HI", "30px Arial", 50, 50);
+
+        drawImage(canvas.id, img.id, x, 0, 80, 80);
+        if ++x >= 1280 x = 0;
+    });
 
     runEventLoop();
 }

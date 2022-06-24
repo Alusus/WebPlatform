@@ -34,6 +34,7 @@
         generateProperty[borderColor, BorderColor, Color];
         generateProperty[layout, Layout, String];
         generateProperty[justify, Justify, String];
+        generateProperty[align, Justify, String];
         generateProperty[direction, Direction, String];
 
         //---------
@@ -107,14 +108,15 @@
                         "border-width:%fpt %fpt %fpt %fpt;"
                         "border-color:rgb(%i, %i, %i);"
                         "background-color:rgb(%i, %i, %i);"
-                        "display:flex;flex-direction:%s;justify-content: %s;"
+                        "display:flex;flex-direction:%s;"
+                        "justify-content:%s;align-items:%s;"
                         "direction:%s;",
                         this.width.buf, this.height.buf,
                         this.padding.top, this.padding.right, this.padding.bottom, this.padding.left,
                         this.border.top, this.border.right, this.border.bottom, this.border.left,
                         this.borderColor.red, this.borderColor.green, this.borderColor.blue,
                         this.backgroundColor.red, this.backgroundColor.green, this.backgroundColor.blue,
-                        this.layout.buf, this.justify.buf,
+                        this.layout.buf, this.justify.buf, this.align.buf,
                         this.direction.buf
                     )
                 );
@@ -141,6 +143,8 @@
         //-----------
         // Properties
 
+        generateProperty[bitmapWidth, BitmapWidth, String];
+        generateProperty[bitmapHeight, BitmapHeight, String];
         generateProperty[padding, Padding, Quad];
         generateProperty[border, Border, Quad];
         generateProperty[borderColor, BorderColor, Color];
@@ -180,8 +184,10 @@
                 setElementAttribute(
                     this.id, "style",
                     String.format(
-                        "width:%s;"
-                        "height:%s;"
+                        "width:100%%;"
+                        "height:100%%;"
+                        "max-width:%s;"
+                        "max-height:%s;"
                         "padding:%fpt %fpt %fpt %fpt;"
                         "border-style:solid;"
                         "border-width:%fpt %fpt %fpt %fpt;"
@@ -198,6 +204,8 @@
                         this.direction.buf
                     )
                 );
+                setElementAttribute(this.id, "width", this.bitmapWidth);
+                setElementAttribute(this.id, "height", this.bitmapHeight);
             }
         }
 

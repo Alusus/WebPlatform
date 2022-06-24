@@ -1,14 +1,18 @@
 @merge module WebPlatform {
+    // Element Management
     @expname[createElement] function createElement (type: ptr[Char], name: ptr[Char], parent: ptr[Char]);
     @expname[deleteElement] function deleteElement (name: ptr[Char]);
     @expname[setElementAttribute] function setElementAttribute (name: ptr[Char], prop: ptr[Char], value: ptr[Char]);
     @expname[getElementAttribute] function getElementAttribute (name: ptr[Char], prop: ptr[Char]): ptr[array[Char]];
+    // Event Loop
     @expname[fetchNextEvent] function fetchNextEvent (): ptr[array[Char]];
     @expname[registerElementEventHandler] function _registerElementEventHandler (
       elementName: ptr[Char], eventName: ptr[Char], cbId: ArchInt
     );
     @expname[unregisterElementEventHandler] function _unregisterElementEventHandler (elementName: ptr[Char], eventName: ptr[Char]);
     @expname[waitForEvent] function waitForEvent;
+    // TODO: usleep
+    // Async Operations
     @expname[sendRequest] function _sendRequest (
         method: ptr[Char], uri: ptr[Char], headers: ptr[Char], body: ptr[Char], cbId: ArchInt
     );
@@ -16,13 +20,20 @@
     @expname[stopTimer] function _stopTimer (id: Word);
     @expname[setTimeout] function _setTimeout (duration: Word, cbId: ArchInt): Word;
     @expname[cancelTimeout] function _cancelTimeout (id: Word);
+    // Resource Management
+    @expname[loadImage] function _loadImage (url: ptr[Char], cbId: ArchInt): ArchInt;
+    @expname[releaseResource] function releaseResource (resourceId: Int);
+    // Canvas Operations
     @expname[drawLine] function drawLine (name: ptr[Char], x1: Int, y1: Int, x2: Int, y2: Int);
     @expname[drawPolygon] function drawPolygon (name: ptr[Char], pointCount: Int, points: ref[array[Int]]);
     @expname[drawCircle] function drawCircle (name: ptr[Char], x1: Int, y1: Int, x2: Int, y2: Int);
-    @expname[setFillStyle] function setFillStyle (
-        name: ptr[Char],c1:ptr[Char], c2:ptr[Char], x1: Int, y1: Int, x2: Int, y2: Int
-    );
     @expname[drawText] function drawText (name: ptr[Char], text: ptr[Char], font: ptr[Char], x: Int, y: Int);
+    @expname[setFillStyle] function setFillStyle (
+        name: ptr[Char], c1:ptr[Char], c2:ptr[Char], x1: Int, y1: Int, x2: Int, y2: Int
+    );
+    @expname[drawImage] function drawImage (name: ptr[Char], imgId: Int, x: Int, y: Int, w: Int, h: Int);
+    @expname[clearCanvas] function clearCanvas (name: ptr[Char]);
+    // Misc
     @expname[logToConsole] function logToConsole (msg: ptr[Char]);
 }
 

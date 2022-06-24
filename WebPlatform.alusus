@@ -11,16 +11,19 @@ import "Apm";
 import "closure";
 Apm.importFile("Alusus/Http");
 Apm.importFile("Alusus/Json");
+Apm.importFile("Alusus/Promises");
 
 import "WebPlatform/server";
 import "WebPlatform/browser_api";
 import "WebPlatform/signals";
 import "WebPlatform/ui";
 import "WebPlatform/widgets";
+import "WebPlatform/resources";
 import "WebPlatform/main";
 
 @merge module WebPlatform {
     use Srl;
+    use Promises;
 
     function getDirectoryFromPath (path: ptr[array[Char]]): Srl.String {
         return Srl.String(path, Srl.String.findLast(path, '/')~cast[ArchInt] - path~cast[ArchInt]);

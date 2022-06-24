@@ -1,12 +1,16 @@
 const STACK_SIZE = 8192;
 const wasmApi = {};
 const eventsQueue = [];
+const resources = {};
+let resourceCounter = 0;
 let program;
 let wasmMemory = null;
 let asyncifyDataPtr; // Where the unwind/rewind data structure will live.
 let sleeping = false;
 let eventWaiting = false;
 let wasmStrPtr = null;
+
+// Element Management APIs
 
 wasmApi.createElement = (elementType, elementName, parentName) => {
   const parent = document.getElementById(toJsString(parentName));
@@ -40,6 +44,8 @@ wasmApi.getElementAttribute = (elementName, propName) => {
   return toWasmString(result);
 }
 
+// Event Loop APIs
+
 wasmApi.fetchNextEvent = () => {
     if (eventsQueue.length === 0) return 0;
     const result = stringifyEvent(eventsQueue[0]);
@@ -59,6 +65,23 @@ wasmApi.unregisterElementEventHandler = (elementName, eventName) => {
     const jsElementName = toJsString(elementName);
     const jsEventName = toJsString(eventName);
     document.getElementById(jsElementName)[`on${jsEventName}`] = null;
+}
+
+wasmApi.waitForEvent = () => {
+  const view = new Int32Array(wasmMemory.buffer, asyncifyDataPtr);
+  if (!eventWaiting) {
+    // We are called in order to start a sleep/unwind.
+    // Fill in the data structure with the start pos and end pos of the stack.
+    view[0] = asyncifyDataPtr + 8;
+    view[1] = asyncifyDataPtr + 8 + STACK_SIZE;
+
+    program.instance.exports.asyncify_start_unwind(asyncifyDataPtr);
+    eventWaiting = true;
+  } else {
+    // We are called as part of a resume/rewind. Stop waiting.
+    program.instance.exports.asyncify_stop_rewind();
+    eventWaiting = false;
+  }
 }
 
 wasmApi.usleep = (ms) => {
@@ -85,72 +108,13 @@ wasmApi.usleep = (ms) => {
   }
 }
 
-wasmApi.drawLine = (name, x1, y1, x2, y2) => {
-  var c = document.getElementById(toJsString(name));
-  var ctx = c.getContext("2d");
-  ctx.beginPath();
-  ctx.moveTo(x1, y1);
-  ctx.lineTo(x2, y2);
-  ctx.stroke(); 
-}
-
-wasmApi.drawPolygon = (name, pointCount, points) => {
-  var canvas = document.getElementById(toJsString(name));
-  var ctx = canvas.getContext("2d");
-  const pointsArray = new Int32Array(wasmMemory.buffer, points, pointCount * 2);
-  ctx.moveTo(pointsArray[0], pointsArray[1]);
-  for  (var i = 1; i < pointCount; i++){
-    ctx.lineTo(pointsArray[i*2], pointsArray[i*2+1]);
-  }
-  ctx.closePath();
-  ctx.fill();
-}
-  
-wasmApi.drawText = (name, text, font, x, y) => {
-  var canvas = document.getElementById(toJsString(name));
-  var ctx = canvas.getContext("2d");
-  ctx.font = toJsString(font);
-  ctx.fillText(toJsString(text), x, y);
-} 
-
-wasmApi.drawCircle = (name, x1, y1, x2, y2) => {
-  var circle = document.getElementById(toJsString(name));
-  var ctx = circle.getContext("2d");
-  ctx.beginPath(); 
-  ctx.arc(x1, y1, x2, 0, 2 * Math.PI);
-  ctx.stroke();
-}
-
-wasmApi.setFillStyle = (name, c1, c2, x1, y1, x2, y2) => {
-  var canvas = document.getElementById(toJsString(name));
-  var ctx = canvas.getContext("2d");
-  var gradient = ctx.createLinearGradient(x1, y1, x2, y2);
-  gradient.addColorStop(0, toJsString(c1));
-  gradient.addColorStop(1, toJsString(c2));
-  ctx.fillStyle = gradient;
-}
-
-wasmApi.waitForEvent = () => {
-  const view = new Int32Array(wasmMemory.buffer, asyncifyDataPtr);
-  if (!eventWaiting) {
-    // We are called in order to start a sleep/unwind.
-    // Fill in the data structure with the start pos and end pos of the stack.
-    view[0] = asyncifyDataPtr + 8;
-    view[1] = asyncifyDataPtr + 8 + STACK_SIZE;
-
-    program.instance.exports.asyncify_start_unwind(asyncifyDataPtr);
-    eventWaiting = true;
-  } else {
-    // We are called as part of a resume/rewind. Stop waiting.
-    program.instance.exports.asyncify_stop_rewind();
-    eventWaiting = false;
-  }
-}
+// Async Operations APIs
 
 wasmApi.sendRequest = (method, uri, headers, body, cbId) => {
   const controller = new AbortController();
   const signal = controller.signal;
   // 10 seconds timeout.
+  // TODO: Clear the registered closure on timeout.
   const timeoutId = setTimeout(() => controller.abort(), 10000);
 
   fetch(toJsString(uri), {
@@ -196,10 +160,90 @@ wasmApi.cancelTimeout = (id) => {
   clearTimeout(id);
 }
 
+// Resource Management
+
+wasmApi.loadImage = (url, cbId) => {
+  image = new Image();
+  const resourceId = ++resourceCounter;
+  image.onload = () => {
+    onEvent(cbId, false, 'loadImage', { resourceId });
+  };
+  image.src = toJsString(url);
+  resources[resourceId] = image;
+  return resourceId;
+}
+
+wasmApi.releaseResource = (resourceId) => {
+  delete resources[resourceId];
+}
+
+// Canvas APIs
+
+wasmApi.drawLine = (name, x1, y1, x2, y2) => {
+  var c = document.getElementById(toJsString(name));
+  var ctx = c.getContext("2d");
+  ctx.beginPath();
+  ctx.moveTo(x1, y1);
+  ctx.lineTo(x2, y2);
+  ctx.stroke();
+}
+
+wasmApi.drawPolygon = (name, pointCount, points) => {
+  var canvas = document.getElementById(toJsString(name));
+  var ctx = canvas.getContext("2d");
+  const pointsArray = new Int32Array(wasmMemory.buffer, points, pointCount * 2);
+  ctx.moveTo(pointsArray[0], pointsArray[1]);
+  for  (var i = 1; i < pointCount; i++){
+    ctx.lineTo(pointsArray[i*2], pointsArray[i*2+1]);
+  }
+  ctx.closePath();
+  ctx.fill();
+}
+
+wasmApi.drawCircle = (name, x1, y1, x2, y2) => {
+  var circle = document.getElementById(toJsString(name));
+  var ctx = circle.getContext("2d");
+  ctx.beginPath();
+  ctx.arc(x1, y1, x2, 0, 2 * Math.PI);
+  ctx.stroke();
+}
+
+wasmApi.drawText = (name, text, font, x, y) => {
+  var canvas = document.getElementById(toJsString(name));
+  var ctx = canvas.getContext("2d");
+  ctx.font = toJsString(font);
+  ctx.fillText(toJsString(text), x, y);
+}
+
+wasmApi.setFillStyle = (name, c1, c2, x1, y1, x2, y2) => {
+  var canvas = document.getElementById(toJsString(name));
+  var ctx = canvas.getContext("2d");
+  var gradient = ctx.createLinearGradient(x1, y1, x2, y2);
+  gradient.addColorStop(0, toJsString(c1));
+  gradient.addColorStop(1, toJsString(c2));
+  ctx.fillStyle = gradient;
+}
+
+wasmApi.drawImage = (name, imgId, x, y, w, h) => {
+  var canvas = document.getElementById(toJsString(name));
+  var ctx = canvas.getContext("2d");
+  if (w === -1) ctx.drawImage(resources[imgId], x, y);
+  else  ctx.drawImage(resources[imgId], x, y, w, h);
+}
+
+wasmApi.clearCanvas = (name) => {
+  var canvas = document.getElementById(toJsString(name));
+  var ctx = canvas.getContext("2d");
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+// Misc APIs
+
 wasmApi.logToConsole = (msg) => {
   console.log(toJsString(msg));
 }
 
+// Helper Functions
 
 function stringifyEvent(event) {
   const obj = { cbId: event.cbId, recurring: event.recurring, eventName: event.eventName, eventData: {} };
@@ -244,6 +288,8 @@ function toWasmString(str) {
   return wasmStrPtr;
 }
 
+// Main Functions
+
 async function loadWasm(filename, importTable) {
   let request = await fetch(filename);
   let binary = await request.arrayBuffer();
@@ -265,5 +311,4 @@ async function start(moduleName) {
   program.instance.exports.wasmStart();
   program.instance.exports.asyncify_stop_unwind();
 }
-
 

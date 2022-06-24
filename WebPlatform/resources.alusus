@@ -1,0 +1,26 @@
+@merge module WebPlatform {
+    //==========================================================================
+    // ImageResource
+    // An image resource that can be used with canvas image operations.
+    class ImageResource {
+        def id: ArchInt = 0;
+        def url: String;
+
+        handler this~terminate() {
+            if this.id != 0 releaseResource(this.id);
+        }
+
+        handler this.load(u: ptr[array[Char]]): SrdRef[Promise[Int]] {
+            def p: SrdRef[Promise[Int]] = Promise[Int].new();
+            this.url = u;
+            loadImage(u, closure (json: Json) {
+                def data: Json = json.getObject("eventData");
+                if this.id != 0 releaseResource(this.id);
+                this.id = data.getInt("resourceId");
+                p.resolve(0);
+            });
+            return p;
+        }
+    }
+}
+
