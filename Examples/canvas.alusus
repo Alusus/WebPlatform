@@ -68,7 +68,8 @@ func main {
 
         def size: Int = Math.sin(3.14 * x / 320.0) * 40 + 100;
         def y: Int = Math.sin(3.14 * x / 320.0) * 100 + 400 - size / 2;
-        drawImage(canvas.id, img.id, x, y, size, size);
+        def alpha: Float = Math.sin(3.14 * x / 80.0) / 4 + 0.75;
+        drawImage(canvas.id, img.id, x, y, size, size, alpha);
         if ++x >= 1280 x = -80;
     });
 

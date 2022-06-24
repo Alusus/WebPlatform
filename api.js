@@ -224,11 +224,14 @@ wasmApi.setFillStyle = (name, c1, c2, x1, y1, x2, y2) => {
   ctx.fillStyle = gradient;
 }
 
-wasmApi.drawImage = (name, imgId, x, y, w, h) => {
+wasmApi.drawImage = (name, imgId, x, y, w, h, a) => {
   var canvas = document.getElementById(toJsString(name));
   var ctx = canvas.getContext("2d");
+  ctx.save();
+  ctx.globalAlpha = a;
   if (w === -1) ctx.drawImage(resources[imgId], x, y);
-  else  ctx.drawImage(resources[imgId], x, y, w, h);
+  else ctx.drawImage(resources[imgId], x, y, w, h);
+  ctx.restore();
 }
 
 wasmApi.clearCanvas = (name) => {

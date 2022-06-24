@@ -31,7 +31,7 @@
     @expname[setFillStyle] function setFillStyle (
         name: ptr[Char], c1:ptr[Char], c2:ptr[Char], x1: Int, y1: Int, x2: Int, y2: Int
     );
-    @expname[drawImage] function drawImage (name: ptr[Char], imgId: Int, x: Int, y: Int, w: Int, h: Int);
+    @expname[drawImage] function drawImage (name: ptr[Char], imgId: Int, x: Int, y: Int, w: Int, h: Int, alpha: Float);
     @expname[clearCanvas] function clearCanvas (name: ptr[Char]);
     // Misc
     @expname[logToConsole] function logToConsole (msg: ptr[Char]);
