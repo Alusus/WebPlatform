@@ -100,7 +100,14 @@ if !Fs.exists(String.format("%s/dist/stdlib-min.wasm", stdlibPath.buf)) {
         String("string/strcat"),
         String("string/strncat"),
         String("string/strlen"),
-        String("string/strchrnul")
+        String("string/strchrnul"),
+        String("math/sinf"),
+        String("math/__sindf"),
+        String("math/cosf"),
+        String("math/__cosdf"),
+        String("math/__rem_pio2f"),
+        String("math/__rem_pio2_large"),
+        String("math/scalbn")
     });
     def i: Int;
     for i = 0, i < fnFilenames.getLength(), ++i {

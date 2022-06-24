@@ -1,3 +1,4 @@
+import "Srl/Math";
 import "Apm";
 Apm.importFile("Alusus/WebPlatform");
 use Srl;
@@ -55,8 +56,8 @@ func main {
     def img: ImageResource;
     await(img.load("https://alusus.org/Resources/logo.svg"));
 
-    def x: Int = 0;
-    startTimer(10000, closure (x: by_ref, img: by_ref)&(json: Json) {
+    def x: Int = -80;
+    startTimer(8000, closure (x: by_ref, img: by_ref)&(json: Json) {
         clearCanvas(canvas.id);
         drawLine(canvas.id, 0,0, 100,100);
         drawCircle(canvas.id, 100,180, 90,0 );
@@ -65,8 +66,10 @@ func main {
         drawPolygon(canvas.id, 5, points.buf);
         drawText(canvas.id, "HI", "30px Arial", 50, 50);
 
-        drawImage(canvas.id, img.id, x, 0, 80, 80);
-        if ++x >= 1280 x = 0;
+        def size: Int = Math.sin(3.14 * x / 320.0) * 40 + 100;
+        def y: Int = Math.sin(3.14 * x / 320.0) * 100 + 400 - size / 2;
+        drawImage(canvas.id, img.id, x, y, size, size);
+        if ++x >= 1280 x = -80;
     });
 
     runEventLoop();
