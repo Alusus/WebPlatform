@@ -77,9 +77,11 @@
     //==========================================================================
     // Async Operations
 
-    function sendRequest (method: ptr[Char], uri: ptr[Char], headers: ptr[Char], body: ptr[Char], cb: closure (Json)) {
+    function sendRequest (
+        method: ptr[Char], uri: ptr[Char], headers: ptr[Char], body: ptr[Char], timeoutInMs: Int, cb: closure (Json)
+    ) {
         def index: ArchInt = addEventHandler(cb);
-        _sendRequest(method, uri, headers, body, eventHandlers(index).id);
+        _sendRequest(method, uri, headers, body, timeoutInMs, eventHandlers(index).id);
     }
 
     function startTimer (duration: Word, cb: closure (Json)): ArchInt {

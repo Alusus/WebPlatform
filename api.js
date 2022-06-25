@@ -110,12 +110,16 @@ wasmApi.usleep = (ms) => {
 
 // Async Operations APIs
 
-wasmApi.sendRequest = (method, uri, headers, body, cbId) => {
+wasmApi.sendRequest = (method, uri, headers, body, timeoutInMs, cbId) => {
   const controller = new AbortController();
   const signal = controller.signal;
-  // 10 seconds timeout.
-  // TODO: Clear the registered closure on timeout.
-  const timeoutId = setTimeout(() => controller.abort(), 10000);
+  const timeoutId = setTimeout(() => {
+    controller.abort();
+    onEvent(cbId, false, 'sendRequest', {
+      status: 0,
+      body: "Connection timeout"
+    });
+  }, timeoutInMs)
 
   fetch(toJsString(uri), {
     method: toJsString(method),
@@ -132,10 +136,16 @@ wasmApi.sendRequest = (method, uri, headers, body, cbId) => {
     return response.text().then(bodyText => {
       clearTimeout(timeoutId);
       onEvent(cbId, false, 'sendRequest', {
-        status: response.staus,
+        status: response.status,
         headers: Object.fromEntries(response.headers.entries()),
         body: bodyText
       });
+    });
+  }).catch(err => {
+    clearTimeout(timeoutId);
+    onEvent(cbId, false, 'sendRequest', {
+      status: 0,
+      body: err.message
     });
   });
 }

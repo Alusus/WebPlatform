@@ -99,7 +99,15 @@ func main {
                 border = Quad(1);
                 borderColor = Color(0, 0, 0);
                 // padding = Quad(5);
+                def notificationLabel: SrdRef[Label];
                 addChildren({
+                    Label.new(String()).{
+                        notificationLabel = this;
+                        width = String("100%");
+                        height = String("20pt");
+                        fontColor = Color(200, 50, 50);
+                        fontSize = 10.0;
+                    },
                     Label.new(String()).{
                         width = String("100%");
                         height = String("100%");
@@ -107,9 +115,17 @@ func main {
                         fontSize = 20.0;
 
                         onFetch = closure (json: Json) {
-                            def data: String = json.getObject("eventData").getString("body");
-                            if this.getText() != data {
-                                this.setText(data);
+                            def status: Int = json.getObject("eventData").getInt("status");
+                            if status >= 200 and status < 300 {
+                                def data: String = json.getObject("eventData").getString("body");
+                                if this.getText() != data {
+                                    this.setText(data);
+                                }
+                                if notificationLabel.getText() != "" {
+                                    notificationLabel.setText(String(""));
+                                }
+                            } else {
+                                notificationLabel.setText(String("الاتصال مقطوع. رمز حالة ب.ن.ن.ف: ") + status);
                             }
                         };
                     }
@@ -135,9 +151,10 @@ func main {
                                 def newData: String = encodeHtml(widget.getText());
                                 widget.setText(String());
                                 sendRequest(
-                                    "POST", "/messages", "Content-Type: application/text", newData, closure (Json) {}
+                                    "POST", "/messages", "Content-Type: application/text", newData, 10000,
+                                    closure (Json) {}
                                 );
-                                sendRequest("GET", "/messages", null, null, onFetch);
+                                sendRequest("GET", "/messages", null, null, 500, onFetch);
                             }
                         });
                     },
@@ -150,9 +167,10 @@ func main {
                             def newData: String = encodeHtml(textInput.getText());
                             textInput.setText(String());
                             sendRequest(
-                                "POST", "/messages", "Content-Type: application/text", newData, closure (Json) {}
+                                "POST", "/messages", "Content-Type: application/text", newData, 10000,
+                                closure (Json) {}
                             );
-                            sendRequest("GET", "/messages", null, null, onFetch);
+                            sendRequest("GET", "/messages", null, null, 500, onFetch);
                         });
                     }
                 });
@@ -161,9 +179,9 @@ func main {
     });
 
     startTimer(500000, closure (json: Json) {
-        sendRequest("GET", "/messages", null, null, onFetch);
+        sendRequest("GET", "/messages", null, null, 500, onFetch);
     });
-    sendRequest("GET", "/messages", null, null, onFetch);
+    sendRequest("GET", "/messages", null, null, 500, onFetch);
 
     runEventLoop();
 }

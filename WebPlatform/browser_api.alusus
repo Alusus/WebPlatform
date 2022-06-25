@@ -9,12 +9,14 @@
     @expname[registerElementEventHandler] function _registerElementEventHandler (
       elementName: ptr[Char], eventName: ptr[Char], cbId: ArchInt
     );
-    @expname[unregisterElementEventHandler] function _unregisterElementEventHandler (elementName: ptr[Char], eventName: ptr[Char]);
+    @expname[unregisterElementEventHandler] function _unregisterElementEventHandler (
+        elementName: ptr[Char], eventName: ptr[Char]
+    );
     @expname[waitForEvent] function waitForEvent;
     // TODO: usleep
     // Async Operations
     @expname[sendRequest] function _sendRequest (
-        method: ptr[Char], uri: ptr[Char], headers: ptr[Char], body: ptr[Char], cbId: ArchInt
+        method: ptr[Char], uri: ptr[Char], headers: ptr[Char], body: ptr[Char], timeoutInMs: Int, cbId: ArchInt
     );
     @expname[startTimer] function _startTimer (duration: Word, cbId: ArchInt): Word;
     @expname[stopTimer] function _stopTimer (id: Word);
