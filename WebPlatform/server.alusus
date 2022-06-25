@@ -89,6 +89,43 @@
         }
     }
 
+    func addAssetRoutes (parent: ref[Core.Basic.TiObject]) {
+        def elements: Array[ref[Core.Basic.TiObject]] = Spp.astMgr.findElements(
+            ast { modifier == "assetRoute" || modifier == "مسار_موارد" },
+            parent,
+            Spp.SeekerFlags.SKIP_OWNERS | Spp.SeekerFlags.SKIP_USES | Spp.SeekerFlags.SKIP_CHILDREN
+        );
+        def i: Int;
+        for i = 0, i < elements.getLength(), ++i {
+            def endpointParams: Array[String];
+            if !Core.Basic.isDerivedFrom[elements(i), Core.Data.Ast.StringLiteral] {
+                System.fail(1, "Invalid asset route");
+            }
+            validateAssetRoute(Core.Basic.dynCastRef[elements(i), Core.Data.Ast.StringLiteral].value.value);
+            Spp.astMgr.insertAst(
+                ast {
+                    if String.isEqual(method, "GET") && String.find(uri, element) == (uri+1) && Fs.exists(uri+1) {
+                        Http.sendFile(connection, uri+1);
+                        return 1;
+                    }
+                },
+                Srl.Map[Srl.String, ref[Core.Basic.TiObject]]().set(Srl.String("element"), elements(i))
+            );
+        }
+    }
+
+    func validateAssetRoute(route: String) {
+        if route.getLength() == 0 {
+            System.fail(1, "Invalid asset route; path is empty");
+        }
+        if route(0) == '/' or route(0) == '.' {
+            System.fail(1, String("Invalid asset route; path should not start with / or .: ") + route);
+        }
+        if route(route.getLength() - 1) != '/' {
+            System.fail(1, String("Invalid asset route; path should end with /: ") + route);
+        }
+    }
+
     func startServer(options: ref[Array[CharsPtr]]): ptr[Http.Context] {
         addUiEndpoints(Root~ast);
         if uiEndpoints.getLength() == 0 {
@@ -141,6 +178,7 @@
         }
 
         preprocess { addBeEndpoints(Root~ast) };
+        preprocess { addAssetRoutes(Root~ast) };
 
         def content: array[Char, 1024];
         String.assign(content~ptr, "<h1>404 - Not Found</h1><p> you are in \"%s\"", requestInfo~cnt.localUri);
