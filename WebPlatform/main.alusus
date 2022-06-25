@@ -123,6 +123,19 @@
         return _loadImage(url, eventHandlers(index).id);
     }
 
+    function loadFont (fontName: ptr[Char], url: ptr[Char], cb: closure (Json)) {
+        def index: ArchInt = addEventHandler(cb);
+        _loadFont(fontName, url, eventHandlers(index).id);
+    }
+
+    function loadFont (fontName: ptr[Char], url: ptr[Char]): SrdRef[Promise[Int]] {
+        def p: SrdRef[Promise[Int]] = Promise[Int].new();
+        loadFont(fontName, url, closure (json: Json) {
+            p.resolve(0);
+        });
+        return p;
+    }
+
     //==========================================================================
     // Event Loop
 
@@ -147,12 +160,13 @@
         }
     }
 
-    function await(p: SrdRef[Promise[Int]]) {
+    function await [Rtype: type = Int] (p: SrdRef[Promise[Rtype]]): Rtype {
         while 1 {
             waitForEvent();
             dispatchEvents();
             if p.status != Status.NEW break;
         }
+        return p.result;
     }
 }
 

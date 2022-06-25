@@ -25,6 +25,7 @@
     // Resource Management
     @expname[loadImage] function _loadImage (url: ptr[Char], cbId: ArchInt): ArchInt;
     @expname[releaseResource] function releaseResource (resourceId: Int);
+    @expname[loadFont] function _loadFont (fontName: ptr[Char], url: ptr[Char], cbId: ArchInt);
     // Canvas Operations
     @expname[drawLine] function drawLine (name: ptr[Char], x1: Int, y1: Int, x2: Int, y2: Int);
     @expname[drawPolygon] function drawPolygon (name: ptr[Char], pointCount: Int, points: ref[array[Int]]);

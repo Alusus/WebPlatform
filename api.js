@@ -187,6 +187,14 @@ wasmApi.releaseResource = (resourceId) => {
   delete resources[resourceId];
 }
 
+wasmApi.loadFont = (fontName, url, cbId) => {
+  const font = new FontFace(toJsString(fontName), `url(${toJsString(url)})`);
+  font.load().then(() => {
+    document.fonts.add(font);
+    onEvent(cbId, false, 'loadFont', {});
+  });
+}
+
 // Canvas APIs
 
 wasmApi.drawLine = (name, x1, y1, x2, y2) => {
