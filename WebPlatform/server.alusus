@@ -91,7 +91,7 @@
 
     func addAssetRoutes (parent: ref[Core.Basic.TiObject]) {
         def elements: Array[ref[Core.Basic.TiObject]] = Spp.astMgr.findElements(
-            ast { modifier == "assetRoute" || modifier == "مسار_موارد" },
+            ast { modifier == "assetsRoute" || modifier == "مسار_موارد" },
             parent,
             Spp.SeekerFlags.SKIP_OWNERS | Spp.SeekerFlags.SKIP_USES | Spp.SeekerFlags.SKIP_CHILDREN
         );

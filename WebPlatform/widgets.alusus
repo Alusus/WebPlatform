@@ -11,7 +11,7 @@
         generateProperty[backgroundColor, BackgroundColor, Color];
 
         handler this~init() {
-            this.backgroundColor~init(255, 255, 255);
+            this.backgroundColor~init(255, 255, 255, 0);
         }
 
         handler this.build(ownerId: String) as_ptr;
@@ -34,7 +34,7 @@
         generateProperty[borderColor, BorderColor, Color];
         generateProperty[layout, Layout, String];
         generateProperty[justify, Justify, String];
-        generateProperty[align, Justify, String];
+        generateProperty[align, Align, String];
         generateProperty[direction, Direction, String];
 
         //---------
@@ -106,16 +106,19 @@
                         "padding:%fpt %fpt %fpt %fpt;"
                         "border-style:solid;"
                         "border-width:%fpt %fpt %fpt %fpt;"
-                        "border-color:rgb(%i, %i, %i);"
-                        "background-color:rgb(%i, %i, %i);"
+                        "border-color:rgba(%i, %i, %i, %i);"
+                        "background-color:rgba(%i, %i, %i, %i);"
                         "display:flex;flex-direction:%s;"
                         "justify-content:%s;align-items:%s;"
                         "direction:%s;",
-                        this.width.buf, this.height.buf,
+                        ptr[Char]()~use_in(chr){ if this.width == "auto-flex" chr = ";flex:auto" else chr = this.width },
+                        ptr[Char]()~use_in(chr){ if this.height == "auto-flex" chr = ";flex:auto" else chr = this.height },
                         this.padding.top, this.padding.right, this.padding.bottom, this.padding.left,
                         this.border.top, this.border.right, this.border.bottom, this.border.left,
-                        this.borderColor.red, this.borderColor.green, this.borderColor.blue,
-                        this.backgroundColor.red, this.backgroundColor.green, this.backgroundColor.blue,
+                        this.borderColor.red, this.borderColor.green,
+                        this.borderColor.blue, this.borderColor.alpha,
+                        this.backgroundColor.red, this.backgroundColor.green,
+                        this.backgroundColor.blue, this.backgroundColor.alpha,
                         this.layout.buf, this.justify.buf, this.align.buf,
                         this.direction.buf
                     )
@@ -148,18 +151,12 @@
         generateProperty[padding, Padding, Quad];
         generateProperty[border, Border, Quad];
         generateProperty[borderColor, BorderColor, Color];
-        generateProperty[layout, Layout, String];
-        generateProperty[justify, Justify, String];
-        generateProperty[direction, Direction, String];
 
         //---------
         // Handlers
 
         handler this~init() {
             this.borderColor~init(255, 255, 255);
-            this.layout = String("column");
-            this.justify = String("space-around");
-            this.direction = String("rtl");
         }
 
         //-------------------
@@ -191,17 +188,15 @@
                         "padding:%fpt %fpt %fpt %fpt;"
                         "border-style:solid;"
                         "border-width:%fpt %fpt %fpt %fpt;"
-                        "border-color:rgb(%i, %i, %i);"
-                        "background-color:rgb(%i, %i, %i);"
-                        "display:flex;flex-direction:%s;justify-content: %s;"
-                        "direction:%s;",
+                        "border-color:rgba(%i, %i, %i, %i);"
+                        "background-color:rgba(%i, %i, %i, %i);",
                         this.width.buf, this.height.buf,
                         this.padding.top, this.padding.right, this.padding.bottom, this.padding.left,
                         this.border.top, this.border.right, this.border.bottom, this.border.left,
-                        this.borderColor.red, this.borderColor.green, this.borderColor.blue,
-                        this.backgroundColor.red, this.backgroundColor.green, this.backgroundColor.blue,
-                        this.layout.buf, this.justify.buf,
-                        this.direction.buf
+                        this.borderColor.red, this.borderColor.green,
+                        this.borderColor.blue, this.borderColor.alpha,
+                        this.backgroundColor.red, this.backgroundColor.green,
+                        this.backgroundColor.blue, this.backgroundColor.alpha
                     )
                 );
                 setElementAttribute(this.id, "width", this.bitmapWidth);
@@ -216,6 +211,83 @@
             def r: SrdRef[Canvas];
             r.alloc()~init();
             return r;
+        }
+    }
+
+    //==========================================================================
+    // Image
+    class Image {
+        @injection def widget: Widget;
+
+        //-----------
+        // Properties
+
+        generateProperty[url, Url, String];
+        generateProperty[padding, Padding, Quad];
+        generateProperty[border, Border, Quad];
+        generateProperty[borderColor, BorderColor, Color];
+
+        //---------
+        // Handlers
+
+        handler this~init() {
+        }
+        handler this~init(u: ptr[array[Char]]) {
+            this.url = String(u);
+        }
+
+        //-------------------
+        // Function Overrides
+
+        handler (this:Widget).build (ownerId: String) set_ptr {
+            this.id = getNewId();
+            createElement("img", this.id, ownerId);
+            this.update();
+        }
+
+        handler (this:Widget).unbuild() set_ptr {
+            if this.id.getLength() > 0 {
+                deleteElement(this.id);
+
+                this.id = String();
+            }
+        }
+
+        handler (this:Widget).update() set_ptr {
+            if this.id.getLength() > 0 {
+                setElementAttribute(
+                    this.id, "style",
+                    String.format(
+                        "width:%s;"
+                        "height:%s;"
+                        "padding:%fpt %fpt %fpt %fpt;"
+                        "border-style:solid;"
+                        "border-width:%fpt %fpt %fpt %fpt;"
+                        "border-color:rgba(%i, %i, %i, %i);"
+                        "background-color:rgba(%i, %i, %i, %i);",
+                        this.width.buf, this.height.buf,
+                        this.padding.top, this.padding.right, this.padding.bottom, this.padding.left,
+                        this.border.top, this.border.right, this.border.bottom, this.border.left,
+                        this.borderColor.red, this.borderColor.green,
+                        this.borderColor.blue, this.borderColor.alpha,
+                        this.backgroundColor.red, this.backgroundColor.green,
+                        this.backgroundColor.blue, this.backgroundColor.alpha
+                    )
+                );
+                setElementAttribute(this.id, "src", this.url);
+            }
+        }
+
+        //-----------------
+        // Shared Functions
+
+        function new (u: ptr[array[Char]]): SrdRef[Image] {
+            def r: SrdRef[Image];
+            r.alloc()~init(u);
+            return r;
+        }
+        function new (): SrdRef[Image] {
+            return new("");
         }
     }
 
@@ -267,14 +339,15 @@
                     String.format(
                         "width:%s;"
                         "height:%s;"
-                        "background-color:rgb(%i, %i, %i);"
+                        "background-color:rgba(%i, %i, %i, %i);"
                         "color:rgb(%i, %i, %i);"
                         "font-size:%fpt;"
                         "text-align:%s;"
                         "padding:%fpt %fpt %fpt %fpt;"
                         "direction:%s",
                         this.width.buf, this.height.buf,
-                        this.backgroundColor.red, this.backgroundColor.green, this.backgroundColor.blue,
+                        this.backgroundColor.red, this.backgroundColor.green,
+                        this.backgroundColor.blue, this.backgroundColor.alpha,
                         this.fontColor.red, this.fontColor.green, this.fontColor.blue,
                         this.fontSize,
                         this.textAlign.buf,
@@ -364,13 +437,14 @@
                     String.format(
                         "width: %s;"
                         "height: %s;"
-                        "background-color: rgb(%i, %i, %i);"
+                        "background-color: rgba(%i, %i, %i, %i);"
                         "color:rgb(%i, %i, %i);"
                         "font-size:%fpt;"
                         "text-align:%s;"
                         "direction:%s",
                         this.width.buf, this.height.buf,
-                        this.backgroundColor.red, this.backgroundColor.green, this.backgroundColor.blue,
+                        this.backgroundColor.red, this.backgroundColor.green,
+                        this.backgroundColor.blue, this.backgroundColor.alpha,
                         this.fontColor.red, this.fontColor.green, this.fontColor.blue,
                         this.fontSize,
                         this.textAlign.buf,
@@ -511,13 +585,14 @@
                         "resize:none;"
                         "width:%s;"
                         "height:%s;"
-                        "background-color:rgb(%i, %i, %i);"
+                        "background-color:rgba(%i, %i, %i, %i);"
                         "color:rgb(%i, %i, %i);"
                         "font-size:%fpt;"
                         "text-align:%s;"
                         "direction:%s",
                         this.width.buf, this.height.buf,
-                        this.backgroundColor.red, this.backgroundColor.green, this.backgroundColor.blue,
+                        this.backgroundColor.red, this.backgroundColor.green,
+                        this.backgroundColor.blue, this.backgroundColor.alpha,
                         this.fontColor.red, this.fontColor.green, this.fontColor.blue,
                         this.fontSize,
                         this.textAlign.buf,
@@ -607,6 +682,7 @@
     WebPlatform.defSrdRefCast[Button];
     WebPlatform.defSrdRefCast[TextInput];
     WebPlatform.defSrdRefCast[Hyperlink];
+    WebPlatform.defSrdRefCast[Image];
     WebPlatform.defSrdRefCast[Canvas];
 }
 

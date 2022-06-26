@@ -28,6 +28,8 @@ func getMessages (conn: ptr[Http.Connection]) {
     Http.print(conn, response.buf);
 }
 
+@assetsRoute def assetsRoute: "Assets/";
+
 //==============================================================================
 // Frontend
 
@@ -40,23 +42,34 @@ func createHeader (): SrdRef[Widget] {
     return Box.new({}).{
         width = String("100%");
         height = String("80pt");
-        padding = Quad(5, 0);
+        padding = Quad(5, 0, 3, 0);
         backgroundColor = PrimeryColor;
         borderColor = PrimeryColor;
         border = Quad(1.5);
+        justify = String("space-between");
 
         addChildren({
-            Label.new(String("أمثلة منصة ويب الأسس - الدردشة")).{
-                fontColor = Color("fff");
-                fontSize = 21.0;
-                width = String("100%");
-                height = String("100%");
-                backgroundColor = PrimeryColor;
+            Box.new({}).{
+                layout = String("row");
+                justify = String("space-between");
+                align = String("center");
+                addChildren({
+                    Box.new({ Label.new(String("أمثلة منصة ويب الأسس - الدردشة")).{
+                        fontColor = Color("fff");
+                        fontSize = 21.0;
+                        height = String("100%");
+                        padding = Quad(0, 10);
+                    } }),
+                    Image.new().{
+                        url = String("/Assets/wblogo.svg");
+                        height = String("50pt;");
+                        padding = Quad(0, 10);
+                    }
+                });
             },
             Box.new({}).{
                 layout = String("row");
                 justify = String("space-between");
-                backgroundColor = PrimeryColor;
 
                 addChildren({
                     Hyperlink.new(String("/"), Label.new(String("الرئيسية")).{
@@ -90,15 +103,14 @@ func main {
 
     setView(Box.new({}).{
         height = String("100%");
-        // padding = Quad(0, 50);
+        justify = String("space-between");
         addChildren({
             createHeader(),
             Box.new({}).{
                 width = String("100%");
-                height = String("100%");
-                border = Quad(1);
-                borderColor = Color(0, 0, 0);
-                // padding = Quad(5);
+                height = String("auto-flex");
+                border = Quad(0);
+                padding = Quad(5);
                 def notificationLabel: SrdRef[Label];
                 addChildren({
                     Label.new(String()).{
@@ -138,17 +150,17 @@ func main {
                 border = Quad(1.5);
                 borderColor = PrimeryColor;
                 backgroundColor = PrimeryColor;
-                // padding = Quad(5);
                 def textInput: SrdRef[TextInput];
                 addChildren({
                     TextInput.new().{
                         textInput = this;
                         width = String("100%");
                         height = String("100%");
+                        backgroundColor = Color("fff");
                         fontSize = 12.0;
                         onKeyUp.connect(closure (widget: ref[TextInput], payload: ref[String]) {
                             if payload == "Shift+Enter" {
-                                def newData: String = encodeHtml(widget.getText());
+                                def newData: String = String("- ") + encodeHtml(widget.getText()).trim();
                                 widget.setText(String());
                                 sendRequest(
                                     "POST", "/messages", "Content-Type: application/text", newData, 10000,
@@ -164,7 +176,7 @@ func main {
                         backgroundColor = Color(200, 200, 200);
                         fontSize = 16.0;
                         onClick.connect(closure (widget: ref[Button], payload: ref[Int]) {
-                            def newData: String = encodeHtml(textInput.getText());
+                            def newData: String = String("- ") + encodeHtml(textInput.getText()).trim();
                             textInput.setText(String());
                             sendRequest(
                                 "POST", "/messages", "Content-Type: application/text", newData, 10000,

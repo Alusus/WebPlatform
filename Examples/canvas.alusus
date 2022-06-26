@@ -10,7 +10,7 @@ use WebPlatform;
 def PrimeryColor: Color("8e50ef");
 def LightColor: Color("c380ff");
 
-@assetRoute def assetRoute: "Assets/";
+@assetsRoute def assetsRoute: "Assets/";
 
 func createHeader (): SrdRef[Widget] {
     setElementAttribute("body", "style", "padding: 0; margin: 0;");
