@@ -231,7 +231,7 @@ wasmApi.drawLine = (canvasId, x1, y1, x2, y2) => {
   ctx.stroke();
 }
 
-wasmApi.drawPolygon = (canvasId, pointCount, points) => {
+wasmApi.drawPolygon = (canvasId, pointCount, points, filled) => {
   var canvas = resources[canvasId];
   var ctx = canvas.getContext("2d");
   const pointsArray = new Int32Array(wasmMemory.buffer, points, pointCount * 2);
@@ -240,7 +240,8 @@ wasmApi.drawPolygon = (canvasId, pointCount, points) => {
     ctx.lineTo(pointsArray[i*2], pointsArray[i*2+1]);
   }
   ctx.closePath();
-  ctx.fill();
+  if (filled) ctx.fill();
+  else ctx.stroke();
 }
 
 wasmApi.drawCircle = (canvasId, x1, y1, x2, y2) => {
@@ -265,6 +266,18 @@ wasmApi.setFillStyle = (canvasId, c1, c2, x1, y1, x2, y2) => {
   gradient.addColorStop(0, toJsString(c1));
   gradient.addColorStop(1, toJsString(c2));
   ctx.fillStyle = gradient;
+}
+
+wasmApi.setStrokeStyle = (canvasId, ss) => {
+  var canvas = resources[canvasId];
+  var ctx = canvas.getContext("2d");
+  ctx.strokeStyle = toJsString(ss);
+}
+
+wasmApi.setLineWidth = (canvasId, lw) => {
+  var canvas = resources[canvasId];
+  var ctx = canvas.getContext("2d");
+  ctx.lineWidth = lw;
 }
 
 wasmApi.drawImage = (canvasId, imgId, x, y, w, h, a) => {

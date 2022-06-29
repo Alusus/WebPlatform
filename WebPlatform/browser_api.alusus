@@ -33,12 +33,16 @@
     @expname[loadFont] function _loadFont (fontName: ptr[Char], url: ptr[Char], cbId: ArchInt);
     // Canvas Operations
     @expname[drawLine] function drawLine (canvasId: ArchInt, x1: Int, y1: Int, x2: Int, y2: Int);
-    @expname[drawPolygon] function drawPolygon (canvasId: ArchInt, pointCount: Int, points: ref[array[Int]]);
+    @expname[drawPolygon] function drawPolygon (
+        canvasId: ArchInt, pointCount: Int, points: ref[array[Int]], filled: Bool
+    );
     @expname[drawCircle] function drawCircle (canvasId: ArchInt, x1: Int, y1: Int, x2: Int, y2: Int);
     @expname[drawText] function drawText (canvasId: ArchInt, text: ptr[Char], font: ptr[Char], x: Int, y: Int);
     @expname[setFillStyle] function setFillStyle (
         canvasId: ArchInt, c1:ptr[Char], c2:ptr[Char], x1: Int, y1: Int, x2: Int, y2: Int
     );
+    @expname[setStrokeStyle] function setStrokeStyle (canvasId: ArchInt, ss: ptr[Char]);
+    @expname[setLineWidth] function setLineWidth (canvasId: ArchInt, lw: Int);
     @expname[drawImage] function drawImage (canvasId: ArchInt, imgId: Int, x: Int, y: Int, w: Int, h: Int, alpha: Float);
     @expname[clearCanvas] function clearCanvas (canvasId: ArchInt);
     // Misc

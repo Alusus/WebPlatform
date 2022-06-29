@@ -57,8 +57,12 @@ func main {
 
     def dynImg: ImageResource;
     def canvasRes: CanvasResource(100, 100);
+    canvasRes.setLineWidth(5);
+    canvasRes.setStrokeStyle("#ff5555");
     canvasRes.drawLine(0, 0, 100, 100);
     canvasRes.drawLine(100, 0, 0, 100);
+    def points: Array [Int]({ 25, 25, 75, 25, 75, 75, 25, 75 });
+    canvasRes.drawPolygon(4, points.buf, false);
     dynImg.initFromCanvas(canvasRes);
 
     def img: ImageResource;
@@ -75,7 +79,7 @@ func main {
         canvas.drawCircle(100,180, 90,0 );
         def points: Array [Int]({ 50, 50, 100, 50, 100, 100, 50, 100, 25, 75 });
         canvas.setFillStyle("black", "blue", 0, 0, 100, 100);
-        canvas.drawPolygon(5, points.buf);
+        canvas.drawPolygon(5, points.buf, true);
         def TEXT: "الأسس";
         canvas.drawText(TEXT, "30px AlususMono", 550, 150);
 

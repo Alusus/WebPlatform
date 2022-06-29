@@ -6,8 +6,8 @@
             WebPlatform.drawLine(this.getResourceId(), x1, y1, x2, y2);
         }
 
-        handler this.drawPolygon(pointCount: Int, points: ref[array[Int]]) {
-            WebPlatform.drawPolygon(this.getResourceId(), pointCount, points);
+        handler this.drawPolygon(pointCount: Int, points: ref[array[Int]], filled: Bool) {
+            WebPlatform.drawPolygon(this.getResourceId(), pointCount, points, filled);
         }
 
         handler this.drawCircle(x1: Int, y1: Int, x2: Int, y2: Int) {
@@ -20,6 +20,14 @@
 
         handler this.setFillStyle(c1:ptr[Char], c2:ptr[Char], x1: Int, y1: Int, x2: Int, y2: Int) {
             WebPlatform.setFillStyle(this.getResourceId(), c1, c2, x1, y1, x2, y2);
+        }
+
+        handler this.setStrokeStyle(ss: ptr[Char]) {
+            WebPlatform.setStrokeStyle(this.getResourceId(), ss);
+        }
+
+        handler this.setLineWidth(lw: Int) {
+            WebPlatform.setLineWidth(this.getResourceId(), lw);
         }
 
         handler this.drawImage(img: ref[ImageResource], x: Int, y: Int, w: Int, h: Int, alpha: Float) {
