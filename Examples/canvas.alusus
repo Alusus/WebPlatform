@@ -55,6 +55,12 @@ func main {
         });
     });
 
+    def dynImg: ImageResource;
+    def canvasRes: CanvasResource(100, 100);
+    canvasRes.drawLine(0, 0, 100, 100);
+    canvasRes.drawLine(100, 0, 0, 100);
+    dynImg.initFromCanvas(canvasRes);
+
     def img: ImageResource;
 
     await(Promises.Promise[Int].all({
@@ -63,20 +69,22 @@ func main {
     }).ignoreResult());
 
     def x: Int = -80;
-    startTimer(8000, closure (x: by_ref, img: by_ref)&(json: Json) {
-        clearCanvas(canvas.id);
-        drawLine(canvas.id, 0,0, 100,100);
-        drawCircle(canvas.id, 100,180, 90,0 );
+    startTimer(8000, closure (x: by_ref, img: by_ref, dynImg: by_ref)&(json: Json) {
+        canvas.clear();
+        canvas.drawLine(0,0, 100,100);
+        canvas.drawCircle(100,180, 90,0 );
         def points: Array [Int]({ 50, 50, 100, 50, 100, 100, 50, 100, 25, 75 });
-        setFillStyle(canvas.id , "black", "blue", 0, 0, 100, 100);
-        drawPolygon(canvas.id, 5, points.buf);
+        canvas.setFillStyle("black", "blue", 0, 0, 100, 100);
+        canvas.drawPolygon(5, points.buf);
         def TEXT: "الأسس";
-        drawText(canvas.id, TEXT, "30px AlususMono", 550, 150);
+        canvas.drawText(TEXT, "30px AlususMono", 550, 150);
 
         def size: Int = Math.sin(3.14 * x / 320.0) * 40 + 100;
-        def y: Int = Math.sin(3.14 * x / 320.0) * 100 + 400 - size / 2;
+        def y1: Int = Math.sin(3.14 * x / 320.0) * 100 + 400 - size / 2;
+        def y2: Int = Math.cos(3.14 * x / 320.0) * 100 + 400 - size / 2;
         def alpha: Float = Math.sin(3.14 * x / 80.0) / 4 + 0.75;
-        drawImage(canvas.id, img.id, x, y, size, size, alpha);
+        canvas.drawImage(img, x, y1, size, size, alpha);
+        canvas.drawImage(dynImg, x, y2, size, size, alpha);
         if ++x >= 1280 x = -80;
     });
 

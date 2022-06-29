@@ -21,6 +21,36 @@
             });
             return p;
         }
+
+        handler this.initFromCanvas(canvas: ref[CanvasResource]) {
+            if this.id != 0 releaseResource(this.id);
+            this.id = createImageResourceFromCanvasResource(canvas.id);
+        }
+    }
+
+    //==========================================================================
+    // CanvasResource
+    // A detached canvas that can be used to generate images dynamically.
+    class CanvasResource {
+        @injection def drawing: Drawing;
+        def id: ArchInt = 0;
+
+        handler this~init() {}
+        handler this~init(w: Int, h: Int) {
+            this.init(w, h);
+        }
+        handler this.init(w: Int, h: Int) {
+            if this.id != 0 releaseResource(this.id);
+            this.id = createCanvasResource(w, h);
+        }
+
+        handler this~terminate() {
+            if this.id != 0 releaseResource(this.id);
+        }
+
+        handler (this: Drawing).getResourceId(): ArchInt set_ptr {
+            return this.id;
+        }
     }
 }
 

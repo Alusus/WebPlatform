@@ -142,6 +142,8 @@
     // A free form drawing area.
     class Canvas {
         @injection def widget: Widget;
+        @injection def drawing: Drawing;
+        def resourceId: ArchInt;
 
         //-----------
         // Properties
@@ -165,12 +167,14 @@
         handler (this:Widget).build (ownerId: String) set_ptr {
             this.id = getNewId();
             createElement("canvas", this.id, ownerId);
+            this.resourceId = registerElementAsResource(this.id);
             this.update();
         }
 
         handler (this:Widget).unbuild() set_ptr {
             if this.id.getLength() > 0 {
                 deleteElement(this.id);
+                releaseResource(this.resourceId);
 
                 this.id = String();
             }
@@ -202,6 +206,11 @@
                 setElementAttribute(this.id, "width", this.bitmapWidth);
                 setElementAttribute(this.id, "height", this.bitmapHeight);
             }
+        }
+
+        handler (this: Drawing).getResourceId(): ArchInt set_ptr {
+            unshiftThis[drawing];
+            return this.resourceId;
         }
 
         //-----------------

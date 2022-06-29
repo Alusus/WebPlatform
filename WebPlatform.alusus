@@ -20,6 +20,7 @@ import "WebPlatform/ui";
 import "WebPlatform/widgets";
 import "WebPlatform/resources";
 import "WebPlatform/main";
+import "WebPlatform/Drawing";
 
 @merge module WebPlatform {
     use Srl;

@@ -173,13 +173,38 @@ wasmApi.cancelTimeout = (id) => {
 // Resource Management
 
 wasmApi.loadImage = (url, cbId) => {
-  image = new Image();
+  const image = new Image();
   const resourceId = ++resourceCounter;
   image.onload = () => {
     onEvent(cbId, false, 'loadImage', { resourceId });
   };
   image.src = toJsString(url);
   resources[resourceId] = image;
+  return resourceId;
+}
+
+wasmApi.createCanvasResource = (width, height) => {
+  const canvas = document.createElement('canvas');
+  canvas.width = width;
+  canvas.height = height;
+  const resourceId = ++resourceCounter;
+  resources[resourceId] = canvas;
+  return resourceId;
+}
+
+wasmApi.createImageResourceFromCanvasResource = (canvasId) => {
+  const canvas = resources[canvasId];
+  const image = new Image();
+  const resourceId = ++resourceCounter;
+  image.src = canvas.toDataURL('image/png');
+  resources[resourceId] = image;
+  return resourceId;
+}
+
+wasmApi.registerElementAsResource = (elementName) => {
+  const element = document.getElementById(toJsString(elementName));
+  const resourceId = ++resourceCounter;
+  resources[resourceId] = element;
   return resourceId;
 }
 
@@ -197,17 +222,17 @@ wasmApi.loadFont = (fontName, url, cbId) => {
 
 // Canvas APIs
 
-wasmApi.drawLine = (name, x1, y1, x2, y2) => {
-  var c = document.getElementById(toJsString(name));
-  var ctx = c.getContext("2d");
+wasmApi.drawLine = (canvasId, x1, y1, x2, y2) => {
+  var canvas = resources[canvasId];
+  var ctx = canvas.getContext("2d");
   ctx.beginPath();
   ctx.moveTo(x1, y1);
   ctx.lineTo(x2, y2);
   ctx.stroke();
 }
 
-wasmApi.drawPolygon = (name, pointCount, points) => {
-  var canvas = document.getElementById(toJsString(name));
+wasmApi.drawPolygon = (canvasId, pointCount, points) => {
+  var canvas = resources[canvasId];
   var ctx = canvas.getContext("2d");
   const pointsArray = new Int32Array(wasmMemory.buffer, points, pointCount * 2);
   ctx.moveTo(pointsArray[0], pointsArray[1]);
@@ -218,23 +243,23 @@ wasmApi.drawPolygon = (name, pointCount, points) => {
   ctx.fill();
 }
 
-wasmApi.drawCircle = (name, x1, y1, x2, y2) => {
-  var circle = document.getElementById(toJsString(name));
-  var ctx = circle.getContext("2d");
+wasmApi.drawCircle = (canvasId, x1, y1, x2, y2) => {
+  var canvas = resources[canvasId];
+  var ctx = canvas.getContext("2d");
   ctx.beginPath();
   ctx.arc(x1, y1, x2, 0, 2 * Math.PI);
   ctx.stroke();
 }
 
-wasmApi.drawText = (name, text, font, x, y) => {
-  var canvas = document.getElementById(toJsString(name));
+wasmApi.drawText = (canvasId, text, font, x, y) => {
+  var canvas = resources[canvasId];
   var ctx = canvas.getContext("2d");
   ctx.font = toJsString(font);
   ctx.fillText(toJsString(text), x, y);
 }
 
-wasmApi.setFillStyle = (name, c1, c2, x1, y1, x2, y2) => {
-  var canvas = document.getElementById(toJsString(name));
+wasmApi.setFillStyle = (canvasId, c1, c2, x1, y1, x2, y2) => {
+  var canvas = resources[canvasId];
   var ctx = canvas.getContext("2d");
   var gradient = ctx.createLinearGradient(x1, y1, x2, y2);
   gradient.addColorStop(0, toJsString(c1));
@@ -242,8 +267,8 @@ wasmApi.setFillStyle = (name, c1, c2, x1, y1, x2, y2) => {
   ctx.fillStyle = gradient;
 }
 
-wasmApi.drawImage = (name, imgId, x, y, w, h, a) => {
-  var canvas = document.getElementById(toJsString(name));
+wasmApi.drawImage = (canvasId, imgId, x, y, w, h, a) => {
+  var canvas = resources[canvasId];
   var ctx = canvas.getContext("2d");
   ctx.save();
   ctx.globalAlpha = a;
@@ -252,8 +277,8 @@ wasmApi.drawImage = (name, imgId, x, y, w, h, a) => {
   ctx.restore();
 }
 
-wasmApi.clearCanvas = (name) => {
-  var canvas = document.getElementById(toJsString(name));
+wasmApi.clearCanvas = (canvasId) => {
+  var canvas = resources[canvasId];
   var ctx = canvas.getContext("2d");
   ctx.clearRect(0, 0, canvas.width, canvas.height);
 }

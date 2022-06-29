@@ -1,0 +1,34 @@
+@merge module WebPlatform {
+    class Drawing {
+        handler this.getResourceId(): ArchInt as_ptr;
+
+        handler this.drawLine(x1: Int, y1: Int, x2: Int, y2: Int) {
+            WebPlatform.drawLine(this.getResourceId(), x1, y1, x2, y2);
+        }
+
+        handler this.drawPolygon(pointCount: Int, points: ref[array[Int]]) {
+            WebPlatform.drawPolygon(this.getResourceId(), pointCount, points);
+        }
+
+        handler this.drawCircle(x1: Int, y1: Int, x2: Int, y2: Int) {
+            WebPlatform.drawCircle(this.getResourceId(), x1, y1, x2, y2);
+        }
+
+        handler this.drawText(text: ptr[Char], font: ptr[Char], x: Int, y: Int) {
+            WebPlatform.drawText(this.getResourceId(), text, font, x, y);
+        }
+
+        handler this.setFillStyle(c1:ptr[Char], c2:ptr[Char], x1: Int, y1: Int, x2: Int, y2: Int) {
+            WebPlatform.setFillStyle(this.getResourceId(), c1, c2, x1, y1, x2, y2);
+        }
+
+        handler this.drawImage(img: ref[ImageResource], x: Int, y: Int, w: Int, h: Int, alpha: Float) {
+            WebPlatform.drawImage(this.getResourceId(), img.id, x, y, w, h, alpha);
+        }
+
+        handler this.clear() {
+            WebPlatform.clearCanvas(this.getResourceId());
+        }
+    }
+}
+

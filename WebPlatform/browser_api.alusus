@@ -24,18 +24,23 @@
     @expname[cancelTimeout] function _cancelTimeout (id: Word);
     // Resource Management
     @expname[loadImage] function _loadImage (url: ptr[Char], cbId: ArchInt): ArchInt;
-    @expname[releaseResource] function releaseResource (resourceId: Int);
+    @expname[createCanvasResource] function createCanvasResource (width: Int, height: Int): ArchInt;
+    @expname[createImageResourceFromCanvasResource] function createImageResourceFromCanvasResource (
+        canvasId: ArchInt
+    ): ArchInt;
+    @expname[registerElementAsResource] function registerElementAsResource (id: ptr[Char]): ArchInt;
+    @expname[releaseResource] function releaseResource (resourceId: ArchInt);
     @expname[loadFont] function _loadFont (fontName: ptr[Char], url: ptr[Char], cbId: ArchInt);
     // Canvas Operations
-    @expname[drawLine] function drawLine (name: ptr[Char], x1: Int, y1: Int, x2: Int, y2: Int);
-    @expname[drawPolygon] function drawPolygon (name: ptr[Char], pointCount: Int, points: ref[array[Int]]);
-    @expname[drawCircle] function drawCircle (name: ptr[Char], x1: Int, y1: Int, x2: Int, y2: Int);
-    @expname[drawText] function drawText (name: ptr[Char], text: ptr[Char], font: ptr[Char], x: Int, y: Int);
+    @expname[drawLine] function drawLine (canvasId: ArchInt, x1: Int, y1: Int, x2: Int, y2: Int);
+    @expname[drawPolygon] function drawPolygon (canvasId: ArchInt, pointCount: Int, points: ref[array[Int]]);
+    @expname[drawCircle] function drawCircle (canvasId: ArchInt, x1: Int, y1: Int, x2: Int, y2: Int);
+    @expname[drawText] function drawText (canvasId: ArchInt, text: ptr[Char], font: ptr[Char], x: Int, y: Int);
     @expname[setFillStyle] function setFillStyle (
-        name: ptr[Char], c1:ptr[Char], c2:ptr[Char], x1: Int, y1: Int, x2: Int, y2: Int
+        canvasId: ArchInt, c1:ptr[Char], c2:ptr[Char], x1: Int, y1: Int, x2: Int, y2: Int
     );
-    @expname[drawImage] function drawImage (name: ptr[Char], imgId: Int, x: Int, y: Int, w: Int, h: Int, alpha: Float);
-    @expname[clearCanvas] function clearCanvas (name: ptr[Char]);
+    @expname[drawImage] function drawImage (canvasId: ArchInt, imgId: Int, x: Int, y: Int, w: Int, h: Int, alpha: Float);
+    @expname[clearCanvas] function clearCanvas (canvasId: ArchInt);
     // Misc
     @expname[logToConsole] function logToConsole (msg: ptr[Char]);
 }
