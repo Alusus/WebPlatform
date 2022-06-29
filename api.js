@@ -208,6 +208,17 @@ wasmApi.registerElementAsResource = (elementName) => {
   return resourceId;
 }
 
+wasmApi.loadAudio = (url, cbId) => {
+  const audio = document.createElement('audio');
+  const resourceId = ++resourceCounter;
+  audio.onloadeddata = () => {
+    onEvent(cbId, false, 'loadAudio', { resourceId });
+  };
+  audio.src = toJsString(url);
+  resources[resourceId] = audio;
+  return resourceId;
+}
+
 wasmApi.releaseResource = (resourceId) => {
   delete resources[resourceId];
 }
@@ -294,6 +305,23 @@ wasmApi.clearCanvas = (canvasId) => {
   var canvas = resources[canvasId];
   var ctx = canvas.getContext("2d");
   ctx.clearRect(0, 0, canvas.width, canvas.height);
+}
+
+// Audio APIs
+
+wasmApi.playAudio = (audioId, loop) => {
+  var audio = resources[audioId];
+  if (!audio.paused) {
+    audio = audio.cloneNode();
+  }
+  audio.loop = loop;
+  audio.play();
+}
+
+wasmApi.stopAudio = (audioId) => {
+  var audio = resources[audioId];
+  audio.pause();
+  audio.currentTime = 0;
 }
 
 // Misc APIs

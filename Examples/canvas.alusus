@@ -37,11 +37,73 @@ func createHeader (): SrdRef[Widget] {
 
 @uiEndpoint["/", "WebPlatform Example - Canvas"]
 func main {
+    // Load assets from the server.
+    def img: ImageResource;
+    def music: AudioResource;
+    def sound: AudioResource;
+    await(Promises.Promise[Int].all({
+        img.load("Assets/logo.svg"),
+        loadFont("AlususMono", "Assets/AlususMono.otf"),
+        music.load("Assets/music.mp3"),
+        sound.load("Assets/sound.mp3")
+    }).ignoreResult());
+
+    // Build the view
     def canvas: SrdRef[Canvas];
     setView(Box.new({}).{
         align = String("center");
         addChildren({
             createHeader(),
+            Box.new({}).{
+                layout = String("row");
+                addChildren({
+                    Button.new(String("شغل الموسيقى")).{
+                        height = String("30pt");
+                        width = String("120pt");
+                        backgroundColor = Color(200, 200, 200);
+                        fontSize = 16.0;
+                        onClick.connect(closure (music: by_ref)&(widget: ref[Button], payload: ref[Int]) {
+                            music.play(true);
+                        });
+                    },
+                    Button.new(String("أوقف الموسيقى")).{
+                        height = String("30pt");
+                        width = String("120pt");
+                        backgroundColor = Color(200, 200, 200);
+                        fontSize = 16.0;
+                        onClick.connect(closure (music: by_ref)&(widget: ref[Button], payload: ref[Int]) {
+                            music.stop();
+                        });
+                    },
+                    Button.new(String("شغل الصوت")).{
+                        height = String("30pt");
+                        width = String("120pt");
+                        backgroundColor = Color(200, 200, 200);
+                        fontSize = 16.0;
+                        onClick.connect(closure (sound: by_ref)&(widget: ref[Button], payload: ref[Int]) {
+                            sound.play(false);
+                        });
+                    },
+                    Button.new(String("شغل الصوت بتكرار")).{
+                        height = String("30pt");
+                        width = String("150pt");
+                        backgroundColor = Color(200, 200, 200);
+                        fontSize = 16.0;
+                        onClick.connect(closure (sound: by_ref)&(widget: ref[Button], payload: ref[Int]) {
+                            sound.play(true);
+                        });
+                    },
+                    Button.new(String("أوقف الصوت")).{
+                        height = String("30pt");
+                        width = String("120pt");
+                        backgroundColor = Color(200, 200, 200);
+                        fontSize = 16.0;
+                        onClick.connect(closure (sound: by_ref)&(widget: ref[Button], payload: ref[Int]) {
+                            sound.stop();
+                        });
+                    }
+                });
+            }
             Canvas.new().{
                 canvas = this;
                 width = String("1280px");
@@ -55,6 +117,7 @@ func main {
         });
     });
 
+    // Generate an image dynamically.
     def dynImg: ImageResource;
     def canvasRes: CanvasResource(100, 100);
     canvasRes.setLineWidth(5);
@@ -65,13 +128,7 @@ func main {
     canvasRes.drawPolygon(4, points.buf, false);
     dynImg.initFromCanvas(canvasRes);
 
-    def img: ImageResource;
-
-    await(Promises.Promise[Int].all({
-        img.load("Assets/logo.svg"),
-        loadFont("AlususMono", "Assets/AlususMono.otf")
-    }).ignoreResult());
-
+    // Animation loop.
     def x: Int = -80;
     startTimer(8000, closure (x: by_ref, img: by_ref, dynImg: by_ref)&(json: Json) {
         canvas.clear();

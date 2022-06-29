@@ -123,6 +123,11 @@
         return _loadImage(url, eventHandlers(index).id);
     }
 
+    function loadAudio (url: ptr[Char], cb: closure (Json)): ArchInt {
+        def index: ArchInt = addEventHandler(cb);
+        return _loadAudio(url, eventHandlers(index).id);
+    }
+
     function loadFont (fontName: ptr[Char], url: ptr[Char], cb: closure (Json)) {
         def index: ArchInt = addEventHandler(cb);
         _loadFont(fontName, url, eventHandlers(index).id);

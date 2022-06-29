@@ -29,6 +29,7 @@
         canvasId: ArchInt
     ): ArchInt;
     @expname[registerElementAsResource] function registerElementAsResource (id: ptr[Char]): ArchInt;
+    @expname[loadAudio] function _loadAudio (url: ptr[Char], cbId: ArchInt): ArchInt;
     @expname[releaseResource] function releaseResource (resourceId: ArchInt);
     @expname[loadFont] function _loadFont (fontName: ptr[Char], url: ptr[Char], cbId: ArchInt);
     // Canvas Operations
@@ -45,6 +46,9 @@
     @expname[setLineWidth] function setLineWidth (canvasId: ArchInt, lw: Int);
     @expname[drawImage] function drawImage (canvasId: ArchInt, imgId: Int, x: Int, y: Int, w: Int, h: Int, alpha: Float);
     @expname[clearCanvas] function clearCanvas (canvasId: ArchInt);
+    // Audio Operations
+    @expname[playAudio] function playAudio (audioId: ArchInt, loop: Bool);
+    @expname[stopAudio] function stopAudio (audioId: ArchInt);
     // Misc
     @expname[logToConsole] function logToConsole (msg: ptr[Char]);
 }
