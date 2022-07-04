@@ -5,12 +5,14 @@ use Srl;
 use WebPlatform;
 
 //==============================================================================
+// Backend
+
+@assetsRoute def assetsRoute: "Assets/";
+
+//==============================================================================
 // Frontend
 
 def PrimeryColor: Color("8e50ef");
-def LightColor: Color("c380ff");
-
-@assetsRoute def assetsRoute: "Assets/";
 
 func createHeader (): SrdRef[Widget] {
     setElementAttribute("body", "style", "padding: 0; margin: 0;");
@@ -24,7 +26,7 @@ func createHeader (): SrdRef[Widget] {
         border = Quad(1.5);
 
         addChildren({
-            Label.new(String("أمثلة منصة ويب الأسس - لوحة رسم")).{
+            Label.new(String("أمثلة منصة ويب الأسس - مرسم")).{
                 fontColor = Color("fff");
                 fontSize = 21.0;
                 width = String("100%");
