@@ -1,0 +1,48 @@
+@merge module WebPlatform {
+    class Window {
+        @shared def instance: Window(0~cast[ptr]);
+        def id: ptr[array[Char]] = "window";
+        def view: SrdRef[Widget];
+        def keysToSwallow: String;
+
+        handler this~init(dummy: ptr) {
+            this.onKeyDown.owner~no_deref = this;
+            this.onKeyUp.owner~no_deref = this;
+        }
+
+        //-------
+        // Events
+
+        def onKeyDown: Signal[Window, String];
+        def onKeyDownId: ArchInt = -1;
+        def onKeyUp: Signal[Window, String];
+        def onKeyUpId: ArchInt = -1;
+
+        handler this.onSignalConnectionsChanged(signal: ptr[Signal[Window, String]], connectionCount: Int) {
+            if signal == this.onKeyDown~ptr {
+                handleKeySignalConnectionChanged[onKeyDown, "keydown", this.keysToSwallow, {
+                    this.onKeyDown.emit(data.getString("code"));
+                }];
+            } else if signal == this.onKeyUp~ptr {
+                handleKeySignalConnectionChanged[onKeyUp, "keyup", this.keysToSwallow, {
+                    this.onKeyUp.emit(data.getString("code"));
+                }];
+            }
+        }
+
+        //---------
+        // Handlers
+
+        handler this.setView(v: SrdRef[Widget]) {
+            this.unsetView();
+            this.view = v;
+            this.view.build(String("body"));
+        }
+
+        handler this.unsetView() {
+            if this.view.obj~ptr != 0 this.view.unbuild();
+            this.view.release();
+        }
+    }
+}
+

@@ -50,9 +50,14 @@ func main {
         sound.load("Assets/sound.mp3")
     }).ignoreResult());
 
+    def xx: Int = 200;
+    def yy: Int = 150;
+    def dx: Int = 0;
+    def dy: Int = 0;
+
     // Build the view
     def canvas: SrdRef[Canvas];
-    setView(Box.new({}).{
+    Window.instance.setView(Box.new({}).{
         align = String("center");
         addChildren({
             createHeader(),
@@ -115,9 +120,30 @@ func main {
                 border = Quad(1, 1, 1, 1);
                 borderColor = Color(0, 0, 0);
                 backgroundColor = Color(220, 220, 220);
+                onMouseMove.connect(
+                    closure (xx: by_ref, yy: by_ref)&(widget: ref[Canvas], payload: ref[MouseMovePayload]) {
+                    xx = payload.posX;
+                    yy = payload.posY;
+                });
             }
         });
     });
+
+    Window.instance.{
+        keysToSwallow = "ArrowUp,ArrowDown,ArrowLeft,ArrowRight";
+        onKeyDown.connect(closure (dx: by_ref, dy: by_ref)&(window: ref[Window], payload: ref[String]) {
+            if payload == "ArrowUp" dy = -5
+            else if payload == "ArrowDown" dy = 5
+            else if payload == "ArrowRight" dx = 5
+            else if payload == "ArrowLeft" dx = -5;
+        });
+        onKeyUp.connect(closure (dx: by_ref, dy: by_ref)&(window: ref[Window], payload: ref[String]) {
+            if payload == "ArrowUp" dy = 0
+            else if payload == "ArrowDown" dy = 0
+            else if payload == "ArrowRight" dx = 0
+            else if payload == "ArrowLeft" dx = 0;
+        });
+    };
 
     // Generate an image dynamically.
     def dynImg: ImageResource;
@@ -132,7 +158,9 @@ func main {
 
     // Animation loop.
     def x: Int = -80;
-    startTimer(8000, closure (x: by_ref, img: by_ref, dynImg: by_ref)&(json: Json) {
+    startTimer(8000, closure (
+        x: by_ref, img: by_ref, dynImg: by_ref, xx: by_ref, yy: by_ref, dx: by_ref, dy: by_ref
+    ) & (json: Json) {
         canvas.clear();
         canvas.drawLine(0,0, 100,100);
         canvas.drawCircle(100,180, 90,0 );
@@ -148,7 +176,10 @@ func main {
         def alpha: Float = Math.sin(3.14 * x / 80.0) / 4 + 0.75;
         canvas.drawImage(img, x, y1, size, size, alpha);
         canvas.drawImage(dynImg, x, y2, size, size, alpha);
+        canvas.drawImage(dynImg, xx, yy, size, size, alpha);
         if ++x >= 1280 x = -80;
+        xx += dx;
+        yy += dy;
     });
 
     runEventLoop();

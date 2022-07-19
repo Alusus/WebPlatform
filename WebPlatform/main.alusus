@@ -65,6 +65,19 @@
         return eventHandlers(index).id;
     }
 
+    function registerElementKeyEventHandler (
+        elementName: ptr[array[Char]], eventName: ptr[array[Char]], keysToSwallow: ptr[array[Char]], cb: closure (Json)
+    ): ArchInt {
+        def index: ArchInt = addEventHandler(cb);
+        _registerElementKeyEventHandler(elementName, eventName, keysToSwallow, eventHandlers(index).id);
+        def eventIdentification: SrdRef[ElementEventIdentification];
+        eventIdentification.construct();
+        eventIdentification.elementName = elementName;
+        eventIdentification.eventName = eventName;
+        eventHandlers(index).info = castSrdRef[eventIdentification, Void];
+        return eventHandlers(index).id;
+    }
+
     function unregisterElementEventHandler (id: ArchInt) {
         def i: ArchInt = findEventHandlerIndex(id);
         if i == -1 return;

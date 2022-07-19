@@ -9,6 +9,9 @@
     @expname[registerElementEventHandler] function _registerElementEventHandler (
       elementName: ptr[Char], eventName: ptr[Char], cbId: ArchInt
     );
+    @expname[registerElementKeyEventHandler] function _registerElementKeyEventHandler (
+      elementName: ptr[Char], eventName: ptr[Char], keysToSwallow: ptr[Char], cbId: ArchInt
+    );
     @expname[unregisterElementEventHandler] function _unregisterElementEventHandler (
         elementName: ptr[Char], eventName: ptr[Char]
     );

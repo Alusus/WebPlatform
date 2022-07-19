@@ -154,11 +154,37 @@
         generateProperty[border, Border, Quad];
         generateProperty[borderColor, BorderColor, Color];
 
+        //-------
+        // Events
+
+        def onMouseMove: Signal[Canvas, MouseMovePayload];
+        def onMouseMoveId: ArchInt = -1;
+        // TODO: Add mouseIn and mouseOut events?
+
         //---------
         // Handlers
 
         handler this~init() {
             this.borderColor~init(255, 255, 255);
+            this.onMouseMove.owner~no_deref = this;
+        }
+
+        //-----------------
+        // Member Functions
+
+        handler this.onSignalConnectionsChanged(signal: ptr[Signal[Canvas, MouseMovePayload]], connectionCount: Int) {
+            if this.id == "" return;
+
+            if signal == this.onMouseMove~ptr {
+                handleSignalConnectionChanged[onMouseMove, "mousemove", {
+                    this.onMouseMove.emit(MouseMovePayload().{
+                        posX = data.getInt("offsetX");
+                        posY = data.getInt("offsetY");
+                        deltaX = data.getInt("movementX");
+                        deltaY = data.getInt("movementY");
+                    });
+                }];
+            }
         }
 
         //-------------------
@@ -169,6 +195,7 @@
             createElement("canvas", this.id, ownerId);
             this.resourceId = registerElementAsResource(this.id);
             this.update();
+            this.onSignalConnectionsChanged(this.onMouseMove~ptr, this.onMouseMove.getConnectionCount());
         }
 
         handler (this:Widget).unbuild() set_ptr {
@@ -411,13 +438,9 @@
             if this.id == "" return;
 
             if signal == this.onClick~ptr {
-                if connectionCount > 0 and this.onClickId == -1 {
-                    this.onClickId = registerElementEventHandler(this.id, "click", closure (json: Json) {
-                        this.onClick.emit(Int(0));
-                    });
-                } else if connectionCount == 0 and this.onClickId != -1{
-                    unregisterElementEventHandler(this.onClickId);
-                }
+                handleSignalConnectionChanged[onClick, "click", {
+                    this.onClick.emit(Int(0));
+                }];
             }
         }
 
@@ -512,13 +535,9 @@
             if this.id == "" return;
 
             if signal == this.onChanged~ptr {
-                if connectionCount > 0 and this.onChangedId == -1 {
-                    this.onChangedId = registerElementEventHandler(this.id, "change", closure (json: Json) {
-                        this.onChanged.emit(Int(0));
-                    });
-                } else if connectionCount == 0 and this.onChangedId != -1{
-                    unregisterElementEventHandler(this.onChangedId);
-                }
+                handleSignalConnectionChanged[onChanged, "change", {
+                    this.onChanged.emit(Int(0));
+                }];
             }
         }
 
@@ -526,29 +545,19 @@
             if this.id == "" return;
 
             if signal == this.onKeyPress~ptr {
-                if connectionCount > 0 and this.onKeyPressId == -1 {
-                    this.onKeyPressId = registerElementEventHandler(this.id, "keypress", closure (json: Json) {
-                        def data: Json = json.getObject("eventData");
-                        def outPayload: String;
-                        if data.getBool("shiftKey") outPayload += "Shift+";
-                        outPayload += data.getString("code");
-                        this.onKeyPress.emit(outPayload);
-                    });
-                } else if connectionCount == 0 and this.onKeyPressId != -1{
-                    unregisterElementEventHandler(this.onKeyPressId);
-                }
+                handleKeySignalConnectionChanged[onKeyPress, "keypress", "", {
+                    def outPayload: String;
+                    if data.getBool("shiftKey") outPayload += "Shift+";
+                    outPayload += data.getString("code");
+                    this.onKeyPress.emit(outPayload);
+                }];
             } else if signal == this.onKeyUp~ptr {
-                if connectionCount > 0 and this.onKeyUpId == -1 {
-                    this.onKeyUpId = registerElementEventHandler(this.id, "keyup", closure (json: Json) {
-                        def data: Json = json.getObject("eventData");
-                        def outPayload: String;
-                        if data.getBool("shiftKey") outPayload += "Shift+";
-                        outPayload += data.getString("code");
-                        this.onKeyUp.emit(outPayload);
-                    });
-                } else if connectionCount == 0 and this.onKeyUpId != -1{
-                    unregisterElementEventHandler(this.onKeyUpId);
-                }
+                handleKeySignalConnectionChanged[onKeyUp, "keyup", "", {
+                    def outPayload: String;
+                    if data.getBool("shiftKey") outPayload += "Shift+";
+                    outPayload += data.getString("code");
+                    this.onKeyUp.emit(outPayload);
+                }];
             }
         }
 

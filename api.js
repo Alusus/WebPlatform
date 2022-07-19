@@ -56,15 +56,42 @@ wasmApi.fetchNextEvent = () => {
 wasmApi.registerElementEventHandler = (elementName, eventName, cbId) => {
     const jsElementName = toJsString(elementName);
     const jsEventName = toJsString(eventName);
-    document.getElementById(jsElementName)[`on${jsEventName}`] = (event) => {
-      onEvent(cbId, true, jsEventName, event);
-    };
+    if (jsElementName === 'window') {
+      window[`on${jsEventName}`] = (event) => {
+        onEvent(cbId, true, jsEventName, event);
+      };
+    } else {
+      document.getElementById(jsElementName)[`on${jsEventName}`] = (event) => {
+        onEvent(cbId, true, jsEventName, event);
+      };
+    }
+}
+
+wasmApi.registerElementKeyEventHandler = (elementName, eventName, keysToSwallow, cbId) => {
+    const toSwallow = toJsString(keysToSwallow).split(',');
+    const jsElementName = toJsString(elementName);
+    const jsEventName = toJsString(eventName);
+    if (jsElementName === 'window') {
+      window[`on${jsEventName}`] = (event) => {
+        if (toSwallow.includes(event.code)) event.preventDefault();
+        onEvent(cbId, true, jsEventName, event);
+      };
+    } else {
+      document.getElementById(jsElementName)[`on${jsEventName}`] = (event) => {
+        if (toSwallow.includes(event.code)) event.preventDefault();
+        onEvent(cbId, true, jsEventName, event);
+      };
+    }
 }
 
 wasmApi.unregisterElementEventHandler = (elementName, eventName) => {
     const jsElementName = toJsString(elementName);
     const jsEventName = toJsString(eventName);
-    document.getElementById(jsElementName)[`on${jsEventName}`] = null;
+    if (jsElementName === 'window') {
+      window[`on${jsEventName}`] = null;
+    } else {
+      document.getElementById(jsElementName)[`on${jsEventName}`] = null;
+    }
 }
 
 wasmApi.waitForEvent = () => {
@@ -332,16 +359,26 @@ wasmApi.logToConsole = (msg) => {
 
 // Helper Functions
 
+const eventPropMap = {
+  mousemove: ['offsetX', 'offsetY', 'movementX', 'movementY'],
+  keydown: ['code', 'shiftKey', 'ctrlKey', 'altKey'],
+  keyup: ['code', 'shiftKey', 'ctrlKey', 'altKey'],
+  keypress: ['code', 'shiftKey', 'ctrlKey', 'altKey'],
+  change: [],
+  click: [],
+  loadImage: ['resourceId'],
+  loadFont: [],
+  loadAudio: ['resourceId'],
+  sendRequest: ['status', 'headers', 'body'],
+  timer: [],
+};
+
 function stringifyEvent(event) {
   const obj = { cbId: event.cbId, recurring: event.recurring, eventName: event.eventName, eventData: {} };
-  for (let k in event.eventData) {
+  for (let k of eventPropMap[event.eventName]) {
     obj.eventData[k] = event.eventData[k];
   }
-  return JSON.stringify(obj, (k, v) => {
-    if (v instanceof Node) return 'Node';
-    if (v instanceof Window) return 'Window';
-    return v;
-  }, ' ');
+  return JSON.stringify(obj);
 }
 
 function onEvent (cbId, recurring, eventName, event) {

@@ -21,6 +21,7 @@ import "WebPlatform/widgets";
 import "WebPlatform/resources";
 import "WebPlatform/main";
 import "WebPlatform/Drawing";
+import "WebPlatform/Window";
 
 @merge module WebPlatform {
     use Srl;

@@ -101,7 +101,7 @@ func encodeHtml(str: String): String {
 func main {
     def onFetch: closure (json: Json);
 
-    setView(Box.new({}).{
+    Window.instance.setView(Box.new({}).{
         height = String("100%");
         justify = String("space-between");
         addChildren({
@@ -200,7 +200,7 @@ func main {
 
 @uiEndpoint["/about", "WebPlatform Example - Chat"]
 func about {
-    setView(Box.new({}).{
+    Window.instance.setView(Box.new({}).{
         addChildren({
             createHeader(),
             Label.new(String("مثال الدردشة")).{

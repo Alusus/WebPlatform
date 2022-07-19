@@ -2,18 +2,6 @@
     //==========================================================================
     // Functions and Macros
 
-    def view: SrdRef[Widget];
-    function setView(v: SrdRef[Widget]) {
-        unsetView();
-        view = v;
-        view.build(String("body"));
-    }
-
-    function unsetView() {
-        if view.obj~ptr != 0 view.unbuild();
-        view.release();
-    }
-
     function getNewId (): String {
         @shared def counter: Int(0);
         return String("id") + (++counter);
@@ -139,6 +127,33 @@
                 result += this.convertHexToDecimal(letters~next_arg[Char]);
             }
             return result;
+        }
+    }
+
+    //==========================================================================
+    // MouseMovePayload
+    // The payload of the mouse-move event.
+    class MouseMovePayload {
+        def posX: Float = 0;
+        def posY: Float = 0;
+        def deltaX: Float = 0;
+        def deltaY: Float = 0;
+
+        handler this~init() {}
+        handler this~init(x: Float, y: Float, dx: Float, dy: Float) {
+            this.posX = x;
+            this.posY = y;
+            this.deltaX = dx;
+            this.deltaY = dy;
+        }
+        handler this~init(temp_ref[MouseMovePayload]) {
+            this = value;
+        }
+        handler this = temp_ref[MouseMovePayload] {
+            this.posX = value.posX;
+            this.posY = value.posY;
+            this.deltaX = value.deltaX;
+            this.deltaY = value.deltaY;
         }
     }
 }
