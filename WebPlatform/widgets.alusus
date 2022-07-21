@@ -509,6 +509,25 @@
         generateProperty[fontColor, FontColor, Color];
         generateProperty[textAlign, TextAlign, String];
         generateProperty[textDirection, TextDirection, String];
+
+        def _text: String;
+        handler this.setText (t: String) {
+            this._text = t;
+            if this.id.getLength() > 0 setElementAttribute(this.id, "value", t);
+        }
+        handler this.getText (): String {
+            if this.id.getLength() == 0 this._text = String()
+            else this._text = String(getElementAttribute(this.id, "value"));
+            return this._text;
+        }
+        handler this.text = (val: temp_ref[String]) {
+            this.setText(val);
+            return this._text;
+        }
+        handler this.text: ref[String] {
+            return this.getText();
+        }
+
         def onChanged: Signal[TextInput, Int];
         def onChangedId: ArchInt = -1;
         def onKeyPress: Signal[TextInput, String];
@@ -561,14 +580,6 @@
             }
         }
 
-        handler this.setText (t: String) {
-            if this.id.getLength() > 0 setElementAttribute(this.id, "value", t);
-        }
-        handler this.getText (): String {
-            if this.id.getLength() == 0 return String();
-            return String(getElementAttribute(this.id, "value"));
-        }
-
         //-------------------
         // Function Overrides
 
@@ -597,6 +608,7 @@
 
         handler (this:Widget).update() set_ptr {
             if this.id.getLength() > 0 {
+                setElementAttribute(this.id, "value", this._text);
                 setElementAttribute(
                     this.id, "style",
                     String.format(
