@@ -10,13 +10,111 @@
         generateProperty[height, Height, String];
         generateProperty[backgroundColor, BackgroundColor, Color];
 
+        // Events
+        def onResize: Signal[Widget, Int];
+        def onResizeId: ArchInt = -1;
+        def onMouseMove: Signal[Widget, MouseMovePayload];
+        def onMouseMoveId: ArchInt = -1;
+        def onMouseEnter: Signal[Widget, Int];
+        def onMouseEnterId: ArchInt = -1;
+        def onMouseOut: Signal[Widget, Int];
+        def onMouseOutId: ArchInt = -1;
+        def onMouseDown: Signal[Widget, Int];
+        def onMouseDownId: ArchInt = -1;
+        def onMouseUp: Signal[Widget, Int];
+        def onMouseUpId: ArchInt = -1;
+
         handler this~init() {
             this.backgroundColor~init(255, 255, 255, 0);
+            this.onResize.owner~no_deref = this;
+            this.onMouseMove.owner~no_deref = this;
+            this.onMouseEnter.owner~no_deref = this;
+            this.onMouseOut.owner~no_deref = this;
+            this.onMouseDown.owner~no_deref = this;
+            this.onMouseUp.owner~no_deref = this;
         }
+
+        //-------------------
+        // Abstract Functions
 
         handler this.build(ownerId: String) as_ptr;
         handler this.unbuild() as_ptr;
         handler this.update() as_ptr;
+
+        //-----------------
+        // Member Functions
+
+        handler this.buildCommon() {
+            this.onSignalConnectionsChanged(this.onResize~ptr, this.onResize.getConnectionCount());
+            this.onSignalConnectionsChanged(this.onMouseMove~ptr, this.onMouseMove.getConnectionCount());
+            this.onSignalConnectionsChanged(this.onMouseEnter~ptr, this.onMouseEnter.getConnectionCount());
+            this.onSignalConnectionsChanged(this.onMouseOut~ptr, this.onMouseOut.getConnectionCount());
+            this.onSignalConnectionsChanged(this.onMouseDown~ptr, this.onMouseDown.getConnectionCount());
+            this.onSignalConnectionsChanged(this.onMouseUp~ptr, this.onMouseUp.getConnectionCount());
+        }
+
+        handler this.unbuildCommon() {
+        }
+
+        handler this.onSignalConnectionsChanged(signal: ptr[Signal[Widget, Int]], connectionCount: Int) {
+            if this.id == "" return;
+
+            if signal == this.onResize~ptr {
+                if connectionCount > 0 and this.onResizeId == -1 {
+                    this.onResizeId = observeResize(
+                        this.id,
+                        closure (json: Json) {
+                            this.onResize.emit(Int(0));
+                        }
+                    );
+                } else if connectionCount == 0 and this.onResizeId != -1 {
+                    unobserveResize(this.onResizeId);
+                }
+            }
+
+            if signal == this.onMouseEnter~ptr {
+                handleSignalConnectionChanged[onMouseEnter, "mouseenter", {
+                    this.onMouseEnter.emit(Int(0));
+                }];
+            }
+            if signal == this.onMouseOut~ptr {
+                handleSignalConnectionChanged[onMouseOut, "mouseout", {
+                    this.onMouseOut.emit(Int(0));
+                }];
+            }
+            if signal == this.onMouseDown~ptr {
+                handleSignalConnectionChanged[onMouseDown, "mousedown", {
+                    this.onMouseDown.emit(Int().{ this = data.getInt("button") });
+                }];
+            }
+            if signal == this.onMouseUp~ptr {
+                handleSignalConnectionChanged[onMouseUp, "mouseup", {
+                    this.onMouseUp.emit(Int().{ this = data.getInt("button") });
+                }];
+            }
+        }
+
+        handler this.onSignalConnectionsChanged(signal: ptr[Signal[Widget, MouseMovePayload]], connectionCount: Int) {
+            if this.id == "" return;
+
+            if signal == this.onMouseMove~ptr {
+                handleSignalConnectionChanged[onMouseMove, "mousemove", {
+                    this.onMouseMove.emit(MouseMovePayload().{
+                        posX = data.getInt("offsetX");
+                        posY = data.getInt("offsetY");
+                        deltaX = data.getInt("movementX");
+                        deltaY = data.getInt("movementY");
+                    });
+                }];
+            }
+        }
+
+        handler this.getDimensions(): Dimensions {
+            if this.id == "" return Dimensions(0, 0);
+            def d: Dimensions;
+            getElementDimensions(this.id, d);
+            return d;
+        }
     }
 
     //==========================================================================
@@ -81,6 +179,8 @@
             for i = 0, i < this.children.getLength(), ++i {
                 this.children(i).build(this.id);
             }
+
+            this.buildCommon();
         }
 
         handler (this:Widget).unbuild() set_ptr {
@@ -92,6 +192,7 @@
                     this.children(i).unbuild();
                 }
 
+                this.unbuildCommon();
                 this.id = String();
             }
         }
@@ -154,37 +255,11 @@
         generateProperty[border, Border, Quad];
         generateProperty[borderColor, BorderColor, Color];
 
-        //-------
-        // Events
-
-        def onMouseMove: Signal[Canvas, MouseMovePayload];
-        def onMouseMoveId: ArchInt = -1;
-        // TODO: Add mouseIn and mouseOut events?
-
         //---------
         // Handlers
 
         handler this~init() {
             this.borderColor~init(255, 255, 255);
-            this.onMouseMove.owner~no_deref = this;
-        }
-
-        //-----------------
-        // Member Functions
-
-        handler this.onSignalConnectionsChanged(signal: ptr[Signal[Canvas, MouseMovePayload]], connectionCount: Int) {
-            if this.id == "" return;
-
-            if signal == this.onMouseMove~ptr {
-                handleSignalConnectionChanged[onMouseMove, "mousemove", {
-                    this.onMouseMove.emit(MouseMovePayload().{
-                        posX = data.getInt("offsetX");
-                        posY = data.getInt("offsetY");
-                        deltaX = data.getInt("movementX");
-                        deltaY = data.getInt("movementY");
-                    });
-                }];
-            }
         }
 
         //-------------------
@@ -195,14 +270,14 @@
             createElement("canvas", this.id, ownerId);
             this.resourceId = registerElementAsResource(this.id);
             this.update();
-            this.onSignalConnectionsChanged(this.onMouseMove~ptr, this.onMouseMove.getConnectionCount());
+            this.buildCommon();
         }
 
         handler (this:Widget).unbuild() set_ptr {
             if this.id.getLength() > 0 {
                 deleteElement(this.id);
                 releaseResource(this.resourceId);
-
+                this.unbuildCommon();
                 this.id = String();
             }
         }
@@ -279,12 +354,13 @@
             this.id = getNewId();
             createElement("img", this.id, ownerId);
             this.update();
+            this.buildCommon();
         }
 
         handler (this:Widget).unbuild() set_ptr {
             if this.id.getLength() > 0 {
                 deleteElement(this.id);
-
+                this.unbuildCommon();
                 this.id = String();
             }
         }
@@ -358,11 +434,13 @@
             this.id = getNewId();
             createElement("span", this.id, ownerId);
             this.update();
+            this.buildCommon();
         }
 
         handler (this:Widget).unbuild() set_ptr {
             if this.id.getLength() > 0 {
                 deleteElement(this.id);
+                this.unbuildCommon();
                 this.id = String();
             }
         }
@@ -452,12 +530,14 @@
             createElement("button", this.id, ownerId);
             this.update();
             this.onSignalConnectionsChanged(this.onClick~ptr, this.onClick.getConnectionCount());
+            this.buildCommon();
         }
 
         handler (this:Widget).unbuild() set_ptr {
             if this.onClickId != -1 unregisterElementEventHandler(this.onClickId);
             this.onClickId = -1;
             deleteElement(this.id);
+            this.unbuildCommon();
             this.id = String();
         }
 
@@ -590,6 +670,7 @@
             this.onSignalConnectionsChanged(this.onChanged~ptr, this.onChanged.getConnectionCount());
             this.onSignalConnectionsChanged(this.onKeyPress~ptr, this.onKeyPress.getConnectionCount());
             this.onSignalConnectionsChanged(this.onKeyUp~ptr, this.onKeyUp.getConnectionCount());
+            this.buildCommon();
         }
 
         handler (this:Widget).unbuild() set_ptr {
@@ -603,6 +684,7 @@
             this.onKeyUpId = -1;
 
             deleteElement(this.id);
+            this.unbuildCommon();
             this.id = String();
         }
 
@@ -675,6 +757,7 @@
             this.update();
 
             if this.child.obj~ptr != 0 this.child.build(this.id);
+            this.buildCommon();
         }
 
         handler (this:Widget).unbuild() set_ptr {
@@ -683,6 +766,7 @@
 
                 if this.child.obj~ptr != 0 this.child.unbuild();
 
+                this.unbuildCommon();
                 this.id = String();
             }
         }

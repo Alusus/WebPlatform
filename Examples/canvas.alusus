@@ -37,6 +37,11 @@ func createHeader (): SrdRef[Widget] {
     }~cast[SrdRef[Widget]];
 }
 
+class Position {
+    def x: Int;
+    def y: Int;
+}
+
 @uiEndpoint["/", "WebPlatform Example - Canvas"]
 func main {
     // Load assets from the server.
@@ -50,10 +55,12 @@ func main {
         sound.load("Assets/sound.mp3")
     }).ignoreResult());
 
-    def xx: Int = 200;
-    def yy: Int = 150;
-    def dx: Int = 0;
-    def dy: Int = 0;
+    def pos: Position;
+    pos.x = 200;
+    pos.y = 150;
+    def delta: Position;
+    delta.x = delta.y = 0;
+    def pressed: Bool = 0;
 
     // Build the view
     def canvas: SrdRef[Canvas];
@@ -117,13 +124,29 @@ func main {
                 height = String("800px");
                 bitmapWidth = String("1280px");
                 bitmapHeight = String("800px");
-                border = Quad(1, 1, 1, 1);
+                border = Quad(2);
                 borderColor = Color(0, 0, 0);
                 backgroundColor = Color(220, 220, 220);
+                def dim: Dimensions(1, 1);
                 onMouseMove.connect(
-                    closure (xx: by_ref, yy: by_ref)&(widget: ref[Canvas], payload: ref[MouseMovePayload]) {
-                    xx = payload.posX;
-                    yy = payload.posY;
+                    closure (pos: by_ref, dim: by_ref)&(widget: ref[Widget], payload: ref[MouseMovePayload]) {
+                    pos.x = payload.posX * 1280 / dim.width;
+                    pos.y = payload.posY * 800 / dim.height;
+                });
+                onMouseEnter.connect(closure (widget: ref[Widget], payload: ref[Int]) {
+                    this.borderColor = Color(0, 0, 0);
+                });
+                onMouseOut.connect(closure (widget: ref[Widget], payload: ref[Int]) {
+                    this.borderColor = Color(255, 0, 0);
+                });
+                onMouseDown.connect(closure (pressed: by_ref)&(widget: ref[Widget], payload: ref[Int]) {
+                    if payload == 0 pressed = 1;
+                });
+                onMouseUp.connect(closure (pressed: by_ref)&(widget: ref[Widget], payload: ref[Int]) {
+                    if payload == 0 pressed = 0;
+                });
+                onResize.connect(closure (dim: by_ref)&(widget: ref[Widget], payload: ref[Int]) {
+                    dim = this.getDimensions();
                 });
             }
         });
@@ -131,17 +154,17 @@ func main {
 
     Window.instance.{
         keysToSwallow = "ArrowUp,ArrowDown,ArrowLeft,ArrowRight";
-        onKeyDown.connect(closure (dx: by_ref, dy: by_ref)&(window: ref[Window], payload: ref[String]) {
-            if payload == "ArrowUp" dy = -5
-            else if payload == "ArrowDown" dy = 5
-            else if payload == "ArrowRight" dx = 5
-            else if payload == "ArrowLeft" dx = -5;
+        onKeyDown.connect(closure (delta: by_ref)&(window: ref[Window], payload: ref[String]) {
+            if payload == "ArrowUp" delta.y = -5
+            else if payload == "ArrowDown" delta.y = 5
+            else if payload == "ArrowRight" delta.x = 5
+            else if payload == "ArrowLeft" delta.x = -5;
         });
-        onKeyUp.connect(closure (dx: by_ref, dy: by_ref)&(window: ref[Window], payload: ref[String]) {
-            if payload == "ArrowUp" dy = 0
-            else if payload == "ArrowDown" dy = 0
-            else if payload == "ArrowRight" dx = 0
-            else if payload == "ArrowLeft" dx = 0;
+        onKeyUp.connect(closure (delta: by_ref)&(window: ref[Window], payload: ref[String]) {
+            if payload == "ArrowUp" delta.y = 0
+            else if payload == "ArrowDown" delta.y = 0
+            else if payload == "ArrowRight" delta.x = 0
+            else if payload == "ArrowLeft" delta.x = 0;
         });
     };
 
@@ -159,7 +182,7 @@ func main {
     // Animation loop.
     def x: Int = -80;
     startTimer(8000, closure (
-        x: by_ref, img: by_ref, dynImg: by_ref, xx: by_ref, yy: by_ref, dx: by_ref, dy: by_ref
+        x: by_ref, img: by_ref, dynImg: by_ref, pos: by_ref, delta: by_ref, pressed: by_ref
     ) & (json: Json) {
         canvas.clear();
         canvas.drawLine(0,0, 100,100);
@@ -176,10 +199,11 @@ func main {
         def alpha: Float = Math.sin(3.14 * x / 80.0) / 4 + 0.75;
         canvas.drawImage(img, x, y1, size, size, alpha);
         canvas.drawImage(dynImg, x, y2, size, size, alpha);
-        canvas.drawImage(dynImg, xx, yy, size, size, alpha);
+        if pressed canvas.drawImage(img, pos.x, pos.y, size, size, alpha)
+        else canvas.drawImage(dynImg, pos.x, pos.y, size, size, alpha);
         if ++x >= 1280 x = -80;
-        xx += dx;
-        yy += dy;
+        pos.x += delta.x;
+        pos.y += delta.y;
     });
 
     runEventLoop();

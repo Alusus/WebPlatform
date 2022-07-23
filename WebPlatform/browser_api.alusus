@@ -4,6 +4,7 @@
     @expname[deleteElement] function deleteElement (name: ptr[Char]);
     @expname[setElementAttribute] function setElementAttribute (name: ptr[Char], prop: ptr[Char], value: ptr[Char]);
     @expname[getElementAttribute] function getElementAttribute (name: ptr[Char], prop: ptr[Char]): ptr[array[Char]];
+    @expname[getElementDimensions] function getElementDimensions (name: ptr[Char], result: ref[Dimensions]);
     // Event Loop
     @expname[fetchNextEvent] function fetchNextEvent (): ptr[array[Char]];
     @expname[registerElementEventHandler] function _registerElementEventHandler (
@@ -15,6 +16,8 @@
     @expname[unregisterElementEventHandler] function _unregisterElementEventHandler (
         elementName: ptr[Char], eventName: ptr[Char]
     );
+    @expname[observeResize] function _observeResize (elementName: ptr[Char], cbId: ArchInt);
+    @expname[unobserveResize] function _unobserveResize (elementName: ptr[Char]);
     @expname[waitForEvent] function waitForEvent;
     // TODO: usleep
     // Async Operations

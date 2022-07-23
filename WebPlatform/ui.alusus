@@ -28,6 +28,26 @@
 
 
     //==========================================================================
+    // Dimensions
+    class Dimensions {
+        def width: Int = 0;
+        def height: Int = 0;
+
+        handler this~init() {}
+        handler this~init(w: Int, h: Int) {
+            this.width = w;
+            this.height = h;
+        }
+        handler this~init(temp_ref[Dimensions]) {
+            this = value;
+        }
+        handler this = temp_ref[Dimensions] {
+            this.width = value.width;
+            this.height = value.height;
+        }
+    }
+
+    //==========================================================================
     // Quad
     // A tuple of four float values used for the four sides of a rectangle. This
     // is used for things like border thickness or padding.

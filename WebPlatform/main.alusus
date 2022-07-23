@@ -87,6 +87,26 @@
         eventHandlers.remove(i);
     }
 
+    function observeResize (elementName: ptr[array[Char]], cb: closure (Json)): ArchInt {
+        def index: ArchInt = addEventHandler(cb);
+        _observeResize(elementName, eventHandlers(index).id);
+        def eventIdentification: SrdRef[ElementEventIdentification];
+        eventIdentification.construct();
+        eventIdentification.elementName = elementName;
+        eventIdentification.eventName = "observeResize";
+        eventHandlers(index).info = castSrdRef[eventIdentification, Void];
+        return eventHandlers(index).id;
+    }
+
+    function unobserveResize (id: ArchInt) {
+        def i: ArchInt = findEventHandlerIndex(id);
+        if i == -1 return;
+        def eventIdentification: SrdRef[ElementEventIdentification] =
+            castSrdRef[eventHandlers(i).info, ElementEventIdentification];
+        _unobserveResize(eventIdentification.elementName);
+        eventHandlers.remove(i);
+    }
+
     //==========================================================================
     // Async Operations
 

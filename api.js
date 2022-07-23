@@ -10,6 +10,14 @@ let sleeping = false;
 let eventWaiting = false;
 let wasmStrPtr = null;
 
+const resizeObserver = new ResizeObserver(entries => {
+  for (let entry of entries) {
+    if (entry.target.dataset.resizeObserverCbId) {
+      onEvent(parseInt(entry.target.dataset.resizeObserverCbId, 10), true, 'resizeObserver', {});
+    }
+  }
+});
+
 // Element Management APIs
 
 wasmApi.createElement = (elementType, elementName, parentName) => {
@@ -21,6 +29,7 @@ wasmApi.createElement = (elementType, elementName, parentName) => {
 
 wasmApi.deleteElement = (elementName) => {
   const element = document.getElementById(toJsString(elementName));
+  if (element.dataset.resizeObserverCbId) resizeObserver.unobserve(element);
   if (element) element.remove();
 }
 
@@ -42,6 +51,13 @@ wasmApi.getElementAttribute = (elementName, propName) => {
   else if (prop === 'value') result = document.getElementById(toJsString(elementName)).value;
   else result = document.getElementById(toJsString(elementName)).getAttribute(prop);
   return toWasmString(result);
+}
+
+wasmApi.getElementDimensions = (elementName, pResult) => {
+  const element = document.getElementById(toJsString(elementName));
+  const resultArray = new Int32Array(wasmMemory.buffer, pResult, 2);
+  resultArray[0] = element.clientWidth;
+  resultArray[1] = element.clientHeight;
 }
 
 // Event Loop APIs
@@ -92,6 +108,18 @@ wasmApi.unregisterElementEventHandler = (elementName, eventName) => {
     } else {
       document.getElementById(jsElementName)[`on${jsEventName}`] = null;
     }
+}
+
+wasmApi.observeResize = (elementName, cbId) => {
+    const element = document.getElementById(toJsString(elementName))
+    element.dataset.resizeObserverCbId = cbId;
+    resizeObserver.observe(element);
+}
+
+wasmApi.unobserveResize = (elementName) => {
+    const element = document.getElementById(toJsString(elementName))
+    element.dataset.resizeObserverCbId = null;
+    resizeObserver.unobserve(element);
 }
 
 wasmApi.waitForEvent = () => {
@@ -361,6 +389,10 @@ wasmApi.logToConsole = (msg) => {
 
 const eventPropMap = {
   mousemove: ['offsetX', 'offsetY', 'movementX', 'movementY'],
+  mouseenter: [],
+  mouseout: [],
+  mousedown: ['button'],
+  mouseup: ['button'],
   keydown: ['code', 'shiftKey', 'ctrlKey', 'altKey'],
   keyup: ['code', 'shiftKey', 'ctrlKey', 'altKey'],
   keypress: ['code', 'shiftKey', 'ctrlKey', 'altKey'],
@@ -371,6 +403,7 @@ const eventPropMap = {
   loadAudio: ['resourceId'],
   sendRequest: ['status', 'headers', 'body'],
   timer: [],
+  resizeObserver: [],
 };
 
 function stringifyEvent(event) {
