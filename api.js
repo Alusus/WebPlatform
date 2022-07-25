@@ -381,6 +381,38 @@ wasmApi.stopAudio = (audioId) => {
 
 // Misc APIs
 
+wasmApi.requestPointerLock = (elementName) => {
+    const jsElementName = toJsString(elementName);
+    document.getElementById(jsElementName).requestPointerLock();
+    if (!document.onpointerlockchange) {
+        document.onpointerlockchange = () => {
+            if (window.onpointerlockchange) {
+                window.onpointerlockchange({ enabled: !!document.pointerLockElement });
+            }
+        }
+    }
+}
+
+wasmApi.exitPointerLock = () => {
+    document.exitPointerLock();
+}
+
+wasmApi.requestFullScreen = (elementName) => {
+    const jsElementName = toJsString(elementName);
+    document.getElementById(jsElementName).requestFullscreen();
+    if (!document.onfullscreenchange) {
+        document.onfullscreenchange = () => {
+            if (window.onfullscreenchange) {
+                window.onfullscreenchange({ enabled: !!document.fullscreenElement });
+            }
+        }
+    }
+}
+
+wasmApi.exitFullScreen = () => {
+    document.exitFullscreen();
+}
+
 wasmApi.logToConsole = (msg) => {
   console.log(toJsString(msg));
 }
@@ -404,6 +436,8 @@ const eventPropMap = {
   sendRequest: ['status', 'headers', 'body'],
   timer: [],
   resizeObserver: [],
+  pointerlockchange: ['enabled'],
+  fullscreenchange: ['enabled'],
 };
 
 function stringifyEvent(event) {

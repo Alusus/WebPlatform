@@ -56,6 +56,10 @@
     @expname[playAudio] function playAudio (audioId: ArchInt, loop: Bool);
     @expname[stopAudio] function stopAudio (audioId: ArchInt);
     // Misc
+    @expname[requestPointerLock] function requestPointerLock (elementName: ptr[Char]);
+    @expname[exitPointerLock] function exitPointerLock();
+    @expname[requestFullScreen] function requestFullScreen (elementName: ptr[Char]);
+    @expname[exitFullScreen] function exitFullScreen();
     @expname[logToConsole] function logToConsole (msg: ptr[Char]);
 }
 

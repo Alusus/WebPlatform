@@ -115,6 +115,16 @@
             getElementDimensions(this.id, d);
             return d;
         }
+
+        handler this.requestPointerLock() {
+            if this.id == "" return;
+            WebPlatform.requestPointerLock(this.id);
+        }
+
+        handler this.requestFullScreen() {
+            if this.id == "" return;
+            WebPlatform.requestFullScreen(this.id);
+        }
     }
 
     //==========================================================================

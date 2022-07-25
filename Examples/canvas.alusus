@@ -61,6 +61,8 @@ func main {
     def delta: Position;
     delta.x = delta.y = 0;
     def pressed: Bool = 0;
+    def pointerLocked: Bool = false;
+    def fullscreen: Bool = false;
 
     // Build the view
     def canvas: SrdRef[Canvas];
@@ -128,10 +130,18 @@ func main {
                 borderColor = Color(0, 0, 0);
                 backgroundColor = Color(220, 220, 220);
                 def dim: Dimensions(1, 1);
-                onMouseMove.connect(
-                    closure (pos: by_ref, dim: by_ref)&(widget: ref[Widget], payload: ref[MouseMovePayload]) {
-                    pos.x = payload.posX * 1280 / dim.width;
-                    pos.y = payload.posY * 800 / dim.height;
+                onMouseMove.connect(closure (
+                    pos: by_ref, dim: by_ref, pointerLocked: by_ref
+                )&(
+                    widget: ref[Widget], payload: ref[MouseMovePayload]
+                ) {
+                    if pointerLocked {
+                        pos.x += payload.deltaX;
+                        pos.y += payload.deltaY;
+                    } else {
+                        pos.x = payload.posX * 1280 / dim.width;
+                        pos.y = payload.posY * 800 / dim.height;
+                    }
                 });
                 onMouseEnter.connect(closure (widget: ref[Widget], payload: ref[Int]) {
                     this.borderColor = Color(0, 0, 0);
@@ -154,17 +164,37 @@ func main {
 
     Window.instance.{
         keysToSwallow = "ArrowUp,ArrowDown,ArrowLeft,ArrowRight";
-        onKeyDown.connect(closure (delta: by_ref)&(window: ref[Window], payload: ref[String]) {
+        onKeyDown.connect(closure (
+            delta: by_ref, pointerLocked: by_ref, fullscreen: by_ref
+        )&(
+            window: ref[Window], payload: ref[String]
+        ) {
             if payload == "ArrowUp" delta.y = -5
             else if payload == "ArrowDown" delta.y = 5
             else if payload == "ArrowRight" delta.x = 5
-            else if payload == "ArrowLeft" delta.x = -5;
+            else if payload == "ArrowLeft" delta.x = -5
+            else if payload == "Enter" {
+                if fullscreen exitFullScreen()
+                else canvas.requestFullScreen();
+            }
+            else if payload == "Space" {
+                if pointerLocked exitPointerLock()
+                else canvas.requestPointerLock();
+            }
         });
         onKeyUp.connect(closure (delta: by_ref)&(window: ref[Window], payload: ref[String]) {
             if payload == "ArrowUp" delta.y = 0
             else if payload == "ArrowDown" delta.y = 0
             else if payload == "ArrowRight" delta.x = 0
             else if payload == "ArrowLeft" delta.x = 0;
+        });
+        onPointerLockChange.connect(closure (pointerLocked: by_ref)&(window: ref[Window], payload: ref[Bool]) {
+            pointerLocked = payload;
+        });
+        onFullScreenChange.connect(closure (fullscreen: by_ref)&(window: ref[Window], payload: ref[Bool]) {
+            fullscreen = payload;
+            if payload canvas.requestPointerLock()
+            else exitPointerLock();
         });
     };
 
