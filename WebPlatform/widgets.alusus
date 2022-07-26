@@ -115,7 +115,17 @@
             getElementDimensions(this.id, d);
             return d;
         }
-        handler this.updateCommenPropertyString() :String{
+
+        handler this.requestPointerLock() {
+            if this.id == "" return;
+            WebPlatform.requestPointerLock(this.id);
+        }
+
+        handler this.requestFullScreen() {
+            if this.id == "" return;
+            WebPlatform.requestFullScreen(this.id);
+        }
+         handler this.updateCommenPropertyString() :String{
             return String.format(
                         "width:%s;"
                         "height:%s;"
@@ -289,19 +299,23 @@
             if this.id.getLength() > 0 {
                 setElementAttribute(
                     this.id, "style",
-                    this.updateCommenPropertyString() +String.format(
+                    String.format(
+                        "width:100%%;"
+                        "height:100%%;"
                         "max-width:%s;"
                         "max-height:%s;"
                         "padding:%fpt %fpt %fpt %fpt;"
                         "border-style:solid;"
                         "border-width:%fpt %fpt %fpt %fpt;"
                         "border-color:rgba(%i, %i, %i, %i);"
-                        ,
-
+                        "background-color:rgba(%i, %i, %i, %i);",
+                        this.width.buf, this.height.buf,
                         this.padding.top, this.padding.right, this.padding.bottom, this.padding.left,
                         this.border.top, this.border.right, this.border.bottom, this.border.left,
                         this.borderColor.red, this.borderColor.green,
-                        this.borderColor.blue, this.borderColor.alpha
+                        this.borderColor.blue, this.borderColor.alpha,
+                        this.backgroundColor.red, this.backgroundColor.green,
+                        this.backgroundColor.blue, this.backgroundColor.alpha
                     )
                 );
                 setElementAttribute(this.id, "width", this.bitmapWidth);
@@ -700,8 +714,11 @@
             return r;
         }
     }
-    // input type
-     class Input {
+
+    //==========================================================================
+    // Input
+
+    class Input {
         @injection def widget: Widget;
 
         //-----------------------
@@ -710,9 +727,8 @@
         generateProperty[fontSize, FontSize, Float];
         generateProperty[fontColor, FontColor, Color];
         generateProperty[textAlign, TextAlign, String];
-        generateProperty[inputType, InputType, String];
         generateProperty[textDirection, TextDirection, String];
-
+        generateProperty[inputType, InputType, String];
 
         def _text: String;
         handler this.setText (t: String) {
@@ -749,12 +765,23 @@
             this.fontSize = 10.0;
             this.textAlign = String("right");
             this.textDirection = String("rtl");
+            this.inputType=String("text");
+        }
+
+        handler this~init(inputType : String) {
+            this.onChanged.owner~no_deref = this;
+            this.onKeyPress.owner~no_deref = this;
+            this.onKeyUp.owner~no_deref = this;
+            this.fontSize = 10.0;
+            this.textAlign = String("right");
+            this.textDirection = String("rtl");
+            this.inputType=inputType ;
         }
 
         //-----------------
         // Member Functions
 
-        handler this.onSignalConnectionsChanged(signal: ptr[Signal[TextInput, Int]], connectionCount: Int) {
+        handler this.onSignalConnectionsChanged(signal: ptr[Signal[Input, Int]], connectionCount: Int) {
             if this.id == "" return;
 
             if signal == this.onChanged~ptr {
@@ -764,7 +791,7 @@
             }
         }
 
-        handler this.onSignalConnectionsChanged(signal: ptr[Signal[TextInput, String]], connectionCount: Int) {
+        handler this.onSignalConnectionsChanged(signal: ptr[Signal[Input, String]], connectionCount: Int) {
             if this.id == "" return;
 
             if signal == this.onKeyPress~ptr {
@@ -789,7 +816,7 @@
 
         handler (this:Widget).build (ownerId: String) set_ptr {
             this.id = getNewId();
-            createElement("textarea", this.id, ownerId);
+            createElement("input", this.id, ownerId);
             this.update();
             this.onSignalConnectionsChanged(this.onChanged~ptr, this.onChanged.getConnectionCount());
             this.onSignalConnectionsChanged(this.onKeyPress~ptr, this.onKeyPress.getConnectionCount());
@@ -829,15 +856,21 @@
                         this.textDirection.buf
                     )
                 );
+                setElementAttribute(this.id, "type", this.inputType);
             }
         }
 
         //-----------------
         // Shared Functions
 
-        function new (): SrdRef[TextInput] {
-            def r: SrdRef[TextInput];
+        function new (): SrdRef[Input] {
+            def r: SrdRef[Input];
             r.alloc()~init();
+            return r;
+        }
+        function new (t : String): SrdRef[Input] {
+            def r: SrdRef[Input];
+            r.alloc()~init(t);
             return r;
         }
     }
@@ -916,5 +949,6 @@
     WebPlatform.defSrdRefCast[Hyperlink];
     WebPlatform.defSrdRefCast[Image];
     WebPlatform.defSrdRefCast[Canvas];
+    WebPlatform.defSrdRefCast[Input];
 }
 
