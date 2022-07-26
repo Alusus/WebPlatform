@@ -63,6 +63,7 @@ func main {
     def pressed: Bool = 0;
     def pointerLocked: Bool = false;
     def fullscreen: Bool = false;
+    def gamepadsCount: Int = 0;
 
     // Build the view
     def canvas: SrdRef[Canvas];
@@ -196,6 +197,12 @@ func main {
             if payload canvas.requestPointerLock()
             else exitPointerLock();
         });
+        onGamepadConnected.connect(closure (gamepadsCount: by_ref)&(window: ref[Window], payload: ref[String]) {
+            gamepadsCount = getGamepadsCount();
+        });
+        onGamepadDisconnected.connect(closure (gamepadsCount: by_ref)&(window: ref[Window], payload: ref[String]) {
+            gamepadsCount = getGamepadsCount();
+        });
     };
 
     // Generate an image dynamically.
@@ -212,7 +219,7 @@ func main {
     // Animation loop.
     def x: Int = -80;
     startTimer(8000, closure (
-        x: by_ref, img: by_ref, dynImg: by_ref, pos: by_ref, delta: by_ref, pressed: by_ref
+        x: by_ref, img: by_ref, dynImg: by_ref, pos: by_ref, delta: by_ref, pressed: by_ref, gamepadsCount: by_ref
     ) & (json: Json) {
         canvas.clear();
         canvas.drawLine(0,0, 100,100);
@@ -229,6 +236,13 @@ func main {
         def alpha: Float = Math.sin(3.14 * x / 80.0) / 4 + 0.75;
         canvas.drawImage(img, x, y1, size, size, alpha);
         canvas.drawImage(dynImg, x, y2, size, size, alpha);
+
+        if gamepadsCount > 0 {
+            delta.x = getGamepadAxis(0, 0) * 5;
+            delta.y = getGamepadAxis(0, 1) * 5;
+            pressed = getGamepadButton(0, 0) > 0.5;
+        }
+
         if pressed canvas.drawImage(img, pos.x, pos.y, size, size, alpha)
         else canvas.drawImage(dynImg, pos.x, pos.y, size, size, alpha);
         if ++x >= 1280 x = -80;

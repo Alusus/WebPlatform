@@ -10,6 +10,8 @@
             this.onKeyUp.owner~no_deref = this;
             this.onPointerLockChange.owner~no_deref = this;
             this.onFullScreenChange.owner~no_deref = this;
+            this.onGamepadConnected.owner~no_deref = this;
+            this.onGamepadDisconnected.owner~no_deref = this;
         }
 
         //-------
@@ -23,6 +25,10 @@
         def onPointerLockChangeId: ArchInt = -1;
         def onFullScreenChange: Signal[Window, Bool];
         def onFullScreenChangeId: ArchInt = -1;
+        def onGamepadConnected: Signal[Window, String];
+        def onGamepadConnectedId: ArchInt = -1;
+        def onGamepadDisconnected: Signal[Window, String];
+        def onGamepadDisconnectedId: ArchInt = -1;
 
         handler this.onSignalConnectionsChanged(signal: ptr[Signal[Window, String]], connectionCount: Int) {
             if signal == this.onKeyDown~ptr {
@@ -32,6 +38,14 @@
             } else if signal == this.onKeyUp~ptr {
                 handleKeySignalConnectionChanged[onKeyUp, "keyup", this.keysToSwallow, {
                     this.onKeyUp.emit(data.getString("code"));
+                }];
+            } else if signal == this.onGamepadConnected~ptr {
+                handleSignalConnectionChanged[onGamepadConnected, "gamepadconnected", {
+                    this.onGamepadConnected.emit(data.getObject("gamepad").getString("id"));
+                }];
+            } else if signal == this.onGamepadDisconnected~ptr {
+                handleSignalConnectionChanged[onGamepadDisconnected, "gamepaddisconnected", {
+                    this.onGamepadDisconnected.emit(data.getObject("gamepad").getString("id"));
                 }];
             }
         }

@@ -14,6 +14,13 @@
     عرف ألغ_احتكار_المؤشر: لقب exitPointerLock؛
     عرف ألغ_ملء_الشاشة: لقب exitFullScreen؛
 
+    عرف هات_عدد_المقابض: لقب getGamepadsCount؛
+    عرف هات_رمز_المقبض: لقب getGamepadId؛
+    عرف هات_عدد_محاور_المقبض: لقب getGamepadAxesCount؛
+    عرف هات_عدد_أزرار_المقبض: لقب getGamepadButtonsCount؛
+    عرف هات_قيمة_محور_المقبض: لقب getGamepadAxis؛
+    عرف هات_قيمة_زر_المقبض: لقب getGamepadButton؛
+
     عرف أبـعاد: لقب Dimensions؛
     @دمج صنف أبـعاد {
         عرف عرض: لقب width؛
@@ -237,6 +244,8 @@
         عرف عند_انتهاء_الكبسة: لقب onKeyUp؛
         عرف عند_تغير_احتكار_المؤشر: لقب onPointerLockChange؛
         عرف عند_تغير_ملء_الشاشة: لقب onFullScreenChange؛
+        عرف عند_ربط_مقبض: لقب onGamepadConnected؛
+        عرف عند_فصل_مقبض: لقب onGamepadDisconnected؛
     }
 }
 

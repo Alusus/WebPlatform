@@ -55,6 +55,13 @@
     // Audio Operations
     @expname[playAudio] function playAudio (audioId: ArchInt, loop: Bool);
     @expname[stopAudio] function stopAudio (audioId: ArchInt);
+    // Gamepads
+    @expname[getGamepadsCount] function getGamepadsCount (): Int;
+    @expname[getGamepadId] function getGamepadId (gpIndex: Int): ptr[array[Char]];
+    @expname[getGamepadAxesCount] function getGamepadAxesCount (gpIndex: Int): Int;
+    @expname[getGamepadButtonsCount] function getGamepadButtonsCount (gpIndex: Int): Int;
+    @expname[getGamepadAxis] function getGamepadAxis (gpIndex: Int, axisIndex: Int): Float;
+    @expname[getGamepadButton] function getGamepadButton (gpIndex: Int, btnIndex: Int): Float;
     // Misc
     @expname[requestPointerLock] function requestPointerLock (elementName: ptr[Char]);
     @expname[exitPointerLock] function exitPointerLock();
