@@ -3,6 +3,7 @@
     //styles class
     //the class to deal with css styles
     class Style {
+    logToConsole("style ");
 
             // Styles
         generateProperty[width, Width, String];
@@ -18,19 +19,22 @@
         generateProperty[padding, Padding, Quad];
         generateProperty[border, Border, Quad];
         generateProperty[borderColor, BorderColor, Color];
-         handler this.update() as_ptr;
+        generateProperty[fontSize, FontSize, Float];
+        generateProperty[fontColor, FontColor, Color];
+        generateProperty[textAlign, TextAlign, String];
+        generateProperty[textDirection, TextDirection, String];
 
-        handler this.setBackground(background : String)
-        {
-            this.background=background;
-            this.background=String.format(" %s ; ",background);
+        handler this.updateStyle() as_ptr;
+        handler this.update() {this.updateStyle();};
 
-        }
+
         handler this.setBackground(color : Color)
         {
+        logToConsole("color bg");
 
-            this.background=String.format("rgba(%i, %i, %i, %i);",color.red, color.green,
+            this.background=String.format("rgba(%i, %i, %i, %i)",color.red, color.green,
                        color.blue,color.alpha);
+                       logToConsole("color bg after");
 
         }
         handler this.setHeight(height : String)
@@ -60,7 +64,16 @@
 
         }
 
-         handler this.setZIndex(zIndex : String)
+         handler this.setMLayout(layout : String)
+        {
+
+            logToConsole("layout before ");
+            this.layout=layout;
+            logToConsole("layout ");
+
+        }
+
+        handler this.setZIndex(zIndex : String)
         {
 
             this.zIndex=zIndex
@@ -121,73 +134,48 @@
                     styleRep=styleRep+this.getPropRep(String("height"),this.height)
                 }
             }
-
-
-                styleRep=styleRep+this.getPropRep(String("border-radius"),this.borderRadius)
-
-
-
-
-
-                styleRep=styleRep+this.getPropRep(String("padding"),this.padding)
-
-
-
-
-
-                styleRep=styleRep+this.getPropRep(String("border-width"),this.border)
-
-
-
-
-
-                styleRep=styleRep+this.getPropRep(String("border-color"),this.borderColor)
-
-
-
+            styleRep=styleRep+this.getPropRep(String("border-radius"),this.borderRadius)
+            styleRep=styleRep+this.getPropRep(String("padding"),this.padding)
+            styleRep=styleRep+this.getPropRep(String("border-width"),this.border)
+            styleRep=styleRep+this.getPropRep(String("border-color"),this.borderColor)
+            styleRep=styleRep+this.getPropRep(String("font-size"),this.fontSize)
+            styleRep=styleRep+this.getPropRep(String("color"),this.fontColor)
             if(this.position!=String(""))
             {
-
                 styleRep=styleRep+this.getPropRep(String("position"),this.position)
-
             }
-
+            if(this.textAlign!=String(""))
+            {
+                styleRep=styleRep+this.getPropRep(String("text-align"),this.textAlign)
+            }
+            if(this.textDirection!=String(""))
+            {
+                styleRep=styleRep+this.getPropRep(String("direction"),this.textDirection)
+            }
             if(this.zIndex!=String(""))
             {
-
                 styleRep=styleRep+this.getPropRep(String("z-index"),this.zIndex)
-
             }
-
             if(this.layout!=String(""))
             {
-
                 styleRep=styleRep+this.getPropRep(String("display:flex;flex-direction"),this.layout)
-
             }
-
             if(this.justify!=String(""))
             {
-
                 styleRep=styleRep+this.getPropRep(String("justify-content"),this.justify)
-
             }
-
             if(this.align!=String(""))
             {
-
                 styleRep=styleRep+this.getPropRep(String("align-items"),this.align)
-
             }
-
             if(this.direction!=String(""))
             {
-
                 styleRep=styleRep+this.getPropRep(String("direction"),this.direction)
-
             }
+            logToConsole(styleRep.buf);
             return styleRep;
         }
+        
 
 
 
@@ -195,14 +183,14 @@
     // Widget
     // The base class of all widgets.
     class Widget {
-        def id: String;
+
 
 
 
         // Styles
-        def style:Style;
+        @injection def style:Style;
 
-
+        def id: String;
         // Events
         def onResize: Signal[Widget, Int];
         def onResizeId: ArchInt = -1;
@@ -233,6 +221,9 @@
         handler this.build(ownerId: String) as_ptr;
         handler this.unbuild() as_ptr;
         handler this.update() as_ptr;
+        handler (this:Style).updateStyle() set_ptr {
+            this.update();
+        }
 
         //-----------------
         // Member Functions
@@ -327,6 +318,8 @@
     class Box {
         @injection def widget: Widget;
         def children: Array[SrdRef[Widget]];
+         logToConsole("box");
+
 
         //-----------
 
@@ -336,10 +329,15 @@
 
         handler this~init() {
             //this.borderColor~init(255, 255, 255);
+            logToConsole("box init befor");
 
-            this.style.layout = String("column");
+
             this.style.justify = String("space-around");
+            logToConsole("box init after justify");
+            this.style.setLayout (String("column"));
+            logToConsole("box init after column");
             this.style.direction = String("rtl");
+            logToConsole("box init after");
         }
 
         handler this.addChildren (count: Int, children: ...temp_ref[SrdRef[Widget]]) {
@@ -510,17 +508,15 @@
         // Properties
 
         generateProperty[url, Url, String];
-        generateProperty[padding, Padding, Quad];
-        generateProperty[border, Border, Quad];
-        generateProperty[borderColor, BorderColor, Color];
-
         //---------
         // Handlers
 
         handler this~init() {
+        logToConsole("image");
         }
         handler this~init(u: ptr[array[Char]]) {
             this.url = String(u);
+            logToConsole("image");
         }
 
         //-------------------
@@ -545,17 +541,7 @@
             if this.id.getLength() > 0 {
                 setElementAttribute(
                     this.id, "style",
-                    this.style.getStyleString()+String.format(
-
-                        "padding:%fpt %fpt %fpt %fpt;"
-                        "border-style:solid;"
-                        "border-width:%fpt %fpt %fpt %fpt;"
-                        "border-color:rgba(%i, %i, %i, %i);",
-                        this.padding.top, this.padding.right, this.padding.bottom, this.padding.left,
-                        this.border.top, this.border.right, this.border.bottom, this.border.left,
-                        this.borderColor.red, this.borderColor.green,
-                        this.borderColor.blue, this.borderColor.alpha
-                    )
+                    this.style.getStyleString()
                 );
                 setElementAttribute(this.id, "src", this.url);
             }
@@ -582,20 +568,15 @@
         //-----------
         // Properties
         generateProperty[text, Text, String];
-        generateProperty[padding, Padding, Quad];
-        generateProperty[fontSize, FontSize, Float];
-        generateProperty[fontColor, FontColor, Color];
-        generateProperty[textAlign, TextAlign, String];
-        generateProperty[textDirection, TextDirection, String];
 
         //----------
         // Handlers
 
         handler this~init(t: String) {
             this.text = t;
-            this.fontSize = 10.0;
-            this.textAlign = String("right");
-            this.textDirection = String("rtl");
+            this.style.fontSize = 10.0;
+            this.style.textAlign = String("right");
+            this.style.textDirection = String("rtl");
         }
 
         //-------------------
@@ -621,19 +602,7 @@
                 setElementAttribute(this.id, "innerHTML", this.text);
                 setElementAttribute(
                     this.id, "style",
-                    this.style.getStyleString()+String.format(
-
-                        "color:rgb(%i, %i, %i);"
-                        "font-size:%fpt;"
-                        "text-align:%s;"
-                        "padding:%fpt %fpt %fpt %fpt;"
-                        "direction:%s",
-                        this.fontColor.red, this.fontColor.green, this.fontColor.blue,
-                        this.fontSize,
-                        this.textAlign.buf,
-                        this.padding.top, this.padding.right, this.padding.bottom, this.padding.left,
-                        this.textDirection.buf
-                    )
+                    this.style.getStyleString()
                 );
             }
         }
@@ -657,10 +626,6 @@
         // Properties and Signals
 
         generateProperty[text, Text, String];
-        generateProperty[fontSize, FontSize, Float];
-        generateProperty[fontColor, FontColor, Color];
-        generateProperty[textAlign, TextAlign, String];
-        generateProperty[textDirection, TextDirection, String];
         def onClick: Signal[Button, Int];
         def onClickId: ArchInt = -1;
 
@@ -670,9 +635,9 @@
         handler this~init(t: String) {
             this.onClick.owner~no_deref = this;
             this.text = t;
-            this.fontSize = 10.0;
-            this.textAlign = String("right");
-            this.textDirection = String("rtl");
+            this.style.fontSize = 10.0;
+            this.style.textAlign = String("right");
+            this.style.textDirection = String("rtl");
         }
 
         //-----------------
@@ -712,16 +677,7 @@
                 setElementAttribute(this.id, "innerHTML", this.text);
                 setElementAttribute(
                     this.id, "style",
-                    this.style.getStyleString() +String.format(
-                        "color:rgb(%i, %i, %i);"
-                        "font-size:%fpt;"
-                        "text-align:%s;"
-                        "direction:%s",
-                        this.fontColor.red, this.fontColor.green, this.fontColor.blue,
-                        this.fontSize,
-                        this.textAlign.buf,
-                        this.textDirection.buf
-                    )
+                    this.style.getStyleString()
                 );
             }
         }
@@ -745,10 +701,7 @@
         //-----------------------
         // Properties and Signals
 
-        generateProperty[fontSize, FontSize, Float];
-        generateProperty[fontColor, FontColor, Color];
-        generateProperty[textAlign, TextAlign, String];
-        generateProperty[textDirection, TextDirection, String];
+
 
         def _text: String;
         handler this.setText (t: String) {
@@ -782,9 +735,9 @@
             this.onChanged.owner~no_deref = this;
             this.onKeyPress.owner~no_deref = this;
             this.onKeyUp.owner~no_deref = this;
-            this.fontSize = 10.0;
-            this.textAlign = String("right");
-            this.textDirection = String("rtl");
+            this.style.fontSize = 10.0;
+            this.style.textAlign = String("right");
+            this.style.textDirection = String("rtl");
         }
 
         //-----------------
@@ -853,17 +806,7 @@
                 setElementAttribute(this.id, "value", this._text);
                 setElementAttribute(
                     this.id, "style",
-                     this.style.getStyleString() +String.format(
-                        "resize:none;"
-                        "color:rgb(%i, %i, %i);"
-                        "font-size:%fpt;"
-                        "text-align:%s;"
-                        "direction:%s",
-                        this.fontColor.red, this.fontColor.green, this.fontColor.blue,
-                        this.fontSize,
-                        this.textAlign.buf,
-                        this.textDirection.buf
-                    )
+                     this.style.getStyleString()
                 );
             }
         }
@@ -887,10 +830,6 @@
         //-----------------------
         // Properties and Signals
 
-        generateProperty[fontSize, FontSize, Float];
-        generateProperty[fontColor, FontColor, Color];
-        generateProperty[textAlign, TextAlign, String];
-        generateProperty[textDirection, TextDirection, String];
         generateProperty[inputType, InputType, String];
         generateProperty[placeholder, Placeholder, String];
 
@@ -918,7 +857,7 @@
         def onKeyPressId: ArchInt = -1;
         def onKeyUp: Signal[Input, String];
         def onKeyUpId: ArchInt = -1;
-//inputType=Input.Type.CHECKBOX
+
         //---------
         // Handlers
 
@@ -926,9 +865,9 @@
             this.onChanged.owner~no_deref = this;
             this.onKeyPress.owner~no_deref = this;
             this.onKeyUp.owner~no_deref = this;
-            this.fontSize = 10.0;
-            this.textAlign = String("right");
-            this.textDirection = String("rtl");
+            this.style.fontSize = 10.0;
+            this.style.textAlign = String("right");
+            this.style.textDirection = String("rtl");
             this.inputType=String("text");
         }
 
@@ -1008,17 +947,7 @@
                 setElementAttribute(this.id, "value", this._text);
                 setElementAttribute(
                     this.id, "style",
-                    this.style.getStyleString() +String.format(
-                        "resize:none;"
-                        "color:rgb(%i, %i, %i);"
-                        "font-size:%fpt;"
-                        "text-align:%s;"
-                        "direction:%s"
-                        ,this.fontColor.red, this.fontColor.green, this.fontColor.blue,
-                        this.fontSize,
-                        this.textAlign.buf,
-                        this.textDirection.buf
-                    )
+                    this.style.getStyleString()
                 );
                 setElementAttribute(this.id, "type", this.inputType);
                 setElementAttribute(this.id, "placeholder", this.placeholder);
