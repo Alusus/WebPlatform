@@ -19,7 +19,6 @@
     @expname[observeResize] function _observeResize (elementName: ptr[Char], cbId: ArchInt);
     @expname[unobserveResize] function _unobserveResize (elementName: ptr[Char]);
     @expname[waitForEvent] function waitForEvent;
-    // TODO: usleep
     // Async Operations
     @expname[sendRequest] function _sendRequest (
         method: ptr[Char], uri: ptr[Char], headers: ptr[Char], body: ptr[Char], timeoutInMs: Int, cbId: ArchInt
@@ -30,6 +29,7 @@
     @expname[cancelTimeout] function _cancelTimeout (id: Word);
     // Resource Management
     @expname[loadImage] function _loadImage (url: ptr[Char], cbId: ArchInt): ArchInt;
+    @expname[getImageDimensions] function getImageDimensions (imgId: Int, result: ref[Dimensions]);
     @expname[createCanvasResource] function createCanvasResource (width: Int, height: Int): ArchInt;
     @expname[createImageResourceFromCanvasResource] function createImageResourceFromCanvasResource (
         canvasId: ArchInt
@@ -38,6 +38,9 @@
     @expname[loadAudio] function _loadAudio (url: ptr[Char], cbId: ArchInt): ArchInt;
     @expname[releaseResource] function releaseResource (resourceId: ArchInt);
     @expname[loadFont] function _loadFont (fontName: ptr[Char], url: ptr[Char], cbId: ArchInt);
+    @expname[setResourceAttribute] function setResourceAttribute (
+        resourceId: ArchInt, name: ptr[Char], value: ptr[Char]
+    );
     // Canvas Operations
     @expname[drawLine] function drawLine (canvasId: ArchInt, x1: Int, y1: Int, x2: Int, y2: Int);
     @expname[drawPolygon] function drawPolygon (
@@ -45,12 +48,17 @@
     );
     @expname[drawCircle] function drawCircle (canvasId: ArchInt, x1: Int, y1: Int, x2: Int, y2: Int);
     @expname[drawText] function drawText (canvasId: ArchInt, text: ptr[Char], font: ptr[Char], x: Int, y: Int);
+    @expname[measureText] function measureText (
+        canvasId: ArchInt, text: ptr[Char], font: ptr[Char], result: ref[Dimensions]
+    );
     @expname[setFillStyle] function setFillStyle (
         canvasId: ArchInt, c1:ptr[Char], c2:ptr[Char], x1: Int, y1: Int, x2: Int, y2: Int
     );
     @expname[setStrokeStyle] function setStrokeStyle (canvasId: ArchInt, ss: ptr[Char]);
     @expname[setLineWidth] function setLineWidth (canvasId: ArchInt, lw: Int);
-    @expname[drawImage] function drawImage (canvasId: ArchInt, imgId: Int, x: Int, y: Int, w: Int, h: Int, alpha: Float);
+    @expname[drawImage] function drawImage (
+        canvasId: ArchInt, imgId: Int, x: Int, y: Int, w: Int, h: Int, alpha: Float
+    );
     @expname[clearCanvas] function clearCanvas (canvasId: ArchInt);
     // Audio Operations
     @expname[playAudio] function playAudio (audioId: ArchInt, loop: Bool);

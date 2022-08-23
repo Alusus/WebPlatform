@@ -238,6 +238,13 @@ wasmApi.loadImage = (url, cbId) => {
     return resourceId;
 }
 
+wasmApi.getImageDimensions = (imgId, pResult) => {
+    var image = resources[imgId];
+    const resultArray = new Int32Array(wasmMemory.buffer, pResult, 2);
+    resultArray[0] = image.width;
+    resultArray[1] = image.height;
+}
+
 wasmApi.createCanvasResource = (width, height) => {
     const canvas = document.createElement('canvas');
     canvas.width = width;
@@ -286,6 +293,10 @@ wasmApi.loadFont = (fontName, url, cbId) => {
     });
 }
 
+wasmApi.setResourceAttribute = (resourceId, name, value) => {
+    resources[resourceId].setAttribute(toJsString(name), toJsString(value))
+}
+
 // Canvas APIs
 
 wasmApi.drawLine = (canvasId, x1, y1, x2, y2) => {
@@ -322,7 +333,18 @@ wasmApi.drawText = (canvasId, text, font, x, y) => {
     var canvas = resources[canvasId];
     var ctx = canvas.getContext("2d");
     ctx.font = toJsString(font);
+    ctx.textBaseline = "top";
     ctx.fillText(toJsString(text), x, y);
+}
+
+wasmApi.measureText = (canvasId, text, font, pResult) => {
+    var canvas = resources[canvasId];
+    var ctx = canvas.getContext("2d");
+    ctx.font = toJsString(font);
+    var dims = ctx.measureText(toJsString(text));
+    const resultArray = new Int32Array(wasmMemory.buffer, pResult, 2);
+    resultArray[0] = dims.width;
+    resultArray[1] = dims.actualBoundingBoxAscent + dims.actualBoundingBoxDescent;
 }
 
 wasmApi.setFillStyle = (canvasId, c1, c2, x1, y1, x2, y2) => {
@@ -441,6 +463,10 @@ wasmApi.exitFullScreen = () => {
 
 wasmApi.logToConsole = (msg) => {
   console.log(toJsString(msg));
+}
+
+wasmApi.rand = () => {
+  return Math.floor(Math.random() * 1073741823);
 }
 
 // Helper Functions

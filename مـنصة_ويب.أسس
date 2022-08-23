@@ -5,6 +5,7 @@
     عرف حدد_ميزة_عنصر: لقب setElementAttribute؛
 
     عرف نفذ_حلقة_معالجة_الأحداث: لقب runEventLoop؛
+    عرف عالج_الاحداث: لقب dispatchEvents؛
     عرف انتظر: لقب await؛
     عرف شغل_الخادم: لقب runServer؛
     عرف ابدأ_المؤقت: لقب startTimer؛
@@ -20,6 +21,8 @@
     عرف هات_عدد_أزرار_المقبض: لقب getGamepadButtonsCount؛
     عرف هات_قيمة_محور_المقبض: لقب getGamepadAxis؛
     عرف هات_قيمة_زر_المقبض: لقب getGamepadButton؛
+
+    عرف اكتب_في_الطرفية: لقب logToConsole؛
 
     عرف أبـعاد: لقب Dimensions؛
     @دمج صنف أبـعاد {
@@ -204,9 +207,13 @@
     @دمج صنف مـورد_صورة {
         عرف حمل: لقب load؛
         عرف هيئ_من_مرسم: لقب initFromCanvas؛
+        عرف هات_الأبعاد: لقب getDimensions؛
     }
 
     عرف مـورد_مرسم: لقب CanvasResource؛
+    @دمج صنف مـورد_مرسم {
+        عرف هيئ: لقب init؛
+    }
 
     عرف مـورد_صوت: لقب AudioResource؛
     @دمج صنف مـورد_صوت {
@@ -224,6 +231,8 @@
         عرف ارسم_مضلع: لقب drawPolygon؛
         عرف ارسم_دائرة: لقب drawCircle؛
         عرف ارسم_كتابة: لقب drawText؛
+        عرف قس_أبعاد_كتابة: لقب measureText؛
+        عرف حدد_الاتجاه: لقب setDirection؛
         عرف حدد_نمط_الملء: لقب setFillStyle؛
         عرف حدد_نمط_القلم: لقب setStrokeStyle؛
         عرف حدد_عرض_القلم: لقب setLineWidth؛

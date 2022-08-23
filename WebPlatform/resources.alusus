@@ -26,6 +26,12 @@
             if this.id != 0 releaseResource(this.id);
             this.id = createImageResourceFromCanvasResource(canvas.id);
         }
+
+        handler this.getDimensions(): Dimensions {
+            def dim: Dimensions;
+            if this.id != 0 getImageDimensions(this.id, dim);
+            return dim;
+        }
     }
 
     //==========================================================================
