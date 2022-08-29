@@ -80,6 +80,20 @@
             this.bottom = value.bottom;
             this.left = value.left;
         }
+	handler this == ref[Quad] : bool
+        {
+            if(this.top==value.top && this.right==value.right && this.bottom==value.bottom && this.left==value.left)
+                return true;
+            return false;
+
+        }
+        handler this != ref[Quad] : bool
+        {
+            if(this.top!=value.top || this.right!=value.right || this.bottom!=value.bottom || this.left!=value.left)
+                return true;
+            return false;
+
+        }
     }
 
     //==========================================================================
@@ -133,7 +147,20 @@
             this.blue = value.blue;
             this.alpha = value.alpha;
         }
+        handler this == ref[Color] : bool
+        {
+            if(this.red==value.red && this.green==value.green && this.blue==value.blue && this.alpha==value.alpha)
+                return true;
+            return false;
 
+        }
+        handler this != ref[Color] : bool
+        {
+            if(this.red!=value.red || this.green!=value.green || this.blue!=value.blue || this.alpha!=value.alpha)
+                return true;
+            return false;
+
+        }
         handler this.convertHexToDecimal(letter: Char): Int {
             if letter >= '0' and letter <= '9' return letter - '0'
             else if letter >= 'a' and letter <= 'f' return 10 + letter - 'a'

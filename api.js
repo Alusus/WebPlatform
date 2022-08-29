@@ -27,6 +27,13 @@ wasmApi.createElement = (elementType, elementName, parentName) => {
     element.setAttribute('id', toJsString(elementName));
 }
 
+wasmApi.createAnimationElement = (elementType, elementBody) => {
+  var style = document.createElement('style');
+  style.type = 'text/css';
+  style.innerHTML = toJsString(elementBody);
+  document.getElementsByTagName('head')[0].appendChild(style);
+}
+
 wasmApi.deleteElement = (elementName) => {
     const element = document.getElementById(toJsString(elementName));
     if (element.dataset.resizeObserverCbId) resizeObserver.unobserve(element);

@@ -1,14 +1,252 @@
 @merge module WebPlatform {
     //==========================================================================
-    // Widget
-    // The base class of all widgets.
-    class Widget {
-        def id: String;
 
+    //styles class
+    //the class to deal with css styles
+    class Style {
         // Styles
         generateProperty[width, Width, String];
         generateProperty[height, Height, String];
-        generateProperty[backgroundColor, BackgroundColor, Color];
+        generateProperty[background, Background, String];
+        generateProperty[borderRadius, BorderRadius, Quad];
+        generateProperty[position, Position, String];
+        generateProperty[zIndex, ZIndex, String];
+        generateProperty[layout, Layout, String];
+        generateProperty[justify, Justify, String];
+        generateProperty[align, Align, String];
+        generateProperty[direction, Direction, String];
+        generateProperty[padding, Padding, Quad];
+        generateProperty[border, Border, Quad];
+        generateProperty[borderColor, BorderColor, Color];
+        generateProperty[fontSize, FontSize, Float];
+        generateProperty[fontColor, FontColor, Color];
+        generateProperty[textAlign, TextAlign, String];
+        generateProperty[textDirection, TextDirection, String];
+        generateProperty[animationName, AnimationName, String];
+        generateProperty[animationDuration, AnimationDuration, float];
+
+        handler this.updateStyle() as_ptr{};
+        handler this.update() {this.updateStyle();};
+        handler this = ref[Style]
+        {
+            this.background=value.background
+            this.textDirection=value.textDirection
+            this.textAlign=value.textAlign
+            this.fontColor=value.fontColor
+            this.fontSize=value.fontSize
+            this.borderColor=value.borderColor
+            this.border=value.border
+            this.padding=value.padding
+            this.direction=value.direction
+            this.align=value.align
+            this.justify=value.justify
+            this.layout=value.layout
+            this.zIndex=value.zIndex
+            this.position=value.position
+            this.borderRadius=value.borderRadius
+            this.height=value.height
+            this.width=value.width
+        }
+        handler this~init(ref[Style])
+        {
+            this.background=value.background
+            this.textDirection=value.textDirection
+            this.textAlign=value.textAlign
+            this.fontColor=value.fontColor
+            this.fontSize=value.fontSize
+            this.borderColor=value.borderColor
+            this.border=value.border
+            this.padding=value.padding
+            this.direction=value.direction
+            this.align=value.align
+            this.justify=value.justify
+            this.layout=value.layout
+            this.zIndex=value.zIndex
+            this.position=value.position
+            this.borderRadius=value.borderRadius
+            this.height=value.height
+            this.width=value.width
+        }
+
+        handler this~init()
+        {
+        }
+        handler this.setBackground(color : Color)
+        {
+            this.background=String.format("rgba(%i, %i, %i, %i)",color.red, color.green,color.blue,color.alpha);
+        }
+        handler this.getPropRep(prop : String,val : String) :String
+        {
+            return String.format("%s:%s;",prop.buf,val.buf)
+        }
+        handler this.getPropRep(prop : String,val : float) :String
+        {
+            return String.format("%s:%f;",prop.buf,val)
+        }
+        handler this.getPropRep(prop : String,val : Quad) :String
+        {
+            return String.format("%s:%fpt %fpt %fpt %fpt;",prop.buf,val.top, val.right, val.bottom, val.left)
+        }
+        handler this.getPropRep(prop : String,val : Color) :String
+        {
+            return String.format("%s:rgba(%i, %i, %i, %i);",prop.buf,val.red, val.green,val.blue,val.alpha)
+        }
+        handler this.getStyleString():String
+        {
+            def styleRep : String;
+            styleRep=String("");
+            if(this.width!=String(""))
+            {
+                if(this.width==String("auto-flex"))
+                {
+                    styleRep=styleRep+this.getPropRep(String("width"),String(";flex:auto"))
+                }
+                else
+                {
+                    styleRep=styleRep+this.getPropRep(String("width"),this.width)
+                }
+            }
+            if(this.height!=String(""))
+            {
+                if(this.height==String("auto-flex"))
+                {
+                    styleRep=styleRep+this.getPropRep(String("height"),String(";flex:auto"))
+                }
+                else
+                {
+                    styleRep=styleRep+this.getPropRep(String("height"),this.height)
+                }
+            }
+            if(this.borderRadius!=Quad())
+            styleRep=styleRep+this.getPropRep(String("border-radius"),this.borderRadius)
+            if(this.padding!=Quad(0))
+            styleRep=styleRep+this.getPropRep(String("padding"),this.padding)
+            if(this.border!=Quad(0))
+            styleRep=styleRep+this.getPropRep(String("border-width"),this.border)
+            if(this.borderColor!=Color(0,0,0,0))
+            styleRep=styleRep+this.getPropRep(String("border-color"),this.borderColor)
+            if(this.fontSize!=0.0)
+            styleRep=styleRep+this.getPropRep(String("font-size"),this.fontSize)
+            if(this.fontColor!=Color())
+            styleRep=styleRep+this.getPropRep(String("color"),this.fontColor)
+            if(this.position!=String(""))
+            {
+                styleRep=styleRep+this.getPropRep(String("position"),this.position)
+            }
+            if(this.background!=String(""))
+            {
+                styleRep=styleRep+this.getPropRep(String("background"),this.background)
+            }
+            if(this.textAlign!=String(""))
+            {
+                styleRep=styleRep+this.getPropRep(String("text-align"),this.textAlign)
+            }
+            if(this.textDirection!=String(""))
+            {
+                styleRep=styleRep+this.getPropRep(String("direction"),this.textDirection)
+            }
+            if(this.zIndex!=String(""))
+            {
+                styleRep=styleRep+this.getPropRep(String("z-index"),this.zIndex)
+            }
+            if(this.layout!=String(""))
+            {
+                styleRep=styleRep+this.getPropRep(String("display:flex;flex-direction"),this.layout)
+            }
+            if(this.justify!=String(""))
+            {
+                styleRep=styleRep+this.getPropRep(String("justify-content"),this.justify)
+            }
+            if(this.align!=String(""))
+            {
+                styleRep=styleRep+this.getPropRep(String("align-items"),this.align)
+            }
+            if(this.direction!=String(""))
+            {
+                styleRep=styleRep+this.getPropRep(String("direction"),this.direction)
+            }
+
+            if(this.animationName!=String(""))
+            {
+                styleRep=styleRep+this.getPropRep(String("animation-name"),this.animationName)
+            }
+            if(this.animationDuration!=0)
+            {
+                styleRep=styleRep+this.getPropRep(String("animation-duration"),String("")+this.animationDuration+String("s"))
+            }
+            logToConsole(styleRep);
+
+            return styleRep;
+        }
+    }
+    // Animation
+    // class to deal with keyframes and animation
+    class Animation{
+        def name : String
+        def styleArray : Array[Style];
+        def percentArray : Array[float];
+        def stringRep:String=String("");
+
+        handler this~init(name:String,styleArray : Array[Style])
+        {
+            logToConsole("animitaion init");
+            this.name=name;
+            this.styleArray=styleArray;
+            def i : int=0;
+            def sectionSize : float=0.0;
+            def floatSection : float=0.0;
+            sectionSize=100/(styleArray.getLength()-1);
+            for i=0 , i< styleArray.getLength() , i+=1
+            {
+                floatSection=i*sectionSize;
+                this.stringRep=this.stringRep + floatSection + String("% {" ) + styleArray(i).getStyleString() + String("}");
+            }
+            def myStr : String
+            this.createAnimation(this.animationRep());
+        }
+        handler this~init(name:String , styleArray : Array[Style] ,percentArray :Array[float])
+        {
+            logToConsole("animationString");
+            this.name=name;
+            this.styleArray=styleArray;
+            this.percentArray=percentArray;
+            def i : int=0;
+            def length:int=0;
+            if(percentArray.getLength()>styleArray.getLength())
+                length=styleArray.getLength()
+            else
+                length=percentArray.getLength()
+
+            for i=0 , i< length , i+=1
+            {
+                this.stringRep=this.stringRep + percentArray(i) + String("% {" ) + styleArray(i).getStyleString()+ String("}");
+            }
+            this.createAnimation(this.animationRep());
+        }
+        handler this~init(){}
+        handler this.animationRep():String
+        {
+            def animationString : String=String("");
+            animationString=animationString + String("@keyframes ") + this.name + String("{");
+            animationString=animationString + this.stringRep + String("}");
+            logToConsole("animationString");
+            return animationString;
+        }
+        handler this.createAnimation(animationString : String)
+        {
+            logToConsole("befor createAnimationElement()");
+            logToConsole(animationString);
+            createAnimationElement("Style", animationString.buf);
+        }
+    }
+    // Widget
+    // The base class of all widgets.
+    class Widget {
+        // Styles
+        @injection def style:Style;
+        def id: String;
+
+
 
         // Events
         def onResize: Signal[Widget, Int];
@@ -40,6 +278,10 @@
         handler this.build(ownerId: String) as_ptr;
         handler this.unbuild() as_ptr;
         handler this.update() as_ptr;
+        handler (this:Style).updateStyle() set_ptr
+	{
+            this.update();
+        }
 
         //-----------------
         // Member Functions
@@ -134,22 +376,12 @@
         @injection def widget: Widget;
         def children: Array[SrdRef[Widget]];
 
-        //-----------
-        // Properties
-
-        generateProperty[padding, Padding, Quad];
-        generateProperty[border, Border, Quad];
-        generateProperty[borderColor, BorderColor, Color];
-        generateProperty[layout, Layout, String];
-        generateProperty[justify, Justify, String];
-        generateProperty[align, Align, String];
-        generateProperty[direction, Direction, String];
+       
 
         //---------
         // Handlers
 
         handler this~init() {
-            this.borderColor~init(255, 255, 255);
             this.layout = String("column");
             this.justify = String("space-around");
             this.direction = String("rtl");
@@ -211,28 +443,7 @@
             if this.id.getLength() > 0 {
                 setElementAttribute(
                     this.id, "style",
-                    String.format(
-                        "width:%s;"
-                        "height:%s;"
-                        "padding:%fpt %fpt %fpt %fpt;"
-                        "border-style:solid;"
-                        "border-width:%fpt %fpt %fpt %fpt;"
-                        "border-color:rgba(%i, %i, %i, %i);"
-                        "background-color:rgba(%i, %i, %i, %i);"
-                        "display:flex;flex-direction:%s;"
-                        "justify-content:%s;align-items:%s;"
-                        "direction:%s;",
-                        ptr[Char]()~use_in(chr){ if this.width == "auto-flex" chr = ";flex:auto" else chr = this.width },
-                        ptr[Char]()~use_in(chr){ if this.height == "auto-flex" chr = ";flex:auto" else chr = this.height },
-                        this.padding.top, this.padding.right, this.padding.bottom, this.padding.left,
-                        this.border.top, this.border.right, this.border.bottom, this.border.left,
-                        this.borderColor.red, this.borderColor.green,
-                        this.borderColor.blue, this.borderColor.alpha,
-                        this.backgroundColor.red, this.backgroundColor.green,
-                        this.backgroundColor.blue, this.backgroundColor.alpha,
-                        this.layout.buf, this.justify.buf, this.align.buf,
-                        this.direction.buf
-                    )
+                    this.style.getStyleString()
                 );
             }
         }
@@ -339,15 +550,6 @@
     // Image
     class Image {
         @injection def widget: Widget;
-
-        //-----------
-        // Properties
-
-        generateProperty[url, Url, String];
-        generateProperty[padding, Padding, Quad];
-        generateProperty[border, Border, Quad];
-        generateProperty[borderColor, BorderColor, Color];
-
         //---------
         // Handlers
 
@@ -375,31 +577,16 @@
             }
         }
 
+
         handler (this:Widget).update() set_ptr {
             if this.id.getLength() > 0 {
                 setElementAttribute(
                     this.id, "style",
-                    String.format(
-                        "width:%s;"
-                        "height:%s;"
-                        "padding:%fpt %fpt %fpt %fpt;"
-                        "border-style:solid;"
-                        "border-width:%fpt %fpt %fpt %fpt;"
-                        "border-color:rgba(%i, %i, %i, %i);"
-                        "background-color:rgba(%i, %i, %i, %i);",
-                        this.width.buf, this.height.buf,
-                        this.padding.top, this.padding.right, this.padding.bottom, this.padding.left,
-                        this.border.top, this.border.right, this.border.bottom, this.border.left,
-                        this.borderColor.red, this.borderColor.green,
-                        this.borderColor.blue, this.borderColor.alpha,
-                        this.backgroundColor.red, this.backgroundColor.green,
-                        this.backgroundColor.blue, this.backgroundColor.alpha
-                    )
+                    this.style.getStyleString()
                 );
                 setElementAttribute(this.id, "src", this.url);
             }
         }
-
         //-----------------
         // Shared Functions
 
@@ -418,14 +605,7 @@
     class Label {
         @injection def widget: Widget;
 
-        //-----------
-        // Properties
-        generateProperty[text, Text, String];
-        generateProperty[padding, Padding, Quad];
-        generateProperty[fontSize, FontSize, Float];
-        generateProperty[fontColor, FontColor, Color];
-        generateProperty[textAlign, TextAlign, String];
-        generateProperty[textDirection, TextDirection, String];
+
 
         //----------
         // Handlers
@@ -460,24 +640,7 @@
                 setElementAttribute(this.id, "innerHTML", this.text);
                 setElementAttribute(
                     this.id, "style",
-                    String.format(
-                        "width:%s;"
-                        "height:%s;"
-                        "background-color:rgba(%i, %i, %i, %i);"
-                        "color:rgb(%i, %i, %i);"
-                        "font-size:%fpt;"
-                        "text-align:%s;"
-                        "padding:%fpt %fpt %fpt %fpt;"
-                        "direction:%s",
-                        this.width.buf, this.height.buf,
-                        this.backgroundColor.red, this.backgroundColor.green,
-                        this.backgroundColor.blue, this.backgroundColor.alpha,
-                        this.fontColor.red, this.fontColor.green, this.fontColor.blue,
-                        this.fontSize,
-                        this.textAlign.buf,
-                        this.padding.top, this.padding.right, this.padding.bottom, this.padding.left,
-                        this.textDirection.buf
-                    )
+                    this.style.getStyleString()
                 );
             }
         }
@@ -498,13 +661,7 @@
         @injection def widget: Widget;
 
         //-----------------------
-        // Properties and Signals
-
-        generateProperty[text, Text, String];
-        generateProperty[fontSize, FontSize, Float];
-        generateProperty[fontColor, FontColor, Color];
-        generateProperty[textAlign, TextAlign, String];
-        generateProperty[textDirection, TextDirection, String];
+        //  Signals
         def onClick: Signal[Button, Int];
         def onClickId: ArchInt = -1;
 
@@ -514,9 +671,9 @@
         handler this~init(t: String) {
             this.onClick.owner~no_deref = this;
             this.text = t;
-            this.fontSize = 10.0;
-            this.textAlign = String("right");
-            this.textDirection = String("rtl");
+            this.style.fontSize = 10.0;
+            this.style.textAlign = String("right");
+            this.style.textDirection = String("rtl");
         }
 
         //-----------------
@@ -556,26 +713,10 @@
                 setElementAttribute(this.id, "innerHTML", this.text);
                 setElementAttribute(
                     this.id, "style",
-                    String.format(
-                        "width: %s;"
-                        "height: %s;"
-                        "background-color: rgba(%i, %i, %i, %i);"
-                        "color:rgb(%i, %i, %i);"
-                        "font-size:%fpt;"
-                        "text-align:%s;"
-                        "direction:%s",
-                        this.width.buf, this.height.buf,
-                        this.backgroundColor.red, this.backgroundColor.green,
-                        this.backgroundColor.blue, this.backgroundColor.alpha,
-                        this.fontColor.red, this.fontColor.green, this.fontColor.blue,
-                        this.fontSize,
-                        this.textAlign.buf,
-                        this.textDirection.buf
-                    )
+                    this.style.getStyleString()
                 );
             }
         }
-
         //-----------------
         // Shared Functions
 
@@ -593,12 +734,7 @@
         @injection def widget: Widget;
 
         //-----------------------
-        // Properties and Signals
-
-        generateProperty[fontSize, FontSize, Float];
-        generateProperty[fontColor, FontColor, Color];
-        generateProperty[textAlign, TextAlign, String];
-        generateProperty[textDirection, TextDirection, String];
+        // Signals
 
         def _text: String;
         handler this.setText (t: String) {
@@ -632,9 +768,9 @@
             this.onChanged.owner~no_deref = this;
             this.onKeyPress.owner~no_deref = this;
             this.onKeyUp.owner~no_deref = this;
-            this.fontSize = 10.0;
-            this.textAlign = String("right");
-            this.textDirection = String("rtl");
+            this.style.fontSize = 10.0;
+            this.style.textAlign = String("right");
+            this.style.textDirection = String("rtl");
         }
 
         //-----------------
@@ -700,26 +836,10 @@
 
         handler (this:Widget).update() set_ptr {
             if this.id.getLength() > 0 {
-                setElementAttribute(this.id, "value", this._text);
+                setElementAttribute(this.id, "innerHTML", this.text);
                 setElementAttribute(
                     this.id, "style",
-                    String.format(
-                        "resize:none;"
-                        "width:%s;"
-                        "height:%s;"
-                        "background-color:rgba(%i, %i, %i, %i);"
-                        "color:rgb(%i, %i, %i);"
-                        "font-size:%fpt;"
-                        "text-align:%s;"
-                        "direction:%s",
-                        this.width.buf, this.height.buf,
-                        this.backgroundColor.red, this.backgroundColor.green,
-                        this.backgroundColor.blue, this.backgroundColor.alpha,
-                        this.fontColor.red, this.fontColor.green, this.fontColor.blue,
-                        this.fontSize,
-                        this.textAlign.buf,
-                        this.textDirection.buf
-                    )
+                    this.style.getStyleString()
                 );
             }
         }
@@ -733,6 +853,98 @@
             return r;
         }
     }
+    //==========================================================================
+    // Input
+
+    class Input {
+        @injection def widget: Widget;
+
+        //-----------------------
+        // Properties and Signals
+
+        generateProperty[inputType, InputType, String];
+        generateProperty[placeholder, Placeholder, String];
+
+        def _text: String;
+        handler this.setText (t: String) {
+            this._text = t;
+            if this.id.getLength() > 0 setElementAttribute(this.id, "value", t);
+        }
+        handler this.getText (): String {
+            if this.id.getLength() == 0 this._text = String()
+            else this._text = String(getElementAttribute(this.id, "value"));
+            return this._text;
+        }
+        handler this.text = (val: temp_ref[String]) {
+            this.setText(val);
+            return this._text;
+        }
+        handler this.text: ref[String] {
+            return this.getText();
+        }
+
+        def onChanged: Signal[Input, Int];
+        def onChangedId: ArchInt = -1;
+        def onKeyPress: Signal[Input, String];
+        def onKeyPressId: ArchInt = -1;
+        def onKeyUp: Signal[Input, String];
+        def onKeyUpId: ArchInt = -1;
+
+        //---------
+        // Handlers
+
+        handler this~init() {
+            this.onChanged.owner~no_deref = this;
+            this.onKeyPress.owner~no_deref = this;
+            this.onKeyUp.owner~no_deref = this;
+            this.style.fontSize = 10.0;
+            this.style.textAlign = String("right");
+            this.style.textDirection = String("rtl");
+            this.inputType=String("text");
+        }
+
+        handler this~init(inputType : String) {
+            this.onChanged.owner~no_deref = this;
+            this.onKeyPress.owner~no_deref = this;
+            this.onKeyUp.owner~no_deref = this;
+            this.fontSize = 10.0;
+            this.textAlign = String("right");
+            this.textDirection = String("rtl");
+            this.inputType=inputType ;
+        }
+
+        //-----------------
+        // Member Functions
+
+        handler this.onSignalConnectionsChanged(signal: ptr[Signal[Input, Int]], connectionCount: Int) {
+            if this.id == "" return;
+
+            if signal == this.onChanged~ptr {
+                handleSignalConnectionChanged[onChanged, "change", {
+                    this.onChanged.emit(Int(0));
+                }];
+            }
+        }
+
+        handler this.onSignalConnectionsChanged(signal: ptr[Signal[Input, String]], connectionCount: Int) {
+            if this.id == "" return;
+
+            if signal == this.onKeyPress~ptr {
+                handleKeySignalConnectionChanged[onKeyPress, "keypress", "", {
+                    def outPayload: String;
+                    if data.getBool("shiftKey") outPayload += "Shift+";
+                    outPayload += data.getString("code");
+                    this.onKeyPress.emit(outPayload);
+                }];
+            } else if signal == this.onKeyUp~ptr {
+                handleKeySignalConnectionChanged[onKeyUp, "keyup", "", {
+                    def outPayload: String;
+                    if data.getBool("shiftKey") outPayload += "Shift+";
+                    outPayload += data.getString("code");
+                    this.onKeyUp.emit(outPayload);
+                }];
+            }
+        }
 
     //==========================================================================
     // Hyperlink
