@@ -239,6 +239,47 @@
             createAnimationElement("Style", animationString.buf);
         }
     }
+
+    // StyleSelector
+    // class to deal with selector and animation
+    class StyleSelector{
+
+        def className : String;
+        def stringRep:String=String("");
+        handler this~init(className:String,style : Style)
+        {
+            logToConsole("StyleSelector init");
+            this.className=className;
+            this.stringRep=this.stringRep + String(".")+this.className + String(" {" ) + style.getStyleString() + String("}");
+            this.createClass(this.stringRep);
+
+        }
+
+        handler this~init(className:String)
+        {
+            logToConsole("StyleSelector init");
+            this.className=className;
+        }
+
+        handler this~init(){}
+        handler this.setClassName(className : String)
+        {
+            this.className=className;
+        }
+        handler this.setStyle(style : Style)
+        {
+            this.stringRep=this.stringRep + String(".")+this.className + String(" {" ) + style.getStyleString() + String("}");
+            this.createClass(this.stringRep);
+        }
+
+        handler this.createClass(cssClassString : String)
+        {
+
+            logToConsole(cssClassString);
+            createAnimationElement("Style", cssClassString.buf);
+        }
+
+    }
     // Widget
     // The base class of all widgets.
     class Widget {
@@ -375,6 +416,7 @@
     class Box {
         @injection def widget: Widget;
         def children: Array[SrdRef[Widget]];
+	def  cStyle: StyleSelector
 
        
 
@@ -415,6 +457,13 @@
         handler (this:Widget).build (ownerId: String) set_ptr {
             this.id = getNewId();
             createElement("div", this.id, ownerId);
+	    if this.id.getLength() > 0 {
+                setElementAttribute(
+                    this.id, "class",
+                    this.id
+                );
+                this.cStyle.setClassName(this.id)
+            }
             this.update();
 
             def i: Int;
@@ -440,12 +489,7 @@
         }
 
         handler (this:Widget).update() set_ptr {
-            if this.id.getLength() > 0 {
-                setElementAttribute(
-                    this.id, "style",
-                    this.style.getStyleString()
-                );
-            }
+            this.cStyle.setStyle(this.style)
         }
 
         //-----------------
