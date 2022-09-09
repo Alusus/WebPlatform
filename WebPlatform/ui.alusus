@@ -148,6 +148,24 @@
             }
             return result;
         }
+
+        handler this~cast[String] {
+            @shared def hex: Array[Char]({
+                '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'
+            });
+            @shared def c: array[Char, 10];
+            c(0) = '#';
+            c(1) = hex((this.red / 16) % 16);
+            c(2) = hex(this.red % 16);
+            c(3) = hex((this.green / 16) % 16);
+            c(4) = hex(this.green % 16);
+            c(5) = hex((this.blue / 16) % 16);
+            c(6) = hex(this.blue % 16);
+            c(7) = hex((this.alpha / 16) % 16);
+            c(8) = hex(this.alpha % 16);
+            c(9) = 0;
+            return String(c~ptr);
+        }
     }
 
     //==========================================================================

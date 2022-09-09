@@ -18,6 +18,16 @@
             WebPlatform.drawText(this.getResourceId(), text, font, x, y);
         }
 
+        handler this.measureText(text: ptr[Char], font: ptr[Char]): Dimensions {
+            def dim: Dimensions;
+            WebPlatform.measureText(this.getResourceId(), text, font, dim);
+            return dim;
+        }
+
+        handler this.setDirection(dir: ptr[Char]) {
+            WebPlatform.setResourceAttribute(this.getResourceId(), "dir", dir);
+        }
+
         handler this.setFillStyle(c1:ptr[Char], c2:ptr[Char], x1: Int, y1: Int, x2: Int, y2: Int) {
             WebPlatform.setFillStyle(this.getResourceId(), c1, c2, x1, y1, x2, y2);
         }
