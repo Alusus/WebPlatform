@@ -3,8 +3,11 @@
 
     //styles class
     //the class to deal with css styles
-    class Style {
-        // Styles
+ class Style {
+        @shared def mapStyle: Map[String,String];
+
+
+            // Styles
         generateProperty[width, Width, String];
         generateProperty[height, Height, String];
         generateProperty[background, Background, String];
@@ -20,13 +23,16 @@
         generateProperty[borderColor, BorderColor, Color];
         generateProperty[fontSize, FontSize, Float];
         generateProperty[fontColor, FontColor, Color];
+        generateProperty[transition, Transition, String];
         generateProperty[textAlign, TextAlign, String];
         generateProperty[textDirection, TextDirection, String];
         generateProperty[animationName, AnimationName, String];
         generateProperty[animationDuration, AnimationDuration, float];
 
         handler this.updateStyle() as_ptr{};
-        handler this.update() {this.updateStyle();};
+        handler this.update() {
+            this.updateStyle();
+        };
         handler this = ref[Style]
         {
             this.background=value.background
@@ -71,26 +77,43 @@
         handler this~init()
         {
         }
+
+
         handler this.setBackground(color : Color)
         {
-            this.background=String.format("rgba(%i, %i, %i, %i)",color.red, color.green,color.blue,color.alpha);
+            this.background=String.format("rgba(%i, %i, %i, %i)",color.red, color.green,
+                       color.blue,color.alpha);
+
+
         }
         handler this.getPropRep(prop : String,val : String) :String
         {
+
             return String.format("%s:%s;",prop.buf,val.buf)
+
         }
+
         handler this.getPropRep(prop : String,val : float) :String
         {
+
             return String.format("%s:%f;",prop.buf,val)
+
         }
         handler this.getPropRep(prop : String,val : Quad) :String
         {
+
             return String.format("%s:%fpt %fpt %fpt %fpt;",prop.buf,val.top, val.right, val.bottom, val.left)
+
         }
+
         handler this.getPropRep(prop : String,val : Color) :String
         {
-            return String.format("%s:rgba(%i, %i, %i, %i);",prop.buf,val.red, val.green,val.blue,val.alpha)
+
+            return String.format("%s:rgba(%i, %i, %i, %i);",prop.buf,val.red, val.green,
+                       val.blue,val.alpha)
+
         }
+
         handler this.getStyleString():String
         {
             def styleRep : String;
@@ -117,6 +140,7 @@
                     styleRep=styleRep+this.getPropRep(String("height"),this.height)
                 }
             }
+
             if(this.borderRadius!=Quad())
             styleRep=styleRep+this.getPropRep(String("border-radius"),this.borderRadius)
             if(this.padding!=Quad(0))
@@ -136,6 +160,10 @@
             if(this.background!=String(""))
             {
                 styleRep=styleRep+this.getPropRep(String("background"),this.background)
+            }
+            if(this.transition!=String(""))
+            {
+                styleRep=styleRep+this.getPropRep(String("transition"),this.transition)
             }
             if(this.textAlign!=String(""))
             {
@@ -174,22 +202,29 @@
             {
                 styleRep=styleRep+this.getPropRep(String("animation-duration"),String("")+this.animationDuration+String("s"))
             }
-            logToConsole(styleRep);
-
             return styleRep;
+        }
+        function setStyleTag()
+        {
+            def i : int=0;
+            def styleString : String("");
+            for i=0 , i< Style.mapStyle.getLength() , i++
+            {
+                styleString+=Style.mapStyle.keyAt(i) + String(" ") +Style.mapStyle(Style.mapStyle.keyAt(i))
+            }
+                addStyleTag( styleString.buf);
         }
     }
     // Animation
     // class to deal with keyframes and animation
     class Animation{
+
         def name : String
         def styleArray : Array[Style];
         def percentArray : Array[float];
         def stringRep:String=String("");
-
         handler this~init(name:String,styleArray : Array[Style])
         {
-            logToConsole("animitaion init");
             this.name=name;
             this.styleArray=styleArray;
             def i : int=0;
@@ -206,7 +241,6 @@
         }
         handler this~init(name:String , styleArray : Array[Style] ,percentArray :Array[float])
         {
-            logToConsole("animationString");
             this.name=name;
             this.styleArray=styleArray;
             this.percentArray=percentArray;
@@ -225,21 +259,20 @@
         }
         handler this~init(){}
         handler this.animationRep():String
-        {
-            def animationString : String=String("");
-            animationString=animationString + String("@keyframes ") + this.name + String("{");
-            animationString=animationString + this.stringRep + String("}");
-            logToConsole("animationString");
-            return animationString;
-        }
+            {
+                def animationString : String=String("");
+                animationString=animationString + String("@keyframes ") + this.name + String("{");
+                animationString=animationString + this.stringRep + String("}");
+                return animationString;
+
+            }
         handler this.createAnimation(animationString : String)
         {
-            logToConsole("befor createAnimationElement()");
-            logToConsole(animationString);
-            createAnimationElement("Style", animationString.buf);
+            Style.mapStyle.set(String(""),animationString)
+            Style.setStyleTag()
         }
-    }
 
+    }
     // StyleSelector
     // class to deal with selector and animation
     class StyleSelector{
@@ -248,35 +281,48 @@
         def stringRep:String=String("");
         handler this~init(className:String,style : Style)
         {
-            logToConsole("StyleSelector init");
             this.className=className;
-            this.stringRep=this.stringRep + String(".")+this.className + String(" {" ) + style.getStyleString() + String("}");
+            this.stringRep= String(" {" ) + style.getStyleString() + String("}");
             this.createClass(this.stringRep);
 
         }
 
+
+
         handler this~init(className:String)
         {
-            logToConsole("StyleSelector init");
+
             this.className=className;
         }
 
         handler this~init(){}
+        handler this.addSelector(selecetorName:String,style : Style)
+        {
+
+            def className : String = this.className;
+            this.className=this.className+String(":")+selecetorName;
+            this.stringRep= String(" {" ) + style.getStyleString() + String("}");
+            this.createClass(this.stringRep);
+            this.className=className;
+
+        }
         handler this.setClassName(className : String)
         {
             this.className=className;
         }
         handler this.setStyle(style : Style)
         {
-            this.stringRep=this.stringRep + String(".")+this.className + String(" {" ) + style.getStyleString() + String("}");
+            this.stringRep= String(" {" ) + style.getStyleString() + String("}");
+
             this.createClass(this.stringRep);
         }
 
         handler this.createClass(cssClassString : String)
         {
 
-            logToConsole(cssClassString);
-            createAnimationElement("Style", cssClassString.buf);
+            Style.mapStyle.set(String(".")+this.className,cssClassString)
+            Style.setStyleTag()
+
         }
 
     }
@@ -286,9 +332,8 @@
         // Styles
         @injection def style:Style;
         def id: String;
-
-
-
+        def  cStyle: StyleSelector
+        def selectorMap : Map[String,Style];
         // Events
         def onResize: Signal[Widget, Int];
         def onResizeId: ArchInt = -1;
@@ -416,13 +461,7 @@
     class Box {
         @injection def widget: Widget;
         def children: Array[SrdRef[Widget]];
-	def  cStyle: StyleSelector
-
-       
-
-        //---------
         // Handlers
-
         handler this~init() {
             this.layout = String("column");
             this.justify = String("space-around");
@@ -457,7 +496,7 @@
         handler (this:Widget).build (ownerId: String) set_ptr {
             this.id = getNewId();
             createElement("div", this.id, ownerId);
-	    if this.id.getLength() > 0 {
+            if this.id.getLength() > 0 {
                 setElementAttribute(
                     this.id, "class",
                     this.id
@@ -489,7 +528,15 @@
         }
 
         handler (this:Widget).update() set_ptr {
-            this.cStyle.setStyle(this.style)
+            if this.id.getLength() > 0 {
+                this.cStyle.setStyle(this.style)
+                def i : int=0;
+                def styleString : String("");
+                for i=0 , i< this.selectorMap.getLength() , i++
+                {
+                     this.cStyle.addSelector(this.selectorMap.keyAt(i),this.selectorMap(this.selectorMap.keyAt(i)))
+                }
+            }
         }
 
         //-----------------

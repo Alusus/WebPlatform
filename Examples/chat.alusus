@@ -36,6 +36,26 @@ func getMessages (conn: ptr[Http.Connection]) {
 def PrimeryColor: Color("8e50ef");
 def LightColor: Color("c380ff");
 
+func animation()
+{
+
+    def style1 : Style;
+    def style2 : Style;
+
+    style1.height = String("50pt");
+    style2.height = String("200pt");
+    style1.setBackground(PrimeryColor);
+    style2.setBackground(  LightColor);
+
+    def styleArray : Array[Style];
+
+    styleArray.add(style1);
+    styleArray.add(style2);
+
+    def myAnimation : Animation(String("example"),styleArray);
+
+
+}
 func createHeader (): SrdRef[Widget] {
     setElementAttribute("body", "style", "padding: 0; margin: 0;");
 
@@ -47,6 +67,11 @@ func createHeader (): SrdRef[Widget] {
         borderColor = PrimeryColor;
         border = Quad(1.5);
         justify = String("space-between");
+	def style : Style;
+        style.height = String("200pt");
+        style.setBackground(  LightColor);
+        selectorMap.set(String("hover"),style);
+
 
         addChildren({
             Box.new({}).{
@@ -64,6 +89,8 @@ func createHeader (): SrdRef[Widget] {
                         url = String("/Assets/wblogo.svg");
                         height = String("50pt;");
                         padding = Quad(0, 10);
+                        style.animationName=String("example");
+                        style.animationDuration=4.5;
                     }
                 });
             },
@@ -104,6 +131,7 @@ func main {
     Window.instance.setView(Box.new({}).{
         height = String("100%");
         justify = String("space-between");
+        animation();
         addChildren({
             createHeader(),
             Box.new({}).{
