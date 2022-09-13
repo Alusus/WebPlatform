@@ -642,6 +642,9 @@
     class Image {
         @injection def widget: Widget;
         //---------
+        // Properties
+        
+        generateProperty[url, Url, String];
         // Handlers
 
         handler this~init() {
@@ -697,7 +700,9 @@
         @injection def widget: Widget;
 
 
-
+        //-----------
+        // Properties
+        generateProperty[text, Text, String];
         //----------
         // Handlers
 
@@ -752,7 +757,9 @@
         @injection def widget: Widget;
 
         //-----------------------
-        //  Signals
+        // Properties and Signals
+
+        generateProperty[text, Text, String];
         def onClick: Signal[Button, Int];
         def onClickId: ArchInt = -1;
 
