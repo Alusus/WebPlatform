@@ -18,6 +18,11 @@ const resizeObserver = new ResizeObserver(entries => {
     }
 });
 
+//map func init
+
+wasmApi.printf=()=>{}
+wasmApi.exit=()=>{}
+
 // Element Management APIs
 
 wasmApi.createElement = (elementType, elementName, parentName) => {
@@ -25,6 +30,23 @@ wasmApi.createElement = (elementType, elementName, parentName) => {
     const element = document.createElement(toJsString(elementType));
     parent.appendChild(element);
     element.setAttribute('id', toJsString(elementName));
+}
+
+wasmApi.addStyleTag= ( elementBody) => {
+  var check =  document.querySelector('style');
+  if(check !== null)
+  {
+      check.type = 'text/css';
+      check.innerHTML = toJsString(elementBody);
+      document.getElementsByTagName('head')[0].appendChild(check);
+  }
+  else
+   {
+      var style=document.createElement('style');
+      style.type = 'text/css';
+      style.innerHTML = toJsString(elementBody);
+      document.getElementsByTagName('head')[0].appendChild(style);
+  }
 }
 
 wasmApi.deleteElement = (elementName) => {

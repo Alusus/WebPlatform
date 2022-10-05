@@ -1,14 +1,423 @@
 @merge module WebPlatform {
     //==========================================================================
+    //styles class
+    //the class to deal with css styles
+    class Style {
+        @shared def mapStyle: Map[String,String];
+            // Styles
+        generateProperty[width, Width, String];
+        generateProperty[height, Height, String];
+        generateProperty[background, Background, String];
+        generateProperty[borderRadius, BorderRadius, Quad];
+        generateProperty[position, Position, String];
+        generateProperty[zIndex, ZIndex, String];
+        generateProperty[layout, Layout, String];
+        generateProperty[justify, Justify, String];
+        generateProperty[margin, Margin, Quad];
+        generateProperty[align, Align, String];
+        generateProperty[direction, Direction, String];
+        generateProperty[padding, Padding, Quad];
+        generateProperty[border, Border, Quad];
+        generateProperty[borderColor, BorderColor, Color];
+        generateProperty[fontSize, FontSize, Float];
+        generateProperty[fontColor, FontColor, Color];
+        generateProperty[transition, Transition, String];
+        generateProperty[textAlign, TextAlign, String];
+        generateProperty[textDirection, TextDirection, String];
+        generateProperty[animationName, AnimationName, String];
+        generateProperty[animationDuration, AnimationDuration, float];
+        generateProperty[transform, Transform, String];
+        generateProperty[overflow, Overflow, String];
+        generateProperty[boxShadow, BoxShadow, String];
+        generateProperty[display, Display, String];
+        generateProperty[cursor, Cursor, String];
+
+        handler this~init(){
+            this.background=String("");
+            this.textDirection=String("");
+            this.textAlign=String("");
+            this.fontSize=0.0;
+            this.direction=String("");
+            this.align=String("");
+            this.justify=String("");
+            this.layout=String("");
+            this.zIndex=String("");
+            this.position=String("");
+            this.height=String("");
+            this.width=String("");
+            this.animationDuration=0.0;
+            this.animationName=String("");
+            this.transition=String("");
+            this.transform=String("");
+            this.overflow=String("");
+            this.boxShadow=String("");
+            this.display=String("");
+            this.cursor=String("");
+
+
+        }
+        handler this.updateStyle() as_ptr{};
+        handler this.update() {
+            this.updateStyle();
+        };
+        handler this = ref[Style]
+        {
+            this.background=value.background
+            this.textDirection=value.textDirection
+            this.textAlign=value.textAlign
+            this.fontColor=value.fontColor
+            this.fontSize=value.fontSize
+            this.borderColor=value.borderColor
+            this.border=value.border
+            this.padding=value.padding
+            this.direction=value.direction
+            this.align=value.align
+            this.justify=value.justify
+            this.layout=value.layout
+            this.zIndex=value.zIndex
+            this.position=value.position
+            this.borderRadius=value.borderRadius
+            this.height=value.height
+            this.width=value.width
+            this.animationDuration=value.animationDuration;
+            this.animationName=value.animationName;
+            this.transition=value.transition;
+            this.transform=value.transform;
+            this.overflow=value.overflow;
+            this.boxShadow=value.boxShadow;
+            this.display=value.display;
+            this.cursor=value.cursor;
+            this.margin=value.margin;
+        }
+        handler this~init(ref[Style])
+        {
+            this.background=value.background
+            this.textDirection=value.textDirection
+            this.textAlign=value.textAlign
+            this.fontColor=value.fontColor
+            this.fontSize=value.fontSize
+            this.borderColor=value.borderColor
+            this.border=value.border
+            this.padding=value.padding
+            this.direction=value.direction
+            this.align=value.align
+            this.justify=value.justify
+            this.layout=value.layout
+            this.zIndex=value.zIndex
+            this.position=value.position
+            this.borderRadius=value.borderRadius
+            this.height=value.height
+            this.width=value.width
+            this.animationDuration=value.animationDuration;
+            this.animationName=value.animationName;
+            this.transition=value.transition;
+            this.transform=value.transform;
+            this.overflow=value.overflow;
+            this.boxShadow=value.boxShadow;
+            this.display=value.display;
+            this.cursor=value.cursor;
+            this.margin=value.margin;
+        }
+        handler this.setBackground(color : Color)
+        {
+            this.background=String.format("rgba(%i, %i, %i, %i)",color.red, color.green,
+                       color.blue,color.alpha);
+
+
+        }
+        handler this.getPropRep(prop : String,val : String) :String
+        {
+
+            return String.format("%s:%s;",prop.buf,val.buf)
+
+        }
+
+        handler this.getPropRep(prop : String,val : float) :String
+        {
+
+            return String.format("%s:%f;",prop.buf,val)
+
+        }
+        handler this.getPropRep(prop : String,val : Quad) :String
+        {
+
+            return String.format("%s:%fpt %fpt %fpt %fpt;",prop.buf,val.top, val.right, val.bottom, val.left)
+
+        }
+
+        handler this.getPropRep(prop : String,val : Color) :String
+        {
+
+            return String.format("%s:rgba(%i, %i, %i, %i);",prop.buf,val.red, val.green,
+                       val.blue,val.alpha)
+
+        }
+
+        handler this.getStyleString():String
+        {
+            def styleRep : String;
+            styleRep=String("");
+            if(this.width!=String(""))
+            {
+                if(this.width==String("auto-flex"))
+                {
+                    styleRep=styleRep+this.getPropRep(String("width"),String(";flex:auto"))
+                }
+                else
+                {
+                    styleRep=styleRep+this.getPropRep(String("width"),this.width)
+                }
+            }
+            if(this.height!=String(""))
+            {
+                if(this.height==String("auto-flex"))
+                {
+                    styleRep=styleRep+this.getPropRep(String("height"),String(";flex:auto"))
+                }
+                else
+                {
+                    styleRep=styleRep+this.getPropRep(String("height"),this.height)
+                }
+            }
+
+            if(this.borderRadius!=Quad(0))
+            styleRep=styleRep+this.getPropRep(String("border-radius"),this.borderRadius)
+            if(this.margin!=Quad(0))
+            {
+                styleRep=styleRep+this.getPropRep(String("margin"),this.margin)
+                logToConsole(String("style margin : ")+String("")+this.getPropRep(String("margin"),this.margin));
+            }
+            if(this.padding!=Quad(0))
+            styleRep=styleRep+this.getPropRep(String("padding"),this.padding)
+            if(this.border!=Quad(0))
+            {
+                if(this.border==Quad(-1))
+                    styleRep=styleRep+this.getPropRep(String("border-width"),Quad(0))
+                styleRep=styleRep+this.getPropRep(String("border-width"),this.border)
+            }
+
+            if(this.borderColor!=Color(0,0,0,0))
+            styleRep=styleRep+this.getPropRep(String("border-color"),this.borderColor)
+            if(this.fontSize>0.0)
+            styleRep=styleRep+this.getPropRep(String("font-size"),this.fontSize)
+            if(this.fontColor!=Color())
+            styleRep=styleRep+this.getPropRep(String("color"),this.fontColor)
+            if(this.position!=String(""))
+            {
+                styleRep=styleRep+this.getPropRep(String("position"),this.position)
+            }
+            if(this.cursor!=String(""))
+            {
+                styleRep=styleRep+this.getPropRep(String("cursor"),this.cursor)
+            }
+            if(this.background!=String(""))
+            {
+                styleRep=styleRep+this.getPropRep(String("background"),this.background)
+            }
+            if(this.boxShadow!=String(""))
+            {
+                styleRep=styleRep+this.getPropRep(String("box-shadow"),this.boxShadow)
+            }
+            if(this.display!=String(""))
+            {
+                styleRep=styleRep+this.getPropRep(String("display"),this.display)
+            }
+            if(this.overflow!=String(""))
+            {
+                styleRep=styleRep+this.getPropRep(String("overflow"),this.overflow)
+            }
+            if(this.transition!=String(""))
+            {
+                styleRep=styleRep+this.getPropRep(String("transition"),this.transition)
+            }
+            if(this.textAlign!=String(""))
+            {
+                styleRep=styleRep+this.getPropRep(String("text-align"),this.textAlign)
+            }
+            if(this.textDirection!=String(""))
+            {
+                styleRep=styleRep+this.getPropRep(String("direction"),this.textDirection)
+            }
+            if(this.transform!=String(""))
+            {
+                styleRep=styleRep+this.getPropRep(String("transform"),this.transform)
+            }
+            if(this.zIndex!=String(""))
+            {
+                styleRep=styleRep+this.getPropRep(String("z-index"),this.zIndex)
+                logToConsole(String("style zIndex : ")+String("")+this.zIndex);
+            }
+            if(this.layout!=String(""))
+            {
+                styleRep=styleRep+this.getPropRep(String("display:flex;flex-direction"),this.layout)
+            }
+            if(this.justify!=String(""))
+            {
+                styleRep=styleRep+this.getPropRep(String("justify-content"),this.justify)
+            }
+            if(this.align!=String(""))
+            {
+                styleRep=styleRep+this.getPropRep(String("align-items"),this.align)
+            }
+            if(this.direction!=String(""))
+            {
+                styleRep=styleRep+this.getPropRep(String("direction"),this.direction)
+            }
+
+            if(this.animationName!=String(""))
+            {
+                styleRep=styleRep+this.getPropRep(String("animation-name"),this.animationName)
+            }
+            if(this.animationDuration>0.0)
+            {
+                styleRep=styleRep+this.getPropRep(String("animation-duration"),String("")+this.animationDuration+String("s"))
+                logToConsole(String("style animationDuration : ")+String("")+this.animationDuration);
+            }
+            return styleRep;
+        }
+        function setStyleTag()
+        {
+            def i : int=0;
+            def styleString : String("");
+            for i=0 , i< Style.mapStyle.getLength() , i++
+            {
+                styleString+=Style.mapStyle.keyAt(i) + String(" ") +Style.mapStyle(Style.mapStyle.keyAt(i))
+
+            }
+                addStyleTag( styleString.buf);
+                //logToConsole(String("style string : ")+styleString);
+        }
+    }
+    // Animation
+    // class to deal with keyframes and animation
+    class Animation{
+
+        def name : String
+        def styleArray : Array[Style];
+        def percentArray : Array[float];
+        def stringRep:String=String("");
+        handler this~init(name:String,styleArray : Array[Style])
+        {
+            this.name=name;
+            this.styleArray=styleArray;
+            def i : int=0;
+            def sectionSize : float=0.0;
+            def floatSection : float=0.0;
+            sectionSize=100/(styleArray.getLength()-1);
+
+            for i=0 , i< styleArray.getLength() , i+=1
+            {
+                floatSection=i*sectionSize;
+                this.stringRep=this.stringRep + floatSection + String("% {" ) + styleArray(i).getStyleString() + String("}");
+            }
+            def myStr : String
+
+            this.createAnimation(this.animationRep());
+
+        }
+
+        handler this~init(name:String , styleArray : Array[Style] ,percentArray :Array[float])
+        {
+            this.name=name;
+            this.styleArray=styleArray;
+            this.percentArray=percentArray;
+            def i : int=0;
+            def length:int=0;
+            if(percentArray.getLength()>styleArray.getLength())
+                length=styleArray.getLength()
+            else
+                length=percentArray.getLength()
+
+            for i=0 , i< length , i+=1
+            {
+                this.stringRep=this.stringRep + percentArray(i) + String("% {" ) + styleArray(i).getStyleString()+ String("}");
+            }
+            this.createAnimation(this.animationRep());
+        }
+        handler this~init(){}
+
+        handler this.animationRep():String
+            {
+                def animationString : String=String("");
+                animationString=animationString + String("@keyframes ") + this.name + String("{");
+                animationString=animationString + this.stringRep + String("}");
+                return animationString;
+
+            }
+        handler this.createAnimation(animationString : String)
+        {
+            Style.mapStyle.set(String(""),animationString)
+            Style.setStyleTag()
+        }
+
+    }
+
+    // StyleSelector
+    // class to deal with selector and animation
+    class StyleSelector{
+
+        def className : String;
+        def stringRep:String=String("");
+        handler this~init(className:String,style : Style)
+        {
+            this.className=className;
+            this.stringRep= String(" {" ) + style.getStyleString() + String("}");
+            this.createClass(this.stringRep);
+
+        }
+
+
+
+        handler this~init(className:String)
+        {
+
+            this.className=className;
+        }
+
+        handler this~init(){}
+        handler this.addSelector(selecetorName:String,style : Style)
+        {
+
+            def className : String = this.className;
+            this.className=this.className+String(":")+selecetorName;
+            this.stringRep= String(" {" ) + style.getStyleString() + String("}");
+            this.createClass(this.stringRep);
+            this.className=className;
+
+        }
+        handler this.setClassName(className : String)
+        {
+            this.className=className;
+        }
+        handler this.setStyle(myStyle : Style)
+        {
+            this.stringRep= String(" {" ) + myStyle.getStyleString() + String("}");
+            //logToConsole(String("setStyle update image : ")+this.stringRep );
+            //logToConsole(String("setStyle update image style string : ")+myStyle.getStyleString());
+
+            this.createClass(this.stringRep);
+        }
+
+        handler this.createClass(cssClassString : String)
+        {
+
+            Style.mapStyle.set(String(".")+this.className,cssClassString)
+            Style.setStyleTag()
+
+        }
+
+    }
+    //==========================================================================
     // Widget
     // The base class of all widgets.
     class Widget {
-        def id: String;
+
 
         // Styles
-        generateProperty[width, Width, String];
-        generateProperty[height, Height, String];
-        generateProperty[backgroundColor, BackgroundColor, Color];
+        @injection def style:Style;
+        def  cStyle: StyleSelector
+        def selectorMap : Map[String,Style];
+        def id: String;
 
         // Events
         def onResize: Signal[Widget, Int];
@@ -25,7 +434,6 @@
         def onMouseUpId: ArchInt = -1;
 
         handler this~init() {
-            this.backgroundColor~init(255, 255, 255, 0);
             this.onResize.owner~no_deref = this;
             this.onMouseMove.owner~no_deref = this;
             this.onMouseEnter.owner~no_deref = this;
@@ -40,6 +448,10 @@
         handler this.build(ownerId: String) as_ptr;
         handler this.unbuild() as_ptr;
         handler this.update() as_ptr;
+        handler (this:Style).updateStyle() set_ptr {
+            this.update();
+            logToConsole("after style updateStyle");
+        }
 
         //-----------------
         // Member Functions
@@ -134,25 +546,14 @@
         @injection def widget: Widget;
         def children: Array[SrdRef[Widget]];
 
-        //-----------
-        // Properties
-
-        generateProperty[padding, Padding, Quad];
-        generateProperty[border, Border, Quad];
-        generateProperty[borderColor, BorderColor, Color];
-        generateProperty[layout, Layout, String];
-        generateProperty[justify, Justify, String];
-        generateProperty[align, Align, String];
-        generateProperty[direction, Direction, String];
-
         //---------
         // Handlers
 
         handler this~init() {
-            this.borderColor~init(255, 255, 255);
-            this.layout = String("column");
+            this.setLayout(String("column"))
             this.justify = String("space-around");
             this.direction = String("rtl");
+            logToConsole("after style update box");
         }
 
         handler this.addChildren (count: Int, children: ...temp_ref[SrdRef[Widget]]) {
@@ -182,9 +583,11 @@
 
         handler (this:Widget).build (ownerId: String) set_ptr {
             this.id = getNewId();
+            logToConsole("after build ");
             createElement("div", this.id, ownerId);
+            setElementAttribute(this.id, "class",this.id);
+            this.cStyle.setClassName(this.id);
             this.update();
-
             def i: Int;
             for i = 0, i < this.children.getLength(), ++i {
                 this.children(i).build(this.id);
@@ -208,32 +611,15 @@
         }
 
         handler (this:Widget).update() set_ptr {
+            logToConsole("after widg update");
             if this.id.getLength() > 0 {
-                setElementAttribute(
-                    this.id, "style",
-                    String.format(
-                        "width:%s;"
-                        "height:%s;"
-                        "padding:%fpt %fpt %fpt %fpt;"
-                        "border-style:solid;"
-                        "border-width:%fpt %fpt %fpt %fpt;"
-                        "border-color:rgba(%i, %i, %i, %i);"
-                        "background-color:rgba(%i, %i, %i, %i);"
-                        "display:flex;flex-direction:%s;"
-                        "justify-content:%s;align-items:%s;"
-                        "direction:%s;",
-                        ptr[Char]()~use_in(chr){ if this.width == "auto-flex" chr = ";flex:auto" else chr = this.width },
-                        ptr[Char]()~use_in(chr){ if this.height == "auto-flex" chr = ";flex:auto" else chr = this.height },
-                        this.padding.top, this.padding.right, this.padding.bottom, this.padding.left,
-                        this.border.top, this.border.right, this.border.bottom, this.border.left,
-                        this.borderColor.red, this.borderColor.green,
-                        this.borderColor.blue, this.borderColor.alpha,
-                        this.backgroundColor.red, this.backgroundColor.green,
-                        this.backgroundColor.blue, this.backgroundColor.alpha,
-                        this.layout.buf, this.justify.buf, this.align.buf,
-                        this.direction.buf
-                    )
-                );
+                this.cStyle.setStyle(this.style)
+                def i : int=0;
+                def styleString : String("");
+                for i=0 , i< this.selectorMap.getLength() , i++
+                {
+                     this.cStyle.addSelector(this.selectorMap.keyAt(i),this.selectorMap(this.selectorMap.keyAt(i)))
+                }
             }
         }
 
@@ -344,9 +730,6 @@
         // Properties
 
         generateProperty[url, Url, String];
-        generateProperty[padding, Padding, Quad];
-        generateProperty[border, Border, Quad];
-        generateProperty[borderColor, BorderColor, Color];
 
         //---------
         // Handlers
@@ -363,6 +746,8 @@
         handler (this:Widget).build (ownerId: String) set_ptr {
             this.id = getNewId();
             createElement("img", this.id, ownerId);
+            setElementAttribute(this.id, "class",this.id);
+            this.cStyle.setClassName(this.id)
             this.update();
             this.buildCommon();
         }
@@ -377,25 +762,13 @@
 
         handler (this:Widget).update() set_ptr {
             if this.id.getLength() > 0 {
-                setElementAttribute(
-                    this.id, "style",
-                    String.format(
-                        "width:%s;"
-                        "height:%s;"
-                        "padding:%fpt %fpt %fpt %fpt;"
-                        "border-style:solid;"
-                        "border-width:%fpt %fpt %fpt %fpt;"
-                        "border-color:rgba(%i, %i, %i, %i);"
-                        "background-color:rgba(%i, %i, %i, %i);",
-                        this.width.buf, this.height.buf,
-                        this.padding.top, this.padding.right, this.padding.bottom, this.padding.left,
-                        this.border.top, this.border.right, this.border.bottom, this.border.left,
-                        this.borderColor.red, this.borderColor.green,
-                        this.borderColor.blue, this.borderColor.alpha,
-                        this.backgroundColor.red, this.backgroundColor.green,
-                        this.backgroundColor.blue, this.backgroundColor.alpha
-                    )
-                );
+                this.cStyle.setStyle(this.style)
+                def i : int=0;
+                def styleString : String("");
+                for i=0 , i< this.selectorMap.getLength() , i++
+                {
+                     this.cStyle.addSelector(this.selectorMap.keyAt(i),this.selectorMap(this.selectorMap.keyAt(i)))
+                }
                 setElementAttribute(this.id, "src", this.url);
             }
         }
@@ -421,11 +794,9 @@
         //-----------
         // Properties
         generateProperty[text, Text, String];
-        generateProperty[padding, Padding, Quad];
-        generateProperty[fontSize, FontSize, Float];
-        generateProperty[fontColor, FontColor, Color];
-        generateProperty[textAlign, TextAlign, String];
-        generateProperty[textDirection, TextDirection, String];
+        generateProperty[tag, Tag, String];
+        generateProperty[hideAria, HideAria, bool];
+        generateProperty[forTag, ForTag, String];
 
         //----------
         // Handlers
@@ -435,6 +806,9 @@
             this.fontSize = 10.0;
             this.textAlign = String("right");
             this.textDirection = String("rtl");
+            this.tag=String("span");
+            this.hideAria=false;
+            this.forTag=String("");
         }
 
         //-------------------
@@ -442,7 +816,9 @@
 
         handler (this:Widget).build (ownerId: String) set_ptr {
             this.id = getNewId();
-            createElement("span", this.id, ownerId);
+            createElement(this.tag, this.id, ownerId);
+            setElementAttribute(this.id, "class",this.id);
+            this.cStyle.setClassName(this.id);
             this.update();
             this.buildCommon();
         }
@@ -458,27 +834,21 @@
         handler (this:Widget).update() set_ptr {
             if this.id.getLength() > 0 {
                 setElementAttribute(this.id, "innerHTML", this.text);
-                setElementAttribute(
-                    this.id, "style",
-                    String.format(
-                        "width:%s;"
-                        "height:%s;"
-                        "background-color:rgba(%i, %i, %i, %i);"
-                        "color:rgb(%i, %i, %i);"
-                        "font-size:%fpt;"
-                        "text-align:%s;"
-                        "padding:%fpt %fpt %fpt %fpt;"
-                        "direction:%s",
-                        this.width.buf, this.height.buf,
-                        this.backgroundColor.red, this.backgroundColor.green,
-                        this.backgroundColor.blue, this.backgroundColor.alpha,
-                        this.fontColor.red, this.fontColor.green, this.fontColor.blue,
-                        this.fontSize,
-                        this.textAlign.buf,
-                        this.padding.top, this.padding.right, this.padding.bottom, this.padding.left,
-                        this.textDirection.buf
-                    )
-                );
+                this.cStyle.setStyle(this.style)
+                def i : int=0;
+                def styleString : String("");
+                for i=0 , i< this.selectorMap.getLength() , i++
+                {
+                     this.cStyle.addSelector(this.selectorMap.keyAt(i),this.selectorMap(this.selectorMap.keyAt(i)))
+                }
+                if this.hideAria==true
+                {
+                   setElementAttribute(this.id, String("aria-hidden"),String("true"));
+                }
+                if this.forTag!=String("")
+                {
+                   setElementAttribute(this.id, String("for"),this.forTag);
+                }
             }
         }
 
@@ -501,10 +871,6 @@
         // Properties and Signals
 
         generateProperty[text, Text, String];
-        generateProperty[fontSize, FontSize, Float];
-        generateProperty[fontColor, FontColor, Color];
-        generateProperty[textAlign, TextAlign, String];
-        generateProperty[textDirection, TextDirection, String];
         def onClick: Signal[Button, Int];
         def onClickId: ArchInt = -1;
 
@@ -538,6 +904,8 @@
         handler (this:Widget).build (ownerId: String) set_ptr {
             this.id = getNewId();
             createElement("button", this.id, ownerId);
+            setElementAttribute(this.id, "class",this.id);
+            this.cStyle.setClassName(this.id);
             this.update();
             this.onSignalConnectionsChanged(this.onClick~ptr, this.onClick.getConnectionCount());
             this.buildCommon();
@@ -554,25 +922,13 @@
         handler (this:Widget).update() set_ptr {
             if this.id.getLength() > 0 {
                 setElementAttribute(this.id, "innerHTML", this.text);
-                setElementAttribute(
-                    this.id, "style",
-                    String.format(
-                        "width: %s;"
-                        "height: %s;"
-                        "background-color: rgba(%i, %i, %i, %i);"
-                        "color:rgb(%i, %i, %i);"
-                        "font-size:%fpt;"
-                        "text-align:%s;"
-                        "direction:%s",
-                        this.width.buf, this.height.buf,
-                        this.backgroundColor.red, this.backgroundColor.green,
-                        this.backgroundColor.blue, this.backgroundColor.alpha,
-                        this.fontColor.red, this.fontColor.green, this.fontColor.blue,
-                        this.fontSize,
-                        this.textAlign.buf,
-                        this.textDirection.buf
-                    )
-                );
+                this.cStyle.setStyle(this.style)
+                def i : int=0;
+                def styleString : String("");
+                for i=0 , i< this.selectorMap.getLength() , i++
+                {
+                     this.cStyle.addSelector(this.selectorMap.keyAt(i),this.selectorMap(this.selectorMap.keyAt(i)))
+                }
             }
         }
 
@@ -594,11 +950,6 @@
 
         //-----------------------
         // Properties and Signals
-
-        generateProperty[fontSize, FontSize, Float];
-        generateProperty[fontColor, FontColor, Color];
-        generateProperty[textAlign, TextAlign, String];
-        generateProperty[textDirection, TextDirection, String];
 
         def _text: String;
         handler this.setText (t: String) {
@@ -676,6 +1027,8 @@
         handler (this:Widget).build (ownerId: String) set_ptr {
             this.id = getNewId();
             createElement("textarea", this.id, ownerId);
+            setElementAttribute(this.id, "class",this.id);
+            this.cStyle.setClassName(this.id);
             this.update();
             this.onSignalConnectionsChanged(this.onChanged~ptr, this.onChanged.getConnectionCount());
             this.onSignalConnectionsChanged(this.onKeyPress~ptr, this.onKeyPress.getConnectionCount());
@@ -701,26 +1054,13 @@
         handler (this:Widget).update() set_ptr {
             if this.id.getLength() > 0 {
                 setElementAttribute(this.id, "value", this._text);
-                setElementAttribute(
-                    this.id, "style",
-                    String.format(
-                        "resize:none;"
-                        "width:%s;"
-                        "height:%s;"
-                        "background-color:rgba(%i, %i, %i, %i);"
-                        "color:rgb(%i, %i, %i);"
-                        "font-size:%fpt;"
-                        "text-align:%s;"
-                        "direction:%s",
-                        this.width.buf, this.height.buf,
-                        this.backgroundColor.red, this.backgroundColor.green,
-                        this.backgroundColor.blue, this.backgroundColor.alpha,
-                        this.fontColor.red, this.fontColor.green, this.fontColor.blue,
-                        this.fontSize,
-                        this.textAlign.buf,
-                        this.textDirection.buf
-                    )
-                );
+                this.cStyle.setStyle(this.style)
+                def i : int=0;
+                def styleString : String("");
+                for i=0 , i< this.selectorMap.getLength() , i++
+                {
+                     this.cStyle.addSelector(this.selectorMap.keyAt(i),this.selectorMap(this.selectorMap.keyAt(i)))
+                }
             }
         }
 
@@ -730,6 +1070,165 @@
         function new (): SrdRef[TextInput] {
             def r: SrdRef[TextInput];
             r.alloc()~init();
+            return r;
+        }
+    }
+
+
+    //==========================================================================
+    // Input
+    class Input {
+        @injection def widget: Widget;
+
+        //-----------------------
+        // Properties and Signals
+
+        generateProperty[inputType, InputType, String];
+        generateProperty[placeholder, Placeholder, String];
+        generateProperty[hideAria, HideAria, bool];
+
+        def _text: String;
+        handler this.setText (t: String) {
+            this._text = t;
+            if this.id.getLength() > 0 setElementAttribute(this.id, "value", t);
+        }
+        handler this.getText (): String {
+            if this.id.getLength() == 0 this._text = String()
+            else this._text = String(getElementAttribute(this.id, "value"));
+            return this._text;
+        }
+        handler this.text = (val: temp_ref[String]) {
+            this.setText(val);
+            return this._text;
+        }
+        handler this.text: ref[String] {
+            return this.getText();
+        }
+
+        def onChanged: Signal[Input, Int];
+        def onChangedId: ArchInt = -1;
+        def onKeyPress: Signal[Input, String];
+        def onKeyPressId: ArchInt = -1;
+        def onKeyUp: Signal[Input, String];
+        def onKeyUpId: ArchInt = -1;
+
+        //---------
+        // Handlers
+
+        handler this~init() {
+            this.onChanged.owner~no_deref = this;
+            this.onKeyPress.owner~no_deref = this;
+            this.onKeyUp.owner~no_deref = this;
+            this.fontSize = 10.0;
+            this.textAlign = String("right");
+            this.textDirection = String("rtl");
+            this.inputType=String("text");
+            this.hideAria=false;
+        }
+        handler this~init(inputType : String) {
+            this.onChanged.owner~no_deref = this;
+            this.onKeyPress.owner~no_deref = this;
+            this.onKeyUp.owner~no_deref = this;
+            this.fontSize = 10.0;
+            this.textAlign = String("right");
+            this.textDirection = String("rtl");
+            this.inputType=inputType;
+            this.hideAria=false;
+        }
+
+        //-----------------
+        // Member Functions
+
+        handler this.onSignalConnectionsChanged(signal: ptr[Signal[Input, Int]], connectionCount: Int) {
+            if this.id == "" return;
+
+            if signal == this.onChanged~ptr {
+                handleSignalConnectionChanged[onChanged, "change", {
+                    this.onChanged.emit(Int(0));
+                }];
+            }
+        }
+
+        handler this.onSignalConnectionsChanged(signal: ptr[Signal[Input, String]], connectionCount: Int) {
+            if this.id == "" return;
+
+            if signal == this.onKeyPress~ptr {
+                handleKeySignalConnectionChanged[onKeyPress, "keypress", "", {
+                    def outPayload: String;
+                    if data.getBool("shiftKey") outPayload += "Shift+";
+                    outPayload += data.getString("code");
+                    this.onKeyPress.emit(outPayload);
+                }];
+            } else if signal == this.onKeyUp~ptr {
+                handleKeySignalConnectionChanged[onKeyUp, "keyup", "", {
+                    def outPayload: String;
+                    if data.getBool("shiftKey") outPayload += "Shift+";
+                    outPayload += data.getString("code");
+                    this.onKeyUp.emit(outPayload);
+                }];
+            }
+        }
+
+        //-------------------
+        // Function Overrides
+
+        handler (this:Widget).build (ownerId: String) set_ptr {
+            this.id = getNewId();
+            createElement("input", this.id, ownerId);
+            setElementAttribute(this.id, "class",this.id);
+            this.cStyle.setClassName(this.id);
+            this.update();
+            this.onSignalConnectionsChanged(this.onChanged~ptr, this.onChanged.getConnectionCount());
+            this.onSignalConnectionsChanged(this.onKeyPress~ptr, this.onKeyPress.getConnectionCount());
+            this.onSignalConnectionsChanged(this.onKeyUp~ptr, this.onKeyUp.getConnectionCount());
+            this.buildCommon();
+        }
+
+        handler (this:Widget).unbuild() set_ptr {
+            if this.onChangedId != -1 unregisterElementEventHandler(this.onChangedId);
+            this.onChangedId = -1;
+
+            if this.onKeyPressId != -1 unregisterElementEventHandler(this.onKeyPressId);
+            this.onKeyPressId = -1;
+
+            if this.onKeyUpId != -1 unregisterElementEventHandler(this.onKeyUpId);
+            this.onKeyUpId = -1;
+
+            deleteElement(this.id);
+            this.unbuildCommon();
+            this.id = String();
+        }
+
+        handler (this:Widget).update() set_ptr {
+            if this.id.getLength() > 0 {
+                setElementAttribute(this.id, "value", this._text);
+                this.cStyle.setStyle(this.style)
+                def i : int=0;
+                def styleString : String("");
+                for i=0 , i< this.selectorMap.getLength() , i++
+                {
+                     this.cStyle.addSelector(this.selectorMap.keyAt(i),this.selectorMap(this.selectorMap.keyAt(i)))
+                }
+                setElementAttribute(this.id, "type", this.inputType);
+                setElementAttribute(this.id, "placeholder", this.placeholder);
+                if this.hideAria==true
+                    {
+                        setElementAttribute(this.id, String("aria-hidden"),String("true"));
+                    }
+            }
+        }
+
+        //-----------------
+        // Shared Functions
+
+        function new (): SrdRef[Input] {
+            def r: SrdRef[Input];
+            r.alloc()~init();
+            return r;
+        }
+        function new (t : String): SrdRef[Input] {
+            def r: SrdRef[Input];
+            r.alloc()~init(t);
             return r;
         }
     }
@@ -764,6 +1263,8 @@
         handler (this:Widget).build (ownerId: String) set_ptr {
             this.id = getNewId();
             createElement("a", this.id, ownerId);
+            setElementAttribute(this.id, "class",this.id);
+            this.cStyle.setClassName(this.id);
             this.update();
 
             if this.child.obj~ptr != 0 this.child.build(this.id);
@@ -785,6 +1286,13 @@
             if this.id.getLength() > 0 {
                 setElementAttribute(this.id, "href", this.url);
                 setElementAttribute(this.id, "style", "text-decoration: none;");
+                this.cStyle.setStyle(this.style)
+                def i : int=0;
+                def styleString : String("");
+                for i=0 , i< this.selectorMap.getLength() , i++
+                {
+                     this.cStyle.addSelector(this.selectorMap.keyAt(i),this.selectorMap(this.selectorMap.keyAt(i)))
+                }
             }
         }
 
@@ -808,5 +1316,6 @@
     WebPlatform.defSrdRefCast[Hyperlink];
     WebPlatform.defSrdRefCast[Image];
     WebPlatform.defSrdRefCast[Canvas];
+    WebPlatform.defSrdRefCast[Input];
 }
 
