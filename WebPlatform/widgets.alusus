@@ -3,7 +3,6 @@
     //styles class
     //the class to deal with css styles
     class Style {
-        @shared def mapStyle: Map[String,String];
             // Styles
         generateProperty[width, Width, String];
         generateProperty[height, Height, String];
@@ -32,7 +31,7 @@
         generateProperty[display, Display, String];
         generateProperty[cursor, Cursor, String];
 
-        handler this~init(){
+        handler this~init() {
             this.background=String("");
             this.textDirection=String("");
             this.textAlign=String("");
@@ -53,15 +52,12 @@
             this.boxShadow=String("");
             this.display=String("");
             this.cursor=String("");
-
-
         }
         handler this.updateStyle() as_ptr{};
         handler this.update() {
             this.updateStyle();
-        };
-        handler this = ref[Style]
-        {
+        }
+        handler this = ref[Style] {
             this.background=value.background
             this.textDirection=value.textDirection
             this.textAlign=value.textAlign
@@ -89,8 +85,7 @@
             this.cursor=value.cursor;
             this.margin=value.margin;
         }
-        handler this~init(ref[Style])
-        {
+        handler this~init(ref[Style]) {
             this.background=value.background
             this.textDirection=value.textDirection
             this.textAlign=value.textAlign
@@ -118,206 +113,140 @@
             this.cursor=value.cursor;
             this.margin=value.margin;
         }
-        handler this.setBackground(color : Color)
-        {
+        handler this.setBackground(color : Color) {
             this.background=String.format("rgba(%i, %i, %i, %i)",color.red, color.green,
                        color.blue,color.alpha);
-
-
         }
-        handler this.getPropRep(prop : String,val : String) :String
-        {
-
+        handler this.getPropRep(prop : String,val : String) :String {
             return String.format("%s:%s;",prop.buf,val.buf)
-
         }
-
-        handler this.getPropRep(prop : String,val : float) :String
-        {
-
+        handler this.getPropRep(prop : String,val : float) :String {
             return String.format("%s:%f;",prop.buf,val)
-
         }
-        handler this.getPropRep(prop : String,val : Quad) :String
-        {
-
+        handler this.getPropRep(prop : String,val : Quad) :String {
             return String.format("%s:%fpt %fpt %fpt %fpt;",prop.buf,val.top, val.right, val.bottom, val.left)
-
         }
-
-        handler this.getPropRep(prop : String,val : Color) :String
-        {
-
+        handler this.getPropRep(prop : String,val : Color) :String {
             return String.format("%s:rgba(%i, %i, %i, %i);",prop.buf,val.red, val.green,
                        val.blue,val.alpha)
-
         }
-
-        handler this.getStyleString():String
-        {
+        handler this.getStyleString():String {
             def styleRep : String;
             styleRep=String("");
-            if(this.width!=String(""))
-            {
-                if(this.width==String("auto-flex"))
-                {
+            if(this.width!=String("")) {
+                if(this.width==String("auto-flex")) {
                     styleRep=styleRep+this.getPropRep(String("width"),String(";flex:auto"))
                 }
-                else
-                {
+                else {
                     styleRep=styleRep+this.getPropRep(String("width"),this.width)
                 }
             }
-            if(this.height!=String(""))
-            {
-                if(this.height==String("auto-flex"))
-                {
+            if(this.height!=String("")) {
+                if(this.height==String("auto-flex")) {
                     styleRep=styleRep+this.getPropRep(String("height"),String(";flex:auto"))
                 }
-                else
-                {
+                else {
                     styleRep=styleRep+this.getPropRep(String("height"),this.height)
                 }
             }
-
             if(this.borderRadius!=Quad(0))
             styleRep=styleRep+this.getPropRep(String("border-radius"),this.borderRadius)
-            if(this.margin!=Quad(0))
-            {
+            if(this.margin!=Quad(0)) {
                 styleRep=styleRep+this.getPropRep(String("margin"),this.margin)
                 logToConsole(String("style margin : ")+String("")+this.getPropRep(String("margin"),this.margin));
             }
             if(this.padding!=Quad(0))
             styleRep=styleRep+this.getPropRep(String("padding"),this.padding)
-            if(this.border!=Quad(0))
-            {
+            if(this.border!=Quad(0)) {
                 if(this.border==Quad(-1))
                     styleRep=styleRep+this.getPropRep(String("border-width"),Quad(0))
                 styleRep=styleRep+this.getPropRep(String("border-width"),this.border)
             }
-
             if(this.borderColor!=Color(0,0,0,0))
             styleRep=styleRep+this.getPropRep(String("border-color"),this.borderColor)
             if(this.fontSize>0.0)
             styleRep=styleRep+this.getPropRep(String("font-size"),this.fontSize)
             if(this.fontColor!=Color())
             styleRep=styleRep+this.getPropRep(String("color"),this.fontColor)
-            if(this.position!=String(""))
-            {
+            if(this.position!=String("")) {
                 styleRep=styleRep+this.getPropRep(String("position"),this.position)
             }
-            if(this.cursor!=String(""))
-            {
+            if(this.cursor!=String("")) {
                 styleRep=styleRep+this.getPropRep(String("cursor"),this.cursor)
             }
-            if(this.background!=String(""))
-            {
+            if(this.background!=String("")) {
                 styleRep=styleRep+this.getPropRep(String("background"),this.background)
             }
-            if(this.boxShadow!=String(""))
-            {
+            if(this.boxShadow!=String("")) {
                 styleRep=styleRep+this.getPropRep(String("box-shadow"),this.boxShadow)
             }
-            if(this.display!=String(""))
-            {
+            if(this.display!=String("")) {
                 styleRep=styleRep+this.getPropRep(String("display"),this.display)
             }
-            if(this.overflow!=String(""))
-            {
+            if(this.overflow!=String("")) {
                 styleRep=styleRep+this.getPropRep(String("overflow"),this.overflow)
             }
-            if(this.transition!=String(""))
-            {
+            if(this.transition!=String("")) {
                 styleRep=styleRep+this.getPropRep(String("transition"),this.transition)
             }
-            if(this.textAlign!=String(""))
-            {
+            if(this.textAlign!=String("")) {
                 styleRep=styleRep+this.getPropRep(String("text-align"),this.textAlign)
             }
-            if(this.textDirection!=String(""))
-            {
+            if(this.textDirection!=String("")) {
                 styleRep=styleRep+this.getPropRep(String("direction"),this.textDirection)
             }
-            if(this.transform!=String(""))
-            {
+            if(this.transform!=String("")) {
                 styleRep=styleRep+this.getPropRep(String("transform"),this.transform)
             }
-            if(this.zIndex!=String(""))
-            {
+            if(this.zIndex!=String("")) {
                 styleRep=styleRep+this.getPropRep(String("z-index"),this.zIndex)
                 logToConsole(String("style zIndex : ")+String("")+this.zIndex);
             }
-            if(this.layout!=String(""))
-            {
+            if(this.layout!=String("")) {
                 styleRep=styleRep+this.getPropRep(String("display:flex;flex-direction"),this.layout)
             }
-            if(this.justify!=String(""))
-            {
+            if(this.justify!=String("")) {
                 styleRep=styleRep+this.getPropRep(String("justify-content"),this.justify)
             }
-            if(this.align!=String(""))
-            {
+            if(this.align!=String("")) {
                 styleRep=styleRep+this.getPropRep(String("align-items"),this.align)
             }
-            if(this.direction!=String(""))
-            {
+            if(this.direction!=String("")) {
                 styleRep=styleRep+this.getPropRep(String("direction"),this.direction)
             }
-
-            if(this.animationName!=String(""))
-            {
+            if(this.animationName!=String("")) {
                 styleRep=styleRep+this.getPropRep(String("animation-name"),this.animationName)
             }
-            if(this.animationDuration>0.0)
-            {
+            if(this.animationDuration>0.0) {
                 styleRep=styleRep+this.getPropRep(String("animation-duration"),String("")+this.animationDuration+String("s"))
                 logToConsole(String("style animationDuration : ")+String("")+this.animationDuration);
             }
             return styleRep;
         }
-        function setStyleTag()
-        {
-            def i : int=0;
-            def styleString : String("");
-            for i=0 , i< Style.mapStyle.getLength() , i++
-            {
-                styleString+=Style.mapStyle.keyAt(i) + String(" ") +Style.mapStyle(Style.mapStyle.keyAt(i))
-
-            }
-                addStyleTag( styleString.buf);
-                //logToConsole(String("style string : ")+styleString);
-        }
     }
+
     // Animation
     // class to deal with keyframes and animation
     class Animation{
-
         def name : String
         def styleArray : Array[Style];
         def percentArray : Array[float];
         def stringRep:String=String("");
-        handler this~init(name:String,styleArray : Array[Style])
-        {
+        handler this~init(name:String,styleArray : Array[Style]) {
             this.name=name;
             this.styleArray=styleArray;
             def i : int=0;
             def sectionSize : float=0.0;
             def floatSection : float=0.0;
             sectionSize=100/(styleArray.getLength()-1);
-
-            for i=0 , i< styleArray.getLength() , i+=1
-            {
+            for i=0 , i< styleArray.getLength() , i+=1 {
                 floatSection=i*sectionSize;
                 this.stringRep=this.stringRep + floatSection + String("% {" ) + styleArray(i).getStyleString() + String("}");
             }
             def myStr : String
-
             this.createAnimation(this.animationRep());
-
         }
-
-        handler this~init(name:String , styleArray : Array[Style] ,percentArray :Array[float])
-        {
+        handler this~init(name:String , styleArray : Array[Style] ,percentArray :Array[float]) {
             this.name=name;
             this.styleArray=styleArray;
             this.percentArray=percentArray;
@@ -328,94 +257,75 @@
             else
                 length=percentArray.getLength()
 
-            for i=0 , i< length , i+=1
-            {
+            for i=0 , i< length , i+=1 {
                 this.stringRep=this.stringRep + percentArray(i) + String("% {" ) + styleArray(i).getStyleString()+ String("}");
             }
             this.createAnimation(this.animationRep());
         }
         handler this~init(){}
-
-        handler this.animationRep():String
-            {
-                def animationString : String=String("");
-                animationString=animationString + String("@keyframes ") + this.name + String("{");
-                animationString=animationString + this.stringRep + String("}");
-                return animationString;
-
+        handler this.animationRep():String {
+            def animationString : String=String("");
+            animationString=animationString + String("@keyframes ") + this.name + String("{");
+            animationString=animationString + this.stringRep + String("}");
+            return animationString;
             }
-        handler this.createAnimation(animationString : String)
-        {
-            Style.mapStyle.set(String(""),animationString)
-            Style.setStyleTag()
+        handler this.createAnimation(animationString : String){
+            StyleRepository.mapStyle.set(String(""),animationString)
+            StyleRepository.setStyleTag()
         }
-
     }
 
-    // StyleSelector
+    // StyleRepository
     // class to deal with selector and animation
-    class StyleSelector{
-
+    class StyleRepository{
+        @shared def mapStyle: Map[String,String];
         def className : String;
         def stringRep:String=String("");
-        handler this~init(className:String,style : Style)
-        {
+        handler this~init(className:String,style : Style) {
             this.className=className;
             this.stringRep= String(" {" ) + style.getStyleString() + String("}");
             this.createClass(this.stringRep);
-
         }
-
-
-
-        handler this~init(className:String)
-        {
-
+        handler this~init(className:String) {
             this.className=className;
         }
-
         handler this~init(){}
-        handler this.addSelector(selecetorName:String,style : Style)
-        {
-
+        handler this.addSelector(selecetorName:String,style : Style){
             def className : String = this.className;
             this.className=this.className+String(":")+selecetorName;
             this.stringRep= String(" {" ) + style.getStyleString() + String("}");
             this.createClass(this.stringRep);
             this.className=className;
-
         }
-        handler this.setClassName(className : String)
-        {
+        handler this.setClassName(className : String) {
             this.className=className;
         }
-        handler this.setStyle(myStyle : Style)
-        {
+        handler this.setStyle(myStyle : Style) {
             this.stringRep= String(" {" ) + myStyle.getStyleString() + String("}");
             //logToConsole(String("setStyle update image : ")+this.stringRep );
             //logToConsole(String("setStyle update image style string : ")+myStyle.getStyleString());
-
             this.createClass(this.stringRep);
         }
-
-        handler this.createClass(cssClassString : String)
-        {
-
-            Style.mapStyle.set(String(".")+this.className,cssClassString)
-            Style.setStyleTag()
-
+        handler this.createClass(cssClassString : String) {
+            StyleRepository.mapStyle.set(String(".")+this.className,cssClassString)
+            StyleRepository.setStyleTag()
         }
-
+        function setStyleTag() {
+            def i : int=0;
+            def styleString : String("");
+            for i=0 , i< StyleRepository.mapStyle.getLength() , i++ {
+                styleString+=StyleRepository.mapStyle.keyAt(i) + String(" ") +StyleRepository.mapStyle(StyleRepository.mapStyle.keyAt(i))
+            }
+            addStyleTag( styleString.buf);
+        }
     }
     //==========================================================================
     // Widget
     // The base class of all widgets.
     class Widget {
-
-
         // Styles
         @injection def style:Style;
-        def  cStyle: StyleSelector
+        def  cStyle: StyleRepository
         def selectorMap : Map[String,Style];
         def id: String;
 
@@ -616,8 +526,7 @@
                 this.cStyle.setStyle(this.style)
                 def i : int=0;
                 def styleString : String("");
-                for i=0 , i< this.selectorMap.getLength() , i++
-                {
+                for i=0 , i< this.selectorMap.getLength() , i++ {
                      this.cStyle.addSelector(this.selectorMap.keyAt(i),this.selectorMap(this.selectorMap.keyAt(i)))
                 }
             }
@@ -765,8 +674,7 @@
                 this.cStyle.setStyle(this.style)
                 def i : int=0;
                 def styleString : String("");
-                for i=0 , i< this.selectorMap.getLength() , i++
-                {
+                for i=0 , i< this.selectorMap.getLength() , i++ {
                      this.cStyle.addSelector(this.selectorMap.keyAt(i),this.selectorMap(this.selectorMap.keyAt(i)))
                 }
                 setElementAttribute(this.id, "src", this.url);
@@ -837,16 +745,13 @@
                 this.cStyle.setStyle(this.style)
                 def i : int=0;
                 def styleString : String("");
-                for i=0 , i< this.selectorMap.getLength() , i++
-                {
+                for i=0 , i< this.selectorMap.getLength() , i++ {
                      this.cStyle.addSelector(this.selectorMap.keyAt(i),this.selectorMap(this.selectorMap.keyAt(i)))
                 }
-                if this.hideAria==true
-                {
+                if this.hideAria==true {
                    setElementAttribute(this.id, String("aria-hidden"),String("true"));
                 }
-                if this.forTag!=String("")
-                {
+                if this.forTag!=String("") {
                    setElementAttribute(this.id, String("for"),this.forTag);
                 }
             }
@@ -925,8 +830,7 @@
                 this.cStyle.setStyle(this.style)
                 def i : int=0;
                 def styleString : String("");
-                for i=0 , i< this.selectorMap.getLength() , i++
-                {
+                for i=0 , i< this.selectorMap.getLength() , i++ {
                      this.cStyle.addSelector(this.selectorMap.keyAt(i),this.selectorMap(this.selectorMap.keyAt(i)))
                 }
             }
@@ -1057,8 +961,7 @@
                 this.cStyle.setStyle(this.style)
                 def i : int=0;
                 def styleString : String("");
-                for i=0 , i< this.selectorMap.getLength() , i++
-                {
+                for i=0 , i< this.selectorMap.getLength() , i++ {
                      this.cStyle.addSelector(this.selectorMap.keyAt(i),this.selectorMap(this.selectorMap.keyAt(i)))
                 }
             }
@@ -1205,16 +1108,14 @@
                 this.cStyle.setStyle(this.style)
                 def i : int=0;
                 def styleString : String("");
-                for i=0 , i< this.selectorMap.getLength() , i++
-                {
+                for i=0 , i< this.selectorMap.getLength() , i++ {
                      this.cStyle.addSelector(this.selectorMap.keyAt(i),this.selectorMap(this.selectorMap.keyAt(i)))
                 }
                 setElementAttribute(this.id, "type", this.inputType);
                 setElementAttribute(this.id, "placeholder", this.placeholder);
-                if this.hideAria==true
-                    {
-                        setElementAttribute(this.id, String("aria-hidden"),String("true"));
-                    }
+                if this.hideAria==true{
+                    setElementAttribute(this.id, String("aria-hidden"),String("true"));
+                }
             }
         }
 
@@ -1289,8 +1190,7 @@
                 this.cStyle.setStyle(this.style)
                 def i : int=0;
                 def styleString : String("");
-                for i=0 , i< this.selectorMap.getLength() , i++
-                {
+                for i=0 , i< this.selectorMap.getLength() , i++ {
                      this.cStyle.addSelector(this.selectorMap.keyAt(i),this.selectorMap(this.selectorMap.keyAt(i)))
                 }
             }
