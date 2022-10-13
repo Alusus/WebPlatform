@@ -66,6 +66,12 @@ wasmApi.setElementAttribute = (elementName, propName, value) => {
     }
 }
 
+wasmApi.getSelectedItemValue = (selectId) => {
+    var select = document.getElementById(toJsString(selectId));
+    var value = select.options[select.selectedIndex].value;
+    return toWasmString(value);
+}
+
 wasmApi.getElementAttribute = (elementName, propName) => {
     const prop = toJsString(propName);
     let result;

@@ -2,6 +2,7 @@
     // Element Management
     @expname[createElement] function createElement (type: ptr[Char], name: ptr[Char], parent: ptr[Char]);
     @expname[addStyleTag] function addStyleTag ( body: ptr[Char]);
+    @expname[getSelectedItemValue] function getSelectedItemValue ( selectId: ptr[Char]):ptr[array[Char]];
     @expname[deleteElement] function deleteElement (name: ptr[Char]);
     @expname[setElementAttribute] function setElementAttribute (name: ptr[Char], prop: ptr[Char], value: ptr[Char]);
     @expname[getElementAttribute] function getElementAttribute (name: ptr[Char], prop: ptr[Char]): ptr[array[Char]];
