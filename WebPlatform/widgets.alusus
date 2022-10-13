@@ -1133,7 +1133,103 @@
             return r;
         }
     }
+    //==========================================================================
+    // Select
+    class Select {
+        @injection def widget: Widget;
+        //def items : Map[String,String];
 
+        //-----------------------
+        // Properties and Signals
+
+        generateProperty[items, Items, Map[String,String]];
+        generateProperty[hideAria, HideAria, bool];
+
+        def onChanged: Signal[Select, Int];
+        def onChangedId: ArchInt = -1;
+
+        //---------
+        // Handlers
+
+        handler this~init() {
+            this.onChanged.owner~no_deref = this;
+            this.textAlign = String("right");
+            this.textDirection = String("rtl");
+            this.hideAria=false;
+        }
+
+        //-----------------
+        // Member Functions
+
+        handler this.onSignalConnectionsChanged(signal: ptr[Signal[Select, Int]], connectionCount: Int) {
+            if this.id == "" return;
+
+            if signal == this.onChanged~ptr {
+                handleSignalConnectionChanged[onChanged, "change", {
+                    this.onChanged.emit(Int(0));
+                }];
+            }
+        }
+
+        //-------------------
+        // Function Overrides
+
+        handler (this:Widget).build (ownerId: String) set_ptr {
+            this.id = getNewId();
+            createElement("select", this.id, ownerId);
+            setElementAttribute(this.id, "class",this.id);
+            this.cStyle.setClassName(this.id);
+            this.update();
+            this.onSignalConnectionsChanged(this.onChanged~ptr, this.onChanged.getConnectionCount());
+            this.buildCommon();
+        }
+
+        handler (this:Widget).unbuild() set_ptr {
+            if this.onChangedId != -1 unregisterElementEventHandler(this.onChangedId);
+            this.onChangedId = -1;
+            deleteElement(this.id);
+            this.unbuildCommon();
+            this.id = String();
+        }
+
+        handler (this:Widget).update() set_ptr {
+            if this.id.getLength() > 0 {
+                //setElementAttribute(this.id, "value", this._text);
+                def i : int =0;
+                def htmlVal : String="";
+                for i=0 , i< this.items.getLength() , i++ {
+                htmlVal+=String("<option value= \"")+this.items.keyAt(i) + String("\">") +this.items(this.items.keyAt(i)) + String("</option>")
+                }
+                logToConsole(String(" htmlVal : ")+htmlVal);
+                setElementAttribute(this.id, "innerHTML", htmlVal);
+                this.cStyle.setStyle(this.style)
+                def styleString : String("");
+                for i=0 , i< this.selectorMap.getLength() , i++ {
+                     this.cStyle.addSelector(this.selectorMap.keyAt(i),this.selectorMap(this.selectorMap.keyAt(i)))
+                }
+                if this.hideAria==true{
+                    setElementAttribute(this.id, String("aria-hidden"),String("true"));
+                }
+            }
+        }
+
+        handler this.getSelectedValue() : String{
+            def selectedValue : String;
+            logToConsole("selected getSelectedValue " );
+            selectedValue=getSelectedItemValue(this.id);
+            return selectedValue;
+        }
+
+        //-----------------
+        // Shared Functions
+
+        function new (): SrdRef[Select] {
+            def r: SrdRef[Select];
+            r.alloc()~init();
+            return r;
+        }
+
+    }
     //==========================================================================
     // Hyperlink
     class Hyperlink {
@@ -1217,5 +1313,6 @@
     WebPlatform.defSrdRefCast[Image];
     WebPlatform.defSrdRefCast[Canvas];
     WebPlatform.defSrdRefCast[Input];
+    WebPlatform.defSrdRefCast[Select];
 }
 
