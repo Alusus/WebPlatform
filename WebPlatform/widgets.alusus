@@ -9,6 +9,7 @@
         generateProperty[background, Background, String];
         generateProperty[borderRadius, BorderRadius, Quad];
         generateProperty[position, Position, String];
+        generateProperty[minHeight, MinHeight, String];
         generateProperty[zIndex, ZIndex, String];
         generateProperty[layout, Layout, String];
         generateProperty[justify, Justify, String];
@@ -30,6 +31,10 @@
         generateProperty[boxShadow, BoxShadow, String];
         generateProperty[display, Display, String];
         generateProperty[cursor, Cursor, String];
+        generateProperty[top, Top, String];
+        generateProperty[left, Left, String];
+        generateProperty[right, Right, String];
+         generateProperty[bottom, Bottom, String];
 
         handler this~init() {
             this.background=String("");
@@ -52,6 +57,11 @@
             this.boxShadow=String("");
             this.display=String("");
             this.cursor=String("");
+            this.minHeight=String("");
+            this.top=String("");
+            this.bottom=String("");
+            this.right=String("");
+            this.left=String("");
         }
         handler this.updateStyle() as_ptr{};
         handler this.update() {
@@ -84,6 +94,11 @@
             this.display=value.display;
             this.cursor=value.cursor;
             this.margin=value.margin;
+            this.minHeight=value.minHeight;
+            this.top=value.top
+            this.bottom=value.bottom
+            this.right=value.right
+            this.left=value.left
         }
         handler this~init(ref[Style]) {
             this.background=value.background
@@ -112,6 +127,11 @@
             this.display=value.display;
             this.cursor=value.cursor;
             this.margin=value.margin;
+            this.minHeight=value.minHeight;
+            this.top=value.top
+            this.bottom=value.bottom
+            this.right=value.right
+            this.left=value.left
         }
         handler this.setBackground(color : Color) {
             this.background=String.format("rgba(%i, %i, %i, %i)",color.red, color.green,
@@ -177,6 +197,18 @@
             if(this.background!=String("")) {
                 styleRep=styleRep+this.getPropRep(String("background"),this.background)
             }
+            if(this.top!=String("")) {
+                styleRep=styleRep+this.getPropRep(String("top"),this.top)
+            }
+            if(this.left!=String("")) {
+                styleRep=styleRep+this.getPropRep(String("left"),this.left)
+            }
+            if(this.right!=String("")) {
+                styleRep=styleRep+this.getPropRep(String("right"),this.right)
+            }
+            if(this.bottom!=String("")) {
+                styleRep=styleRep+this.getPropRep(String("bottom"),this.bottom)
+            }
             if(this.boxShadow!=String("")) {
                 styleRep=styleRep+this.getPropRep(String("box-shadow"),this.boxShadow)
             }
@@ -197,6 +229,9 @@
             }
             if(this.transform!=String("")) {
                 styleRep=styleRep+this.getPropRep(String("transform"),this.transform)
+            }
+            if(this.minHeight!=String("")) {
+                styleRep=styleRep+this.getPropRep(String("min-height"),this.minHeight)
             }
             if(this.zIndex!=String("")) {
                 styleRep=styleRep+this.getPropRep(String("z-index"),this.zIndex)
