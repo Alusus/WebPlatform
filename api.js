@@ -51,6 +51,7 @@ wasmApi.addStyleTag= ( elementBody) => {
 
 wasmApi.deleteElement = (elementName) => {
     const element = document.getElementById(toJsString(elementName));
+    if (! element) return;
     if (element.dataset.resizeObserverCbId) resizeObserver.unobserve(element);
     if (element) element.remove();
 }
@@ -65,7 +66,10 @@ wasmApi.setElementAttribute = (elementName, propName, value) => {
         document.getElementById(toJsString(elementName)).setAttribute(prop, toJsString(value));
     }
 }
+wasmApi.selectItem = (elementName, value) => {
+        document.getElementById(toJsString(elementName)).value = toJsString(value);
 
+}
 wasmApi.getSelectedItemValue = (selectId) => {
     var select = document.getElementById(toJsString(selectId));
     var value = select.options[select.selectedIndex].value;
@@ -134,7 +138,9 @@ wasmApi.unregisterElementEventHandler = (elementName, eventName) => {
     if (jsElementName === 'window') {
         window[`on${jsEventName}`] = null;
     } else {
-        document.getElementById(jsElementName)[`on${jsEventName}`] = null;
+        const element=document.getElementById(jsElementName)
+        if(! element) return;
+        element[`on${jsEventName}`] = null;
     }
 }
 

@@ -1254,6 +1254,11 @@
             selectedValue=getSelectedItemValue(this.id);
             return selectedValue;
         }
+        handler this.selectValue(selectedValue : String) {
+            logToConsole(" selectValue " );
+            selectItem(this.id,selectedValue);
+
+        }
 
         //-----------------
         // Shared Functions
