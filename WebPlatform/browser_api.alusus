@@ -5,11 +5,16 @@
     @expname[selectItem] function selectItem (selectId: ptr[Char], selectedValue: ptr[Char]);
     @expname[getSelectedItemValue] function getSelectedItemValue ( selectId: ptr[Char]):ptr[array[Char]];
     @expname[deleteElement] function deleteElement (name: ptr[Char]);
+    @expname[setCookie] function setCookie (cName: ptr[Char] , vName: ptr[Char] ,exDay: ptr[Char]);
+    @expname[getVarValue] function getVarValue ( varName: ptr[Char]):ptr[array[Char]];
+    @expname[getCookie] function getCookie ( cName: ptr[Char]):ptr[array[Char]];
+    @expname[addVarToSession] function addVarToSession (varName: ptr[Char],varValue: ptr[Char]);
     @expname[setElementAttribute] function setElementAttribute (name: ptr[Char], prop: ptr[Char], value: ptr[Char]);
     @expname[getElementAttribute] function getElementAttribute (name: ptr[Char], prop: ptr[Char]): ptr[array[Char]];
     @expname[getElementDimensions] function getElementDimensions (name: ptr[Char], result: ref[Dimensions]);
     // Event Loop
     @expname[fetchNextEvent] function fetchNextEvent (): ptr[array[Char]];
+    @expname[httpRedirect] function httpRedirect (address : ptr[Char])
     @expname[registerElementEventHandler] function _registerElementEventHandler (
       elementName: ptr[Char], eventName: ptr[Char], cbId: ArchInt
     );

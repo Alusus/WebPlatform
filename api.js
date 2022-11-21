@@ -31,7 +31,33 @@ wasmApi.createElement = (elementType, elementName, parentName) => {
     parent.appendChild(element);
     element.setAttribute('id', toJsString(elementName));
 }
+wasmApi.httpRedirect = (page) => {
+    window.location.replace(toJsString(page));
+}
+wasmApi.addVarToSession = (varName, varValue) => {
+    sessionStorage.setItem(toJsString(varName),toJsString(varValue));
+}
+wasmApi.setCookie = (cname, cvalue, exdays) =>{
+  const d = new Date();
+  d.setTime(d.getTime() + (parseInt(toJsString(exdays)) * 24 * 60 * 60 * 1000));
+  let expires = "expires="+d.toUTCString();
+  document.cookie = toJsString(cname) + "=" + toJsString(cvalue) + ";" + expires + ";path=/";
+}
 
+wasmApi.getCookie = (cname) =>{
+  let name = toJsString(cname) + "=";
+  let ca = document.cookie.split(';');
+  for(let i = 0; i < ca.length; i++) {
+    let c = ca[i];
+    while (c.charAt(0) == ' ') {
+      c = c.substring(1);
+    }
+    if (c.indexOf(name) == 0) {
+      return toWasmString(c.substring(name.length, c.length));
+    }
+  }
+  return toWasmString("");
+}
 wasmApi.addStyleTag= ( elementBody) => {
   var check =  document.querySelector('style');
   if(check !== null)
@@ -48,14 +74,12 @@ wasmApi.addStyleTag= ( elementBody) => {
       document.getElementsByTagName('head')[0].appendChild(style);
   }
 }
-
 wasmApi.deleteElement = (elementName) => {
     const element = document.getElementById(toJsString(elementName));
     if (! element) return;
     if (element.dataset.resizeObserverCbId) resizeObserver.unobserve(element);
     if (element) element.remove();
 }
-
 wasmApi.setElementAttribute = (elementName, propName, value) => {
     const prop = toJsString(propName);
     if (prop === 'innerHTML') {
@@ -69,6 +93,10 @@ wasmApi.setElementAttribute = (elementName, propName, value) => {
 wasmApi.selectItem = (elementName, value) => {
         document.getElementById(toJsString(elementName)).value = toJsString(value);
 
+}
+wasmApi.getVarValue = (varName) => {
+    var value = sessionStorage.getItem(toJsString(varName));
+    return toWasmString(value);
 }
 wasmApi.getSelectedItemValue = (selectId) => {
     var select = document.getElementById(toJsString(selectId));
