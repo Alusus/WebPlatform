@@ -1,367 +1,10 @@
 @merge module WebPlatform {
     //==========================================================================
-    //styles class
-    //the class to deal with css styles
-    class Style {
-            // Styles
-        generateProperty[width, Width, String];
-        generateProperty[height, Height, String];
-        generateProperty[background, Background, String];
-        generateProperty[borderRadius, BorderRadius, Quad];
-        generateProperty[position, Position, String];
-        generateProperty[minHeight, MinHeight, String];
-        generateProperty[zIndex, ZIndex, String];
-        generateProperty[layout, Layout, String];
-        generateProperty[justify, Justify, String];
-        generateProperty[margin, Margin, Quad];
-        generateProperty[align, Align, String];
-        generateProperty[direction, Direction, String];
-        generateProperty[padding, Padding, Quad];
-        generateProperty[border, Border, Quad];
-        generateProperty[borderColor, BorderColor, Color];
-        generateProperty[fontSize, FontSize, Float];
-        generateProperty[fontColor, FontColor, Color];
-        generateProperty[transition, Transition, String];
-        generateProperty[textAlign, TextAlign, String];
-        generateProperty[textDirection, TextDirection, String];
-        generateProperty[animationName, AnimationName, String];
-        generateProperty[animationDuration, AnimationDuration, float];
-        generateProperty[transform, Transform, String];
-        generateProperty[overflow, Overflow, String];
-        generateProperty[boxShadow, BoxShadow, String];
-        generateProperty[display, Display, String];
-        generateProperty[cursor, Cursor, String];
-        generateProperty[top, Top, String];
-        generateProperty[left, Left, String];
-        generateProperty[right, Right, String];
-         generateProperty[bottom, Bottom, String];
-
-        handler this~init() {
-            this.background=String("");
-            this.textDirection=String("");
-            this.textAlign=String("");
-            this.fontSize=0.0;
-            this.direction=String("");
-            this.align=String("");
-            this.justify=String("");
-            this.layout=String("");
-            this.zIndex=String("");
-            this.position=String("");
-            this.height=String("");
-            this.width=String("");
-            this.animationDuration=0.0;
-            this.animationName=String("");
-            this.transition=String("");
-            this.transform=String("");
-            this.overflow=String("");
-            this.boxShadow=String("");
-            this.display=String("");
-            this.cursor=String("");
-            this.minHeight=String("");
-            this.top=String("");
-            this.bottom=String("");
-            this.right=String("");
-            this.left=String("");
-        }
-        handler this.updateStyle() as_ptr{};
-        handler this.update() {
-            this.updateStyle();
-        }
-        handler this = ref[Style] {
-            this.background=value.background
-            this.textDirection=value.textDirection
-            this.textAlign=value.textAlign
-            this.fontColor=value.fontColor
-            this.fontSize=value.fontSize
-            this.borderColor=value.borderColor
-            this.border=value.border
-            this.padding=value.padding
-            this.direction=value.direction
-            this.align=value.align
-            this.justify=value.justify
-            this.layout=value.layout
-            this.zIndex=value.zIndex
-            this.position=value.position
-            this.borderRadius=value.borderRadius
-            this.height=value.height
-            this.width=value.width
-            this.animationDuration=value.animationDuration;
-            this.animationName=value.animationName;
-            this.transition=value.transition;
-            this.transform=value.transform;
-            this.overflow=value.overflow;
-            this.boxShadow=value.boxShadow;
-            this.display=value.display;
-            this.cursor=value.cursor;
-            this.margin=value.margin;
-            this.minHeight=value.minHeight;
-            this.top=value.top
-            this.bottom=value.bottom
-            this.right=value.right
-            this.left=value.left
-        }
-        handler this~init(ref[Style]) {
-            this.background=value.background
-            this.textDirection=value.textDirection
-            this.textAlign=value.textAlign
-            this.fontColor=value.fontColor
-            this.fontSize=value.fontSize
-            this.borderColor=value.borderColor
-            this.border=value.border
-            this.padding=value.padding
-            this.direction=value.direction
-            this.align=value.align
-            this.justify=value.justify
-            this.layout=value.layout
-            this.zIndex=value.zIndex
-            this.position=value.position
-            this.borderRadius=value.borderRadius
-            this.height=value.height
-            this.width=value.width
-            this.animationDuration=value.animationDuration;
-            this.animationName=value.animationName;
-            this.transition=value.transition;
-            this.transform=value.transform;
-            this.overflow=value.overflow;
-            this.boxShadow=value.boxShadow;
-            this.display=value.display;
-            this.cursor=value.cursor;
-            this.margin=value.margin;
-            this.minHeight=value.minHeight;
-            this.top=value.top
-            this.bottom=value.bottom
-            this.right=value.right
-            this.left=value.left
-        }
-        handler this.setBackground(color : Color) {
-            this.background=String.format("rgba(%i, %i, %i, %i)",color.red, color.green,
-                       color.blue,color.alpha);
-        }
-        handler this.getPropRep(prop : String,val : String) :String {
-            return String.format("%s:%s;",prop.buf,val.buf)
-        }
-        handler this.getPropRep(prop : String,val : float) :String {
-            return String.format("%s:%f;",prop.buf,val)
-        }
-        handler this.getPropRep(prop : String,val : Quad) :String {
-            return String.format("%s:%fpt %fpt %fpt %fpt;",prop.buf,val.top, val.right, val.bottom, val.left)
-        }
-        handler this.getPropRep(prop : String,val : Color) :String {
-            return String.format("%s:rgba(%i, %i, %i, %i);",prop.buf,val.red, val.green,
-                       val.blue,val.alpha)
-        }
-        handler this.getStyleString():String {
-            def styleRep : String;
-            styleRep=String("");
-            if(this.width!=String("")) {
-                if(this.width==String("auto-flex")) {
-                    styleRep=styleRep+this.getPropRep(String("width"),String(";flex:auto"))
-                }
-                else {
-                    styleRep=styleRep+this.getPropRep(String("width"),this.width)
-                }
-            }
-            if(this.height!=String("")) {
-                if(this.height==String("auto-flex")) {
-                    styleRep=styleRep+this.getPropRep(String("height"),String(";flex:auto"))
-                }
-                else {
-                    styleRep=styleRep+this.getPropRep(String("height"),this.height)
-                }
-            }
-            if(this.borderRadius!=Quad(0))
-            styleRep=styleRep+this.getPropRep(String("border-radius"),this.borderRadius)
-            if(this.margin!=Quad(0)) {
-                styleRep=styleRep+this.getPropRep(String("margin"),this.margin)
-                logToConsole(String("style margin : ")+String("")+this.getPropRep(String("margin"),this.margin));
-            }
-            if(this.padding!=Quad(0))
-            styleRep=styleRep+this.getPropRep(String("padding"),this.padding)
-            if(this.border!=Quad(0)) {
-                if(this.border==Quad(-1))
-                    styleRep=styleRep+this.getPropRep(String("border-width"),Quad(0))
-                styleRep=styleRep+this.getPropRep(String("border-width"),this.border)
-            }
-            if(this.borderColor!=Color(0,0,0,0))
-            styleRep=styleRep+this.getPropRep(String("border-color"),this.borderColor)
-            if(this.fontSize>0.0)
-            styleRep=styleRep+this.getPropRep(String("font-size"),this.fontSize)
-            if(this.fontColor!=Color())
-            styleRep=styleRep+this.getPropRep(String("color"),this.fontColor)
-            if(this.position!=String("")) {
-                styleRep=styleRep+this.getPropRep(String("position"),this.position)
-            }
-            if(this.cursor!=String("")) {
-                styleRep=styleRep+this.getPropRep(String("cursor"),this.cursor)
-            }
-            if(this.background!=String("")) {
-                styleRep=styleRep+this.getPropRep(String("background"),this.background)
-            }
-            if(this.top!=String("")) {
-                styleRep=styleRep+this.getPropRep(String("top"),this.top)
-            }
-            if(this.left!=String("")) {
-                styleRep=styleRep+this.getPropRep(String("left"),this.left)
-            }
-            if(this.right!=String("")) {
-                styleRep=styleRep+this.getPropRep(String("right"),this.right)
-            }
-            if(this.bottom!=String("")) {
-                styleRep=styleRep+this.getPropRep(String("bottom"),this.bottom)
-            }
-            if(this.boxShadow!=String("")) {
-                styleRep=styleRep+this.getPropRep(String("box-shadow"),this.boxShadow)
-            }
-            if(this.display!=String("")) {
-                styleRep=styleRep+this.getPropRep(String("display"),this.display)
-            }
-            if(this.overflow!=String("")) {
-                styleRep=styleRep+this.getPropRep(String("overflow"),this.overflow)
-            }
-            if(this.transition!=String("")) {
-                styleRep=styleRep+this.getPropRep(String("transition"),this.transition)
-            }
-            if(this.textAlign!=String("")) {
-                styleRep=styleRep+this.getPropRep(String("text-align"),this.textAlign)
-            }
-            if(this.textDirection!=String("")) {
-                styleRep=styleRep+this.getPropRep(String("direction"),this.textDirection)
-            }
-            if(this.transform!=String("")) {
-                styleRep=styleRep+this.getPropRep(String("transform"),this.transform)
-            }
-            if(this.minHeight!=String("")) {
-                styleRep=styleRep+this.getPropRep(String("min-height"),this.minHeight)
-            }
-            if(this.zIndex!=String("")) {
-                styleRep=styleRep+this.getPropRep(String("z-index"),this.zIndex)
-                logToConsole(String("style zIndex : ")+String("")+this.zIndex);
-            }
-            if(this.layout!=String("")) {
-                styleRep=styleRep+this.getPropRep(String("display:flex;flex-direction"),this.layout)
-            }
-            if(this.justify!=String("")) {
-                styleRep=styleRep+this.getPropRep(String("justify-content"),this.justify)
-            }
-            if(this.align!=String("")) {
-                styleRep=styleRep+this.getPropRep(String("align-items"),this.align)
-            }
-            if(this.direction!=String("")) {
-                styleRep=styleRep+this.getPropRep(String("direction"),this.direction)
-            }
-            if(this.animationName!=String("")) {
-                styleRep=styleRep+this.getPropRep(String("animation-name"),this.animationName)
-            }
-            if(this.animationDuration>0.0) {
-                styleRep=styleRep+this.getPropRep(String("animation-duration"),String("")+this.animationDuration+String("s"))
-                logToConsole(String("style animationDuration : ")+String("")+this.animationDuration);
-            }
-            return styleRep;
-        }
-    }
-
-    // Animation
-    // class to deal with keyframes and animation
-    class Animation{
-        def name : String
-        def styleArray : Array[Style];
-        def percentArray : Array[float];
-        def stringRep:String=String("");
-        handler this~init(name:String,styleArray : Array[Style]) {
-            this.name=name;
-            this.styleArray=styleArray;
-            def i : int=0;
-            def sectionSize : float=0.0;
-            def floatSection : float=0.0;
-            sectionSize=100/(styleArray.getLength()-1);
-            for i=0 , i< styleArray.getLength() , i+=1 {
-                floatSection=i*sectionSize;
-                this.stringRep=this.stringRep + floatSection + String("% {" ) + styleArray(i).getStyleString() + String("}");
-            }
-            def myStr : String
-            this.createAnimation(this.animationRep());
-        }
-        handler this~init(name:String , styleArray : Array[Style] ,percentArray :Array[float]) {
-            this.name=name;
-            this.styleArray=styleArray;
-            this.percentArray=percentArray;
-            def i : int=0;
-            def length:int=0;
-            if(percentArray.getLength()>styleArray.getLength())
-                length=styleArray.getLength()
-            else
-                length=percentArray.getLength()
-
-            for i=0 , i< length , i+=1 {
-                this.stringRep=this.stringRep + percentArray(i) + String("% {" ) + styleArray(i).getStyleString()+ String("}");
-            }
-            this.createAnimation(this.animationRep());
-        }
-        handler this~init(){}
-        handler this.animationRep():String {
-            def animationString : String=String("");
-            animationString=animationString + String("@keyframes ") + this.name + String("{");
-            animationString=animationString + this.stringRep + String("}");
-            return animationString;
-            }
-        handler this.createAnimation(animationString : String){
-            StyleRepository.mapStyle.set(String(""),animationString)
-            StyleRepository.setStyleTag()
-        }
-    }
-
-    // StyleRepository
-    // class to deal with selector and animation
-    class StyleRepository{
-        @shared def mapStyle: Map[String,String];
-        def className : String;
-        def stringRep:String=String("");
-        handler this~init(className:String,style : Style) {
-            this.className=className;
-            this.stringRep= String(" {" ) + style.getStyleString() + String("}");
-            this.createClass(this.stringRep);
-        }
-        handler this~init(className:String) {
-            this.className=className;
-        }
-        handler this~init(){}
-        handler this.addSelector(selecetorName:String,style : Style){
-            def className : String = this.className;
-            this.className=this.className+String(":")+selecetorName;
-            this.stringRep= String(" {" ) + style.getStyleString() + String("}");
-            this.createClass(this.stringRep);
-            this.className=className;
-        }
-        handler this.setClassName(className : String) {
-            this.className=className;
-        }
-        handler this.setStyle(myStyle : Style) {
-            this.stringRep= String(" {" ) + myStyle.getStyleString() + String("}");
-            //logToConsole(String("setStyle update image : ")+this.stringRep );
-            //logToConsole(String("setStyle update image style string : ")+myStyle.getStyleString());
-            this.createClass(this.stringRep);
-        }
-        handler this.createClass(cssClassString : String) {
-            StyleRepository.mapStyle.set(String(".")+this.className,cssClassString)
-            StyleRepository.setStyleTag()
-        }
-        function setStyleTag() {
-            def i : int=0;
-            def styleString : String("");
-            for i=0 , i< StyleRepository.mapStyle.getLength() , i++ {
-                styleString+=StyleRepository.mapStyle.keyAt(i) + String(" ") +StyleRepository.mapStyle(StyleRepository.mapStyle.keyAt(i))
-            }
-            addStyleTag( styleString.buf);
-        }
-    }
-    //==========================================================================
     // Widget
     // The base class of all widgets.
     class Widget {
         // Styles
-        @injection def style:Style;
-        def  cStyle: StyleRepository
-        def selectorMap : Map[String,Style];
+        @injection def style: SrdRef[StyleSet];
         def id: String;
 
         // Events
@@ -379,6 +22,7 @@
         def onMouseUpId: ArchInt = -1;
 
         handler this~init() {
+            this.style = SrdRef[StyleSet].construct();
             this.onResize.owner~no_deref = this;
             this.onMouseMove.owner~no_deref = this;
             this.onMouseEnter.owner~no_deref = this;
@@ -393,15 +37,13 @@
         handler this.build(ownerId: String) as_ptr;
         handler this.unbuild() as_ptr;
         handler this.update() as_ptr;
-        handler (this:Style).updateStyle() set_ptr {
-            this.update();
-            logToConsole("after style updateStyle");
-        }
 
         //-----------------
         // Member Functions
 
         handler this.buildCommon() {
+            setElementAttribute(this.id, "class", this.style.className);
+            this.style.build();
             this.onSignalConnectionsChanged(this.onResize~ptr, this.onResize.getConnectionCount());
             this.onSignalConnectionsChanged(this.onMouseMove~ptr, this.onMouseMove.getConnectionCount());
             this.onSignalConnectionsChanged(this.onMouseEnter~ptr, this.onMouseEnter.getConnectionCount());
@@ -411,6 +53,7 @@
         }
 
         handler this.unbuildCommon() {
+            this.style.unbuild();
         }
 
         handler this.onSignalConnectionsChanged(signal: ptr[Signal[Widget, Int]], connectionCount: Int) {
@@ -498,7 +141,6 @@
             this.setLayout(String("column"))
             this.justify = String("space-around");
             this.direction = String("rtl");
-            logToConsole("after style update box");
         }
 
         handler this.addChildren (count: Int, children: ...temp_ref[SrdRef[Widget]]) {
@@ -528,43 +170,30 @@
 
         handler (this:Widget).build (ownerId: String) set_ptr {
             this.id = getNewId();
-            logToConsole("after build ");
             createElement("div", this.id, ownerId);
-            setElementAttribute(this.id, "class",this.id);
-            this.cStyle.setClassName(this.id);
+            this.buildCommon();
             this.update();
             def i: Int;
             for i = 0, i < this.children.getLength(), ++i {
                 this.children(i).build(this.id);
             }
-
-            this.buildCommon();
         }
 
         handler (this:Widget).unbuild() set_ptr {
             if this.id.getLength() > 0 {
                 deleteElement(this.id);
+                this.unbuildCommon();
 
                 def i: Int;
                 for i = 0, i < this.children.getLength(), ++i {
                     this.children(i).unbuild();
                 }
 
-                this.unbuildCommon();
                 this.id = String();
             }
         }
 
         handler (this:Widget).update() set_ptr {
-            logToConsole("after widg update");
-            if this.id.getLength() > 0 {
-                this.cStyle.setStyle(this.style)
-                def i : int=0;
-                def styleString : String("");
-                for i=0 , i< this.selectorMap.getLength() , i++ {
-                     this.cStyle.addSelector(this.selectorMap.keyAt(i),this.selectorMap(this.selectorMap.keyAt(i)))
-                }
-            }
         }
 
         //-----------------
@@ -591,9 +220,6 @@
 
         generateProperty[bitmapWidth, BitmapWidth, String];
         generateProperty[bitmapHeight, BitmapHeight, String];
-        generateProperty[padding, Padding, Quad];
-        generateProperty[border, Border, Quad];
-        generateProperty[borderColor, BorderColor, Color];
 
         //---------
         // Handlers
@@ -602,6 +228,8 @@
             this.borderColor~init(255, 255, 255);
         }
 
+        handler this.onPropUpdated() this.update();
+
         //-------------------
         // Function Overrides
 
@@ -609,8 +237,8 @@
             this.id = getNewId();
             createElement("canvas", this.id, ownerId);
             this.resourceId = registerElementAsResource(this.id);
-            this.update();
             this.buildCommon();
+            this.update();
         }
 
         handler (this:Widget).unbuild() set_ptr {
@@ -624,27 +252,6 @@
 
         handler (this:Widget).update() set_ptr {
             if this.id.getLength() > 0 {
-                setElementAttribute(
-                    this.id, "style",
-                    String.format(
-                        "width:100%%;"
-                        "height:100%%;"
-                        "max-width:%s;"
-                        "max-height:%s;"
-                        "padding:%fpt %fpt %fpt %fpt;"
-                        "border-style:solid;"
-                        "border-width:%fpt %fpt %fpt %fpt;"
-                        "border-color:rgba(%i, %i, %i, %i);"
-                        "background-color:rgba(%i, %i, %i, %i);",
-                        this.width.buf, this.height.buf,
-                        this.padding.top, this.padding.right, this.padding.bottom, this.padding.left,
-                        this.border.top, this.border.right, this.border.bottom, this.border.left,
-                        this.borderColor.red, this.borderColor.green,
-                        this.borderColor.blue, this.borderColor.alpha,
-                        this.backgroundColor.red, this.backgroundColor.green,
-                        this.backgroundColor.blue, this.backgroundColor.alpha
-                    )
-                );
                 setElementAttribute(this.id, "width", this.bitmapWidth);
                 setElementAttribute(this.id, "height", this.bitmapHeight);
             }
@@ -684,16 +291,16 @@
             this.url = String(u);
         }
 
+        handler this.onPropUpdated() this.update();
+
         //-------------------
         // Function Overrides
 
         handler (this:Widget).build (ownerId: String) set_ptr {
             this.id = getNewId();
             createElement("img", this.id, ownerId);
-            setElementAttribute(this.id, "class",this.id);
-            this.cStyle.setClassName(this.id)
-            this.update();
             this.buildCommon();
+            this.update();
         }
 
         handler (this:Widget).unbuild() set_ptr {
@@ -706,12 +313,6 @@
 
         handler (this:Widget).update() set_ptr {
             if this.id.getLength() > 0 {
-                this.cStyle.setStyle(this.style)
-                def i : int=0;
-                def styleString : String("");
-                for i=0 , i< this.selectorMap.getLength() , i++ {
-                     this.cStyle.addSelector(this.selectorMap.keyAt(i),this.selectorMap(this.selectorMap.keyAt(i)))
-                }
                 setElementAttribute(this.id, "src", this.url);
             }
         }
@@ -733,26 +334,28 @@
     // Label
     class Label {
         @injection def widget: Widget;
+        def tag: String;
 
         //-----------
         // Properties
         generateProperty[text, Text, String];
-        generateProperty[tag, Tag, String];
-        generateProperty[hideAria, HideAria, bool];
-        generateProperty[forTag, ForTag, String];
+        generateProperty[ariaHidden, AriaHidden, bool];
+        generateProperty[targetId, TargetId, String];
 
         //----------
         // Handlers
 
         handler this~init(t: String) {
+            this.tag = String("span");
             this.text = t;
             this.fontSize = 10.0;
             this.textAlign = String("right");
             this.textDirection = String("rtl");
-            this.tag=String("span");
-            this.hideAria=false;
-            this.forTag=String("");
+            this.ariaHidden = false;
+            this.targetId = String("");
         }
+
+        handler this.onPropUpdated() this.update();
 
         //-------------------
         // Function Overrides
@@ -760,10 +363,8 @@
         handler (this:Widget).build (ownerId: String) set_ptr {
             this.id = getNewId();
             createElement(this.tag, this.id, ownerId);
-            setElementAttribute(this.id, "class",this.id);
-            this.cStyle.setClassName(this.id);
-            this.update();
             this.buildCommon();
+            this.update();
         }
 
         handler (this:Widget).unbuild() set_ptr {
@@ -777,17 +378,11 @@
         handler (this:Widget).update() set_ptr {
             if this.id.getLength() > 0 {
                 setElementAttribute(this.id, "innerHTML", this.text);
-                this.cStyle.setStyle(this.style)
-                def i : int=0;
-                def styleString : String("");
-                for i=0 , i< this.selectorMap.getLength() , i++ {
-                     this.cStyle.addSelector(this.selectorMap.keyAt(i),this.selectorMap(this.selectorMap.keyAt(i)))
+                if this.ariaHidden == true {
+                   setElementAttribute(this.id, String("aria-hidden"), String("true"));
                 }
-                if this.hideAria==true {
-                   setElementAttribute(this.id, String("aria-hidden"),String("true"));
-                }
-                if this.forTag!=String("") {
-                   setElementAttribute(this.id, String("for"),this.forTag);
+                if this.targetId != "" {
+                   setElementAttribute(this.id, String("for"), this.targetId);
                 }
             }
         }
@@ -825,6 +420,8 @@
             this.textDirection = String("rtl");
         }
 
+        handler this.onPropUpdated() this.update();
+
         //-----------------
         // Member Functions
 
@@ -844,11 +441,9 @@
         handler (this:Widget).build (ownerId: String) set_ptr {
             this.id = getNewId();
             createElement("button", this.id, ownerId);
-            setElementAttribute(this.id, "class",this.id);
-            this.cStyle.setClassName(this.id);
+            this.buildCommon();
             this.update();
             this.onSignalConnectionsChanged(this.onClick~ptr, this.onClick.getConnectionCount());
-            this.buildCommon();
         }
 
         handler (this:Widget).unbuild() set_ptr {
@@ -862,12 +457,6 @@
         handler (this:Widget).update() set_ptr {
             if this.id.getLength() > 0 {
                 setElementAttribute(this.id, "innerHTML", this.text);
-                this.cStyle.setStyle(this.style)
-                def i : int=0;
-                def styleString : String("");
-                for i=0 , i< this.selectorMap.getLength() , i++ {
-                     this.cStyle.addSelector(this.selectorMap.keyAt(i),this.selectorMap(this.selectorMap.keyAt(i)))
-                }
             }
         }
 
@@ -966,13 +555,11 @@
         handler (this:Widget).build (ownerId: String) set_ptr {
             this.id = getNewId();
             createElement("textarea", this.id, ownerId);
-            setElementAttribute(this.id, "class",this.id);
-            this.cStyle.setClassName(this.id);
+            this.buildCommon();
             this.update();
             this.onSignalConnectionsChanged(this.onChanged~ptr, this.onChanged.getConnectionCount());
             this.onSignalConnectionsChanged(this.onKeyPress~ptr, this.onKeyPress.getConnectionCount());
             this.onSignalConnectionsChanged(this.onKeyUp~ptr, this.onKeyUp.getConnectionCount());
-            this.buildCommon();
         }
 
         handler (this:Widget).unbuild() set_ptr {
@@ -993,12 +580,6 @@
         handler (this:Widget).update() set_ptr {
             if this.id.getLength() > 0 {
                 setElementAttribute(this.id, "value", this._text);
-                this.cStyle.setStyle(this.style)
-                def i : int=0;
-                def styleString : String("");
-                for i=0 , i< this.selectorMap.getLength() , i++ {
-                     this.cStyle.addSelector(this.selectorMap.keyAt(i),this.selectorMap(this.selectorMap.keyAt(i)))
-                }
             }
         }
 
@@ -1107,19 +688,19 @@
             }
         }
 
+        handler this.onPropUpdated() this.update();
+
         //-------------------
         // Function Overrides
 
         handler (this:Widget).build (ownerId: String) set_ptr {
             this.id = getNewId();
             createElement("input", this.id, ownerId);
-            setElementAttribute(this.id, "class",this.id);
-            this.cStyle.setClassName(this.id);
+            this.buildCommon();
             this.update();
             this.onSignalConnectionsChanged(this.onChanged~ptr, this.onChanged.getConnectionCount());
             this.onSignalConnectionsChanged(this.onKeyPress~ptr, this.onKeyPress.getConnectionCount());
             this.onSignalConnectionsChanged(this.onKeyUp~ptr, this.onKeyUp.getConnectionCount());
-            this.buildCommon();
         }
 
         handler (this:Widget).unbuild() set_ptr {
@@ -1140,16 +721,10 @@
         handler (this:Widget).update() set_ptr {
             if this.id.getLength() > 0 {
                 setElementAttribute(this.id, "value", this._text);
-                this.cStyle.setStyle(this.style)
-                def i : int=0;
-                def styleString : String("");
-                for i=0 , i< this.selectorMap.getLength() , i++ {
-                     this.cStyle.addSelector(this.selectorMap.keyAt(i),this.selectorMap(this.selectorMap.keyAt(i)))
-                }
                 setElementAttribute(this.id, "type", this.inputType);
                 setElementAttribute(this.id, "placeholder", this.placeholder);
-                if this.hideAria==true{
-                    setElementAttribute(this.id, String("aria-hidden"),String("true"));
+                if this.hideAria == true {
+                    setElementAttribute(this.id, String("aria-hidden"), String("true"));
                 }
             }
         }
@@ -1172,7 +747,6 @@
     // Select
     class Select {
         @injection def widget: Widget;
-        //def items : Map[String,String];
 
         //-----------------------
         // Properties and Signals
@@ -1206,17 +780,17 @@
             }
         }
 
+        handler this.onPropUpdated() this.update();
+
         //-------------------
         // Function Overrides
 
         handler (this:Widget).build (ownerId: String) set_ptr {
             this.id = getNewId();
             createElement("select", this.id, ownerId);
-            setElementAttribute(this.id, "class",this.id);
-            this.cStyle.setClassName(this.id);
+            this.buildCommon();
             this.update();
             this.onSignalConnectionsChanged(this.onChanged~ptr, this.onChanged.getConnectionCount());
-            this.buildCommon();
         }
 
         handler (this:Widget).unbuild() set_ptr {
@@ -1230,18 +804,13 @@
         handler (this:Widget).update() set_ptr {
             if this.id.getLength() > 0 {
                 //setElementAttribute(this.id, "value", this._text);
-                def i : int =0;
-                def htmlVal : String="";
-                for i=0 , i< this.items.getLength() , i++ {
-                htmlVal+=String("<option value= \"")+this.items.keyAt(i) + String("\">") +this.items(this.items.keyAt(i)) + String("</option>")
+                def i: Int = 0;
+                def htmlVal: String;
+                for i = 0, i < this.items.getLength(), ++i {
+                    htmlVal += String("<option value= \"") +
+                        this.items.keyAt(i) + "\">" + this.items.valAt(i) + "</option>";
                 }
-                logToConsole(String(" htmlVal : ")+htmlVal);
                 setElementAttribute(this.id, "innerHTML", htmlVal);
-                this.cStyle.setStyle(this.style)
-                def styleString : String("");
-                for i=0 , i< this.selectorMap.getLength() , i++ {
-                     this.cStyle.addSelector(this.selectorMap.keyAt(i),this.selectorMap(this.selectorMap.keyAt(i)))
-                }
                 if this.hideAria==true{
                     setElementAttribute(this.id, String("aria-hidden"),String("true"));
                 }
@@ -1294,27 +863,27 @@
             if this.child.obj~ptr != 0 && this.id.getLength() > 0 this.child.build(this.id);
         }
 
+        handler this.onPropUpdated() this.update();
+
         //-------------------
         // Function Overrides
 
         handler (this:Widget).build (ownerId: String) set_ptr {
             this.id = getNewId();
             createElement("a", this.id, ownerId);
-            setElementAttribute(this.id, "class",this.id);
-            this.cStyle.setClassName(this.id);
+            this.buildCommon();
             this.update();
 
             if this.child.obj~ptr != 0 this.child.build(this.id);
-            this.buildCommon();
         }
 
         handler (this:Widget).unbuild() set_ptr {
             if this.id.getLength() > 0 {
                 deleteElement(this.id);
+                this.unbuildCommon();
 
                 if this.child.obj~ptr != 0 this.child.unbuild();
 
-                this.unbuildCommon();
                 this.id = String();
             }
         }
@@ -1323,12 +892,6 @@
             if this.id.getLength() > 0 {
                 setElementAttribute(this.id, "href", this.url);
                 setElementAttribute(this.id, "style", "text-decoration: none;");
-                this.cStyle.setStyle(this.style)
-                def i : int=0;
-                def styleString : String("");
-                for i=0 , i< this.selectorMap.getLength() , i++ {
-                     this.cStyle.addSelector(this.selectorMap.keyAt(i),this.selectorMap(this.selectorMap.keyAt(i)))
-                }
             }
         }
 

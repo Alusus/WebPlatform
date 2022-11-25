@@ -1,0 +1,335 @@
+@merge module WebPlatform {
+    //==========================================================================
+    // Styles
+    // Holds styling properties for widgets.
+    class Style {
+        // Variables
+
+        def id: String;
+        def selector: String;
+        def onUpdated: closure();
+
+        // Properties
+        generateProperty[width, Width, String];
+        generateProperty[maxWidth, MaxWidth, String];
+        generateProperty[height, Height, String];
+        generateProperty[maxHeight, MaxHeight, String];
+        generateProperty[border, Border, Quad];
+        generateProperty[borderColor, BorderColor, Color];
+        generateProperty[borderRadius, BorderRadius, Quad];
+        generateProperty[borderStyle, BorderStyle, String];
+        generateProperty[position, Position, String];
+        generateProperty[minHeight, MinHeight, String];
+        generateProperty[zIndex, ZIndex, String];
+        generateProperty[layout, Layout, String];
+        generateProperty[justify, Justify, String];
+        generateProperty[margin, Margin, Quad];
+        generateProperty[align, Align, String];
+        generateProperty[direction, Direction, String];
+        generateProperty[padding, Padding, Quad];
+        generateProperty[fontSize, FontSize, Float];
+        generateProperty[fontColor, FontColor, Color];
+        generateProperty[transition, Transition, String];
+        generateProperty[textAlign, TextAlign, String];
+        generateProperty[textDirection, TextDirection, String];
+        generateProperty[transform, Transform, String];
+        generateProperty[overflow, Overflow, String];
+        generateProperty[boxShadow, BoxShadow, String];
+        generateProperty[display, Display, String];
+        generateProperty[cursor, Cursor, String];
+        generateProperty[top, Top, String];
+        generateProperty[left, Left, String];
+        generateProperty[right, Right, String];
+        generateProperty[bottom, Bottom, String];
+
+        generateProperty[background, Background, String];
+        handler this.setBackground(color: temp_ref[Color]) {
+            this.vbackground = String.format("rgba(%i, %i, %i, %i)", color.red, color.green, color.blue, color.alpha);
+            this.onPropUpdated();
+        }
+        handler this.background = (val: temp_ref[Color]) {
+            this.setBackground(val);
+            return val;
+        }
+
+        def vanimation: SrdRef[Animation];
+        handler this.setAnimation (val: SrdRef[Animation]) {
+            if !this.vanimation.isNull() and this.id != "" this.vanimation.unbuild();
+            this.vanimation = val;
+            if !this.vanimation.isNull() and this.id != "" this.vanimation.build();
+            this.onPropUpdated();
+        }
+        handler this.getAnimation (): SrdRef[Animation] {
+            return this.vanimation;
+        }
+        handler this.animation = (val: SrdRef[Animation]) {
+            this.setAnimation(val);
+            return this.vanimation;
+        }
+        handler this.animation: SrdRef[Animation] {
+            return this.vanimation;
+        }
+
+        // Initializers and Operators
+
+        handler this~init() {
+            this.fontSize = 0.0;
+        }
+
+        handler this~init(ref[Style]) {
+            this = value;
+        }
+
+        handler this = ref[Style] {
+            this.background = value.background;
+            this.textDirection = value.textDirection;
+            this.textAlign = value.textAlign;
+            this.fontColor = value.fontColor;
+            this.fontSize = value.fontSize;
+            this.border = value.border;
+            this.borderColor = value.borderColor;
+            this.borderRadius = value.borderRadius;
+            this.borderStyle = value.borderStyle;
+            this.padding = value.padding;
+            this.direction = value.direction;
+            this.align = value.align;
+            this.justify = value.justify;
+            this.layout = value.layout;
+            this.zIndex = value.zIndex;
+            this.position = value.position;
+            this.width = value.width;
+            this.maxWidth = value.maxWidth;
+            this.height = value.height;
+            this.maxHeight = value.maxHeight;
+            this.animation = value.animation;
+            this.transition = value.transition;
+            this.transform = value.transform;
+            this.overflow = value.overflow;
+            this.boxShadow = value.boxShadow;
+            this.display = value.display;
+            this.cursor = value.cursor;
+            this.margin = value.margin;
+            this.minHeight = value.minHeight;
+            this.top = value.top
+            this.bottom = value.bottom
+            this.right = value.right
+            this.left = value.left
+        }
+
+        // Functions
+
+        handler this.onPropUpdated() {
+            if !this.onUpdated.isNull() this.onUpdated();
+            this.update();
+        }
+
+        handler this.build(id: String, selector: String) {
+            this.id = id;
+            this.selector = selector;
+            if !this.vanimation.isNull() this.vanimation.build();
+            this.update();
+        }
+
+        handler this.unbuild() {
+            if this.id == "" return;
+            if !this.vanimation.isNull() this.vanimation.unbuild();
+            removeStyleRule(this.id, this.selector);
+        }
+
+        handler this.update() {
+            if this.id == "" return;
+            setStyleRule(this.id, this.selector, this.getCssString());
+        }
+
+        handler this.getCssString(): String {
+            def styleRep: String;
+            if this.width != "" {
+                if this.width == String("auto-flex") {
+                    styleRep += getPropRep(String("width"), String(";flex:auto"));
+                } else {
+                    styleRep += getPropRep(String("width"), this.width);
+                }
+            }
+            if this.height != "" {
+                if this.height == String("auto-flex") {
+                    styleRep += getPropRep(String("height"), String(";flex:auto"));
+                }
+                else {
+                    styleRep += getPropRep(String("height"), this.height);
+                }
+            }
+            if this.maxWidth != "" styleRep += getPropRep(String("max-width"), this.maxWidth);
+            if this.maxHeight != "" styleRep += getPropRep(String("max-height"), this.maxHeight);
+            if this.borderRadius != Quad(0) styleRep += getPropRep(String("border-radius"), this.borderRadius);
+            if this.borderStyle != "" styleRep += getPropRep(String("border-style"), this.borderStyle);
+            if this.margin != Quad(0) styleRep += getPropRep(String("margin"), this.margin);
+            if this.padding != Quad(0) styleRep += getPropRep(String("padding"), this.padding);
+            if this.border != Quad(0) {
+                if this.border == Quad(-1) styleRep += getPropRep(String("border-width"), Quad(0));
+                styleRep += getPropRep(String("border-width"), this.border);
+            }
+            if this.borderColor != Color(0,0,0,0) styleRep += getPropRep(String("border-color"), this.borderColor);
+            if this.fontSize > 0.0 styleRep += getPropRep(String("font-size"), this.fontSize);
+            if this.fontColor != Color() styleRep += getPropRep(String("color"), this.fontColor);
+            if this.position != "" styleRep += getPropRep(String("position"), this.position);
+            if this.cursor != "" styleRep += getPropRep(String("cursor"), this.cursor);
+            if this.background != "" styleRep += getPropRep(String("background"), this.background);
+            if this.top != "" styleRep += getPropRep(String("top"), this.top);
+            if this.left != "" styleRep += getPropRep(String("left"), this.left);
+            if this.right != "" styleRep += getPropRep(String("right"), this.right);
+            if this.bottom != "" styleRep += getPropRep(String("bottom"), this.bottom);
+            if this.boxShadow != "" styleRep += getPropRep(String("box-shadow"), this.boxShadow);
+            if this.display != "" styleRep += getPropRep(String("display"), this.display);
+            if this.overflow != "" styleRep += getPropRep(String("overflow"), this.overflow);
+            if this.transition != "" styleRep += getPropRep(String("transition"), this.transition);
+            if this.textAlign != "" styleRep += getPropRep(String("text-align"), this.textAlign);
+            if this.textDirection != "" styleRep += getPropRep(String("direction"), this.textDirection);
+            if this.transform != "" styleRep += getPropRep(String("transform"), this.transform);
+            if this.minHeight != "" styleRep += getPropRep(String("min-height"), this.minHeight);
+            if this.zIndex != "" styleRep += getPropRep(String("z-index"), this.zIndex);
+            if this.layout != "" styleRep += getPropRep(String("display:flex;flex-direction"), this.layout);
+            if this.justify != "" styleRep += getPropRep(String("justify-content"), this.justify);
+            if this.align != "" styleRep += getPropRep(String("align-items"), this.align);
+            if this.direction != "" styleRep += getPropRep(String("direction"), this.direction);
+            if !this.vanimation.isNull() {
+                styleRep += getPropRep(String("animation-name"), this.vanimation.name);
+                styleRep += getPropRep(String("animation-duration"), String("") + this.vanimation.totalDuration + "s");
+            }
+            return styleRep;
+        }
+
+        func getPropRep(prop: String, val: String): String {
+            return String.format("%s:%s;", prop.buf, val.buf);
+        }
+        func getPropRep(prop: String,  val: float): String {
+            return String.format("%s:%f;", prop.buf, val);
+        }
+        func getPropRep(prop: String, val: Quad): String {
+            return String.format("%s:%fpt %fpt %fpt %fpt;", prop.buf, val.top, val.right, val.bottom, val.left);
+        }
+        func getPropRep(prop: String, val: Color): String {
+            return String.format("%s:rgba(%i, %i, %i, %i);", prop.buf, val.red, val.green, val.blue, val.alpha);
+        }
+    }
+
+    //==========================================================================
+    // StyleSet
+    // Manages a set of styles for an element in different states.
+    class StyleSet {
+        @injection def mainStyle: Style;
+        def otherStyles: Map[String, Style];
+        def className: String = getNewId();
+        def buildCounter: Int = 0;
+
+        handler this~init() {}
+
+        handler this(state: String): ref[Style] {
+            return this.otherStyles(state);
+        }
+
+        handler this.build() {
+            if this.buildCounter++ > 0 return;
+
+            createElement("style", this.className, "body");
+            def selector: String = String(".") + this.className;
+            this.mainStyle.build(this.className, selector);
+            selector += ':';
+            def i: Int;
+            for i = 0, i < this.otherStyles.getLength(), i++ {
+                this.otherStyles.valAt(i).build(this.className, selector + this.otherStyles.keyAt(i));
+            }
+        }
+
+        handler this.unbuild() {
+            if this.buildCounter == 0 return;
+            if --this.buildCounter > 0 return;
+
+            deleteElement(this.className);
+            this.mainStyle.unbuild();
+            def i: Int;
+            for i = 0, i < this.otherStyles.getLength(), i++ {
+                this.otherStyles.valAt(i).unbuild();
+            }
+        }
+
+        handler this_type(): SrdRef[StyleSet] {
+            return SrdRef[StyleSet].construct();
+        }
+    }
+
+
+    //==========================================================================
+    // Animation
+    // class to deal with keyframes and animation
+    class Animation {
+        def name : String = getNewId();
+        def buildCounter: Int = 0;
+        def styles: Map[Float, Style];
+        def totalDuration: Float;
+        def onUpdated: closure() = closure() {
+            this.update();
+        }
+
+        handler this~init() {}
+        handler this~init(styles: Array[Style]) this.set(styles);
+        handler this~init(styles: Map[Float, Style]) this.set(styles);
+
+        handler this.set(totalDuration: Float, styles: Array[Style]) {
+            this.totalDuration = totalDuration;
+            this.styles.values = styles;
+
+            def i: Int = 0;
+            def sectionSize: Float = 100f / (styles.getLength() - 1);
+            for i = 0, i < styles.getLength(), i += 1 {
+                this.styles.keys.add(i * sectionSize);
+                this.styles.values(i).onUpdated = this.onUpdated;
+            }
+        }
+        handler this.set(totalDuration: Float, styles: Map[Float, Style]) {
+            this.totalDuration = totalDuration;
+            this.styles = styles;
+
+            def i: Int = 0;
+            for i = 0, i < this.styles.getLength(), i += 1 {
+                this.styles(i).onUpdated = this.onUpdated;
+            }
+        }
+
+        handler this.build() {
+            if this.buildCounter++ > 0 return;
+
+            createElement("style", this.name, "body");
+            this.update();
+        }
+
+        handler this.unbuild() {
+            if this.buildCounter == 0 return;
+            if --this.buildCounter > 0 return;
+
+            deleteElement(this.name);
+        }
+
+        handler this.update() {
+            if this.buildCounter == 0 return;
+
+            def cssString: String = String("@keyframes ") + this.name + String(" {");
+            def i: Int;
+            for i = 0, i < this.styles.getLength(), ++i {
+                cssString = cssString + this.styles.keyAt(i) + "% {" + this.styles(i).getCssString() + "}";
+            }
+            cssString += String("}");
+            setElementAttribute(this.name, "innerHTML", cssString);
+        }
+
+        handler this_type(): SrdRef[Animation] {
+            return SrdRef[Animation].construct();
+        }
+        handler this_type(totalDuration: Float, styles: Array[Style]): SrdRef[Animation] {
+            return SrdRef[Animation].construct().{ set(totalDuration, styles) };
+        }
+        handler this_type(totalDuration: Float, styles: Map[Float, Style]): SrdRef[Animation] {
+            return SrdRef[Animation].construct().{ set(totalDuration, styles) };
+        }
+    }
+}
+

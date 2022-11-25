@@ -32,26 +32,9 @@ wasmApi.createElement = (elementType, elementName, parentName) => {
     element.setAttribute('id', toJsString(elementName));
 }
 
-wasmApi.addStyleTag= ( elementBody) => {
-  var check =  document.querySelector('style');
-  if(check !== null)
-  {
-      check.type = 'text/css';
-      check.innerHTML = toJsString(elementBody);
-      document.getElementsByTagName('head')[0].appendChild(check);
-  }
-  else
-   {
-      var style=document.createElement('style');
-      style.type = 'text/css';
-      style.innerHTML = toJsString(elementBody);
-      document.getElementsByTagName('head')[0].appendChild(style);
-  }
-}
-
 wasmApi.deleteElement = (elementName) => {
     const element = document.getElementById(toJsString(elementName));
-    if (! element) return;
+    if (!element) return;
     if (element.dataset.resizeObserverCbId) resizeObserver.unobserve(element);
     if (element) element.remove();
 }
@@ -66,10 +49,37 @@ wasmApi.setElementAttribute = (elementName, propName, value) => {
         document.getElementById(toJsString(elementName)).setAttribute(prop, toJsString(value));
     }
 }
-wasmApi.selectItem = (elementName, value) => {
-        document.getElementById(toJsString(elementName)).value = toJsString(value);
 
+wasmApi.setStyleRule = (elementName, styleSelector, styleCss) => {
+    const element = document.getElementById(toJsString(elementName));
+    if (!element || !element.sheet) return;
+    const selectorText = toJsString(styleSelector);
+    const cssText = toJsString(styleCss);
+    for (var i = 0; i < element.sheet.rules.length; ++i) {
+        if (element.sheet.rules[i].selectorText == selectorText) {
+            element.sheet.removeRule(i);
+            break;
+        }
+    }
+    element.sheet.insertRule(`${selectorText} { ${cssText} }`);
 }
+
+wasmApi.removeStyleRule = (elementName, styleSelector) => {
+    const element = document.getElementById(toJsString(elementName));
+    if (!element || !element.sheet) return;
+    const selectorText = toJsString(styleSelector);
+    for (var i = 0; i < element.sheet.rules.length; ++i) {
+        if (element.sheet.rules[i].selectorText == selectorText) {
+            element.sheet.removeRule(i);
+            break;
+        }
+    }
+}
+
+wasmApi.selectItem = (elementName, value) => {
+    document.getElementById(toJsString(elementName)).value = toJsString(value);
+}
+
 wasmApi.getSelectedItemValue = (selectId) => {
     var select = document.getElementById(toJsString(selectId));
     var value = select.options[select.selectedIndex].value;
