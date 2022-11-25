@@ -80,7 +80,7 @@
             this.left = value.left;
         }
         handler this == ref[Quad] : bool {
-            if(this.top==value.top && this.right==value.right && this.bottom==value.bottom && this.left==value.left)
+            if (this.top==value.top && this.right==value.right && this.bottom==value.bottom && this.left==value.left)
                 return true;
             return false;
         }

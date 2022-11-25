@@ -348,7 +348,6 @@
         handler this~init(t: String) {
             this.tag = String("span");
             this.text = t;
-            this.fontSize = 10.0;
             this.textAlign = String("right");
             this.textDirection = String("rtl");
             this.ariaHidden = false;
@@ -415,7 +414,6 @@
         handler this~init(t: String) {
             this.onClick.owner~no_deref = this;
             this.text = t;
-            this.fontSize = 10.0;
             this.textAlign = String("right");
             this.textDirection = String("rtl");
         }
@@ -511,7 +509,6 @@
             this.onChanged.owner~no_deref = this;
             this.onKeyPress.owner~no_deref = this;
             this.onKeyUp.owner~no_deref = this;
-            this.fontSize = 10.0;
             this.textAlign = String("right");
             this.textDirection = String("rtl");
         }
@@ -604,7 +601,7 @@
 
         generateProperty[inputType, InputType, String];
         generateProperty[placeholder, Placeholder, String];
-        generateProperty[hideAria, HideAria, bool];
+        generateProperty[ariaHidden, AriaHidden, bool];
 
         def _text: String;
         handler this.setText (t: String) {
@@ -638,21 +635,19 @@
             this.onChanged.owner~no_deref = this;
             this.onKeyPress.owner~no_deref = this;
             this.onKeyUp.owner~no_deref = this;
-            this.fontSize = 10.0;
             this.textAlign = String("right");
             this.textDirection = String("rtl");
-            this.inputType=String("text");
-            this.hideAria=false;
+            this.inputType = String("text");
+            this.ariaHidden = false;
         }
         handler this~init(inputType : String) {
             this.onChanged.owner~no_deref = this;
             this.onKeyPress.owner~no_deref = this;
             this.onKeyUp.owner~no_deref = this;
-            this.fontSize = 10.0;
             this.textAlign = String("right");
             this.textDirection = String("rtl");
             this.inputType=inputType;
-            this.hideAria=false;
+            this.ariaHidden = false;
         }
 
         //-----------------
@@ -723,7 +718,7 @@
                 setElementAttribute(this.id, "value", this._text);
                 setElementAttribute(this.id, "type", this.inputType);
                 setElementAttribute(this.id, "placeholder", this.placeholder);
-                if this.hideAria == true {
+                if this.ariaHidden == true {
                     setElementAttribute(this.id, String("aria-hidden"), String("true"));
                 }
             }
@@ -752,7 +747,7 @@
         // Properties and Signals
 
         generateProperty[items, Items, Map[String,String]];
-        generateProperty[hideAria, HideAria, bool];
+        generateProperty[ariaHidden, AriaHidden, bool];
 
         def onChanged: Signal[Select, Int];
         def onChangedId: ArchInt = -1;
@@ -764,7 +759,7 @@
             this.onChanged.owner~no_deref = this;
             this.textAlign = String("right");
             this.textDirection = String("rtl");
-            this.hideAria=false;
+            this.ariaHidden = false;
         }
 
         //-----------------
@@ -811,7 +806,7 @@
                         this.items.keyAt(i) + "\">" + this.items.valAt(i) + "</option>";
                 }
                 setElementAttribute(this.id, "innerHTML", htmlVal);
-                if this.hideAria==true{
+                if this.ariaHidden == true{
                     setElementAttribute(this.id, String("aria-hidden"),String("true"));
                 }
             }

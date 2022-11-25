@@ -73,7 +73,7 @@
         // Initializers and Operators
 
         handler this~init() {
-            this.fontSize = 0.0;
+            this.fontSize = 10.0;
         }
 
         handler this~init(ref[Style]) {
@@ -164,12 +164,9 @@
             if this.borderStyle != "" styleRep += getPropRep(String("border-style"), this.borderStyle);
             if this.margin != Quad(0) styleRep += getPropRep(String("margin"), this.margin);
             if this.padding != Quad(0) styleRep += getPropRep(String("padding"), this.padding);
-            if this.border != Quad(0) {
-                if this.border == Quad(-1) styleRep += getPropRep(String("border-width"), Quad(0));
-                styleRep += getPropRep(String("border-width"), this.border);
-            }
+            if this.border != Quad(0) styleRep += getPropRep(String("border-width"), this.border);
             if this.borderColor != Color(0,0,0,0) styleRep += getPropRep(String("border-color"), this.borderColor);
-            if this.fontSize > 0.0 styleRep += getPropRep(String("font-size"), this.fontSize);
+            if this.fontSize > 0.0 styleRep += getPropRep(String("font-size"), String() + this.fontSize + "pt");
             if this.fontColor != Color() styleRep += getPropRep(String("color"), this.fontColor);
             if this.position != "" styleRep += getPropRep(String("position"), this.position);
             if this.cursor != "" styleRep += getPropRep(String("cursor"), this.cursor);

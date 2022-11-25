@@ -24,6 +24,7 @@ func createHeader (): SrdRef[Widget] {
         background = PrimeryColor;
         borderColor = PrimeryColor;
         border = Quad(1.5);
+        borderStyle = String("solid");
 
         addChildren({
             Label.new(String("أمثلة منصة ويب الأسس - مرسم")).{
