@@ -18,11 +18,6 @@ const resizeObserver = new ResizeObserver(entries => {
     }
 });
 
-//map func init
-
-wasmApi.printf=()=>{}
-wasmApi.exit=()=>{}
-
 // Element Management APIs
 
 wasmApi.createElement = (elementType, elementName, parentName) => {
@@ -31,49 +26,12 @@ wasmApi.createElement = (elementType, elementName, parentName) => {
     parent.appendChild(element);
     element.setAttribute('id', toJsString(elementName));
 }
-wasmApi.httpRedirect = (page) => {
-    window.location.replace(toJsString(page));
-}
-wasmApi.addVarToSession = (varName, varValue) => {
-    sessionStorage.setItem(toJsString(varName),toJsString(varValue));
-}
-wasmApi.setCookie = (cname, cvalue, exdays) =>{
-  const d = new Date();
-  d.setTime(d.getTime() + (parseInt(toJsString(exdays)) * 24 * 60 * 60 * 1000));
-  let expires = "expires="+d.toUTCString();
-  document.cookie = toJsString(cname) + "=" + toJsString(cvalue) + ";" + expires + ";path=/";
-}
-
-wasmApi.getCookie = (cname) =>{
-  let name = toJsString(cname) + "=";
-  let ca = document.cookie.split(';');
-  for(let i = 0; i < ca.length; i++) {
-    let c = ca[i];
-    while (c.charAt(0) == ' ') {
-      c = c.substring(1);
-    }
-    if (c.indexOf(name) == 0) {
-      return toWasmString(c.substring(name.length, c.length));
-    }
-  }
-  return toWasmString("");
-}
 
 wasmApi.deleteElement = (elementName) => {
     const element = document.getElementById(toJsString(elementName));
     if (!element) return;
     if (element.dataset.resizeObserverCbId) resizeObserver.unobserve(element);
     if (element) element.remove();
-}
-wasmApi.setElementAttribute = (elementName, propName, value) => {
-    const prop = toJsString(propName);
-    if (prop === 'innerHTML') {
-        document.getElementById(toJsString(elementName)).innerHTML = toJsString(value);
-    } else if (prop === 'value') {
-        document.getElementById(toJsString(elementName)).value = toJsString(value);
-    } else {
-        document.getElementById(toJsString(elementName)).setAttribute(prop, toJsString(value));
-    }
 }
 
 wasmApi.setStyleRule = (elementName, styleSelector, styleCss) => {
@@ -102,19 +60,15 @@ wasmApi.removeStyleRule = (elementName, styleSelector) => {
     }
 }
 
-wasmApi.selectItem = (elementName, value) => {
-    document.getElementById(toJsString(elementName)).value = toJsString(value);
-}
-
-wasmApi.getVarValue = (varName) => {
-    var value = sessionStorage.getItem(toJsString(varName));
-    return toWasmString(value);
-}
-
-wasmApi.getSelectedItemValue = (selectId) => {
-    var select = document.getElementById(toJsString(selectId));
-    var value = select.options[select.selectedIndex].value;
-    return toWasmString(value);
+wasmApi.setElementAttribute = (elementName, propName, value) => {
+    const prop = toJsString(propName);
+    if (prop === 'innerHTML') {
+        document.getElementById(toJsString(elementName)).innerHTML = toJsString(value);
+    } else if (prop === 'value') {
+        document.getElementById(toJsString(elementName)).value = toJsString(value);
+    } else {
+        document.getElementById(toJsString(elementName)).setAttribute(prop, toJsString(value));
+    }
 }
 
 wasmApi.getElementAttribute = (elementName, propName) => {
@@ -131,6 +85,18 @@ wasmApi.getElementDimensions = (elementName, pResult) => {
     const resultArray = new Int32Array(wasmMemory.buffer, pResult, 2);
     resultArray[0] = element.clientWidth;
     resultArray[1] = element.clientHeight;
+}
+
+// Element Interaction
+
+wasmApi.selectItem = (elementName, value) => {
+    document.getElementById(toJsString(elementName)).value = toJsString(value);
+}
+
+wasmApi.getSelectedItemValue = (selectId) => {
+    var select = document.getElementById(toJsString(selectId));
+    var value = select.options[select.selectedIndex].value;
+    return toWasmString(value);
 }
 
 // Event Loop APIs
@@ -536,13 +502,52 @@ wasmApi.exitFullScreen = () => {
     document.exitFullscreen();
 }
 
+wasmApi.httpRedirect = (page) => {
+    window.location.replace(toJsString(page));
+}
+
+wasmApi.setCookie = (cname, cvalue, exdays) => {
+  const d = new Date();
+  d.setTime(d.getTime() + (parseInt(toJsString(exdays)) * 24 * 60 * 60 * 1000));
+  let expires = "expires=" + d.toUTCString();
+  document.cookie = toJsString(cname) + "=" + toJsString(cvalue) + ";" + expires + ";path=/";
+}
+
+wasmApi.getCookie = (cname) => {
+  let name = toJsString(cname) + "=";
+  let ca = document.cookie.split(';');
+  for(let i = 0; i < ca.length; i++) {
+    let c = ca[i];
+    while (c.charAt(0) == ' ') {
+      c = c.substring(1);
+    }
+    if (c.indexOf(name) == 0) {
+      return toWasmString(c.substring(name.length, c.length));
+    }
+  }
+  return toWasmString("");
+}
+
+wasmApi.addVarToSession = (varName, varValue) => {
+    sessionStorage.setItem(toJsString(varName),toJsString(varValue));
+}
+
+wasmApi.getVarFromSession = (varName) => {
+    return sessionStorage.getItem(toJsString(varName));
+}
+
 wasmApi.logToConsole = (msg) => {
   console.log(toJsString(msg));
 }
 
+// Libc Functions
+
 wasmApi.rand = () => {
   return Math.floor(Math.random() * 1073741823);
 }
+
+wasmApi.printf = ()=>{}
+wasmApi.exit = ()=>{}
 
 // Helper Functions
 
