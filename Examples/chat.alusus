@@ -43,9 +43,10 @@ func createHeader (): SrdRef[Widget] {
         width = String("100%");
         height = String("80pt");
         padding = Quad(5, 0, 3, 0);
-        backgroundColor = PrimeryColor;
-        borderColor = PrimeryColor;
+        setBackground( PrimeryColor);
         border = Quad(1.5);
+        borderStyle = String("solid");
+        borderColor = PrimeryColor;
         justify = String("space-between");
 
         addChildren({
@@ -76,13 +77,13 @@ func createHeader (): SrdRef[Widget] {
                         fontSize = 16.0;
                         fontColor = Color("fff");
                         padding = Quad(3);
-                        backgroundColor = LightColor;
+                        setBackground(LightColor);
                     }),
                     Hyperlink.new(String("/about"), Label.new(String("عن البرنامج")).{
                         fontSize = 16.0;
                         fontColor = Color("fff");
                         padding = Quad(3);
-                        backgroundColor = LightColor;
+                        setBackground(LightColor);
                     })
                 });
             }
@@ -109,7 +110,6 @@ func main {
             Box.new({}).{
                 width = String("100%");
                 height = String("auto-flex");
-                border = Quad(0);
                 padding = Quad(5);
                 def notificationLabel: SrdRef[Label];
                 addChildren({
@@ -148,15 +148,16 @@ func main {
                 height = String("50pt");
                 layout = String("row");
                 border = Quad(1.5);
+                borderStyle = String("solid");
                 borderColor = PrimeryColor;
-                backgroundColor = PrimeryColor;
+                setBackground(PrimeryColor);
                 def textInput: SrdRef[TextInput];
                 addChildren({
                     TextInput.new().{
                         textInput = this;
                         width = String("100%");
                         height = String("100%");
-                        backgroundColor = Color("fff");
+                        setBackground(Color("fff"));
                         fontSize = 12.0;
                         onKeyUp.connect(closure (widget: ref[TextInput], payload: ref[String]) {
                             if payload == "Shift+Enter" {
@@ -173,7 +174,7 @@ func main {
                     Button.new(String("أرسل")).{
                         height = String("100%");
                         width = String("50pt");
-                        backgroundColor = Color(200, 200, 200);
+                        setBackground(Color(200, 200, 200));
                         fontSize = 16.0;
                         onClick.connect(closure (widget: ref[Button], payload: ref[Int]) {
                             def newData: String = String("- ") + encodeHtml(textInput.getText()).trim();

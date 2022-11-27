@@ -2,11 +2,17 @@
     // Element Management
     @expname[createElement] function createElement (type: ptr[Char], name: ptr[Char], parent: ptr[Char]);
     @expname[deleteElement] function deleteElement (name: ptr[Char]);
+    @expname[setStyleRule] function setStyleRule (name: ptr[Char], selector: ptr[Char], css: ptr[Char]);
+    @expname[removeStyleRule] function removeStyleRule (name: ptr[Char], selector: ptr[Char]);
     @expname[setElementAttribute] function setElementAttribute (name: ptr[Char], prop: ptr[Char], value: ptr[Char]);
     @expname[getElementAttribute] function getElementAttribute (name: ptr[Char], prop: ptr[Char]): ptr[array[Char]];
     @expname[getElementDimensions] function getElementDimensions (name: ptr[Char], result: ref[Dimensions]);
+    // Element Interaction
+    @expname[selectItem] function selectItem (selectId: ptr[Char], selectedValue: ptr[Char]);
+    @expname[getSelectedItemValue] function getSelectedItemValue ( selectId: ptr[Char]):ptr[array[Char]];
     // Event Loop
     @expname[fetchNextEvent] function fetchNextEvent (): ptr[array[Char]];
+    @expname[httpRedirect] function httpRedirect (address : ptr[Char])
     @expname[registerElementEventHandler] function _registerElementEventHandler (
       elementName: ptr[Char], eventName: ptr[Char], cbId: ArchInt
     );
@@ -75,6 +81,10 @@
     @expname[exitPointerLock] function exitPointerLock();
     @expname[requestFullScreen] function requestFullScreen (elementName: ptr[Char]);
     @expname[exitFullScreen] function exitFullScreen();
+    @expname[setCookie] function setCookie (cName: ptr[Char], vName: ptr[Char], exDay: ptr[Char]);
+    @expname[getCookie] function getCookie (cName: ptr[Char]): ptr[array[Char]];
+    @expname[addVarToSession] function addVarToSession (varName: ptr[Char], varValue: ptr[Char]);
+    @expname[getVarFromSession] function getVarFromSession (varName: ptr[Char]): ptr[array[Char]];
     @expname[logToConsole] function logToConsole (msg: ptr[Char]);
 }
 

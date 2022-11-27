@@ -17,6 +17,7 @@ import "WebPlatform/server";
 import "WebPlatform/browser_api";
 import "WebPlatform/signals";
 import "WebPlatform/ui";
+import "WebPlatform/styling";
 import "WebPlatform/widgets";
 import "WebPlatform/resources";
 import "WebPlatform/main";
