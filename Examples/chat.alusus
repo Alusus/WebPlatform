@@ -44,8 +44,9 @@ func createHeader (): SrdRef[Widget] {
         height = String("80pt");
         padding = Quad(5, 0, 3, 0);
         setBackground( PrimeryColor);
-        borderColor = PrimeryColor;
         border = Quad(1.5);
+        borderStyle = String("solid");
+        borderColor = PrimeryColor;
         justify = String("space-between");
 
         addChildren({
@@ -109,7 +110,6 @@ func main {
             Box.new({}).{
                 width = String("100%");
                 height = String("auto-flex");
-                border = Quad(0);
                 padding = Quad(5);
                 def notificationLabel: SrdRef[Label];
                 addChildren({
@@ -148,6 +148,7 @@ func main {
                 height = String("50pt");
                 layout = String("row");
                 border = Quad(1.5);
+                borderStyle = String("solid");
                 borderColor = PrimeryColor;
                 setBackground(PrimeryColor);
                 def textInput: SrdRef[TextInput];

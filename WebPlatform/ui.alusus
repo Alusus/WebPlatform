@@ -11,21 +11,20 @@
         def v__propName__: propType;
         handler this.set__upperCasePropName__ (val: temp_ref[propType]) {
             this.v__propName__ = val;
-            this.update();
+            this.onPropUpdated();
         }
         handler this.get__upperCasePropName__ (): ref[propType] {
             return this.v__propName__;
         }
         handler this.propName = (val: temp_ref[propType]) {
             this.v__propName__ = val;
-            this.update();
+            this.onPropUpdated();
             return this.v__propName__;
         }
         handler this.propName: ref[propType] {
             return this.v__propName__;
         }
     }
-
 
     //==========================================================================
     // Dimensions
@@ -81,7 +80,7 @@
             this.left = value.left;
         }
         handler this == ref[Quad] : bool {
-            if(this.top==value.top && this.right==value.right && this.bottom==value.bottom && this.left==value.left)
+            if (this.top==value.top && this.right==value.right && this.bottom==value.bottom && this.left==value.left)
                 return true;
             return false;
         }
