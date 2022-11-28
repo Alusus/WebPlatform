@@ -321,11 +321,11 @@
         handler this_type(): SrdRef[Animation] {
             return SrdRef[Animation].construct();
         }
-        handler this_type(totalDuration: Float, styles: Array[Style]): SrdRef[Animation] {
-            return SrdRef[Animation].construct().{ set(totalDuration, styles) };
+        handler this_type(d: Float, s: Array[Style]): SrdRef[Animation] {
+            return SrdRef[Animation].construct().{ set(d, s) };
         }
-        handler this_type(totalDuration: Float, styles: Map[Float, Style]): SrdRef[Animation] {
-            return SrdRef[Animation].construct().{ set(totalDuration, styles) };
+        handler this_type(d: Float, s: Map[Float, Style]): SrdRef[Animation] {
+            return SrdRef[Animation].construct().{ set(d, s) };
         }
     }
 }
