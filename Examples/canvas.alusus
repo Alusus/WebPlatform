@@ -17,23 +17,26 @@ def PrimeryColor: Color("8e50ef");
 func createHeader (): SrdRef[Widget] {
     setElementAttribute("body", "style", "padding: 0; margin: 0;");
 
-    return Box.new({}).{
-        width = String("100%");
-        height = String("40pt");
-        padding = Quad(5, 0);
-        background = PrimeryColor;
-        borderColor = PrimeryColor;
-        border = Quad(1.5);
-        borderStyle = String("solid");
-
+    return Box({}).{
+        style.{
+            width = String("100%");
+            height = String("40pt");
+            padding = Quad(5, 0);
+            background = PrimeryColor;
+            borderColor = PrimeryColor;
+            border = Quad(1.5);
+            borderStyle = String("solid");
+            layout = String("column");
+        };
         addChildren({
-            Label.new(String("أمثلة منصة ويب الأسس - مرسم")).{
+            Label(String("أمثلة منصة ويب الأسس - مرسم")).{ style.{
                 fontColor = Color("fff");
                 fontSize = 21.0;
                 width = String("100%");
                 height = String("100%");
                 background = PrimeryColor;
-            },
+                margin = Quad(5, 15);
+            } },
         });
     }~cast[SrdRef[Widget]];
 }
@@ -68,72 +71,88 @@ func main {
 
     // Build the view
     def canvas: SrdRef[Canvas];
-    Window.instance.setView(Box.new({}).{
-        align = String("center");
+    Window.instance.setView(Box({}).{
+        style.{
+            align = String("center");
+            layout = String("column");
+            direction = String("rtl");
+        };
         addChildren({
             createHeader(),
-            Box.new({}).{
-                layout = String("row");
+            Box({}).{
+                style.layout = String("row");
                 addChildren({
-                    Button.new(String("شغل الموسيقى")).{
-                        height = String("30pt");
-                        width = String("120pt");
-                        background = Color(200, 200, 200);
-                        fontSize = 16.0;
+                    Button(String("شغل الموسيقى")).{
+                        style.{
+                            height = String("30pt");
+                            width = String("120pt");
+                            background = Color(200, 200, 200);
+                            fontSize = 16.0;
+                        };
                         onClick.connect(closure (music: by_ref)&(widget: ref[Button], payload: ref[Int]) {
                             music.play(true);
                         });
                     },
-                    Button.new(String("أوقف الموسيقى")).{
-                        height = String("30pt");
-                        width = String("120pt");
-                        background = Color(200, 200, 200);
-                        fontSize = 16.0;
+                    Button(String("أوقف الموسيقى")).{
+                        style.{
+                            height = String("30pt");
+                            width = String("120pt");
+                            background = Color(200, 200, 200);
+                            fontSize = 16.0;
+                        };
                         onClick.connect(closure (music: by_ref)&(widget: ref[Button], payload: ref[Int]) {
                             music.stop();
                         });
                     },
-                    Button.new(String("شغل الصوت")).{
-                        height = String("30pt");
-                        width = String("120pt");
-                        background = Color(200, 200, 200);
-                        fontSize = 16.0;
+                    Button(String("شغل الصوت")).{
+                        style.{
+                            height = String("30pt");
+                            width = String("120pt");
+                            background = Color(200, 200, 200);
+                            fontSize = 16.0;
+                        };
                         onClick.connect(closure (sound: by_ref)&(widget: ref[Button], payload: ref[Int]) {
                             sound.play(false);
                         });
                     },
-                    Button.new(String("شغل الصوت بتكرار")).{
-                        height = String("30pt");
-                        width = String("150pt");
-                        background = Color(200, 200, 200);
-                        fontSize = 16.0;
+                    Button(String("شغل الصوت بتكرار")).{
+                        style.{
+                            height = String("30pt");
+                            width = String("150pt");
+                            background = Color(200, 200, 200);
+                            fontSize = 16.0;
+                        };
                         onClick.connect(closure (sound: by_ref)&(widget: ref[Button], payload: ref[Int]) {
                             sound.play(true);
                         });
                     },
-                    Button.new(String("أوقف الصوت")).{
-                        height = String("30pt");
-                        width = String("120pt");
-                        background = Color(200, 200, 200);
-                        fontSize = 16.0;
+                    Button(String("أوقف الصوت")).{
+                        style.{
+                            height = String("30pt");
+                            width = String("120pt");
+                            background = Color(200, 200, 200);
+                            fontSize = 16.0;
+                        };
                         onClick.connect(closure (sound: by_ref)&(widget: ref[Button], payload: ref[Int]) {
                             sound.stop();
                         });
                     }
                 });
             }
-            Canvas.new().{
+            Canvas().{
                 canvas = this;
-                width = String("100%");
-                height = String("100%");
-                maxWidth = String("1280px");
-                maxHeight = String("800px");
-                bitmapWidth = String("1280px");
-                bitmapHeight = String("800px");
-                border = Quad(2);
-                borderColor = Color(0, 0, 0);
-                borderStyle = String("solid");
-                background = Color(220, 220, 220);
+                style.{
+                    width = String("100%");
+                    height = String("100%");
+                    maxWidth = String("1280px");
+                    maxHeight = String("800px");
+                    bitmapWidth = String("1280px");
+                    bitmapHeight = String("800px");
+                    border = Quad(2);
+                    borderColor = Color(0, 0, 0);
+                    borderStyle = String("solid");
+                    background = Color(220, 220, 220);
+                };
                 def dim: Dimensions(1, 1);
                 onMouseMove.connect(closure (
                     pos: by_ref, dim: by_ref, pointerLocked: by_ref
@@ -149,10 +168,10 @@ func main {
                     }
                 });
                 onMouseEnter.connect(closure (widget: ref[Widget], payload: ref[Int]) {
-                    this.borderColor = Color(0, 0, 0);
+                    this.style.borderColor = Color(0, 0, 0);
                 });
                 onMouseOut.connect(closure (widget: ref[Widget], payload: ref[Int]) {
-                    this.borderColor = Color(255, 0, 0);
+                    this.style.borderColor = Color(255, 0, 0);
                 });
                 onMouseDown.connect(closure (pressed: by_ref)&(widget: ref[Widget], payload: ref[Int]) {
                     if payload == 0 pressed = 1;

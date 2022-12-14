@@ -108,6 +108,29 @@
     }
 
     عرف طـقم_طرز: لقب StyleSet؛
+    عرف مـحدد_حالة: {
+        عرف _فعال_: لقب StateSelector.ACTIVE؛
+        عرف _معلم_: لقب StateSelector.CHECKED؛
+        عرف _مبدئي_: لقب StateSelector.DEFAULT؛
+        عرف _معطل_: لقب StateSelector.DISABLED؛
+        عرف _فارغ_: لقب StateSelector.EMPTY؛
+        عرف _ممكن_: لقب StateSelector.ENABLED؛
+        عرف _بؤرة_: لقب StateSelector.FOCUS؛
+        عرف _ملء_الشاشة_: لقب StateSelector.FULLSCREEN؛
+        عرف _حوم_: لقب StateSelector.HOVER؛
+        عرف _ضمن_النطاق_: لقب StateSelector.IN_RANGE؛
+        عرف _وسطي_: لقب StateSelector.INTERMEDIATE؛
+        عرف _باطل_: لقب StateSelector.INVALID؛
+        عرف _رابط_: لقب StateSelector.LINK؛
+        عرف _اختياري_: لقب StateSelector.OPTIONAL؛
+        عرف _خارج_النطاق_: لقب StateSelector.OUT_OF_RANGE؛
+        عرف _قراءة_فقط_: لقب StateSelector.READ_ONLY؛
+        عرف _قراءة_وكتابة_: لقب StateSelector.READ_WRITE؛
+        عرف _إلزامي_: لقب StateSelector.REQUIRED؛
+        عرف _مستهدف_: لقب StateSelector.TARGET؛
+        عرف _صالح_: لقب StateSelector.VALID؛
+        عرف _مزار_: لقب StateSelector.VISITED؛
+    }
     عرف تـحريك: لقب Animation؛
     @دمج صنف تـحريك {
         عرف حدد: لقب set؛
@@ -120,6 +143,7 @@
     @دمج صنف ودجـة {
         عرف الطراز: لقب style؛
         عرف معرف: لقب id؛
+        عرب_خصلة[اسم_الفئة، _اسم_الفئة، className, ClassName]؛
         عرف عند_تغير_الأبعاد: لقب onResize؛
         عرف عند_تحريك_المؤشر: لقب onMouseMove؛
         عرف عند_دخول_المؤشر: لقب onMouseEnter؛
@@ -133,7 +157,6 @@
 
     عرف صـندوق : لقب Box؛
     @دمج صنف صـندوق {
-        عرف أنشئ: لقب new؛
         عرف فروع: لقب children؛
         عرف أضف_فروع: لقب addChildren؛
         عرف أزل_فروع: لقب removeChildren؛
@@ -142,34 +165,29 @@
     عرف مـرسم: لقب Canvas؛
     @دمج صنف مـرسم {
         عرف معرف_مورد: لقب resourceId؛
-        عرف أنشئ: لقب new؛
         عرب_خصلة[عرض_الصورة، _عرض_الصورة، bitmapWidth، BitmapWidth]؛
         عرب_خصلة[طول_الصورة، _طول_الصورة، bitmapHeight، BitmapHeight]؛
     }
 
     عرف صـورة: لقب Image؛
     @دمج صنف صـورة {
-        عرف أنشئ: لقب new؛
         عرب_خصلة[الرابط، _الرابط، url، Url]؛
     }
 
     عرف عـنوان: لقب Label؛
     @دمج صنف عـنوان {
-        عرف أنشئ: لقب new؛
         عرب_خصلة[النص، _النص، text، Text]؛
         عرب_خصلة[المعرف_المستهدف، _المعرف_المستهدف، targetId، TargetId]؛
     }
 
     عرف الـزر: لقب Button؛
     @دمج صنف الـزر {
-        عرف أنشئ: لقب new؛
         عرب_خصلة[النص، _النص، text، Text]؛
         عرف عند_الضغط: لقب onClick؛
     }
 
     عرف مـدخل_نص: لقب TextInput؛
     @دمج صنف مـدخل_نص {
-        عرف أنشئ: لقب new؛
         عرب_خصلة[النص، _النص، text، Text]؛
         عرف عند_الغيير: لقب onChanged؛
         عرف عند_كبس_مفتاح: لقب onKeyPress؛
@@ -178,7 +196,6 @@
 
     عرف مـدخل: لقب Input؛
     @دمج صنف مـدخل {
-        عرف أنشئ: لقب new؛
         عرب_خصلة[النص، _النص، text، Text]؛
         عرب_خصلة[صنف_الإدخال، _صنف_الإدخال، inputType، InputType]؛
         عرب_خصلة[قيمة_وصفية، _قيمة_وصفية، placeholder، Placeholder]؛
@@ -189,17 +206,20 @@
 
     عرف خـيارات: لقب Select؛
     @دمج صنف خـيارات {
-        عرف أنشئ: لقب new؛
         عرب_خصلة[العناصر، _العناصر، items، Items]؛
         عرف عند_الغيير: لقب onChanged؛
     }
 
     عرف ارتـباط_تشعبي: لقب Hyperlink؛
     @دمج صنف ارتـباط_تشعبي {
-        عرف أنشئ: لقب new؛
         عرف فرع: لقب child؛
         عرف حدد_الفرع: لقب setChild؛
         عرب_خصلة[العنوان، _العنوان، url، Url]؛
+    }
+
+    عرف مـركب: لقب Component؛
+    @دمج صنف مـركب {
+        عرف المشهد: لقب view؛
     }
 
     //==========================================================================

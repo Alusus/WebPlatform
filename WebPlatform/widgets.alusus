@@ -3,9 +3,12 @@
     // Widget
     // The base class of all widgets.
     class Widget {
-        // Styles
-        @injection def style: SrdRef[StyleSet];
+        // Variables
+        def _style: SrdRef[StyleSet];
         def id: String;
+
+        // Properties
+        generateProperty[className, ClassName, String];
 
         // Events
         def onResize: Signal[Widget, Int];
@@ -22,7 +25,6 @@
         def onMouseUpId: ArchInt = -1;
 
         handler this~init() {
-            this.style = SrdRef[StyleSet].construct();
             this.onResize.owner~no_deref = this;
             this.onMouseMove.owner~no_deref = this;
             this.onMouseEnter.owner~no_deref = this;
@@ -41,9 +43,21 @@
         //-----------------
         // Member Functions
 
+        handler this.onPropUpdated() this.updateCommon();
+
+        handler this.style: SrdRef[StyleSet] {
+            if this._style.isNull() {
+                this._style = SrdRef[StyleSet].construct();
+                if this.id != "" {
+                    this._style.build();
+                    this.updateCommon();
+                }
+            }
+            return this._style;
+        }
+
         handler this.buildCommon() {
-            setElementAttribute(this.id, "class", this.style.className);
-            this.style.build();
+            if not this._style.isNull() this._style.build();
             this.onSignalConnectionsChanged(this.onResize~ptr, this.onResize.getConnectionCount());
             this.onSignalConnectionsChanged(this.onMouseMove~ptr, this.onMouseMove.getConnectionCount());
             this.onSignalConnectionsChanged(this.onMouseEnter~ptr, this.onMouseEnter.getConnectionCount());
@@ -53,7 +67,14 @@
         }
 
         handler this.unbuildCommon() {
-            this.style.unbuild();
+            if not this._style.isNull() this._style.unbuild();
+        }
+
+        handler this.updateCommon() {
+            if this.id != "" {
+                if this._style.isNull() setElementAttribute(this.id, "class", this.className)
+                else setElementAttribute(this.id, "class", this.className + " " + this._style.className);
+            }
         }
 
         handler this.onSignalConnectionsChanged(signal: ptr[Signal[Widget, Int]], connectionCount: Int) {
@@ -138,9 +159,6 @@
         // Handlers
 
         handler this~init() {
-            this.setLayout(String("column"))
-            this.justify = String("space-around");
-            this.direction = String("rtl");
         }
 
         handler this.addChildren (count: Int, children: ...temp_ref[SrdRef[Widget]]) {
@@ -194,12 +212,13 @@
         }
 
         handler (this:Widget).update() set_ptr {
+            this.updateCommon();
         }
 
         //-----------------
         // Shared Functions
 
-        function new (count: Int, args: ...temp_ref[SrdRef[Widget]]): SrdRef[Box] {
+        handler this_type(count: Int, args: ...temp_ref[SrdRef[Widget]]): SrdRef[Box] {
             def r: SrdRef[Box];
             r.alloc()~init();
             while count-- > 0 r.addChildren({ args~next_arg[ref[SrdRef[Widget]]] });
@@ -225,7 +244,6 @@
         // Handlers
 
         handler this~init() {
-            this.borderColor~init(255, 255, 255);
         }
 
         handler this.onPropUpdated() this.update();
@@ -252,6 +270,7 @@
 
         handler (this:Widget).update() set_ptr {
             if this.id.getLength() > 0 {
+                this.updateCommon();
                 setElementAttribute(this.id, "width", this.bitmapWidth);
                 setElementAttribute(this.id, "height", this.bitmapHeight);
             }
@@ -265,7 +284,7 @@
         //-----------------
         // Shared Functions
 
-        function new (): SrdRef[Canvas] {
+        handler this_type(): SrdRef[Canvas] {
             def r: SrdRef[Canvas];
             r.alloc()~init();
             return r;
@@ -313,6 +332,7 @@
 
         handler (this:Widget).update() set_ptr {
             if this.id.getLength() > 0 {
+                this.updateCommon();
                 setElementAttribute(this.id, "src", this.url);
             }
         }
@@ -320,13 +340,13 @@
         //-----------------
         // Shared Functions
 
-        function new (u: ptr[array[Char]]): SrdRef[Image] {
+        handler this_type(u: ptr[array[Char]]): SrdRef[Image] {
             def r: SrdRef[Image];
             r.alloc()~init(u);
             return r;
         }
-        function new (): SrdRef[Image] {
-            return new("");
+        handler this_type(): SrdRef[Image] {
+            return Image("");
         }
     }
 
@@ -348,8 +368,6 @@
         handler this~init(t: String) {
             this.tag = String("span");
             this.text = t;
-            this.textAlign = String("right");
-            this.textDirection = String("rtl");
             this.ariaHidden = false;
             this.targetId = String("");
         }
@@ -376,6 +394,7 @@
 
         handler (this:Widget).update() set_ptr {
             if this.id.getLength() > 0 {
+                this.updateCommon();
                 setElementAttribute(this.id, "innerHTML", this.text);
                 if this.ariaHidden == true {
                    setElementAttribute(this.id, String("aria-hidden"), String("true"));
@@ -389,7 +408,7 @@
         //-----------------
         // Shared Functions
 
-        function new (t: String): SrdRef[Label] {
+        handler this_type(t: String): SrdRef[Label] {
             def r: SrdRef[Label];
             r.alloc()~init(t);
             return r;
@@ -414,8 +433,6 @@
         handler this~init(t: String) {
             this.onClick.owner~no_deref = this;
             this.text = t;
-            this.textAlign = String("right");
-            this.textDirection = String("rtl");
         }
 
         handler this.onPropUpdated() this.update();
@@ -454,6 +471,7 @@
 
         handler (this:Widget).update() set_ptr {
             if this.id.getLength() > 0 {
+                this.updateCommon();
                 setElementAttribute(this.id, "innerHTML", this.text);
             }
         }
@@ -461,7 +479,7 @@
         //-----------------
         // Shared Functions
 
-        function new (t: String): SrdRef[Button] {
+        handler this_type(t: String): SrdRef[Button] {
             def r: SrdRef[Button];
             r.alloc()~init(t);
             return r;
@@ -509,8 +527,6 @@
             this.onChanged.owner~no_deref = this;
             this.onKeyPress.owner~no_deref = this;
             this.onKeyUp.owner~no_deref = this;
-            this.textAlign = String("right");
-            this.textDirection = String("rtl");
         }
 
         //-----------------
@@ -576,6 +592,7 @@
 
         handler (this:Widget).update() set_ptr {
             if this.id.getLength() > 0 {
+                this.updateCommon();
                 setElementAttribute(this.id, "value", this._text);
             }
         }
@@ -583,13 +600,12 @@
         //-----------------
         // Shared Functions
 
-        function new (): SrdRef[TextInput] {
+        handler this_type(): SrdRef[TextInput] {
             def r: SrdRef[TextInput];
             r.alloc()~init();
             return r;
         }
     }
-
 
     //==========================================================================
     // Input
@@ -715,6 +731,7 @@
 
         handler (this:Widget).update() set_ptr {
             if this.id.getLength() > 0 {
+                this.updateCommon();
                 setElementAttribute(this.id, "value", this._text);
                 setElementAttribute(this.id, "type", this.inputType);
                 setElementAttribute(this.id, "placeholder", this.placeholder);
@@ -727,17 +744,18 @@
         //-----------------
         // Shared Functions
 
-        function new (): SrdRef[Input] {
+        handler this_type(): SrdRef[Input] {
             def r: SrdRef[Input];
             r.alloc()~init();
             return r;
         }
-        function new (t : String): SrdRef[Input] {
+        handler this_type(t : String): SrdRef[Input] {
             def r: SrdRef[Input];
             r.alloc()~init(t);
             return r;
         }
     }
+
     //==========================================================================
     // Select
     class Select {
@@ -798,6 +816,7 @@
 
         handler (this:Widget).update() set_ptr {
             if this.id.getLength() > 0 {
+                this.updateCommon();
                 //setElementAttribute(this.id, "value", this._text);
                 def i: Int = 0;
                 def htmlVal: String;
@@ -827,13 +846,14 @@
         //-----------------
         // Shared Functions
 
-        function new (): SrdRef[Select] {
+        handler this_type(): SrdRef[Select] {
             def r: SrdRef[Select];
             r.alloc()~init();
             return r;
         }
 
     }
+
     //==========================================================================
     // Hyperlink
     class Hyperlink {
@@ -885,6 +905,7 @@
 
         handler (this:Widget).update() set_ptr {
             if this.id.getLength() > 0 {
+                this.updateCommon();
                 setElementAttribute(this.id, "href", this.url);
                 setElementAttribute(this.id, "style", "text-decoration: none;");
             }
@@ -893,24 +914,35 @@
         //-----------------
         // Shared Functions
 
-        function new (url: String, child: temp_ref[SrdRef[Widget]]): SrdRef[Hyperlink] {
+        handler this_type(url: String, child: temp_ref[SrdRef[Widget]]): SrdRef[Hyperlink] {
             def r: SrdRef[Hyperlink];
             r.alloc()~init(url);
             r.setChild(child);
             return r;
         }
     }
-}
 
-@merge module Srl {
-    WebPlatform.defSrdRefCast[Box];
-    WebPlatform.defSrdRefCast[Label];
-    WebPlatform.defSrdRefCast[Button];
-    WebPlatform.defSrdRefCast[TextInput];
-    WebPlatform.defSrdRefCast[Hyperlink];
-    WebPlatform.defSrdRefCast[Image];
-    WebPlatform.defSrdRefCast[Canvas];
-    WebPlatform.defSrdRefCast[Input];
-    WebPlatform.defSrdRefCast[Select];
+    //==========================================================================
+    // Component
+    class Component {
+        @injection def widget: Widget;
+        def view: SrdRef[Widget];
+
+        //---------
+        // Handlers
+
+        handler this~init() {}
+
+        //-------------------
+        // Function Overrides
+
+        handler (this:Widget).build (ownerId: String) set_ptr {
+            if this.view.obj~ptr != 0 this.view.build(ownerId);
+        }
+
+        handler (this:Widget).unbuild() set_ptr {
+            if this.view.obj~ptr != 0 this.view.unbuild();
+        }
+    }
 }
 

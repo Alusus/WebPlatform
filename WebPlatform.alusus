@@ -33,12 +33,5 @@ import "WebPlatform/Window";
     }
 
     def webPlatformPath: Srl.String = getDirectoryFromPath(getThisSourceFullPath[]);
-
-    macro defSrdRefCast [tpName] {
-        def __tpName__SrdRef: alias SrdRef[WebPlatform.tpName];
-        @merge class __tpName__SrdRef {
-            handler this~cast[SrdRef[WebPlatform.Widget]] return SrdRef[WebPlatform.Widget](this.refCounter, this.widget);
-        }
-    }
 }
 
