@@ -10,6 +10,8 @@
     // Element Interaction
     @expname[selectItem] function selectItem (selectId: ptr[Char], selectedValue: ptr[Char]);
     @expname[getSelectedItemValue] function getSelectedItemValue ( selectId: ptr[Char]):ptr[array[Char]];
+    // Alert 
+    @expname[showAlert] function showAlert(message : ptr[Char]):bool;
     // Event Loop
     @expname[fetchNextEvent] function fetchNextEvent (): ptr[array[Char]];
     @expname[httpRedirect] function httpRedirect (address : ptr[Char])

@@ -651,8 +651,6 @@
             this.onChanged.owner~no_deref = this;
             this.onKeyPress.owner~no_deref = this;
             this.onKeyUp.owner~no_deref = this;
-            this.textAlign = String("right");
-            this.textDirection = String("rtl");
             this.inputType = String("text");
             this.ariaHidden = false;
         }
@@ -660,8 +658,6 @@
             this.onChanged.owner~no_deref = this;
             this.onKeyPress.owner~no_deref = this;
             this.onKeyUp.owner~no_deref = this;
-            this.textAlign = String("right");
-            this.textDirection = String("rtl");
             this.inputType=inputType;
             this.ariaHidden = false;
         }
@@ -775,8 +771,6 @@
 
         handler this~init() {
             this.onChanged.owner~no_deref = this;
-            this.textAlign = String("right");
-            this.textDirection = String("rtl");
             this.ariaHidden = false;
         }
 
