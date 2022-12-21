@@ -41,8 +41,8 @@
         generateProperty[left, Left, String];
         generateProperty[right, Right, String];
         generateProperty[bottom, Bottom, String];
-
         generateProperty[background, Background, String];
+
         handler this.setBackground(color: temp_ref[Color]) {
             this.vbackground = String.format("rgba(%i, %i, %i, %i)", color.red, color.green, color.blue, color.alpha);
             this.onPropUpdated();
@@ -75,8 +75,7 @@
         handler this~init() {
             this.fontSize = 10.0;
             this.display = String("flex");
-            this.layout = String("column");
-	
+            this.layout = String("column");	
         }
 
         handler this~init(ref[Style]) {
@@ -309,6 +308,7 @@
         handler this~init() {}
         handler this~init(styles: Array[Style]) this.set(styles);
         handler this~init(styles: Map[Float, Style]) this.set(styles);
+
         handler this.set(totalDuration: Float, styles: Array[Style]) {
             this.totalDuration = totalDuration;
             this.styles.values = styles;
@@ -337,16 +337,14 @@
             this.update();
         }
 
-        handler this.unbuild() {
-            
+        handler this.unbuild() {           
             if this.buildCounter == 0 return;
             if --this.buildCounter > 0 return;
-            deleteElement(this.name);
-	    
+
+            deleteElement(this.name);	    
         }
 
         handler this.update() {
-
             if this.buildCounter == 0 return;
 
             def cssString: String = String("@keyframes ") + this.name + String(" {");
@@ -355,8 +353,7 @@
                 cssString = cssString + this.styles.keyAt(i) + "% {" + this.styles(i).getCssString() + "}";
             }
             cssString += String("}");
-            setElementAttribute(this.name, "innerHTML", cssString);
-            
+            setElementAttribute(this.name, "innerHTML", cssString);           
         }
 
         handler this_type(): SrdRef[Animation] {
