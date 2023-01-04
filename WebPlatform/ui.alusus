@@ -90,6 +90,34 @@
     }
 
     //==========================================================================
+    // ImageSource
+    // A class that is used to add images to the pic element
+    class ImageSource {
+        def src: String = "";
+        def maxWidth: String = "";
+
+        handler this~init() {}
+        handler this~init(src : String , maxWidth : String) {
+            this.src = src;
+            this.maxWidth = maxWidth;
+        }
+        handler this~init(temp_ref[ImageSource]) {
+            this = value;
+        }
+        handler this = temp_ref[ImageSource] {
+            this.src = value.src;
+            this.maxWidth = value.maxWidth;
+        }
+        handler this == ref[ImageSource] : bool {
+            if (this.src==value.src )
+                return true;
+            return false;
+        }
+        handler this != ref[ImageSource] : bool {
+            return !(this == value);
+        }
+    }
+    //==========================================================================
     // Color
     class Color {
         def red: Int = 0;
