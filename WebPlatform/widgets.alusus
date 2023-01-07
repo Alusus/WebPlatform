@@ -334,7 +334,6 @@
             if this.id.getLength() > 0 {
                 this.updateCommon();
                 setElementAttribute(this.id, "src", this.url);
-
             }
         }
 
@@ -351,9 +350,9 @@
         }
     }
 
-//==========================================================================
+    //==========================================================================
     // Picture
-    class Picture    {
+    class Picture {
         @injection def widget: Widget;
 
         //-----------
@@ -404,7 +403,11 @@
                 def i: Int = 0;
                 def htmlVal: String="";
                 for i=0,i<this.sourceArray.getLength() , i+=1{
-                    htmlVal+=String.format("<source srcset=\"%s\" media=\"(max-width:%s)\">",this.sourceArray(i).src.buf,this.sourceArray(i).maxWidth.buf)
+                    htmlVal += String.format(
+                        "<source srcset=\"%s\" media=\"(max-width:%s)\">",
+                        this.sourceArray(i).src.buf,
+                        this.sourceArray(i).maxWidth.buf
+                    );
                 }
 
                 setElementAttribute(this.id, "innerHTML", htmlVal);
@@ -944,6 +947,7 @@
             if this.child.obj~ptr != 0 && this.id.getLength() > 0 this.child.build(this.id);
         }
 
+        handler this.onPropUpdated() this.update();
 
         //-------------------
         // Function Overrides

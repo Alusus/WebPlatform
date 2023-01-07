@@ -91,7 +91,7 @@
 
     //==========================================================================
     // ImageSource
-    // A class that is used to add images to the pic element
+    // Image sources used by the Picture wiedget.
     class ImageSource {
         def src: String = "";
         def maxWidth: String = "";
@@ -117,6 +117,7 @@
             return !(this == value);
         }
     }
+
     //==========================================================================
     // Color
     class Color {

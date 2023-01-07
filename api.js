@@ -35,8 +35,8 @@ wasmApi.deleteElement = (elementName) => {
 }
 
 wasmApi.showAlert = (message) =>{
-  let isExecuted = confirm(toJsString(message));
-  return isExecuted;
+    let isExecuted = confirm(toJsString(message));
+    return isExecuted;
 }
 
 wasmApi.setStyleRule = (elementName, styleSelector, styleCss) => {
@@ -151,7 +151,7 @@ wasmApi.unregisterElementEventHandler = (elementName, eventName) => {
         window[`on${jsEventName}`] = null;
     } else {
         const element=document.getElementById(jsElementName)
-        if(! element) return;
+        if (!element) return;
         element[`on${jsEventName}`] = null;
     }
 }
