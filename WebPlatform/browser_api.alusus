@@ -9,12 +9,12 @@
     @expname[getElementDimensions] function getElementDimensions (name: ptr[Char], result: ref[Dimensions]);
     // Element Interaction
     @expname[selectItem] function selectItem (selectId: ptr[Char], selectedValue: ptr[Char]);
-    @expname[getSelectedItemValue] function getSelectedItemValue ( selectId: ptr[Char]):ptr[array[Char]];
+    @expname[getSelectedItemValue] function getSelectedItemValue (selectId: ptr[Char]): ptr[array[Char]];
     // Alert 
-    @expname[showAlert] function showAlert(message : ptr[Char]):bool;
+    @expname[showAlert] function showAlert (message: ptr[Char]): Bool;
     // Event Loop
     @expname[fetchNextEvent] function fetchNextEvent (): ptr[array[Char]];
-    @expname[httpRedirect] function httpRedirect (address : ptr[Char])
+    @expname[httpRedirect] function httpRedirect (address: ptr[Char]);
     @expname[registerElementEventHandler] function _registerElementEventHandler (
       elementName: ptr[Char], eventName: ptr[Char], cbId: ArchInt
     );
