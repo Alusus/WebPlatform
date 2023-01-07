@@ -34,6 +34,11 @@ wasmApi.deleteElement = (elementName) => {
     if (element) element.remove();
 }
 
+wasmApi.showAlert = (message) =>{
+    let isExecuted = confirm(toJsString(message));
+    return isExecuted;
+}
+
 wasmApi.setStyleRule = (elementName, styleSelector, styleCss) => {
     const element = document.getElementById(toJsString(elementName));
     if (!element || !element.sheet) return;
@@ -146,7 +151,7 @@ wasmApi.unregisterElementEventHandler = (elementName, eventName) => {
         window[`on${jsEventName}`] = null;
     } else {
         const element=document.getElementById(jsElementName)
-        if(! element) return;
+        if (!element) return;
         element[`on${jsEventName}`] = null;
     }
 }

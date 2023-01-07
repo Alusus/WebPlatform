@@ -74,6 +74,8 @@
 
         handler this~init() {
             this.fontSize = 10.0;
+            this.display = String("flex");
+            this.layout = String("column");	
         }
 
         handler this~init(ref[Style]) {
@@ -165,6 +167,7 @@
             if this.margin != Quad(0) styleRep += getPropRep(String("margin"), this.margin);
             if this.padding != Quad(0) styleRep += getPropRep(String("padding"), this.padding);
             if this.border != Quad(0) styleRep += getPropRep(String("border-width"), this.border);
+            if this.border == Quad(-1) styleRep += getPropRep(String("border-width"), Quad(0));
             if this.borderColor != Color(0,0,0,0) styleRep += getPropRep(String("border-color"), this.borderColor);
             if this.fontSize > 0.0 styleRep += getPropRep(String("font-size"), String() + this.fontSize + "pt");
             if this.fontColor != Color() styleRep += getPropRep(String("color"), this.fontColor);
@@ -184,7 +187,7 @@
             if this.transform != "" styleRep += getPropRep(String("transform"), this.transform);
             if this.minHeight != "" styleRep += getPropRep(String("min-height"), this.minHeight);
             if this.zIndex != "" styleRep += getPropRep(String("z-index"), this.zIndex);
-            if this.layout != "" styleRep += getPropRep(String("display:flex;flex-direction"), this.layout);
+            if this.layout != "" styleRep += getPropRep(String("flex-direction"), this.layout);
             if this.justify != "" styleRep += getPropRep(String("justify-content"), this.justify);
             if this.align != "" styleRep += getPropRep(String("align-items"), this.align);
             if this.direction != "" styleRep += getPropRep(String("direction"), this.direction);
