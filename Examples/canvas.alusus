@@ -12,29 +12,30 @@ use WebPlatform;
 //==============================================================================
 // Frontend
 
-def PrimeryColor: Color("8e50ef");
+def PRIMARY_COLOR: Color("8e50ef");
 
 func createHeader (): SrdRef[Widget] {
     setElementAttribute("body", "style", "padding: 0; margin: 0;");
 
     return Box({}).{
         style.{
-            width = String("100%");
-            height = String("40pt");
+            width = "100%";
+            height = "40pt";
             padding = Quad(5, 0);
-            background = PrimeryColor;
-            borderColor = PrimeryColor;
+            background = PRIMARY_COLOR;
+            borderColor = PRIMARY_COLOR;
             border = Quad(1.5);
-            borderStyle = String("solid");
-            layout = String("column");
+            borderStyle = "solid";
+            display = "flex";
+            layout = "column";
         };
         addChildren({
             Label(String("أمثلة منصة ويب الأسس - مرسم")).{ style.{
                 fontColor = Color("fff");
                 fontSize = 21.0;
-                width = String("100%");
-                height = String("100%");
-                background = PrimeryColor;
+                width = "100%";
+                height = "100%";
+                background = PRIMARY_COLOR;
                 margin = Quad(5, 15);
             } },
         });
@@ -73,19 +74,21 @@ func main {
     def canvas: SrdRef[Canvas];
     Window.instance.setView(Box({}).{
         style.{
-            align = String("center");
-            layout = String("column");
-            direction = String("rtl");
+            align = "center";
+            display = "flex";
+            layout = "column";
+            direction = "rtl";
         };
         addChildren({
             createHeader(),
             Box({}).{
-                style.layout = String("row");
+                style.display = "flex";
+                style.layout = "row";
                 addChildren({
                     Button(String("شغل الموسيقى")).{
                         style.{
-                            height = String("30pt");
-                            width = String("120pt");
+                            height = "30pt";
+                            width = "120pt";
                             background = Color(200, 200, 200);
                             fontSize = 16.0;
                         };
@@ -95,8 +98,8 @@ func main {
                     },
                     Button(String("أوقف الموسيقى")).{
                         style.{
-                            height = String("30pt");
-                            width = String("120pt");
+                            height = "30pt";
+                            width = "120pt";
                             background = Color(200, 200, 200);
                             fontSize = 16.0;
                         };
@@ -106,8 +109,8 @@ func main {
                     },
                     Button(String("شغل الصوت")).{
                         style.{
-                            height = String("30pt");
-                            width = String("120pt");
+                            height = "30pt";
+                            width = "120pt";
                             background = Color(200, 200, 200);
                             fontSize = 16.0;
                         };
@@ -117,8 +120,8 @@ func main {
                     },
                     Button(String("شغل الصوت بتكرار")).{
                         style.{
-                            height = String("30pt");
-                            width = String("150pt");
+                            height = "30pt";
+                            width = "150pt";
                             background = Color(200, 200, 200);
                             fontSize = 16.0;
                         };
@@ -128,8 +131,8 @@ func main {
                     },
                     Button(String("أوقف الصوت")).{
                         style.{
-                            height = String("30pt");
-                            width = String("120pt");
+                            height = "30pt";
+                            width = "120pt";
                             background = Color(200, 200, 200);
                             fontSize = 16.0;
                         };
@@ -141,16 +144,16 @@ func main {
             }
             Canvas().{
                 canvas = this;
+                bitmapWidth = String("1280px");
+                bitmapHeight = String("800px");
                 style.{
-                    width = String("100%");
-                    height = String("100%");
-                    maxWidth = String("1280px");
-                    maxHeight = String("800px");
-                    bitmapWidth = String("1280px");
-                    bitmapHeight = String("800px");
+                    width = "100%";
+                    height = "100%";
+                    maxWidth = "1280px";
+                    maxHeight = "800px";
                     border = Quad(2);
+                    borderStyle = "solid";
                     borderColor = Color(0, 0, 0);
-                    borderStyle = String("solid");
                     background = Color(220, 220, 220);
                 };
                 def dim: Dimensions(1, 1);

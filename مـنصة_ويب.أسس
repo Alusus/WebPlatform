@@ -8,6 +8,7 @@
     عرف عالج_الاحداث: لقب dispatchEvents؛
     عرف انتظر: لقب await؛
     عرف شغل_الخادم: لقب runServer؛
+    عرف ابدأ_الخادم: لقب startServer؛
     عرف ابدأ_المؤقت: لقب startTimer؛
     عرف أرسل_نداء: لقب sendRequest؛
     عرف حمل_خط: لقب loadFont؛
@@ -72,39 +73,41 @@
 
     عرف طـراز: لقب Style؛
     @دمج صنف طـراز {
-        عرب_خصلة[العرض، _العرض، width, Width]؛
-        عرب_خصلة[أقصى_عرض، _أقصى_عرض، maxWidth, MaxWidth]؛
-        عرب_خصلة[الطول، _الطول، height, Height]؛
-        عرب_خصلة[أقصى_طول، _أقصى_طول، maxHeight, MaxHeight]؛
-        عرب_خصلة[الإطار، _الإطار، border, Border]؛
-        عرب_خصلة[لون_الإطار، _لون_الإطار، borderColor, BorderColor]؛
-        عرب_خصلة[نصف_قطر_الإطار، _نصف_قطر_الإطار، borderRadius, BorderRadius]؛
-        عرب_خصلة[طراز_الإطار، _طراز_الإطار، borderStyle, BorderStyle]؛
-        عرب_خصلة[الموقع، _الموقع، position, Position]؛
-        عرب_خصلة[أدنى_ارتفاع، _أدنى_ارتفاع، minHeight, MinHeight]؛
-        عرب_خصلة[تسلسل_العمق، _تسلسل_العمق، zIndex, ZIndex]؛
-        عرب_خصلة[النسق، _النسق، layout, Layout]؛
-        عرب_خصلة[ملء_السطر، _ملء_السطر، justify, Justify]؛
-        عرب_خصلة[الهامش، _الهامش، margin, Margin]؛
-        عرب_خصلة[المحاذاة، _المحاذاة، align, Align]؛
-        عرب_خصلة[الاتجاه، _الاتجاه، direction, Direction]؛
-        عرب_خصلة[الحشوة، _الحشوة، padding, Padding]؛
-        عرب_خصلة[حجم_الخط، _حجم_الخط، fontSize, FontSize]؛
-        عرب_خصلة[لون_الخط، _لون_الخط، fontColor, FontColor]؛
-        عرب_خصلة[الانتقال، _الانتقال، transition, Transition]؛
-        عرب_خصلة[محاذاة_النص، _محاذاة_النص، textAlign, TextAlign]؛
-        عرب_خصلة[اتجاه_النص، _اتجاه_النص، textDirection, TextDirection]؛
-        عرب_خصلة[التحول، _التحول، transform, Transform]؛
-        عرب_خصلة[الفيض، _الفيض، overflow, Overflow]؛
-        عرب_خصلة[ظل_الصندوق، _ظل_الصندوق، boxShadow, BoxShadow]؛
-        عرب_خصلة[الإظهار، _الإظهار، display, Display]؛
-        عرب_خصلة[المؤشر، _المؤشر، cursor, Cursor]؛
-        عرب_خصلة[فوق، _فوق، top, Top]؛
-        عرب_خصلة[يسار، _يسار، left, Left]؛
-        عرب_خصلة[يمين، _يمين، right, Right]؛
-        عرب_خصلة[تحت، _تحت، bottom, Bottom]؛
-        عرب_خصلة[الخلفية، _الخلفية، background، Background]؛
-        عرب_خصلة[التحريك، _التحريك، animation، Animation]؛
+        عرف العرض: لقب width؛
+        عرف الطول: لقب height؛
+        عرف أدنى_عرض: لقب minWidth؛
+        عرف أدنى_ارتفاع: لقب minHeight؛
+        عرف أقصى_عرض: لقب maxWidth؛
+        عرف أقصى_طول: لقب maxHeight؛
+        عرف الإطار: لقب border؛
+        عرف لون_الإطار: لقب borderColor؛
+        عرف نصف_قطر_الإطار: لقب borderRadius؛
+        عرف طراز_الإطار: لقب borderStyle؛
+        عرف الموقع: لقب position؛
+        عرف تسلسل_العمق: لقب zIndex؛
+        عرف المرونة: لقب flex؛
+        عرف النسق: لقب layout؛
+        عرف ملء_السطر: لقب justify؛
+        عرف الهامش: لقب margin؛
+        عرف المحاذاة: لقب align؛
+        عرف محاذاة_النص: لقب textAlign؛
+        عرف الاتجاه: لقب direction؛
+        عرف الحشوة: لقب padding؛
+        عرف حجم_الخط: لقب fontSize؛
+        عرف لون_الخط: لقب fontColor؛
+        عرف الانتقال: لقب transition؛
+        عرف التحول: لقب transform؛
+        عرف الإزاحة: لقب translate؛
+        عرف الفيض: لقب overflow؛
+        عرف ظل_الصندوق: لقب boxShadow؛
+        عرف الإظهار: لقب display؛
+        عرف المؤشر: لقب cursor؛
+        عرف فوق: لقب top؛
+        عرف يسار: لقب left؛
+        عرف يمين: لقب right؛
+        عرف تحت: لقب bottom؛
+        عرف الخلفية: لقب background؛
+        عرف التحريك: لقب animation؛
     }
 
     عرف طـقم_طرز: لقب StyleSet؛

@@ -1,4 +1,51 @@
 @merge module WebPlatform {
+    macro generateStringStyleProp [propName, styleName] {
+        handler this.propName = (val: CharsPtr) {
+            this.props(String(styleName)) = String(val);
+            this.onPropUpdated();
+            return val;
+        }
+        handler this.propName = (val: ref[String]) {
+            this.props(String(styleName)) = val;
+            this.onPropUpdated();
+            return val;
+        }
+        handler this.propName: ref[String] {
+            return this.props(String(styleName));
+        }
+    }
+
+    macro generateColorStyleProp [propName, styleName] {
+        handler this.propName = (val: ref[Color]) {
+            this.props(String(styleName)) = String.format(
+                "rgba(%i, %i, %i, %i)", val.red, val.green, val.blue, val.alpha
+            );
+            this.onPropUpdated();
+            return val;
+        }
+        generateStringStyleProp[propName, styleName];
+    }
+
+    macro generateFloatStyleProp [propName, styleName] {
+        handler this.propName = (val: Float) {
+            this.props(String(styleName)) = String.format("%fpt", val);
+            this.onPropUpdated();
+            return val;
+        }
+        generateStringStyleProp[propName, styleName];
+    }
+
+    macro generateQuadStyleProp [propName, styleName] {
+        handler this.propName = (val: ref[Quad]) {
+            this.props(String(styleName)) = String.format(
+                "%fpt %fpt %fpt %fpt", val.top, val.right, val.bottom, val.left
+            );
+            this.onPropUpdated();
+            return val;
+        }
+        generateStringStyleProp[propName, styleName];
+    }
+
     //==========================================================================
     // Styles
     // Holds styling properties for widgets.
@@ -7,63 +54,52 @@
 
         def id: String;
         def selector: String;
+        def props: Map[String, String];
         def onUpdated: closure();
 
         // Properties
-        generateProperty[width, Width, String];
-        generateProperty[maxWidth, MaxWidth, String];
-        generateProperty[height, Height, String];
-        generateProperty[maxHeight, MaxHeight, String];
-        generateProperty[border, Border, Quad];
-        generateProperty[borderColor, BorderColor, Color];
-        generateProperty[borderRadius, BorderRadius, Quad];
-        generateProperty[borderStyle, BorderStyle, String];
-        generateProperty[position, Position, String];
-        generateProperty[minHeight, MinHeight, String];
-        generateProperty[zIndex, ZIndex, String];
-        generateProperty[layout, Layout, String];
-        generateProperty[justify, Justify, String];
-        generateProperty[margin, Margin, Quad];
-        generateProperty[align, Align, String];
-        generateProperty[direction, Direction, String];
-        generateProperty[padding, Padding, Quad];
-        generateProperty[fontSize, FontSize, Float];
-        generateProperty[fontColor, FontColor, Color];
-        generateProperty[transition, Transition, String];
-        generateProperty[textAlign, TextAlign, String];
-        generateProperty[textDirection, TextDirection, String];
-        generateProperty[transform, Transform, String];
-        generateProperty[overflow, Overflow, String];
-        generateProperty[boxShadow, BoxShadow, String];
-        generateProperty[display, Display, String];
-        generateProperty[cursor, Cursor, String];
-        generateProperty[top, Top, String];
-        generateProperty[left, Left, String];
-        generateProperty[right, Right, String];
-        generateProperty[bottom, Bottom, String];
 
-        generateProperty[background, Background, String];
-        handler this.setBackground(color: temp_ref[Color]) {
-            this.vbackground = String.format("rgba(%i, %i, %i, %i)", color.red, color.green, color.blue, color.alpha);
-            this.onPropUpdated();
-        }
-        handler this.background = (val: temp_ref[Color]) {
-            this.setBackground(val);
-            return val;
-        }
+        generateStringStyleProp[width, "width"];
+        generateStringStyleProp[height, "height"];
+        generateStringStyleProp[minWidth, "min-width"];
+        generateStringStyleProp[minHeight, "min-height"];
+        generateStringStyleProp[maxWidth, "max-width"];
+        generateStringStyleProp[maxHeight, "max-height"];
+        generateQuadStyleProp[border, "border"];
+        generateColorStyleProp[borderColor, "border-color"];
+        generateQuadStyleProp[borderRadius, "border-radius"];
+        generateStringStyleProp[borderStyle, "border-style"];
+        generateStringStyleProp[position, "position"];
+        generateStringStyleProp[zIndex, "z-index"];
+        generateStringStyleProp[flex, "flex"];
+        generateStringStyleProp[layout, "flex-direction"];
+        generateStringStyleProp[justify, "justify-content"];
+        generateQuadStyleProp[margin, "margin"];
+        generateStringStyleProp[align, "align-items"];
+        generateStringStyleProp[textAlign, "text-align"];
+        generateStringStyleProp[direction, "direction"];
+        generateQuadStyleProp[padding, "padding"];
+        generateFloatStyleProp[fontSize, "font-size"];
+        generateColorStyleProp[fontColor, "color"];
+        generateStringStyleProp[transition, "transition"];
+        generateStringStyleProp[transform, "transform"];
+        generateStringStyleProp[translate, "translate"];
+        generateStringStyleProp[overflow, "overflow"];
+        generateStringStyleProp[boxShadow, "box-shadow"];
+        generateStringStyleProp[display, "display"];
+        generateStringStyleProp[cursor, "cursor"];
+        generateStringStyleProp[top, "top"];
+        generateStringStyleProp[left, "left"];
+        generateStringStyleProp[right, "right"];
+        generateStringStyleProp[bottom, "bottom"];
+        generateColorStyleProp[background, "background"];
 
         def vanimation: SrdRef[Animation];
-        handler this.setAnimation (val: SrdRef[Animation]) {
+        handler this.animation = (val: SrdRef[Animation]) {
             if !this.vanimation.isNull() and this.id != "" this.vanimation.unbuild();
             this.vanimation = val;
             if !this.vanimation.isNull() and this.id != "" this.vanimation.build();
             this.onPropUpdated();
-        }
-        handler this.getAnimation (): SrdRef[Animation] {
-            return this.vanimation;
-        }
-        handler this.animation = (val: SrdRef[Animation]) {
-            this.setAnimation(val);
             return this.vanimation;
         }
         handler this.animation: SrdRef[Animation] {
@@ -72,50 +108,16 @@
 
         // Initializers and Operators
 
-        handler this~init() {
-            this.fontSize = 10.0;
-            this.display = String("flex");
-            this.layout = String("column");	
-        }
+        handler this~init() {}
 
         handler this~init(ref[Style]) {
             this = value;
         }
 
         handler this = ref[Style] {
-            this.background = value.background;
-            this.textDirection = value.textDirection;
-            this.textAlign = value.textAlign;
-            this.fontColor = value.fontColor;
-            this.fontSize = value.fontSize;
-            this.border = value.border;
-            this.borderColor = value.borderColor;
-            this.borderRadius = value.borderRadius;
-            this.borderStyle = value.borderStyle;
-            this.padding = value.padding;
-            this.direction = value.direction;
-            this.align = value.align;
-            this.justify = value.justify;
-            this.layout = value.layout;
-            this.zIndex = value.zIndex;
-            this.position = value.position;
-            this.width = value.width;
-            this.maxWidth = value.maxWidth;
-            this.height = value.height;
-            this.maxHeight = value.maxHeight;
-            this.animation = value.animation;
-            this.transition = value.transition;
-            this.transform = value.transform;
-            this.overflow = value.overflow;
-            this.boxShadow = value.boxShadow;
-            this.display = value.display;
-            this.cursor = value.cursor;
-            this.margin = value.margin;
-            this.minHeight = value.minHeight;
-            this.top = value.top
-            this.bottom = value.bottom
-            this.right = value.right
-            this.left = value.left
+            this.props = value.props;
+            this.vanimation = value.vanimation;
+            this.onPropUpdated();
         }
 
         // Functions
@@ -145,70 +147,15 @@
 
         handler this.getCssString(): String {
             def styleRep: String;
-            if this.width != "" {
-                if this.width == String("auto-flex") {
-                    styleRep += getPropRep(String("width"), String(";flex:auto"));
-                } else {
-                    styleRep += getPropRep(String("width"), this.width);
-                }
+            def i: Int;
+            for i = 0, i < this.props.getLength(), ++i {
+                styleRep += this.props.keyAt(i) + ":" + this.props.valAt(i) + ";";
             }
-            if this.height != "" {
-                if this.height == String("auto-flex") {
-                    styleRep += getPropRep(String("height"), String(";flex:auto"));
-                }
-                else {
-                    styleRep += getPropRep(String("height"), this.height);
-                }
-            }
-            if this.maxWidth != "" styleRep += getPropRep(String("max-width"), this.maxWidth);
-            if this.maxHeight != "" styleRep += getPropRep(String("max-height"), this.maxHeight);
-            if this.borderRadius != Quad(0) styleRep += getPropRep(String("border-radius"), this.borderRadius);
-            if this.borderStyle != "" styleRep += getPropRep(String("border-style"), this.borderStyle);
-            if this.margin != Quad(0) styleRep += getPropRep(String("margin"), this.margin);
-            if this.padding != Quad(0) styleRep += getPropRep(String("padding"), this.padding);
-            if this.border != Quad(0) styleRep += getPropRep(String("border-width"), this.border);
-            if this.border == Quad(-1) styleRep += getPropRep(String("border-width"), Quad(0));
-            if this.borderColor != Color(0,0,0,0) styleRep += getPropRep(String("border-color"), this.borderColor);
-            if this.fontSize > 0.0 styleRep += getPropRep(String("font-size"), String() + this.fontSize + "pt");
-            if this.fontColor != Color() styleRep += getPropRep(String("color"), this.fontColor);
-            if this.position != "" styleRep += getPropRep(String("position"), this.position);
-            if this.cursor != "" styleRep += getPropRep(String("cursor"), this.cursor);
-            if this.background != "" styleRep += getPropRep(String("background"), this.background);
-            if this.top != "" styleRep += getPropRep(String("top"), this.top);
-            if this.left != "" styleRep += getPropRep(String("left"), this.left);
-            if this.right != "" styleRep += getPropRep(String("right"), this.right);
-            if this.bottom != "" styleRep += getPropRep(String("bottom"), this.bottom);
-            if this.boxShadow != "" styleRep += getPropRep(String("box-shadow"), this.boxShadow);
-            if this.display != "" styleRep += getPropRep(String("display"), this.display);
-            if this.overflow != "" styleRep += getPropRep(String("overflow"), this.overflow);
-            if this.transition != "" styleRep += getPropRep(String("transition"), this.transition);
-            if this.textAlign != "" styleRep += getPropRep(String("text-align"), this.textAlign);
-            if this.textDirection != "" styleRep += getPropRep(String("direction"), this.textDirection);
-            if this.transform != "" styleRep += getPropRep(String("transform"), this.transform);
-            if this.minHeight != "" styleRep += getPropRep(String("min-height"), this.minHeight);
-            if this.zIndex != "" styleRep += getPropRep(String("z-index"), this.zIndex);
-            if this.layout != "" styleRep += getPropRep(String("flex-direction"), this.layout);
-            if this.justify != "" styleRep += getPropRep(String("justify-content"), this.justify);
-            if this.align != "" styleRep += getPropRep(String("align-items"), this.align);
-            if this.direction != "" styleRep += getPropRep(String("direction"), this.direction);
             if !this.vanimation.isNull() {
-                styleRep += getPropRep(String("animation-name"), this.vanimation.name);
-                styleRep += getPropRep(String("animation-duration"), String("") + this.vanimation.totalDuration + "s");
+                styleRep += String.format("animation-name:%s;", this.vanimation.name.buf);
+                styleRep += String.format("animation-duration:%fs;", this.vanimation.totalDuration);
             }
             return styleRep;
-        }
-
-        func getPropRep(prop: String, val: String): String {
-            return String.format("%s:%s;", prop.buf, val.buf);
-        }
-        func getPropRep(prop: String,  val: float): String {
-            return String.format("%s:%f;", prop.buf, val);
-        }
-        func getPropRep(prop: String, val: Quad): String {
-            return String.format("%s:%fpt %fpt %fpt %fpt;", prop.buf, val.top, val.right, val.bottom, val.left);
-        }
-        func getPropRep(prop: String, val: Color): String {
-            return String.format("%s:rgba(%i, %i, %i, %i);", prop.buf, val.red, val.green, val.blue, val.alpha);
         }
     }
 
