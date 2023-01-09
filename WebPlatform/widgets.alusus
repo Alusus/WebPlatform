@@ -56,6 +56,18 @@
             return this._style;
         }
 
+        handler this.style = SrdRef[StyleSet] {
+            if this.id != "" and not this._style.isNull() {
+                this._style.unbuild();
+            }
+            this._style = value;
+            if this.id != "" and not this._style.isNull() {
+                this._style.build();
+            }
+            this.updateCommon();
+            return this._style;
+        }
+
         handler this.buildCommon() {
             if not this._style.isNull() this._style.build();
             this.onSignalConnectionsChanged(this.onResize~ptr, this.onResize.getConnectionCount());
@@ -1006,10 +1018,12 @@
         // Function Overrides
 
         handler (this:Widget).build (ownerId: String) set_ptr {
-            if this.view.obj~ptr != 0 this.view.build(ownerId);
+            this.id = ownerId;
+            if this.view.obj~ptr != 0 this.view.build(this.id);
         }
 
         handler (this:Widget).unbuild() set_ptr {
+            this.id = String();
             if this.view.obj~ptr != 0 this.view.unbuild();
         }
     }
