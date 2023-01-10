@@ -1,0 +1,67 @@
+@merge module WebPlatform {
+    //==========================================================================
+    // Label
+    class Label {
+        @injection def widget: Widget;
+        def tag: String;
+
+        //-----------
+        // Properties
+        generateProperty[text, Text, String];
+        generateProperty[ariaHidden, AriaHidden, bool];
+        generateProperty[targetId, TargetId, String];
+
+        //----------
+        // Handlers
+
+        handler this~init(t: String) {
+            this.tag = String("span");
+            this.text = t;
+            this.ariaHidden = false;
+            this.targetId = String("");
+        }
+
+        handler this.onPropUpdated() this.update();
+
+        //-------------------
+        // Function Overrides
+
+        handler (this:Widget).build (ownerId: String) set_ptr {
+            this.id = getNewId();
+            createElement(this.tag, this.id, ownerId);
+            this.buildCommon();
+            this.update();
+        }
+
+        handler (this:Widget).unbuild() set_ptr {
+            if this.id.getLength() > 0 {
+                deleteElement(this.id);
+                this.unbuildCommon();
+                this.id = String();
+            }
+        }
+
+        handler (this:Widget).update() set_ptr {
+            if this.id.getLength() > 0 {
+                this.updateCommon();
+                setElementAttribute(this.id, "innerHTML", this.text);
+                if this.ariaHidden == true {
+                   setElementAttribute(this.id, String("aria-hidden"), String("true"));
+                }
+                if this.targetId != "" {
+                   setElementAttribute(this.id, String("for"), this.targetId);
+                }
+            }
+        }
+
+        //-----------------
+        // Shared Functions
+
+        handler this_type(t: String): SrdRef[Label] {
+            def r: SrdRef[Label];
+            r.alloc()~init(t);
+            return r;
+        }
+    }
+}
+

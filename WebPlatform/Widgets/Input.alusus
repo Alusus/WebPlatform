@@ -1,0 +1,147 @@
+@merge module WebPlatform {
+    //==========================================================================
+    // Input
+    class Input {
+        @injection def widget: Widget;
+
+        //-----------------------
+        // Properties and Signals
+
+        generateProperty[inputType, InputType, String];
+        generateProperty[placeholder, Placeholder, String];
+        generateProperty[ariaHidden, AriaHidden, bool];
+
+        def _text: String;
+        handler this.setText (t: String) {
+            this._text = t;
+            if this.id.getLength() > 0 setElementAttribute(this.id, "value", t);
+        }
+        handler this.getText (): String {
+            if this.id.getLength() == 0 this._text = String()
+            else this._text = String(getElementAttribute(this.id, "value"));
+            return this._text;
+        }
+        handler this.text = (val: temp_ref[String]) {
+            this.setText(val);
+            return this._text;
+        }
+        handler this.text: ref[String] {
+            return this.getText();
+        }
+
+        def onChanged: Signal[Input, Int];
+        def onChangedId: ArchInt = -1;
+        def onKeyPress: Signal[Input, String];
+        def onKeyPressId: ArchInt = -1;
+        def onKeyUp: Signal[Input, String];
+        def onKeyUpId: ArchInt = -1;
+
+        //---------
+        // Handlers
+
+        handler this~init() {
+            this.onChanged.owner~no_deref = this;
+            this.onKeyPress.owner~no_deref = this;
+            this.onKeyUp.owner~no_deref = this;
+            this.inputType = String("text");
+            this.ariaHidden = false;
+        }
+        handler this~init(inputType : String) {
+            this.onChanged.owner~no_deref = this;
+            this.onKeyPress.owner~no_deref = this;
+            this.onKeyUp.owner~no_deref = this;
+            this.inputType=inputType;
+            this.ariaHidden = false;
+        }
+
+        //-----------------
+        // Member Functions
+
+        handler this.onSignalConnectionsChanged(signal: ptr[Signal[Input, Int]], connectionCount: Int) {
+            if this.id == "" return;
+
+            if signal == this.onChanged~ptr {
+                handleSignalConnectionChanged[onChanged, "change", {
+                    this.onChanged.emit(Int(0));
+                }];
+            }
+        }
+
+        handler this.onSignalConnectionsChanged(signal: ptr[Signal[Input, String]], connectionCount: Int) {
+            if this.id == "" return;
+
+            if signal == this.onKeyPress~ptr {
+                handleKeySignalConnectionChanged[onKeyPress, "keypress", "", {
+                    def outPayload: String;
+                    if data.getBool("shiftKey") outPayload += "Shift+";
+                    outPayload += data.getString("code");
+                    this.onKeyPress.emit(outPayload);
+                }];
+            } else if signal == this.onKeyUp~ptr {
+                handleKeySignalConnectionChanged[onKeyUp, "keyup", "", {
+                    def outPayload: String;
+                    if data.getBool("shiftKey") outPayload += "Shift+";
+                    outPayload += data.getString("code");
+                    this.onKeyUp.emit(outPayload);
+                }];
+            }
+        }
+
+        handler this.onPropUpdated() this.update();
+
+        //-------------------
+        // Function Overrides
+
+        handler (this:Widget).build (ownerId: String) set_ptr {
+            this.id = getNewId();
+            createElement("input", this.id, ownerId);
+            this.buildCommon();
+            this.update();
+            this.onSignalConnectionsChanged(this.onChanged~ptr, this.onChanged.getConnectionCount());
+            this.onSignalConnectionsChanged(this.onKeyPress~ptr, this.onKeyPress.getConnectionCount());
+            this.onSignalConnectionsChanged(this.onKeyUp~ptr, this.onKeyUp.getConnectionCount());
+        }
+
+        handler (this:Widget).unbuild() set_ptr {
+            if this.onChangedId != -1 unregisterElementEventHandler(this.onChangedId);
+            this.onChangedId = -1;
+
+            if this.onKeyPressId != -1 unregisterElementEventHandler(this.onKeyPressId);
+            this.onKeyPressId = -1;
+
+            if this.onKeyUpId != -1 unregisterElementEventHandler(this.onKeyUpId);
+            this.onKeyUpId = -1;
+
+            deleteElement(this.id);
+            this.unbuildCommon();
+            this.id = String();
+        }
+
+        handler (this:Widget).update() set_ptr {
+            if this.id.getLength() > 0 {
+                this.updateCommon();
+                setElementAttribute(this.id, "value", this._text);
+                setElementAttribute(this.id, "type", this.inputType);
+                setElementAttribute(this.id, "placeholder", this.placeholder);
+                if this.ariaHidden == true {
+                    setElementAttribute(this.id, String("aria-hidden"), String("true"));
+                }
+            }
+        }
+
+        //-----------------
+        // Shared Functions
+
+        handler this_type(): SrdRef[Input] {
+            def r: SrdRef[Input];
+            r.alloc()~init();
+            return r;
+        }
+        handler this_type(t : String): SrdRef[Input] {
+            def r: SrdRef[Input];
+            r.alloc()~init(t);
+            return r;
+        }
+    }
+}
+

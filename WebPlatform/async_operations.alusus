@@ -1,0 +1,66 @@
+@merge module WebPlatform {
+    function sendRequest (
+        method: ptr[Char], uri: ptr[Char], headers: ptr[Char], body: ptr[Char], timeoutInMs: Int, cb: closure (Json)
+    ) {
+        def index: ArchInt = addEventHandler(cb);
+        _sendRequest(method, uri, headers, body, timeoutInMs, eventHandlers(index).id);
+    }
+
+    function startTimer (duration: Word, cb: closure (Json)): ArchInt {
+        def index: ArchInt = addEventHandler(cb);
+        def timerInfo: SrdRef[Word];
+        timerInfo.construct();
+        timerInfo.obj = _startTimer(duration, eventHandlers(index).id);
+        eventHandlers(index).info = castSrdRef[timerInfo, Void];
+        return eventHandlers(index).id;
+    }
+
+    function stopTimer (id: ArchInt) {
+        def i: ArchInt = findEventHandlerIndex(id);
+        if i == -1 return;
+        def timerInfo: SrdRef[Word] = castSrdRef[eventHandlers(i).info, Word];
+        _stopTimer(timerInfo.obj);
+        eventHandlers.remove(i);
+    }
+
+    function setTimeout (duration: Word, cb: closure (Json)): ArchInt {
+        def index: ArchInt = addEventHandler(cb);
+        def timeoutInfo: SrdRef[Word];
+        timeoutInfo.construct();
+        timeoutInfo.obj = _setTimeout(duration, eventHandlers(index).id);
+        eventHandlers(index).info = castSrdRef[timeoutInfo, Void];
+        return eventHandlers(index).id;
+    }
+
+    function cancelTimeout (id: ArchInt) {
+        def i: ArchInt = findEventHandlerIndex(id);
+        if i == -1 return;
+        def timeoutInfo: SrdRef[Word] = castSrdRef[eventHandlers(i).info, Word];
+        _cancelTimeout(timeoutInfo.obj);
+        eventHandlers.remove(i);
+    }
+
+    function loadImage (url: ptr[Char], cb: closure (Json)): ArchInt {
+        def index: ArchInt = addEventHandler(cb);
+        return _loadImage(url, eventHandlers(index).id);
+    }
+
+    function loadAudio (url: ptr[Char], cb: closure (Json)): ArchInt {
+        def index: ArchInt = addEventHandler(cb);
+        return _loadAudio(url, eventHandlers(index).id);
+    }
+
+    function loadFont (fontName: ptr[Char], url: ptr[Char], cb: closure (Json)) {
+        def index: ArchInt = addEventHandler(cb);
+        _loadFont(fontName, url, eventHandlers(index).id);
+    }
+
+    function loadFont (fontName: ptr[Char], url: ptr[Char]): SrdRef[Promise[Int]] {
+        def p: SrdRef[Promise[Int]] = Promise[Int].new();
+        loadFont(fontName, url, closure (json: Json) {
+            p.resolve(0);
+        });
+        return p;
+    }
+}
+

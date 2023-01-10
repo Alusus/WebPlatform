@@ -1,0 +1,70 @@
+@merge module WebPlatform {
+    //==========================================================================
+    // Hyperlink
+    class Hyperlink {
+        @injection def widget: Widget;
+        def child: SrdRef[Widget];
+
+        //-----------
+        // Properties
+
+        generateProperty[url, Url, String];
+
+        //---------
+        // Handlers
+
+        handler this~init(url: String) {
+            this.url = url;
+        }
+
+        handler this.setChild (child: temp_ref[SrdRef[Widget]]) {
+            if this.child.obj~ptr != 0 this.child.unbuild();
+            this.child = child;
+            if this.child.obj~ptr != 0 && this.id.getLength() > 0 this.child.build(this.id);
+        }
+
+        handler this.onPropUpdated() this.update();
+
+        //-------------------
+        // Function Overrides
+
+        handler (this:Widget).build (ownerId: String) set_ptr {
+            this.id = getNewId();
+            createElement("a", this.id, ownerId);
+            this.buildCommon();
+            this.update();
+
+            if this.child.obj~ptr != 0 this.child.build(this.id);
+        }
+
+        handler (this:Widget).unbuild() set_ptr {
+            if this.id.getLength() > 0 {
+                deleteElement(this.id);
+                this.unbuildCommon();
+
+                if this.child.obj~ptr != 0 this.child.unbuild();
+
+                this.id = String();
+            }
+        }
+
+        handler (this:Widget).update() set_ptr {
+            if this.id.getLength() > 0 {
+                this.updateCommon();
+                setElementAttribute(this.id, "href", this.url);
+                setElementAttribute(this.id, "style", "text-decoration: none;");
+            }
+        }
+
+        //-----------------
+        // Shared Functions
+
+        handler this_type(url: String, child: temp_ref[SrdRef[Widget]]): SrdRef[Hyperlink] {
+            def r: SrdRef[Hyperlink];
+            r.alloc()~init(url);
+            r.setChild(child);
+            return r;
+        }
+    }
+}
+

@@ -1,0 +1,163 @@
+@merge module WebPlatform {
+    //==========================================================================
+    // Widget
+    // The base class of all widgets.
+    class Widget {
+        // Variables
+        def _style: SrdRef[StyleSet];
+        def id: String;
+
+        // Properties
+        generateProperty[className, ClassName, String];
+
+        // Events
+        def onResize: Signal[Widget, Int];
+        def onResizeId: ArchInt = -1;
+        def onMouseMove: Signal[Widget, MouseMovePayload];
+        def onMouseMoveId: ArchInt = -1;
+        def onMouseEnter: Signal[Widget, Int];
+        def onMouseEnterId: ArchInt = -1;
+        def onMouseOut: Signal[Widget, Int];
+        def onMouseOutId: ArchInt = -1;
+        def onMouseDown: Signal[Widget, Int];
+        def onMouseDownId: ArchInt = -1;
+        def onMouseUp: Signal[Widget, Int];
+        def onMouseUpId: ArchInt = -1;
+
+        handler this~init() {
+            this.onResize.owner~no_deref = this;
+            this.onMouseMove.owner~no_deref = this;
+            this.onMouseEnter.owner~no_deref = this;
+            this.onMouseOut.owner~no_deref = this;
+            this.onMouseDown.owner~no_deref = this;
+            this.onMouseUp.owner~no_deref = this;
+        }
+
+        //-------------------
+        // Abstract Functions
+
+        handler this.build(ownerId: String) as_ptr;
+        handler this.unbuild() as_ptr;
+        handler this.update() as_ptr;
+
+        //-----------------
+        // Member Functions
+
+        handler this.onPropUpdated() this.updateCommon();
+
+        handler this.style: SrdRef[StyleSet] {
+            if this._style.isNull() {
+                this._style = SrdRef[StyleSet].construct();
+                if this.id != "" {
+                    this._style.build();
+                    this.updateCommon();
+                }
+            }
+            return this._style;
+        }
+
+        handler this.style = SrdRef[StyleSet] {
+            if this.id != "" and not this._style.isNull() {
+                this._style.unbuild();
+            }
+            this._style = value;
+            if this.id != "" and not this._style.isNull() {
+                this._style.build();
+            }
+            this.updateCommon();
+            return this._style;
+        }
+
+        handler this.buildCommon() {
+            if not this._style.isNull() this._style.build();
+            this.onSignalConnectionsChanged(this.onResize~ptr, this.onResize.getConnectionCount());
+            this.onSignalConnectionsChanged(this.onMouseMove~ptr, this.onMouseMove.getConnectionCount());
+            this.onSignalConnectionsChanged(this.onMouseEnter~ptr, this.onMouseEnter.getConnectionCount());
+            this.onSignalConnectionsChanged(this.onMouseOut~ptr, this.onMouseOut.getConnectionCount());
+            this.onSignalConnectionsChanged(this.onMouseDown~ptr, this.onMouseDown.getConnectionCount());
+            this.onSignalConnectionsChanged(this.onMouseUp~ptr, this.onMouseUp.getConnectionCount());
+        }
+
+        handler this.unbuildCommon() {
+            if not this._style.isNull() this._style.unbuild();
+        }
+
+        handler this.updateCommon() {
+            if this.id != "" {
+                if this._style.isNull() setElementAttribute(this.id, "class", this.className)
+                else setElementAttribute(this.id, "class", this.className + " " + this._style.className);
+            }
+        }
+
+        handler this.onSignalConnectionsChanged(signal: ptr[Signal[Widget, Int]], connectionCount: Int) {
+            if this.id == "" return;
+
+            if signal == this.onResize~ptr {
+                if connectionCount > 0 and this.onResizeId == -1 {
+                    this.onResizeId = observeResize(
+                        this.id,
+                        closure (json: Json) {
+                            this.onResize.emit(Int(0));
+                        }
+                    );
+                } else if connectionCount == 0 and this.onResizeId != -1 {
+                    unobserveResize(this.onResizeId);
+                }
+            }
+
+            if signal == this.onMouseEnter~ptr {
+                handleSignalConnectionChanged[onMouseEnter, "mouseenter", {
+                    this.onMouseEnter.emit(Int(0));
+                }];
+            }
+            if signal == this.onMouseOut~ptr {
+                handleSignalConnectionChanged[onMouseOut, "mouseout", {
+                    this.onMouseOut.emit(Int(0));
+                }];
+            }
+            if signal == this.onMouseDown~ptr {
+                handleSignalConnectionChanged[onMouseDown, "mousedown", {
+                    this.onMouseDown.emit(Int().{ this = data.getInt("button") });
+                }];
+            }
+            if signal == this.onMouseUp~ptr {
+                handleSignalConnectionChanged[onMouseUp, "mouseup", {
+                    this.onMouseUp.emit(Int().{ this = data.getInt("button") });
+                }];
+            }
+        }
+
+        handler this.onSignalConnectionsChanged(signal: ptr[Signal[Widget, MouseMovePayload]], connectionCount: Int) {
+            if this.id == "" return;
+
+            if signal == this.onMouseMove~ptr {
+                handleSignalConnectionChanged[onMouseMove, "mousemove", {
+                    this.onMouseMove.emit(MouseMovePayload().{
+                        posX = data.getInt("offsetX");
+                        posY = data.getInt("offsetY");
+                        deltaX = data.getInt("movementX");
+                        deltaY = data.getInt("movementY");
+                    });
+                }];
+            }
+        }
+
+        handler this.getDimensions(): Dimensions {
+            if this.id == "" return Dimensions(0, 0);
+            def d: Dimensions;
+            getElementDimensions(this.id, d);
+            return d;
+        }
+
+        handler this.requestPointerLock() {
+            if this.id == "" return;
+            WebPlatform.requestPointerLock(this.id);
+        }
+
+        handler this.requestFullScreen() {
+            if this.id == "" return;
+            WebPlatform.requestFullScreen(this.id);
+        }
+    }
+}
+

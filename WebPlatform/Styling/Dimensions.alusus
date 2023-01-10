@@ -1,0 +1,22 @@
+@merge module WebPlatform {
+    //==========================================================================
+    // Dimensions
+    class Dimensions {
+        def width: Int = 0;
+        def height: Int = 0;
+
+        handler this~init() {}
+        handler this~init(w: Int, h: Int) {
+            this.width = w;
+            this.height = h;
+        }
+        handler this~init(temp_ref[Dimensions]) {
+            this = value;
+        }
+        handler this = temp_ref[Dimensions] {
+            this.width = value.width;
+            this.height = value.height;
+        }
+    }
+}
+

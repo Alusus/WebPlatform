@@ -1,0 +1,32 @@
+@merge module WebPlatform {
+    function dispatchEvents {
+        while 1 {
+            def jsonStr: ptr[array[Char]] = fetchNextEvent();
+            if jsonStr == 0 break;
+            def json: Json(jsonStr);
+            // TODO: Use (and implement) json.getArchInt("cbId").
+            def index: ArchInt = findEventHandlerIndex(json.getInt("cbId"));
+            if index != -1 {
+                eventHandlers(index).cb(json);
+                if !json.getBool("recurring") eventHandlers.remove(index);
+            }
+        }
+    }
+    
+    function runEventLoop {
+        while 1 {
+            waitForEvent();
+            dispatchEvents();
+        }
+    }
+
+    function await [Rtype: type = Int] (p: SrdRef[Promise[Rtype]]): Rtype {
+        while 1 {
+            waitForEvent();
+            dispatchEvents();
+            if p.status != Status.NEW break;
+        }
+        return p.result;
+    }
+}
+

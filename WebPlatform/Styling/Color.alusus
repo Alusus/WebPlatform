@@ -1,0 +1,96 @@
+@merge module WebPlatform {
+    //==========================================================================
+    // Color
+    class Color {
+        def red: Int = 0;
+        def green: Int = 0;
+        def blue: Int = 0;
+        def alpha: Int = 0;
+
+        handler this~init() {}
+        handler this~init(r: Int, g: Int, b: Int) {
+            this.red = r;
+            this.green = g;
+            this.blue = b;
+            this.alpha = 255;
+        }
+        handler this~init(r: Int, g: Int, b: Int, a: Int) {
+            this.red = r;
+            this.green = g;
+            this.blue = b;
+            this.alpha = a;
+        }
+
+        handler this~init(hex: String) {
+            if hex.getLength() == 3 or hex.getLength() == 4 {
+                this.red = this.convertHexToDecimal({ hex(0), hex(0) });
+                this.green = this.convertHexToDecimal({ hex(1), hex(1) });
+                this.blue = this.convertHexToDecimal({ hex(2), hex(2) });
+                if hex.getLength() == 3 this.alpha = 255
+                else this.alpha = this.convertHexToDecimal({ hex(3), hex(3) });
+            } else if hex.getLength() == 6 or hex.getLength() == 8 {
+                this.red = this.convertHexToDecimal({ hex(0), hex(1) });
+                this.green = this.convertHexToDecimal({ hex(2), hex(3) });
+                this.blue = this.convertHexToDecimal({ hex(4), hex(5) });
+                if hex.getLength() == 6 this.alpha = 255
+                else this.alpha = this.convertHexToDecimal({ hex(6), hex(7) });
+            }
+        }
+
+        handler this~init(hex: ptr[array[Char]]) {
+            this~init(String(hex));
+        }
+
+        handler this~init(temp_ref[Color]) {
+            this = value;
+        }
+        handler this = temp_ref[Color] {
+            this.red = value.red;
+            this.green = value.green;
+            this.blue = value.blue;
+            this.alpha = value.alpha;
+        }
+        handler this == ref[Color] : bool {
+            if(this.red==value.red && this.green==value.green && this.blue==value.blue && this.alpha==value.alpha)
+                return true;
+            return false;
+        }
+        handler this != ref[Color] : bool {
+            return !(this == value);
+        }
+
+        handler this.convertHexToDecimal(letter: Char): Int {
+            if letter >= '0' and letter <= '9' return letter - '0'
+            else if letter >= 'a' and letter <= 'f' return 10 + letter - 'a'
+            else if letter >= 'A' and letter <= 'F' return 10 + letter - 'A'
+            else return 0;
+        }
+        handler this.convertHexToDecimal(count: Int, letters: ...Char): Int {
+            def result: Int = 0;
+            while count-- > 0 {
+                result *= 16;
+                result += this.convertHexToDecimal(letters~next_arg[Char]);
+            }
+            return result;
+        }
+
+        handler this~cast[String] {
+            @shared def hex: Array[Char]({
+                '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'
+            });
+            @shared def c: array[Char, 10];
+            c(0) = '#';
+            c(1) = hex((this.red / 16) % 16);
+            c(2) = hex(this.red % 16);
+            c(3) = hex((this.green / 16) % 16);
+            c(4) = hex(this.green % 16);
+            c(5) = hex((this.blue / 16) % 16);
+            c(6) = hex(this.blue % 16);
+            c(7) = hex((this.alpha / 16) % 16);
+            c(8) = hex(this.alpha % 16);
+            c(9) = 0;
+            return String(c~ptr);
+        }
+    }
+}
+

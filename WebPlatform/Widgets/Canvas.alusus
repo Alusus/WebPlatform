@@ -1,0 +1,67 @@
+@merge module WebPlatform {
+    //==========================================================================
+    // Canvas
+    // A free form drawing area.
+    class Canvas {
+        @injection def widget: Widget;
+        @injection def drawing: Drawing;
+        def resourceId: ArchInt;
+
+        //-----------
+        // Properties
+
+        generateProperty[bitmapWidth, BitmapWidth, String];
+        generateProperty[bitmapHeight, BitmapHeight, String];
+
+        //---------
+        // Handlers
+
+        handler this~init() {
+        }
+
+        handler this.onPropUpdated() this.update();
+
+        //-------------------
+        // Function Overrides
+
+        handler (this:Widget).build (ownerId: String) set_ptr {
+            this.id = getNewId();
+            createElement("canvas", this.id, ownerId);
+            this.resourceId = registerElementAsResource(this.id);
+            this.buildCommon();
+            this.update();
+        }
+
+        handler (this:Widget).unbuild() set_ptr {
+            if this.id.getLength() > 0 {
+                deleteElement(this.id);
+                releaseResource(this.resourceId);
+                this.unbuildCommon();
+                this.id = String();
+            }
+        }
+
+        handler (this:Widget).update() set_ptr {
+            if this.id.getLength() > 0 {
+                this.updateCommon();
+                setElementAttribute(this.id, "width", this.bitmapWidth);
+                setElementAttribute(this.id, "height", this.bitmapHeight);
+            }
+        }
+
+        handler (this: Drawing).getResourceId(): ArchInt set_ptr {
+            unshiftThis[drawing];
+            return this.resourceId;
+        }
+
+        //-----------------
+        // Shared Functions
+
+        handler this_type(): SrdRef[Canvas] {
+            def r: SrdRef[Canvas];
+            r.alloc()~init();
+            return r;
+        }
+    }
+}
+

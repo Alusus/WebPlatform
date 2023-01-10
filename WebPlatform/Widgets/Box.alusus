@@ -1,0 +1,80 @@
+@merge module WebPlatform {
+    //==========================================================================
+    // Box
+    // A rectangular area that contains other widgets.
+    class Box {
+        @injection def widget: Widget;
+        def children: Array[SrdRef[Widget]];
+
+        //---------
+        // Handlers
+
+        handler this~init() {
+        }
+
+        handler this.addChildren (count: Int, children: ...temp_ref[SrdRef[Widget]]) {
+            while count-- > 0 {
+                def child: ref[SrdRef[Widget]](children~next_arg[ref[SrdRef[Widget]]]);
+                this.children.add(child);
+                if this.id.getLength() > 0 child.build(this.id);
+            }
+        }
+
+        handler this.removeChildren (count: Int, children: ...temp_ref[SrdRef[Widget]]) {
+            while count-- > 0 {
+                def child: ref[SrdRef[Widget]](children~next_arg[ref[SrdRef[Widget]]]);
+                def i: Int;
+                for i = 0, i < this.children.getLength(), ++i {
+                    if this.children(i).obj~ptr == child.obj~ptr {
+                        child.unbuild();
+                        this.children.remove(i);
+                        return;
+                    }
+                }
+            }
+        }
+
+        //-------------------
+        // Function Overrides
+
+        handler (this:Widget).build (ownerId: String) set_ptr {
+            this.id = getNewId();
+            createElement("div", this.id, ownerId);
+            this.buildCommon();
+            this.update();
+            def i: Int;
+            for i = 0, i < this.children.getLength(), ++i {
+                this.children(i).build(this.id);
+            }
+        }
+
+        handler (this:Widget).unbuild() set_ptr {
+            if this.id.getLength() > 0 {
+                deleteElement(this.id);
+                this.unbuildCommon();
+
+                def i: Int;
+                for i = 0, i < this.children.getLength(), ++i {
+                    this.children(i).unbuild();
+                }
+
+                this.id = String();
+            }
+        }
+
+        handler (this:Widget).update() set_ptr {
+            this.updateCommon();
+        }
+
+        //-----------------
+        // Shared Functions
+
+        handler this_type(count: Int, args: ...temp_ref[SrdRef[Widget]]): SrdRef[Box] {
+            def r: SrdRef[Box];
+            r.alloc()~init();
+            while count-- > 0 r.addChildren({ args~next_arg[ref[SrdRef[Widget]]] });
+            return r;
+        }
+    }
+}
+
