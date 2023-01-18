@@ -78,10 +78,10 @@
         عرف العرض: لقب width؛
         عرف الطول: لقب height؛
         عرف أدنى_عرض: لقب minWidth؛
-        عرف أدنى_ارتفاع: لقب minHeight؛
+        عرف أدنى_طول: لقب minHeight؛
         عرف أقصى_عرض: لقب maxWidth؛
         عرف أقصى_طول: لقب maxHeight؛
-        عرف الإطار: لقب border؛
+        عرف سمك_الإطار: لقب borderWidth؛
         عرف لون_الإطار: لقب borderColor؛
         عرف نصف_قطر_الإطار: لقب borderRadius؛
         عرف طراز_الإطار: لقب borderStyle؛
@@ -97,6 +97,8 @@
         عرف الحشوة: لقب padding؛
         عرف حجم_الخط: لقب fontSize؛
         عرف لون_الخط: لقب fontColor؛
+        عرف فئة_الخط: لقب fontFamily؛
+        عرف الشفافية: لقب opacity؛
         عرف الانتقال: لقب transition؛
         عرف التحول: لقب transform؛
         عرف الإزاحة: لقب translate؛

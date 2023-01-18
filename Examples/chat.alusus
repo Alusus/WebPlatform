@@ -93,7 +93,7 @@ class Header {
                 height = "85pt";
                 padding = Quad(4, 0, 0, 0);
                 background = PRIMARY_COLOR;
-                border = Quad(1.5);
+                borderWidth = Quad(1.5);
                 borderStyle = "solid";
                 borderColor = PRIMARY_COLOR;
                 justify = "space-between";
@@ -110,7 +110,7 @@ class Header {
                         align = "center";
                     };
                     addChildren({
-                        Box({ Label(String("أمثلة منصة ويب الأسس - الدردشة")).{ style.{
+                        Box({ Label(String("Alusus Web Platform Examples - Chat")).{ style.{
                             fontColor = Color("fff");
                             fontSize = 21.0;
                             height = "100%";
@@ -132,8 +132,8 @@ class Header {
                         justify = "space-between";
                     };
                     addChildren({
-                        MenuButton(String("/"), String("الرئيسية"), String("/Assets/chat.svg")),
-                        MenuButton(String("/about"), String("عن البرنامج"), String("/Assets/about.svg"))
+                        MenuButton(String("/"), String("Main"), String("/Assets/chat.svg")),
+                        MenuButton(String("/about"), String("About"), String("/Assets/about.svg"))
                     });
                 }
             });
@@ -169,7 +169,7 @@ class TextEntry {
                 display = "flex";
                 layout = "row";
                 justify = "space-between";
-                border = Quad(1.5);
+                borderWidth = Quad(1.5);
                 borderStyle = "solid";
                 borderColor = PRIMARY_COLOR;
                 background = PRIMARY_COLOR;
@@ -191,7 +191,7 @@ class TextEntry {
                         }
                     });
                 },
-                Button(String("أرسل")).{
+                Button(String("Send")).{
                     style.{
                         height = "100%";
                         width = "50pt";
@@ -199,7 +199,7 @@ class TextEntry {
                         fontSize = 16.0;
                         justify = "center";
                     };
-                    onClick.connect(closure (widget: ref[Button], payload: ref[Int]) {
+                    onClick.connect(closure (widget: ref[Widget], payload: ref[Int]) {
                         def newData: String = String("- ") + encodeHtml(self.textInput.getText()).trim();
                         self.textInput.setText(String());
                         if not self.onNewEntry.isNull() self.onNewEntry(newData);
@@ -234,7 +234,6 @@ func main {
         style.{
             height = "100%";
             justify = "space-between";
-            direction = "rtl";
             display = "flex";
             layout = "column";
         };
@@ -278,7 +277,7 @@ func main {
                                     notificationLabel.setText(String(""));
                                 }
                             } else {
-                                notificationLabel.setText(String("الاتصال مقطوع. رمز حالة ب.ن.ن.ف: ") + status);
+                                notificationLabel.setText(String("Connection error. HTTP status: ") + status);
                             }
                         };
                     }
@@ -313,16 +312,15 @@ func about {
     Window.instance.setView(Box({}).{
         style.{
             display = "flex";
-            direction = "rtl";
             layout = "column";
         };
         addChildren({
             Header(),
-            Label(String("مثال الدردشة")).{ style.{
+            Label(String("Chat Example")).{ style.{
                 fontColor = Color(0, 0, 0);
                 fontSize = 30.0;
             } },
-            Label(String("طُور باستخدام منصة ويب الأسس")).{ style.{
+            Label(String("Built using Alusus Web Platform")).{ style.{
                 fontColor = Color(0, 0, 0);
                 fontSize = 20.0;
             } }
