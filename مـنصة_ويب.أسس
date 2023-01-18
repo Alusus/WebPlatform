@@ -24,6 +24,7 @@
     عرف هات_قيمة_زر_المقبض: لقب getGamepadButton؛
 
     عرف اكتب_في_الطرفية: لقب logToConsole؛
+    عرف طابق_نمطا: لقب regexMatch؛
 
     عرف أبـعاد: لقب Dimensions؛
     @دمج صنف أبـعاد {

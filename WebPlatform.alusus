@@ -43,6 +43,7 @@ import "WebPlatform/Window";
 import "WebPlatform/event_handling";
 import "WebPlatform/event_loop";
 import "WebPlatform/async_operations";
+import "WebPlatform/string_operations";
 
 @merge module WebPlatform {
     use Srl;

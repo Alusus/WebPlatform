@@ -88,5 +88,7 @@
     @expname[addVarToSession] function addVarToSession (varName: ptr[Char], varValue: ptr[Char]);
     @expname[getVarFromSession] function getVarFromSession (varName: ptr[Char]): ptr[array[Char]];
     @expname[logToConsole] function logToConsole (msg: ptr[Char]);
+    // String
+    @expname[regexMatch] function _regexMatch (str: ptr[Char], regex: ptr[Char], lastIndex: ref[Int]): ptr[Char];
 }
 
