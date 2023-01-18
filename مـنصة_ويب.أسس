@@ -23,6 +23,7 @@
     عرف هات_قيمة_محور_المقبض: لقب getGamepadAxis؛
     عرف هات_قيمة_زر_المقبض: لقب getGamepadButton؛
 
+    عرف أعد_التوجيه: لقب httpRedirect؛
     عرف اكتب_في_الطرفية: لقب logToConsole؛
     عرف طابق_نمطا: لقب regexMatch؛
 
@@ -274,6 +275,8 @@
         عرف النموذج: لقب instance؛
         عرف حدد_المشهد: لقب setView؛
         عرف أزل_المشهد: لقب unsetView؛
+        عرف مسار_الصفحة: لقب locationPath؛
+        عرف ادفع_حالة: لقب pushState؛
         عرف المفاتيح_المكبوتة: لقب keysToSwallow؛
         عرف عند_بدء_الكبسة: لقب onKeyDown؛
         عرف عند_انتهاء_الكبسة: لقب onKeyUp؛
@@ -281,6 +284,7 @@
         عرف عند_تغير_ملء_الشاشة: لقب onFullScreenChange؛
         عرف عند_ربط_مقبض: لقب onGamepadConnected؛
         عرف عند_فصل_مقبض: لقب onGamepadDisconnected؛
+        عرف عند_تغير_المسار: لقب onPathChanged؛
     }
 }
 

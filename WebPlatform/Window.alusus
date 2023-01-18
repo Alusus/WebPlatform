@@ -12,6 +12,7 @@
             this.onFullScreenChange.owner~no_deref = this;
             this.onGamepadConnected.owner~no_deref = this;
             this.onGamepadDisconnected.owner~no_deref = this;
+            this.onPathChanged.owner~no_deref = this;
         }
 
         //-------
@@ -29,6 +30,8 @@
         def onGamepadConnectedId: ArchInt = -1;
         def onGamepadDisconnected: Signal[Window, String];
         def onGamepadDisconnectedId: ArchInt = -1;
+        def onPathChanged: Signal[Window, Int];
+        def onPathChangedId: ArchInt = -1;
 
         handler this.onSignalConnectionsChanged(signal: ptr[Signal[Window, String]], connectionCount: Int) {
             if signal == this.onKeyDown~ptr {
@@ -62,6 +65,14 @@
             }
         }
 
+        handler this.onSignalConnectionsChanged(signal: ptr[Signal[Window, Int]], connectionCount: Int) {
+            if signal == this.onPathChanged~ptr {
+                handleSignalConnectionChanged[onPathChanged, "popstate", {
+                    this.onPathChanged.emit(Int(0));
+                }];
+            }
+        }
+
         //---------
         // Handlers
 
@@ -74,6 +85,15 @@
         handler this.unsetView() {
             if this.view.obj~ptr != 0 this.view.unbuild();
             this.view.release();
+        }
+
+        handler this.locationPath: String {
+            return String(getLocationPath()~cast[CharsPtr]);
+        }
+
+        handler this.pushState (url: ptr[array[Char]]) {
+            WebPlatform.pushState(url, "{}");
+            this.onPathChanged.emit(Int(0));
         }
     }
 }

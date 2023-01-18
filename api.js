@@ -511,6 +511,14 @@ wasmApi.httpRedirect = (page) => {
     window.location.replace(toJsString(page));
 }
 
+wasmApi.pushState = (url, state) => {
+  window.history.pushState(JSON.parse(toJsString(state)), null, toJsString(url));
+}
+
+wasmApi.getLocationPath = () => {
+    return toWasmString(window.location.pathname);
+}
+
 wasmApi.setCookie = (cname, cvalue, exdays) => {
   const d = new Date();
   d.setTime(d.getTime() + (parseInt(toJsString(exdays)) * 24 * 60 * 60 * 1000));
@@ -587,6 +595,7 @@ const eventPropMap = {
     fullscreenchange: ['enabled'],
     gamepadconnected: ['gamepad'],
     gamepaddisconnected: ['gamepad'],
+    popstate: ['state'],
 };
 
 function stringifyEvent(event) {
