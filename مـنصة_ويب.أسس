@@ -233,6 +233,36 @@
         عرف تذيل_الإزالة: لقب beforeBuild؛
     }
 
+    عرف مـبدال: لقب Switcher؛
+    @دمج صنف مـبدال {
+        عرف حدد_الانتقال: لقب setTransition؛
+        عرف بدل_إلى: لقب switchTo؛
+    }
+
+    عرف انـتقال_مبدال: لقب SwitcherTransition؛
+    @دمج صنف انـتقال_مبدال {
+        عرف طراز_المشهد_الحالي: لقب currentViewStyle؛
+        عرف طراز_المشهد_التالي: لقب incomingViewStyle؛
+        عرف المدة_الكلية: لقب totalDuration؛
+    }
+
+    عرف هات_انتقال_انزلاق_أفقي_أمامي: لقب getForwardHorizontalSlideTransition؛
+    عرف هات_انتقال_انزلاق_أفقي_خلفي: لقب getBackwardHorizontalSlideTransition؛
+    عرف هات_انتقال_انزلاق_عمودي_أمامي: لقب getForwardVerticalSlideTransition؛
+    عرف هات_انتقال_انزلاق_عمودي_خلفي: لقب getBackwardVerticalSlideTransition؛
+    عرف هات_انتقال_تلاشي: لقب getFadeTransition؛
+
+    عرف مـبدال_توجيه: لقب RoutingSwitcher؛
+    @دمج صنف مـبدال_توجيه {
+        عرف متحسس_المسار: لقب routeListener؛
+        عرف عند_المسار_المجهول: لقب onUnknownRoute؛
+        عرف تسلسل_المسار_الحالي: لقب currentRouteIndex؛
+        عرف حدد_النمط: لقب setRegex؛
+        عرف مسار: لقب route؛
+        عرف حدد_الانتقال: لقب setTransition؛
+        عرف استنتج_تسلسل_المسار_الحالي: لقب determineCurrentRouteIndex؛
+    }
+
     //==========================================================================
     // موارد
 
@@ -274,7 +304,7 @@
     }
 
     //==========================================================================
-    // وسائط
+    // عامة
 
     عرف نـافذة: لقب Window؛
     @دمج صنف نـافذة {
@@ -291,6 +321,26 @@
         عرف عند_ربط_مقبض: لقب onGamepadConnected؛
         عرف عند_فصل_مقبض: لقب onGamepadDisconnected؛
         عرف عند_تغير_المسار: لقب onPathChanged؛
+    }
+
+    عرف مـتحسس_مسار: لقب RouteListener؛
+    @دمج صنف مـتحسس_مسار {
+        عرف نمط: لقب regex؛
+        عرف عند_التوجيه: لقب onRoute؛
+        عرف أطلق_التوجيه: لقب triggerRoute؛
+        عرف هات_المسار_الحالي: لقب getCurrentRoute؛
+    }
+
+    عرف حـمولة_مسار: لقب RoutePayload؛
+    @دمج صنف حـمولة_مسار {
+        عرف المسار_الكامل: لقب fullPath؛
+        عرف المسار: لقب route؛
+    }
+
+    عرف مـوجه: لقب Router؛
+    @دمج صنف مـوجه {
+        عرف مسار: لقب route؛
+        عرف أطلق_التوجيه: لقب triggerRoute؛
     }
 }
 

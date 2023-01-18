@@ -1,0 +1,215 @@
+@merge module WebPlatform {
+    //==========================================================================
+    // Switcher
+    // A view switcher allowing users to dynamically switch the child view and
+    // optionally do that with a transition animation.
+    class Switcher {
+        @injection def component: Component;
+        @shared def transitionUniqueCounter: Int(0);
+        def transitionUniqueSuffix: Int = ++transitionUniqueCounter;
+        def innerView: SrdRef[Box];
+        def transitionView: SrdRef[Box];
+        def transitionTimeout: ArchInt = 0;
+        def transitionDurations: Map[String, Int];
+
+        this.style.{
+            display = String("flex");
+            layout = String("row");
+            overflow = String("clip");
+        };
+        this.style("switcherview").{
+            width = String("100%");
+            height = String("100%");
+            flex = String("none");
+        };
+        this.view = Box({})~use_in(self) {
+            style = this.style;
+            addChildren({
+                Box({})~use_in(self) {
+                    className = String("switcherview");
+                    this.innerView = self;
+                }
+            });
+        };
+
+        handler this~init() {
+        }
+
+        handler this~init(child: SrdRef[Widget]) {
+            this.innerView.addChildren({ child });
+        }
+
+        handler this.setTransition(name: String, transition: SwitcherTransition) {
+            name += this.transitionUniqueSuffix;
+            this.transitionDurations(name) = transition.totalDuration;
+            this.style(name + "_current") = transition.currentViewStyle;
+            this.style(name + "_incoming") = transition.incomingViewStyle;
+        }
+
+        handler this.switchTo(child: SrdRef[Widget]) {
+            this.switchTo(child, String());
+        }
+
+        handler this.switchTo(child: SrdRef[Widget], transitionName: String) {
+            transitionName += this.transitionUniqueSuffix;
+            if this.transitionTimeout != 0 cancelTimeout(this.transitionTimeout);
+            this.endTransition();
+
+            castRef[this.view.obj, Box]~use_in(self) {
+                addChildren({
+                    Box({})~use_in(self) {
+                        if transitionName != "" className = transitionName + "_incoming switcherview"
+                        else className = String("switcherview");
+                        addChildren({ child });
+                        this.transitionView = self;
+                    }
+                });
+            };
+            if transitionName != "" this.innerView.className = transitionName + "_current switcherview";
+
+            if transitionName != "" {
+                this.transitionTimeout = setTimeout(this.transitionDurations(transitionName), closure (json: Json) {
+                    this.endTransition();
+                });
+            } else {
+                this.endTransition();
+            }
+        }
+
+        handler this.endTransition() {
+            if this.transitionView.isNull() return;
+            castRef[this.view.obj, Box].removeChildren({ this.innerView });
+            this.innerView = this.transitionView;
+            this.innerView.className = String("switcherview");
+            this.transitionView.release();
+            this.transitionTimeout = 0;
+        }
+
+        //-----------------
+        // Shared Functions
+
+        handler this_type(): SrdRef[Switcher] {
+            return SrdRef[Switcher].construct();
+        }
+        handler this_type(child: temp_ref[SrdRef[Widget]]): SrdRef[Switcher] {
+            return SrdRef[Switcher]().{ alloc()~init(child) };
+        }
+    }
+
+    //==========================================================================
+    // SwitcherTransition
+    // Contains transition animation styles used by the switcher.
+    class SwitcherTransition {
+        def currentViewStyle: Style;
+        def incomingViewStyle: Style;
+        def totalDuration: Int;
+
+        handler this~init() {}
+        handler this~init(ref[this_type]) this = value;
+        handler this = ref[this_type] {
+            this.currentViewStyle = value.currentViewStyle;
+            this.incomingViewStyle = value.incomingViewStyle;
+            this.totalDuration = value.totalDuration;
+        }
+    }
+
+    //==========================================================================
+    // Default Transitions
+
+    func getForwardHorizontalSlideTransition (duration: Float, rtl: Bool): SwitcherTransition {
+        return SwitcherTransition().{
+            totalDuration = duration * 1000000;
+            currentViewStyle.{
+                if rtl translate = "100%" else translate = "-100%";
+                animation = Animation(duration, Array[Style]({
+                    Style().{ translate = "0%" },
+                    Style().{ if rtl translate = "100%" else translate = "-100%" }
+                }));
+            };
+            incomingViewStyle = currentViewStyle;
+        }
+    }
+
+    func getBackwardHorizontalSlideTransition (duration: Float, rtl: Bool): SwitcherTransition {
+        return SwitcherTransition().{
+            totalDuration = duration * 1000000;
+            currentViewStyle.{
+                if rtl translate = "-100%" else translate = "100%";
+                animation = Animation(duration, Array[Style]({
+                    Style().{ translate = "0%" },
+                    Style().{ if rtl translate = "-100%" else translate = "100%" }
+                }));
+            };
+            incomingViewStyle.{
+                if rtl translate = "100%" else translate = "-100%";
+                animation = Animation(duration, Array[Style]({
+                    Style().{ if rtl translate = "200%" else translate = "-200%" },
+                    Style().{ if rtl translate = "100%" else translate = "-100%" }
+                }));
+            };
+        }
+    }
+
+    func getForwardVerticalSlideTransition (duration: Float, rtl: Bool): SwitcherTransition {
+        return SwitcherTransition().{
+            totalDuration = duration * 1000000;
+            currentViewStyle.{
+                translate = "0 -100%";
+                animation = Animation(duration, Array[Style]({
+                    Style().{ translate = "0 0%" },
+                    Style().{ translate = "0 -100%" }
+                }));
+            };
+            incomingViewStyle.{
+                if rtl translate = "100% 0" else translate = "-100% 0";
+                animation = Animation(duration, Array[Style]({
+                    Style().{ if rtl translate = "100% 100%" else translate = "-100% 100%" },
+                    Style().{ if rtl translate = "100% 0" else translate = "-100% 0" }
+                }));
+            };
+        }
+    }
+
+    func getBackwardVerticalSlideTransition (duration: Float, rtl: Bool): SwitcherTransition {
+        return SwitcherTransition().{
+            totalDuration = duration * 1000000;
+            currentViewStyle.{
+                translate = "0 100%";
+                animation = Animation(duration, Array[Style]({
+                    Style().{ translate = "0 0%" },
+                    Style().{ translate = "0 100%" }
+                }));
+            };
+            incomingViewStyle.{
+                if rtl translate = "100% 0" else translate = "-100% 0%";
+                animation = Animation(duration, Array[Style]({
+                    Style().{ if rtl translate = "100% -100%" else translate = "-100% -100%" },
+                    Style().{ if rtl translate = "100% 0" else translate = "-100% 0" }
+                }));
+            };
+        }
+    }
+
+    func getFadeTransition (duration: Float, rtl: Bool): SwitcherTransition {
+        return SwitcherTransition().{
+            totalDuration = duration * 1000000;
+            currentViewStyle.{
+                opacity = 0.0;
+                animation = Animation(duration, Array[Style]({
+                    Style().{ opacity = 1.0 },
+                    Style().{ opacity = 0.0 }
+                }));
+            };
+            incomingViewStyle.{
+                if rtl translate = "100%" else translate = "-100%";
+                animation = Animation(duration, Array[Style]({
+                    Style().{ opacity = 0.0 },
+                    Style().{ opacity = 1.0 }
+                }));
+            };
+        }
+    }
+
+    // TODO: Add more transitions.
+}
+

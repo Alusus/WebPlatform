@@ -1,0 +1,466 @@
+import "Apm";
+Apm.importFile("Alusus/WebPlatform");
+use Srl;
+use WebPlatform;
+
+//==============================================================================
+// Backend
+
+@assetsRoute def assetsRoute: "Assets/";
+
+//==============================================================================
+// Frontend Components
+
+class MenuButton {
+    @injection def component: Component;
+
+    handler this~init(link: String, label: String) {
+        this.view = Box({}).{
+            style.{
+                layout = "row";
+                align = "center";
+                textAlign = "center";
+                width = "60pt";
+                cursor = "pointer";
+                transition = ".3s";
+            };
+            style("label").{
+                fontSize = 14.0;
+                fontColor = Color("444");
+            }
+            style({ StateSelector.HOVER }).{
+                transform = "scale(1.3)";
+            }
+            style({ StateSelector.HOVER, "label" }).{
+                fontSize = 14.0;
+                fontColor = Color("000");
+            }
+            onClick.connect(closure (widget: ref[Widget], payload: ref[Int]) {
+                Window.instance.pushState(link);
+            });
+            addChildren({
+                Label(label).{
+                    className = String("label")
+                }
+            });
+        };
+    }
+
+    handler this_type(link: String, label: String): SrdRef[MenuButton] {
+        return SrdRef[MenuButton]().{ alloc()~init(link, label) };
+    }
+}
+
+class SideButton {
+    @injection def component: Component;
+    def onButtonClicked: closure();
+
+    handler this~init(label: String) {
+        def self: ref[this_type](this);
+        this.view = Box({}).{
+            style.{
+                align = "center";
+                cursor = "pointer";
+                width = "40pt";
+                textAlign = "center";
+            };
+            style("label").{
+                fontSize = 14.0;
+                fontColor = Color("444");
+            }
+            style({ StateSelector.HOVER, "label" }).{
+                fontSize = 14.0;
+                fontColor = Color("000");
+            }
+            onClick.connect(closure (widget: ref[Widget], payload: ref[Int]) {
+                self.onButtonClicked();
+            });
+            addChildren({
+                Label(label).{
+                    className = String("label")
+                }
+            });
+        };
+    }
+
+    handler this_type(label: String): SrdRef[SideButton] {
+        return SrdRef[SideButton]().{ alloc()~init(label) };
+    }
+}
+
+class Header {
+    @injection def component: Component;
+    def indicator: SrdRef[Box];
+    def routingSwitcher: SrdRef[RoutingSwitcher];
+    def routeCallback: closure (ref[RouteListener], ref[RoutePayload]) =
+        closure (ref[RouteListener], ref[RoutePayload]) {
+            this.updateIndicator();
+        };
+
+    handler this~init() {
+        def self: ref[this_type](this);
+        this.view = Box({}).{
+            style.{
+                width = "100%";
+                height = "85pt";
+                padding = Quad(4, 0, 0, 0);
+                borderWidth = Quad(0, 0, 3, 0);
+                borderStyle = "solid";
+                borderColor = Color("666");
+                justify = "space-between";
+                align = "center";
+                display = "flex";
+                layout = "column";
+            };
+            def i: Int;
+            for i = 0, i < 3, ++i {
+                style(String("indicator")+i).{
+                    width = "60pt";
+                    height = "3pt";
+                    background = Color(0, 0, 150);
+                    transform=String.format("translateX(%ipt)", i * 60);
+                    transition=String(".5s");
+                };
+            }
+
+            addChildren({
+                Box({}).{
+                    style.{
+                        display = "flex";
+                        layout = "row";
+                        justify = "space-between";
+                        align = "center";
+                    };
+                    addChildren({
+                        Image().{
+                            url = String("/Assets/wblogo.svg");
+                            style.{
+                                height = "50pt";
+                                padding = Quad(0, 10);
+                            };
+                        },
+                        Box({ Label(String("Alusus Web Platform Example")).{ style.{
+                            fontColor = Color("000");
+                            fontSize = 21.0;
+                            height = "100%";
+                            padding = Quad(0, 10);
+                        } } })
+                    });
+                },
+                Box({}).{
+                    style.{
+                        display = "flex";
+                        layout = "row";
+                        justify = "center";
+                    };
+                    addChildren({
+                        MenuButton(String("/one"), String("One")),
+                        MenuButton(String("/two"), String("Two")),
+                        MenuButton(String("/three"), String("Three"))
+                    });
+                },
+                Box({}).{
+                    style.{
+                        display = "flex";
+                        layout = "row";
+                        justify = "start";
+                        width = "180pt";
+                        padding = Quad(0, 0, 4, 0);
+                    };
+                    addChildren({
+                        Box({}).{
+                            self.indicator = this;
+                        }
+                    });
+                }
+            });
+        };
+    }
+
+    handler this~terminate() {
+        if not this.routingSwitcher.isNull() {
+            this.routingSwitcher.routeListener.onRoute.disconnect(this.routeCallback);
+        }
+    }
+
+    handler this.setRoutingSwitcher(rs: SrdRef[RoutingSwitcher]) {
+        if not this.routingSwitcher.isNull() {
+            this.routingSwitcher.routeListener.onRoute.disconnect(this.routeCallback);
+        }
+        this.routingSwitcher = rs;
+        this.routingSwitcher.routeListener.onRoute.connect(this.routeCallback);
+        this.indicator.className = String("indicator") + Int()~use_in(i) {
+            i = this.routingSwitcher.determineCurrentRouteIndex();
+            if i == -1 i = 0;
+        }
+    }
+
+    handler this.updateIndicator() {
+        this.indicator.className = String("indicator") + this.routingSwitcher.currentRouteIndex;
+    }
+
+    handler this_type(): SrdRef[Header] {
+        return SrdRef[Header].construct();
+    }
+}
+
+class Page {
+    @injection def component: Component;
+
+    handler this~init(label: String) {
+        this.view = Label(label).{
+            style.{
+                fontColor = Color(0, 0, 0);
+                fontSize = 20.0;
+            }
+        };
+    }
+
+    handler this_type(label: String): SrdRef[Page] {
+        return SrdRef[Page]().{ alloc()~init(label) };
+    }
+}
+
+class ImgView {
+    @injection def component: Component;
+
+    handler this~init(path: String) {
+        this.view = Image().{
+            url = path;
+            style.{
+                width = "100%";
+                height = "100%";
+            };
+        };
+    }
+
+    handler this_type(path: String): SrdRef[ImgView] {
+        return SrdRef[ImgView]().{ alloc()~init(path) };
+    }
+}
+
+class ImageViewer {
+    @injection def component: Component;
+
+    handler this~init() {
+        this.view = Box({}).{
+            style.{
+                width = "100%";
+                height = "100%";
+                display = "flex";
+                layout = "row";
+            };
+            addChildren({
+                Box({}).{
+                    style.{
+                        layout = "column";
+                        background = Color("eee");
+                    };
+                    addChildren({
+                        SideButton(String("1")).{ onButtonClicked = closure() { Window.instance.pushState("/one/img1") } },
+                        SideButton(String("2")).{ onButtonClicked = closure() { Window.instance.pushState("/one/img2") } },
+                        SideButton(String("3")).{ onButtonClicked = closure() { Window.instance.pushState("/one/img3") } },
+                    });
+                },
+                Box({}).{
+                    style.{
+                        flex = "auto";
+                    };
+                    addChildren({
+                        RoutingSwitcher().{
+                            style.{
+                                flex = "auto";
+                                height = "500pt";
+                            };
+                            setRegex(String("^/one/([a-z0-9]+)"));
+                            setTransition(
+                                getFadeTransition(1.0, false),
+                                getFadeTransition(1.0, false)
+                            );
+                            route("img1") = closure(RoutePayload): SrdRef[Component] {
+                                return ImgView(String("/Assets/wblogo.svg"));
+                            };
+                            route("img2") = closure(RoutePayload): SrdRef[Component] {
+                                return ImgView(String("/Assets/future-musume.jpg"));
+                            };
+                            route("img3") = closure(RoutePayload): SrdRef[Component] {
+                                return ImgView(String("/Assets/bridge.png"));
+                            };
+                        }
+                    });
+                }
+            });
+        }
+    }
+
+    handler this_type(): SrdRef[ImageViewer] {
+        return SrdRef[ImageViewer].construct();
+    }
+}
+
+class DigitView {
+    @injection def component: Component;
+
+    handler this~init(label: String) {
+        this.view = Box({}).{
+            style.{
+                width = "100%";
+                height = "100%";
+                display = "flex";
+                align = "center";
+                justify = "center";
+            };
+            addChildren({
+                Box({}).{
+                    style.{
+                        width = "90%";
+                        height = "90%";
+                        borderRadius = Quad(30);
+                        borderColor = Color("444");
+                        borderStyle = "solid";
+                        borderWidth = Quad(10);
+                        display = "flex";
+                        align = "center";
+                        justify = "center";
+                    };
+                    addChildren({
+                        Label(label).{
+                            style.{
+                                fontColor = Color(0, 0, 0);
+                                fontSize = 250.0;
+                            }
+                        }
+                    });
+                }
+            });
+        };
+    }
+
+    handler this_type(label: String): SrdRef[DigitView] {
+        return SrdRef[DigitView]().{ alloc()~init(label) };
+    }
+}
+
+class CounterView {
+    @injection def component: Component;
+    @shared def currentIndex: Int;
+    def switcher: SrdRef[Switcher];
+
+    handler this~init() {
+        def self: ref[this_type](this);
+        this.view = Box({}).{
+            style.{
+                width = "100%";
+                height = "100%";
+                display = "flex";
+                layout = "row";
+            };
+            addChildren({
+                Box({}).{
+                    style.{
+                        layout = "column";
+                        background = Color("eee");
+                    };
+                    addChildren({
+                        SideButton(String("-")).{ onButtonClicked = closure() {
+                            self.switcher.switchTo(DigitView(String() + (--currentIndex)), String("backward"));
+                        } },
+                        SideButton(String("+")).{ onButtonClicked = closure() {
+                            self.switcher.switchTo(DigitView(String() + (++currentIndex)), String("forward"));
+                        } }
+                    });
+                },
+                Box({}).{
+                    style.{
+                        flex = "auto";
+                    };
+                    addChildren({
+                        Switcher().{
+                            style.{
+                                flex = "auto";
+                                height = "500pt";
+                            };
+                            setTransition(String("forward"), getForwardVerticalSlideTransition(0.5, false));
+                            setTransition(String("backward"), getBackwardVerticalSlideTransition(0.5, false));
+                            switchTo(DigitView(String() + currentIndex));
+                            self.switcher = this;
+                        }
+                    });
+                }
+            });
+        }
+    }
+
+    handler this_type(): SrdRef[CounterView] {
+        return SrdRef[CounterView].construct();
+    }
+}
+
+//==============================================================================
+// Frontend Pages
+
+def loremIpsum:
+    "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna"
+    "aliqua. Libero id faucibus nisl tincidunt eget nullam. Dui accumsan sit amet nulla facilisi morbi. Vulputate mi sit"
+    "amet mauris commodo quis imperdiet massa. Eget lorem dolor sed viverra ipsum. Tristique magna sit amet purus gravida"
+    "quis blandit turpis cursus. Iaculis nunc sed augue lacus. Eu nisl nunc mi ipsum faucibus vitae aliquet nec. Proin"
+    "nibh nisl condimentum id venenatis a condimentum vitae. Cursus metus aliquam eleifend mi in nulla posuere"
+    "sollicitudin. Imperdiet nulla malesuada pellentesque elit eget gravida. Ut ornare lectus sit amet. Ultrices dui"
+    "sapien eget mi proin sed. Amet consectetur adipiscing elit duis. Ullamcorper a lacus vestibulum sed arcu."
+    "Scelerisque mauris pellentesque pulvinar pellentesque habitant morbi tristique senectus. Est placerat in egestas"
+    "erat.<br>"
+    "<br>"
+    "Curabitur vitae nunc sed velit dignissim. Et malesuada fames ac turpis. Lorem ipsum dolor sit amet consectetur"
+    "adipiscing elit duis. Maecenas pharetra convallis posuere morbi leo urna molestie at elementum. Vitae aliquet nec"
+    "ullamcorper sit. Egestas egestas fringilla phasellus faucibus scelerisque eleifend donec pretium. Aenean vel elit"
+    "scelerisque mauris pellentesque pulvinar pellentesque habitant. Leo a diam sollicitudin tempor id. Sagittis purus"
+    "sit amet volutpat consequat mauris nunc. Potenti nullam ac tortor vitae purus faucibus ornare. Viverra nam libero"
+    "justo laoreet sit. Scelerisque purus semper eget duis at tellus at urna. Tristique magna sit amet purus gravida"
+    "quis blandit turpis cursus. Orci nulla pellentesque dignissim enim. Orci ac auctor augue mauris augue. Gravida"
+    "neque convallis a cras semper auctor neque vitae.";
+
+@uiEndpoint["/*", "WebPlatform Example"]
+func main {
+    setElementAttribute("body", "style", "padding: 0; margin: 0;");
+    def switcher: SrdRef[Switcher];
+    def header: SrdRef[Header];
+    Window.instance.setView(Box({}).{
+        style.{
+            display = "flex";
+            layout = "column";
+            align = "center";
+        };
+        addChildren({
+            Header().{ header = this },
+            RoutingSwitcher().{
+                style.{
+                    width = "100%";
+                    maxWidth = "600pt";
+                    minHeight = "500pt";
+                };
+                setRegex(String("^/([a-z]+)"));
+                setTransition(
+                    getForwardHorizontalSlideTransition(0.5, false),
+                    getBackwardHorizontalSlideTransition(0.5, false)
+                );
+                route("one") = closure(RoutePayload): SrdRef[Component] {
+                    return ImageViewer();
+                };
+                route("two") = closure(RoutePayload): SrdRef[Component] {
+                    return CounterView();
+                };
+                route("three") = closure(RoutePayload): SrdRef[Component] {
+                    return Page(String(loremIpsum));
+                };
+                header.setRoutingSwitcher(this);
+            }
+        });
+    });
+
+    runEventLoop();
+}
+
+
+Console.print("Starting server on port 8010...\nURL: http://localhost:8010/\n");
+runServer({ "listening_ports", "8010", "static_file_max_age", "0" });
+
