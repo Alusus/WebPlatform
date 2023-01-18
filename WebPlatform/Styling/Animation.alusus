@@ -1,0 +1,76 @@
+@merge module WebPlatform {
+    //==========================================================================
+    // Animation
+    // class to deal with keyframes and animation
+    class Animation {
+        def name : String = getNewId();
+        def buildCounter: Int = 0;
+        def styles: Map[Float, Style];
+        def totalDuration: Float;
+        def onUpdated: closure() = closure() {
+            this.update();
+        }
+
+        handler this~init() {}
+        handler this~init(styles: Array[Style]) this.set(styles);
+        handler this~init(styles: Map[Float, Style]) this.set(styles);
+
+        handler this.set(totalDuration: Float, styles: Array[Style]) {
+            this.totalDuration = totalDuration;
+            this.styles.values = styles;
+
+            def i: Int = 0;
+            def sectionSize: Float = 100f / (styles.getLength() - 1);
+            for i = 0, i < styles.getLength(), i += 1 {
+                this.styles.keys.add(i * sectionSize);
+                this.styles.values(i).onUpdated = this.onUpdated;
+            }
+        }
+        handler this.set(totalDuration: Float, styles: Map[Float, Style]) {
+            this.totalDuration = totalDuration;
+            this.styles = styles;
+
+            def i: Int = 0;
+            for i = 0, i < this.styles.getLength(), i += 1 {
+                this.styles(i).onUpdated = this.onUpdated;
+            }
+        }
+
+        handler this.build() {
+            if this.buildCounter++ > 0 return;
+
+            createElement("style", this.name, "body");
+            this.update();
+        }
+
+        handler this.unbuild() {
+            if this.buildCounter == 0 return;
+            if --this.buildCounter > 0 return;
+
+            deleteElement(this.name);
+        }
+
+        handler this.update() {
+            if this.buildCounter == 0 return;
+
+            def cssString: String = String("@keyframes ") + this.name + String(" {");
+            def i: Int;
+            for i = 0, i < this.styles.getLength(), ++i {
+                cssString = cssString + this.styles.keyAt(i) + "% {" + this.styles(i).getCssString() + "}";
+            }
+            cssString += String("}");
+            setElementAttribute(this.name, "innerHTML", cssString);
+        }
+
+        handler this_type(): SrdRef[Animation] {
+            return SrdRef[Animation].construct();
+        }
+        handler this_type(d: Float, s: Array[Style]): SrdRef[Animation] {
+            return SrdRef[Animation].construct().{ set(d, s) };
+        }
+        handler this_type(d: Float, s: Map[Float, Style]): SrdRef[Animation] {
+            return SrdRef[Animation].construct().{ set(d, s) };
+        }
+    }
+}
+

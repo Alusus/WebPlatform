@@ -1,0 +1,61 @@
+@merge module WebPlatform {
+    //==========================================================================
+    // Image
+    class Image {
+        @injection def widget: Widget;
+
+        //-----------
+        // Properties
+
+        generateProperty[url, Url, String];
+
+        //---------
+        // Handlers
+
+        handler this~init() {
+        }
+        handler this~init(u: ptr[array[Char]]) {
+            this.url = String(u);
+        }
+
+        handler this.onPropUpdated() this.update();
+
+        //-------------------
+        // Function Overrides
+
+        handler (this:Widget).build (ownerId: String) set_ptr {
+            this.id = getNewId();
+            createElement("img", this.id, ownerId);
+            this.buildCommon();
+            this.update();
+        }
+
+        handler (this:Widget).unbuild() set_ptr {
+            if this.id.getLength() > 0 {
+                deleteElement(this.id);
+                this.unbuildCommon();
+                this.id = String();
+            }
+        }
+
+        handler (this:Widget).update() set_ptr {
+            if this.id.getLength() > 0 {
+                this.updateCommon();
+                setElementAttribute(this.id, "src", this.url);
+            }
+        }
+
+        //-----------------
+        // Shared Functions
+
+        handler this_type(u: ptr[array[Char]]): SrdRef[Image] {
+            def r: SrdRef[Image];
+            r.alloc()~init(u);
+            return r;
+        }
+        handler this_type(): SrdRef[Image] {
+            return Image("");
+        }
+    }
+}
+

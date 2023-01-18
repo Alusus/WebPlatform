@@ -1,0 +1,83 @@
+@merge module WebPlatform {
+    //==========================================================================
+    // StyleSet
+    // Manages a set of styles for an element in different states.
+    class StyleSet {
+        @injection def mainStyle: Style;
+        def otherStyles: Map[String, Style];
+        def className: String = getNewId();
+        def buildCounter: Int = 0;
+
+        handler this~init() {}
+
+        handler this(state: CharsPtr): ref[Style] {
+            return this({ state });
+        }
+
+        handler this(count: Int, selectors: ...[CharsPtr, 1]): ref[Style] {
+            def fullSelector: String;
+            while count-- > 0 {
+                def selector: CharsPtr = selectors~next_arg[CharsPtr];
+                if selector~cnt(0) != ':' fullSelector += " .";
+                fullSelector += selector;
+            }
+            return this.otherStyles(fullSelector);
+        }
+
+        handler this.build() {
+            if this.buildCounter++ > 0 return;
+
+            createElement("style", this.className, "body");
+            def selector: String = String(".") + this.className;
+            this.mainStyle.build(this.className, selector);
+            def i: Int;
+            for i = 0, i < this.otherStyles.getLength(), i++ {
+                this.otherStyles.valAt(i).build(this.className, selector + this.otherStyles.keyAt(i));
+            }
+        }
+
+        handler this.unbuild() {
+            if this.buildCounter == 0 return;
+            if --this.buildCounter > 0 return;
+
+            deleteElement(this.className);
+            this.mainStyle.unbuild();
+            def i: Int;
+            for i = 0, i < this.otherStyles.getLength(), i++ {
+                this.otherStyles.valAt(i).unbuild();
+            }
+        }
+
+        handler this_type(): SrdRef[StyleSet] {
+            return SrdRef[StyleSet].construct();
+        }
+    }
+
+    //==========================================================================
+    // StateSelector
+    // Selectors for different states of a widget.
+    def StateSelector: {
+        def ACTIVE: ":active";
+        def CHECKED: ":checked";
+        def DEFAULT: ":default";
+        def DISABLED: ":disabled";
+        def EMPTY: ":empty";
+        def ENABLED: ":enabled";
+        def FOCUS: ":focus";
+        def FULLSCREEN: ":fullscreen";
+        def HOVER: ":hover";
+        def IN_RANGE: ":in-range";
+        def INTERMEDIATE: ":indeterminate";
+        def INVALID: ":invalid";
+        def LINK: ":link";
+        def OPTIONAL: ":optional";
+        def OUT_OF_RANGE: ":out-of-range";
+        def READ_ONLY: ":read-only";
+        def READ_WRITE: ":read-write";
+        def REQUIRED: ":required";
+        def TARGET: ":target";
+        def VALID: ":valid";
+        def VISITED: ":visited";
+    }
+}
+

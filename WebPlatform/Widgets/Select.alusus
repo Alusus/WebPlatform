@@ -1,0 +1,97 @@
+@merge module WebPlatform {
+    //==========================================================================
+    // Select
+    class Select {
+        @injection def widget: Widget;
+
+        //-----------------------
+        // Properties and Signals
+
+        generateProperty[items, Items, Map[String,String]];
+        generateProperty[ariaHidden, AriaHidden, bool];
+
+        def onChanged: Signal[Select, Int];
+        def onChangedId: ArchInt = -1;
+
+        //---------
+        // Handlers
+
+        handler this~init() {
+            this.onChanged.owner~no_deref = this;
+            this.ariaHidden = false;
+        }
+
+        //-----------------
+        // Member Functions
+
+        handler this.onSignalConnectionsChanged(signal: ptr[Signal[Select, Int]], connectionCount: Int) {
+            if this.id == "" return;
+
+            if signal == this.onChanged~ptr {
+                handleSignalConnectionChanged[onChanged, "change", {
+                    this.onChanged.emit(Int(0));
+                }];
+            }
+        }
+
+        handler this.onPropUpdated() this.update();
+
+        //-------------------
+        // Function Overrides
+
+        handler (this:Widget).build (ownerId: String) set_ptr {
+            this.id = getNewId();
+            createElement("select", this.id, ownerId);
+            this.buildCommon();
+            this.update();
+            this.onSignalConnectionsChanged(this.onChanged~ptr, this.onChanged.getConnectionCount());
+        }
+
+        handler (this:Widget).unbuild() set_ptr {
+            if this.onChangedId != -1 unregisterElementEventHandler(this.onChangedId);
+            this.onChangedId = -1;
+            deleteElement(this.id);
+            this.unbuildCommon();
+            this.id = String();
+        }
+
+        handler (this:Widget).update() set_ptr {
+            if this.id.getLength() > 0 {
+                this.updateCommon();
+                //setElementAttribute(this.id, "value", this._text);
+                def i: Int = 0;
+                def htmlVal: String;
+                for i = 0, i < this.items.getLength(), ++i {
+                    htmlVal += String("<option value= \"") +
+                        this.items.keyAt(i) + "\">" + this.items.valAt(i) + "</option>";
+                }
+                setElementAttribute(this.id, "innerHTML", htmlVal);
+                if this.ariaHidden == true{
+                    setElementAttribute(this.id, String("aria-hidden"),String("true"));
+                }
+            }
+        }
+
+        handler this.getSelectedValue() : String{
+            def selectedValue : String;
+            logToConsole("selected getSelectedValue " );
+            selectedValue=getSelectedItemValue(this.id);
+            return selectedValue;
+        }
+        handler this.selectValue(selectedValue : String) {
+            logToConsole(" selectValue " );
+            selectItem(this.id,selectedValue);
+
+        }
+
+        //-----------------
+        // Shared Functions
+
+        handler this_type(): SrdRef[Select] {
+            def r: SrdRef[Select];
+            r.alloc()~init();
+            return r;
+        }
+    }
+}
+

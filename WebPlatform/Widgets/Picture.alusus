@@ -1,0 +1,106 @@
+@merge module WebPlatform {
+    //==========================================================================
+    // Picture
+    class Picture {
+        @injection def widget: Widget;
+
+        //-----------
+        // Properties
+        generateProperty[sourceArray, SourceArray, Array[ImageSource]];
+        def child: SrdRef[Image];
+
+
+        //---------
+        // Handlers
+
+        handler this~init() {
+        }
+        handler this.onPropUpdated() this.update();
+
+        //-------------------
+        // Function Overrides
+
+        handler this.setChild (child: temp_ref[SrdRef[Image]]) {
+            if this.child.obj~ptr != 0 this.child.unbuild();
+            this.child = child;
+            if this.child.obj~ptr != 0 && this.id.getLength() > 0 this.child.build(this.id);
+        }
+
+        handler (this:Widget).build (ownerId: String) set_ptr {
+            this.id = getNewId();
+            createElement("picture", this.id, ownerId);
+            this.buildCommon();
+            this.update();
+
+            if this.child.obj~ptr != 0 this.child.build(this.id);
+        }
+
+        handler (this:Widget).unbuild() set_ptr {
+            if this.id.getLength() > 0 {
+                deleteElement(this.id);
+                this.unbuildCommon();
+
+                if this.child.obj~ptr != 0 this.child.unbuild();
+
+                this.id = String();
+            }
+        }
+
+        handler (this:Widget).update() set_ptr {
+            if this.id.getLength() > 0 {
+                this.updateCommon();
+                def i: Int = 0;
+                def htmlVal: String="";
+                for i=0,i<this.sourceArray.getLength() , i+=1{
+                    htmlVal += String.format(
+                        "<source srcset=\"%s\" media=\"(max-width:%s)\">",
+                        this.sourceArray(i).src.buf,
+                        this.sourceArray(i).maxWidth.buf
+                    );
+                }
+
+                setElementAttribute(this.id, "innerHTML", htmlVal);
+            }
+        }
+
+        //-----------------
+        // Shared Functions
+
+        handler this_type(child : temp_ref[SrdRef[Image]]): SrdRef[Picture] {
+            def r: SrdRef[Picture];
+            r.alloc()~init();
+            r.setChild(child);
+            return r;
+        }
+    }
+
+    //==========================================================================
+    // ImageSource
+    // Image sources used by the Picture wiedget.
+    class ImageSource {
+        def src: String = "";
+        def maxWidth: String = "";
+
+        handler this~init() {}
+        handler this~init(src : String , maxWidth : String) {
+            this.src = src;
+            this.maxWidth = maxWidth;
+        }
+        handler this~init(temp_ref[ImageSource]) {
+            this = value;
+        }
+        handler this = temp_ref[ImageSource] {
+            this.src = value.src;
+            this.maxWidth = value.maxWidth;
+        }
+        handler this == ref[ImageSource] : bool {
+            if (this.src==value.src )
+                return true;
+            return false;
+        }
+        handler this != ref[ImageSource] : bool {
+            return !(this == value);
+        }
+    }
+}
+

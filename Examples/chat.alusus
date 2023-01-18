@@ -33,8 +33,8 @@ func getMessages (conn: ptr[Http.Connection]) {
 //==============================================================================
 // Frontend Components
 
-def PrimeryColor: Color("8e50ef");
-def LightColor: Color("c380ff");
+def PRIMARY_COLOR: Color("8e50ef");
+def LIGHT_COLOR: Color("c380ff");
 
 class MenuButton {
     @injection def component: Component;
@@ -43,23 +43,24 @@ class MenuButton {
         this.view = Box({}).{
             style.{
                 padding = Quad(3);
-                setBackground(LightColor);
-                layout = String("row");
-                align = String("center");
+                background = LIGHT_COLOR;
+                display = "flex";
+                layout = "row";
+                align = "center";
             };
             style("icon").{
                 padding = Quad(0, 4);
-                width = String("20pt;");
-                height = String("0pt;");
-                transition = String(".2s");
+                width = "20pt";
+                height = "0pt";
+                transition = ".2s";
             }
             style("label").{
                 fontSize = 16.0;
                 fontColor = Color("eee");
             }
             style({ StateSelector.HOVER, "icon" }).{
-                height = String("20pt;");
-                transition = String(".2s");
+                height = "20pt";
+                transition = ".2s";
             }
             style({ StateSelector.HOVER, "label" }).{
                 fontSize = 16.0;
@@ -88,35 +89,37 @@ class Header {
     handler this~init() {
         this.view = Box({}).{
             style.{
-                width = String("100%");
-                height = String("85pt");
+                width = "100%";
+                height = "85pt";
                 padding = Quad(4, 0, 0, 0);
-                setBackground( PrimeryColor);
+                background = PRIMARY_COLOR;
                 border = Quad(1.5);
-                borderStyle = String("solid");
-                borderColor = PrimeryColor;
-                justify = String("space-between");
-                layout = String("column");
+                borderStyle = "solid";
+                borderColor = PRIMARY_COLOR;
+                justify = "space-between";
+                display = "flex";
+                layout = "column";
             };
 
             addChildren({
                 Box({}).{
                     style.{
-                        layout = String("row");
-                        justify = String("space-between");
-                        align = String("center");
+                        display = "flex";
+                        layout = "row";
+                        justify = "space-between";
+                        align = "center";
                     };
                     addChildren({
                         Box({ Label(String("أمثلة منصة ويب الأسس - الدردشة")).{ style.{
                             fontColor = Color("fff");
                             fontSize = 21.0;
-                            height = String("100%");
+                            height = "100%";
                             padding = Quad(0, 10);
                         } } }),
                         Image().{
                             url = String("/Assets/wblogo.svg");
                             style.{
-                                height = String("50pt;");
+                                height = "50pt";
                                 padding = Quad(0, 10);
                             };
                         }
@@ -124,8 +127,9 @@ class Header {
                 },
                 Box({}).{
                     style.{
-                        layout = String("row");
-                        justify = String("space-between");
+                        display = "flex";
+                        layout = "row";
+                        justify = "space-between";
                     };
                     addChildren({
                         MenuButton(String("/"), String("الرئيسية"), String("/Assets/chat.svg")),
@@ -162,20 +166,21 @@ class TextEntry {
 
         this.view = Box({}).{
             style.{
-                layout = String("row");
+                display = "flex";
+                layout = "row";
+                justify = "space-between";
                 border = Quad(1.5);
-                borderStyle = String("solid");
-                borderColor = PrimeryColor;
-                setBackground(PrimeryColor);
-                justify = String("space-between");
+                borderStyle = "solid";
+                borderColor = PRIMARY_COLOR;
+                background = PRIMARY_COLOR;
             };
             addChildren({
                 TextInput().{
                     self.textInput = this;
                     style.{
-                        width = String("100%");
-                        height = String("100%");
-                        setBackground(Color("fff"));
+                        width = "100%";
+                        height = "100%";
+                        background = Color("fff");
                         fontSize = 12.0;
                     };
                     onKeyUp.connect(closure (widget: ref[TextInput], payload: ref[String]) {
@@ -188,10 +193,11 @@ class TextEntry {
                 },
                 Button(String("أرسل")).{
                     style.{
-                        height = String("100%");
-                        width = String("50pt");
-                        setBackground(Color(200, 200, 200));
+                        height = "100%";
+                        width = "50pt";
+                        background = Color(200, 200, 200);
                         fontSize = 16.0;
+                        justify = "center";
                     };
                     onClick.connect(closure (widget: ref[Button], payload: ref[Int]) {
                         def newData: String = String("- ") + encodeHtml(self.textInput.getText()).trim();
@@ -226,35 +232,38 @@ func main {
 
     Window.instance.setView(Box({}).{
         style.{
-            height = String("100%");
-            justify = String("space-between");
-            direction = String("rtl");
-            layout = String("column");
+            height = "100%";
+            justify = "space-between";
+            direction = "rtl";
+            display = "flex";
+            layout = "column";
         };
         addChildren({
             Header(),
             Box({}).{
                 style.{
-                    width = String("100%");
-                    height = String("auto-flex");
+                    width = "100%";
+                    height = "auto-flex";
                     padding = Quad(5);
-                    layout = String("column");
+                    display = "flex";
+                    layout = "column";
+                    flex = "auto";
                 };
                 def notificationLabel: SrdRef[Label];
                 addChildren({
                     Label(String()).{
                         notificationLabel = this;
                         style.{
-                            width = String("100%");
-                            height = String("20pt");
+                            width = "100%";
+                            height = "20pt";
                             fontColor = Color(200, 50, 50);
                             fontSize = 10.0;
                         };
                     },
                     Label(String()).{
                         style.{
-                            width = String("100%");
-                            height = String("100%");
+                            width = "100%";
+                            height = "100%";
                             fontColor = Color(50, 50, 50);
                             fontSize = 20.0;
                         };
@@ -302,8 +311,11 @@ func about {
     setElementAttribute("body", "style", "padding: 0; margin: 0;");
 
     Window.instance.setView(Box({}).{
-        style.direction = String("rtl");
-        style.layout = String("column");
+        style.{
+            display = "flex";
+            direction = "rtl";
+            layout = "column";
+        };
         addChildren({
             Header(),
             Label(String("مثال الدردشة")).{ style.{

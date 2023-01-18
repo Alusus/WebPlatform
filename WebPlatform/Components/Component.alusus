@@ -1,0 +1,27 @@
+@merge module WebPlatform {
+    //==========================================================================
+    // Component
+    class Component {
+        @injection def widget: Widget;
+        def view: SrdRef[Widget];
+
+        //---------
+        // Handlers
+
+        handler this~init() {}
+
+        //-------------------
+        // Function Overrides
+
+        handler (this:Widget).build (ownerId: String) set_ptr {
+            this.id = ownerId;
+            if this.view.obj~ptr != 0 this.view.build(this.id);
+        }
+
+        handler (this:Widget).unbuild() set_ptr {
+            this.id = String();
+            if this.view.obj~ptr != 0 this.view.unbuild();
+        }
+    }
+}
+
