@@ -16,10 +16,12 @@
             display = String("flex");
             layout = String("row");
             overflow = String("clip");
+            position = "relative";
         };
         this.style("switcherview").{
             width = String("100%");
             height = String("100%");
+            position = "absolute";
             flex = String("none");
         };
         this.view = Box({})~use_in(self) {
@@ -116,84 +118,40 @@
     //==========================================================================
     // Default Transitions
 
-    func getForwardHorizontalSlideTransition (duration: Float, rtl: Bool): SwitcherTransition {
-        return SwitcherTransition().{
-            totalDuration = duration * 1000000;
-            currentViewStyle.{
-                if rtl translate = "100%" else translate = "-100%";
-                animation = Animation(duration, Array[Style]({
-                    Style().{ translate = "0%" },
-                    Style().{ if rtl translate = "100%" else translate = "-100%" }
-                }));
-            };
-            incomingViewStyle = currentViewStyle;
+    func createSlideSwitcherTransition (duration: Float, vertical: Bool, backward: Bool): SwitcherTransition {
+        def currentEnd: CharsPtr;
+        def incomingStart: CharsPtr;
+        if backward {
+            currentEnd = "100%";
+            incomingStart = "-100%";
+        } else {
+            currentEnd = "-100%";
+            incomingStart = "100%";
         }
-    }
-
-    func getBackwardHorizontalSlideTransition (duration: Float, rtl: Bool): SwitcherTransition {
         return SwitcherTransition().{
             totalDuration = duration * 1000000;
             currentViewStyle.{
-                if rtl translate = "-100%" else translate = "100%";
+                if vertical top = currentEnd else left = currentEnd;
                 animation = Animation(duration, Array[Style]({
-                    Style().{ translate = "0%" },
-                    Style().{ if rtl translate = "-100%" else translate = "100%" }
+                    Style().{ if vertical top = "0" else left = "0" },
+                    Style().{ if vertical top = currentEnd else left = currentEnd }
                 }));
             };
             incomingViewStyle.{
-                if rtl translate = "100%" else translate = "-100%";
+                if vertical top = "0" else left = "0";
                 animation = Animation(duration, Array[Style]({
-                    Style().{ if rtl translate = "200%" else translate = "-200%" },
-                    Style().{ if rtl translate = "100%" else translate = "-100%" }
+                    Style().{ if vertical top = incomingStart else left = incomingStart },
+                    Style().{ if vertical top = "0" else left = "0" }
                 }));
-            };
+            }
         }
     }
 
-    func getForwardVerticalSlideTransition (duration: Float, rtl: Bool): SwitcherTransition {
+    func createFadeSwitcherTransition (duration: Float): SwitcherTransition {
         return SwitcherTransition().{
             totalDuration = duration * 1000000;
             currentViewStyle.{
-                translate = "0 -100%";
-                animation = Animation(duration, Array[Style]({
-                    Style().{ translate = "0 0%" },
-                    Style().{ translate = "0 -100%" }
-                }));
-            };
-            incomingViewStyle.{
-                if rtl translate = "100% 0" else translate = "-100% 0";
-                animation = Animation(duration, Array[Style]({
-                    Style().{ if rtl translate = "100% 100%" else translate = "-100% 100%" },
-                    Style().{ if rtl translate = "100% 0" else translate = "-100% 0" }
-                }));
-            };
-        }
-    }
-
-    func getBackwardVerticalSlideTransition (duration: Float, rtl: Bool): SwitcherTransition {
-        return SwitcherTransition().{
-            totalDuration = duration * 1000000;
-            currentViewStyle.{
-                translate = "0 100%";
-                animation = Animation(duration, Array[Style]({
-                    Style().{ translate = "0 0%" },
-                    Style().{ translate = "0 100%" }
-                }));
-            };
-            incomingViewStyle.{
-                if rtl translate = "100% 0" else translate = "-100% 0%";
-                animation = Animation(duration, Array[Style]({
-                    Style().{ if rtl translate = "100% -100%" else translate = "-100% -100%" },
-                    Style().{ if rtl translate = "100% 0" else translate = "-100% 0" }
-                }));
-            };
-        }
-    }
-
-    func getFadeTransition (duration: Float, rtl: Bool): SwitcherTransition {
-        return SwitcherTransition().{
-            totalDuration = duration * 1000000;
-            currentViewStyle.{
+                left = "0";
                 opacity = 0.0;
                 animation = Animation(duration, Array[Style]({
                     Style().{ opacity = 1.0 },
@@ -201,7 +159,7 @@
                 }));
             };
             incomingViewStyle.{
-                if rtl translate = "100%" else translate = "-100%";
+                left = "0";
                 animation = Animation(duration, Array[Style]({
                     Style().{ opacity = 0.0 },
                     Style().{ opacity = 1.0 }

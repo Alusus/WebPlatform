@@ -274,8 +274,8 @@ class ImageViewer {
                             };
                             setRegex(String("^/one/([a-z0-9]+)"));
                             setTransition(
-                                getFadeTransition(1.0, false),
-                                getFadeTransition(1.0, false)
+                                createFadeSwitcherTransition(1.0),
+                                createFadeSwitcherTransition(1.0)
                             );
                             route("img1") = closure(RoutePayload): SrdRef[Component] {
                                 return ImgView(String("/Assets/wblogo.svg"));
@@ -380,8 +380,8 @@ class CounterView {
                                 flex = "auto";
                                 height = "500pt";
                             };
-                            setTransition(String("forward"), getForwardVerticalSlideTransition(0.5, false));
-                            setTransition(String("backward"), getBackwardVerticalSlideTransition(0.5, false));
+                            setTransition(String("forward"), createSlideSwitcherTransition(0.5, true, false));
+                            setTransition(String("backward"), createSlideSwitcherTransition(0.5, true, true));
                             switchTo(DigitView(String() + currentIndex));
                             self.switcher = this;
                         }
@@ -440,8 +440,8 @@ func main {
                 };
                 setRegex(String("^/([a-z]+)"));
                 setTransition(
-                    getForwardHorizontalSlideTransition(0.5, false),
-                    getBackwardHorizontalSlideTransition(0.5, false)
+                    createSlideSwitcherTransition(0.5, false, false),
+                    createSlideSwitcherTransition(0.5, false, true)
                 );
                 route("one") = closure(RoutePayload): SrdRef[Component] {
                     return ImageViewer();

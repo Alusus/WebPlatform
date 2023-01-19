@@ -246,11 +246,8 @@
         عرف المدة_الكلية: لقب totalDuration؛
     }
 
-    عرف هات_انتقال_انزلاق_أفقي_أمامي: لقب getForwardHorizontalSlideTransition؛
-    عرف هات_انتقال_انزلاق_أفقي_خلفي: لقب getBackwardHorizontalSlideTransition؛
-    عرف هات_انتقال_انزلاق_عمودي_أمامي: لقب getForwardVerticalSlideTransition؛
-    عرف هات_انتقال_انزلاق_عمودي_خلفي: لقب getBackwardVerticalSlideTransition؛
-    عرف هات_انتقال_تلاشي: لقب getFadeTransition؛
+    عرف أنشئ_انتقال_انزلاق_مبدال: لقب createSlideSwitcherTransition؛
+    عرف أنشئ_انتقال_تلاشي_مبدال: لقب createFadeSwitcherTransition؛
 
     عرف مـبدال_توجيه: لقب RoutingSwitcher؛
     @دمج صنف مـبدال_توجيه {
