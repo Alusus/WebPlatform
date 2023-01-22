@@ -37,6 +37,7 @@ import "WebPlatform/Widgets/Canvas";
 import "WebPlatform/Components/Component";
 import "WebPlatform/Components/Switcher";
 import "WebPlatform/Components/RoutingSwitcher";
+import "WebPlatform/Components/Stack";
 import "WebPlatform/Resources/ImageResource";
 import "WebPlatform/Resources/CanvasResource";
 import "WebPlatform/Resources/AudioResource";

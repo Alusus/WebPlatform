@@ -1,0 +1,187 @@
+@merge module WebPlatform {
+    //==========================================================================
+    // Stack
+    // A view stack allowing users to stack views on top of each other and
+    // optionally do that with a transition animation.
+    class Stack {
+        @injection def component: Component;
+        @shared def transitionUniqueCounter: Int(0);
+        def transitionUniqueSuffix: Int = ++transitionUniqueCounter;
+        def views: Array[SrdRef[Box]];
+        def transitionTimeout: ArchInt = 0;
+        def transitionIn: Bool;
+        def transitionDurations: Map[String, Int];
+
+        this.style.{
+            display = String("flex");
+            layout = String("row");
+            overflow = String("clip");
+            position = "relative";
+        };
+        this.style("stackview").{
+            width = String("100%");
+            height = String("100%");
+            position = "absolute";
+            left = "0";
+            flex = String("none");
+        };
+        this.view = Box({})~use_in(self) {
+            style = this.style;
+        };
+
+        handler this~init() {
+        }
+
+        handler this~init(child: SrdRef[Widget]) {
+            this.innerView.addChildren({ child });
+        }
+
+        handler this.setTransition(name: String, transition: StackTransition) {
+            name += this.transitionUniqueSuffix;
+            this.transitionDurations(name) = transition.totalDuration;
+            this.style(name) = transition.topViewStyle;
+        }
+
+        handler this.push(child: SrdRef[Widget]) {
+            this.push(child, String());
+        }
+
+        handler this.push(child: SrdRef[Widget], transitionName: String) {
+            transitionName += this.transitionUniqueSuffix;
+            if this.transitionTimeout != 0 {
+                cancelTimeout(this.transitionTimeout);
+                this.endTransition();
+            }
+
+            castRef[this.view.obj, Box]~use_in(self) {
+                addChildren({
+                    Box({})~use_in(self) {
+                        if transitionName != "" className = transitionName + " stackview"
+                        else className = String("stackview");
+                        addChildren({ child });
+                        this.views.add(self);
+                    }
+                });
+            };
+
+            this.transitionIn = true;
+            if transitionName != "" {
+                this.transitionTimeout = setTimeout(this.transitionDurations(transitionName), closure (json: Json) {
+                    this.endTransition();
+                });
+            } else {
+                this.endTransition();
+            }
+        }
+
+        handler this.pop() {
+            this.push(String());
+        }
+
+        handler this.pop(transitionName: String) {
+            if this.views.getLength() == 0 return;
+            transitionName += this.transitionUniqueSuffix;
+            if this.transitionTimeout != 0 {
+                cancelTimeout(this.transitionTimeout);
+                this.endTransition();
+            }
+
+            this.transitionIn = false;
+            if transitionName != "" {
+                this.views(this.views.getLength()-1).className = transitionName + " stackview"
+                this.transitionTimeout = setTimeout(this.transitionDurations(transitionName), closure (json: Json) {
+                    this.endTransition();
+                });
+            } else {
+                this.endTransition();
+            }
+        }
+
+        handler this.endTransition() {
+            if this.views.getLength() == 0 return;
+            if this.transitionIn {
+                this.views(this.views.getLength()-1).className = String("stackview");
+            } else {
+                castRef[this.view.obj, Box].removeChildren({ this.views(this.views.getLength()-1) });
+                this.views.remove(this.views.getLength()-1);
+            }
+            this.transitionTimeout = 0;
+        }
+
+        //-----------------
+        // Shared Functions
+
+        handler this_type(): SrdRef[Stack] {
+            return SrdRef[Stack].construct();
+        }
+        handler this_type(child: temp_ref[SrdRef[Widget]]): SrdRef[Stack] {
+            return SrdRef[Stack]().{ alloc()~init(child) };
+        }
+    }
+
+    //==========================================================================
+    // StackTransition
+    // Contains transition animation styles used by the stack.
+    class StackTransition {
+        def topViewStyle: Style;
+        def totalDuration: Int;
+
+        handler this~init() {}
+        handler this~init(ref[this_type]) this = value;
+        handler this = ref[this_type] {
+            this.topViewStyle = value.topViewStyle;
+            this.totalDuration = value.totalDuration;
+        }
+    }
+
+    //==========================================================================
+    // Default Transitions
+
+    func createSlideStackTransition (duration: Float, vertical: Bool, backward: Bool): StackTransition {
+        def start: CharsPtr;
+        def end: CharsPtr;
+        if backward {
+            start = "0";
+            end = "100%";
+        } else {
+            start = "100%";
+            end = "0";
+        }
+        return StackTransition().{
+            totalDuration = duration * 1000000;
+            topViewStyle.{
+                if vertical top = end else left = end;
+                animation = Animation(duration, Array[Style]({
+                    Style().{ if vertical top = start else left = start },
+                    Style().{ if vertical top = end else left = end }
+                }));
+            }
+        }
+    }
+
+    func createFadeStackTransition (duration: Float, backward: Bool): StackTransition {
+        def start: Float;
+        def end: Float;
+        if backward {
+            start = 1.0;
+            end = 0.0;
+        } else {
+            start = 0.0;
+            end = 1.0;
+        }
+        return StackTransition().{
+            totalDuration = duration * 1000000;
+            topViewStyle.{
+                left = "0";
+                opacity = end;
+                animation = Animation(duration, Array[Style]({
+                    Style().{ opacity = start },
+                    Style().{ opacity = end }
+                }));
+            };
+        }
+    }
+
+    // TODO: Add more transitions.
+}
+

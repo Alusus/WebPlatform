@@ -9,6 +9,29 @@ use WebPlatform;
 @assetsRoute def assetsRoute: "Assets/";
 
 //==============================================================================
+// Constants
+
+def loremIpsum:
+    "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna"
+    "aliqua. Libero id faucibus nisl tincidunt eget nullam. Dui accumsan sit amet nulla facilisi morbi. Vulputate mi sit"
+    "amet mauris commodo quis imperdiet massa. Eget lorem dolor sed viverra ipsum. Tristique magna sit amet purus gravida"
+    "quis blandit turpis cursus. Iaculis nunc sed augue lacus. Eu nisl nunc mi ipsum faucibus vitae aliquet nec. Proin"
+    "nibh nisl condimentum id venenatis a condimentum vitae. Cursus metus aliquam eleifend mi in nulla posuere"
+    "sollicitudin. Imperdiet nulla malesuada pellentesque elit eget gravida. Ut ornare lectus sit amet. Ultrices dui"
+    "sapien eget mi proin sed. Amet consectetur adipiscing elit duis. Ullamcorper a lacus vestibulum sed arcu."
+    "Scelerisque mauris pellentesque pulvinar pellentesque habitant morbi tristique senectus. Est placerat in egestas"
+    "erat.<br>"
+    "<br>"
+    "Curabitur vitae nunc sed velit dignissim. Et malesuada fames ac turpis. Lorem ipsum dolor sit amet consectetur"
+    "adipiscing elit duis. Maecenas pharetra convallis posuere morbi leo urna molestie at elementum. Vitae aliquet nec"
+    "ullamcorper sit. Egestas egestas fringilla phasellus faucibus scelerisque eleifend donec pretium. Aenean vel elit"
+    "scelerisque mauris pellentesque pulvinar pellentesque habitant. Leo a diam sollicitudin tempor id. Sagittis purus"
+    "sit amet volutpat consequat mauris nunc. Potenti nullam ac tortor vitae purus faucibus ornare. Viverra nam libero"
+    "justo laoreet sit. Scelerisque purus semper eget duis at tellus at urna. Tristique magna sit amet purus gravida"
+    "quis blandit turpis cursus. Orci nulla pellentesque dignissim enim. Orci ac auctor augue mauris augue. Gravida"
+    "neque convallis a cras semper auctor neque vitae.";
+
+//==============================================================================
 // Frontend Components
 
 class MenuButton {
@@ -204,20 +227,107 @@ class Header {
     }
 }
 
-class Page {
-    @injection def component: Component;
+def article: String(loremIpsum);
 
-    handler this~init(label: String) {
-        this.view = Label(label).{
+class Article {
+    @injection def component: Component;
+    def stack: WkRef[Stack];
+    def label: SrdRef[Label];
+
+    handler this~init() {
+        def self: ref[this_type](this);
+        this.view = Box({}).{
             style.{
-                fontColor = Color(0, 0, 0);
-                fontSize = 20.0;
-            }
+                align = "end";
+                display = "flex";
+                layout = "column";
+                height = "100%";
+                overflow = "scroll";
+            };
+            addChildren({
+                SideButton(String("🖉")).{
+                    onButtonClicked = closure() {
+                        self.stack.push(ArticleEditor(self.label.text.replace("<br>", "\n")).{
+                            this.onUpdated = closure(t: String) {
+                                article = t.replace("\n", "<br>");
+                                self.label.text = article;
+                                self.stack.pop(String("outgoing"));
+                            }
+                        }, String("incoming"));
+                    }
+                },
+                Label(article).{
+                    style.{
+                        fontColor = Color(0, 0, 0);
+                        fontSize = 20.0;
+                    }
+                    self.label = this;
+                }
+            });
         };
     }
 
-    handler this_type(label: String): SrdRef[Page] {
-        return SrdRef[Page]().{ alloc()~init(label) };
+    handler this_type(): SrdRef[Article] {
+        return SrdRef[Article].construct();
+    }
+}
+
+class ArticleEditor {
+    @injection def component: Component;
+    def textInput: SrdRef[TextInput];
+    def onUpdated: closure(String);
+
+    handler this~init(str: String) {
+        def self: ref[this_type](this);
+        this.view = Box({}).{
+            style.{
+                width = "100%";
+                height = "100%";
+                align = "end";
+                display = "flex";
+                layout = "column";
+                background = "white";
+            };
+            addChildren({
+                SideButton(String("💾")).{ onButtonClicked = closure() {
+                    self.onUpdated(self.textInput.text);
+                } },
+                TextInput().{
+                    style.{
+                        width = "100%";
+                        height = "100%";
+                        fontSize = 20.0;
+                    };
+                    text = str;
+                    self.textInput = this;
+                },
+            });
+        };
+    }
+
+    handler this_type(label: String): SrdRef[ArticleEditor] {
+        return SrdRef[ArticleEditor]().{ alloc()~init(label) };
+    }
+}
+
+class ArticleView {
+    @injection def component: Component;
+
+    handler this~init() {
+        def self: ref[this_type](this);
+        this.view = Stack().{
+            style.{
+                width = "100%";
+                height = "100%";
+            };
+            setTransition(String("incoming"), createSlideStackTransition(0.5, true, false));
+            setTransition(String("outgoing"), createSlideStackTransition(0.5, true, true));
+            push(Article()~use_in(a) { stack = this });
+        };
+    }
+
+    handler this_type(): SrdRef[ArticleView] {
+        return SrdRef[ArticleView].construct();
     }
 }
 
@@ -399,26 +509,6 @@ class CounterView {
 //==============================================================================
 // Frontend Pages
 
-def loremIpsum:
-    "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna"
-    "aliqua. Libero id faucibus nisl tincidunt eget nullam. Dui accumsan sit amet nulla facilisi morbi. Vulputate mi sit"
-    "amet mauris commodo quis imperdiet massa. Eget lorem dolor sed viverra ipsum. Tristique magna sit amet purus gravida"
-    "quis blandit turpis cursus. Iaculis nunc sed augue lacus. Eu nisl nunc mi ipsum faucibus vitae aliquet nec. Proin"
-    "nibh nisl condimentum id venenatis a condimentum vitae. Cursus metus aliquam eleifend mi in nulla posuere"
-    "sollicitudin. Imperdiet nulla malesuada pellentesque elit eget gravida. Ut ornare lectus sit amet. Ultrices dui"
-    "sapien eget mi proin sed. Amet consectetur adipiscing elit duis. Ullamcorper a lacus vestibulum sed arcu."
-    "Scelerisque mauris pellentesque pulvinar pellentesque habitant morbi tristique senectus. Est placerat in egestas"
-    "erat.<br>"
-    "<br>"
-    "Curabitur vitae nunc sed velit dignissim. Et malesuada fames ac turpis. Lorem ipsum dolor sit amet consectetur"
-    "adipiscing elit duis. Maecenas pharetra convallis posuere morbi leo urna molestie at elementum. Vitae aliquet nec"
-    "ullamcorper sit. Egestas egestas fringilla phasellus faucibus scelerisque eleifend donec pretium. Aenean vel elit"
-    "scelerisque mauris pellentesque pulvinar pellentesque habitant. Leo a diam sollicitudin tempor id. Sagittis purus"
-    "sit amet volutpat consequat mauris nunc. Potenti nullam ac tortor vitae purus faucibus ornare. Viverra nam libero"
-    "justo laoreet sit. Scelerisque purus semper eget duis at tellus at urna. Tristique magna sit amet purus gravida"
-    "quis blandit turpis cursus. Orci nulla pellentesque dignissim enim. Orci ac auctor augue mauris augue. Gravida"
-    "neque convallis a cras semper auctor neque vitae.";
-
 @uiEndpoint["/*", "WebPlatform Example"]
 func main {
     setElementAttribute("body", "style", "padding: 0; margin: 0;");
@@ -450,7 +540,7 @@ func main {
                     return CounterView();
                 };
                 route("three") = closure(RoutePayload): SrdRef[Component] {
-                    return Page(String(loremIpsum));
+                    return ArticleView();
                 };
                 header.setRoutingSwitcher(this);
             }
