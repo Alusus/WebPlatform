@@ -8,31 +8,15 @@
         // Properties and Signals
 
         generateProperty[text, Text, String];
-        def onClick: Signal[Button, Int];
-        def onClickId: ArchInt = -1;
 
         //---------
         // Handlers
 
         handler this~init(t: String) {
-            this.onClick.owner~no_deref = this;
             this.text = t;
         }
 
         handler this.onPropUpdated() this.update();
-
-        //-----------------
-        // Member Functions
-
-        handler this.onSignalConnectionsChanged(signal: ptr[Signal[Button, Int]], connectionCount: Int) {
-            if this.id == "" return;
-
-            if signal == this.onClick~ptr {
-                handleSignalConnectionChanged[onClick, "click", {
-                    this.onClick.emit(Int(0));
-                }];
-            }
-        }
 
         //-------------------
         // Function Overrides
@@ -42,12 +26,9 @@
             createElement("button", this.id, ownerId);
             this.buildCommon();
             this.update();
-            this.onSignalConnectionsChanged(this.onClick~ptr, this.onClick.getConnectionCount());
         }
 
         handler (this:Widget).unbuild() set_ptr {
-            if this.onClickId != -1 unregisterElementEventHandler(this.onClickId);
-            this.onClickId = -1;
             deleteElement(this.id);
             this.unbuildCommon();
             this.id = String();

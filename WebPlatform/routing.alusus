@@ -1,0 +1,97 @@
+@merge module WebPlatform {
+    //==========================================================================
+    // RouteListener
+    // Allows listening to route changes and performing actions accordingly.
+    class RouteListener {
+        // Member Variables
+
+        def pathChangedHandler: closure (ref[Window], ref[Int]) = closure (ref[Window], ref[Int]) {
+            this.triggerRoute();
+        };
+        def regex: String;
+        def onRoute: Signal[RouteListener, RoutePayload];
+
+        // Initialization
+
+        handler this~init() {
+            this.onRoute.owner~no_deref = this;
+            Window.instance.onPathChanged.connect(this.pathChangedHandler);
+        }
+
+        handler this~init(regex: String) {
+            this.regex = regex;
+            this.onRoute.owner~no_deref = this;
+            Window.instance.onPathChanged.connect(this.pathChangedHandler);
+        }
+
+        handler this~terminate() {
+            Window.instance.onPathChanged.disconnect(this.pathChangedHandler);
+        }
+
+        // Member Functions
+
+        handler this.onSignalConnectionsChanged(signal: ptr[Signal[RouteListener, RoutePayload]], connCount: Int) {
+        }
+
+        handler this.triggerRoute() {
+            this.onRoute.emit(this.getCurrentRoute());
+        }
+
+        handler this.getCurrentRoute(): RoutePayload {
+            return RoutePayload()~use_in(self) {
+                fullPath = Window.instance.locationPath;
+                if this.regex != "" route = regexMatch(fullPath, this.regex)(1)
+                else route = fullPath;
+            }
+        }
+    }
+
+    //==========================================================================
+    // RoutePayload
+    class RoutePayload {
+        def fullPath: String;
+        def route: String;
+
+        handler this~init() {}
+        handler this~init(ref[this_type]) this = value;
+        handler this = ref[this_type] {
+            this.fullPath = value.fullPath;
+            this.route = value.route;
+        }
+    }
+
+    //==========================================================================
+    // Router
+    // Enables performing different actions based on the visited route.
+    class Router {
+        // Member Variables
+
+        def routeListener: RouteListener;
+        def routes: Map[String, closure(RoutePayload)];
+        def onUnknownRoute: closure(RoutePayload);
+
+        // Initialization
+
+        router.connect(closure (ref[Router], payload: RouterPayload) {
+            this.triggerRoute(payload);
+        });
+
+        handler this~init() {
+        }
+
+        handler this~init(regex: String) {
+            this.routeListener.regex = regex;
+        }
+
+        // Member Functions
+
+        handler this.route(r: String): ref[closure(String)] return this.routes(r);
+
+        handler this.triggerRoute(payload: RoutePayload) {
+            def pos: ArchInt = this.routes.findPos(payload.route);
+            if pos != -1 this.routes.valAt(pos)(payload)
+            else if not this.onUnknownRoute.isNull() this.onUnknownRoute(payload);
+        }
+    }
+}
+

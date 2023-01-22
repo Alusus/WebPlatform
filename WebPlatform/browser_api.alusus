@@ -14,7 +14,6 @@
     @expname[showAlert] function showAlert (message: ptr[Char]): Bool;
     // Event Loop
     @expname[fetchNextEvent] function fetchNextEvent (): ptr[array[Char]];
-    @expname[httpRedirect] function httpRedirect (address: ptr[Char]);
     @expname[registerElementEventHandler] function _registerElementEventHandler (
       elementName: ptr[Char], eventName: ptr[Char], cbId: ArchInt
     );
@@ -83,10 +82,15 @@
     @expname[exitPointerLock] function exitPointerLock();
     @expname[requestFullScreen] function requestFullScreen (elementName: ptr[Char]);
     @expname[exitFullScreen] function exitFullScreen();
+    @expname[httpRedirect] function httpRedirect (address: ptr[Char]);
+    @expname[getLocationPath] function getLocationPath (): ptr[Char];
+    @expname[pushState] function pushState (url: ptr[Char], state: ptr[Char]);
     @expname[setCookie] function setCookie (cName: ptr[Char], vName: ptr[Char], exDay: ptr[Char]);
     @expname[getCookie] function getCookie (cName: ptr[Char]): ptr[array[Char]];
     @expname[addVarToSession] function addVarToSession (varName: ptr[Char], varValue: ptr[Char]);
     @expname[getVarFromSession] function getVarFromSession (varName: ptr[Char]): ptr[array[Char]];
     @expname[logToConsole] function logToConsole (msg: ptr[Char]);
+    // String
+    @expname[regexMatch] function _regexMatch (str: ptr[Char], regex: ptr[Char], lastIndex: ref[Int]): ptr[Char];
 }
 

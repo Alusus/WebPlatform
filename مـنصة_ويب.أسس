@@ -23,7 +23,9 @@
     عرف هات_قيمة_محور_المقبض: لقب getGamepadAxis؛
     عرف هات_قيمة_زر_المقبض: لقب getGamepadButton؛
 
+    عرف أعد_التوجيه: لقب httpRedirect؛
     عرف اكتب_في_الطرفية: لقب logToConsole؛
+    عرف طابق_نمطا: لقب regexMatch؛
 
     عرف أبـعاد: لقب Dimensions؛
     @دمج صنف أبـعاد {
@@ -76,10 +78,10 @@
         عرف العرض: لقب width؛
         عرف الطول: لقب height؛
         عرف أدنى_عرض: لقب minWidth؛
-        عرف أدنى_ارتفاع: لقب minHeight؛
+        عرف أدنى_طول: لقب minHeight؛
         عرف أقصى_عرض: لقب maxWidth؛
         عرف أقصى_طول: لقب maxHeight؛
-        عرف الإطار: لقب border؛
+        عرف سمك_الإطار: لقب borderWidth؛
         عرف لون_الإطار: لقب borderColor؛
         عرف نصف_قطر_الإطار: لقب borderRadius؛
         عرف طراز_الإطار: لقب borderStyle؛
@@ -95,6 +97,8 @@
         عرف الحشوة: لقب padding؛
         عرف حجم_الخط: لقب fontSize؛
         عرف لون_الخط: لقب fontColor؛
+        عرف فئة_الخط: لقب fontFamily؛
+        عرف الشفافية: لقب opacity؛
         عرف الانتقال: لقب transition؛
         عرف التحول: لقب transform؛
         عرف الإزاحة: لقب translate؛
@@ -153,6 +157,7 @@
         عرف عند_خروج_المؤشر: لقب onMouseOut؛
         عرف عند_بدء_النقرة: لقب onMouseDown؛
         عرف عند_انتهاء_النقرة: لقب onMouseUp؛
+        عرف عند_الضغط: لقب onClick؛
         عرف هات_الأبعاد: لقب getDimensions؛
         عرف التمس_احتكار_المؤشر: لقب requestPointerLock؛
         عرف التمس_ملء_الشاشة: لقب requestFullScreen؛
@@ -186,7 +191,6 @@
     عرف الـزر: لقب Button؛
     @دمج صنف الـزر {
         عرب_خصلة[النص، _النص، text، Text]؛
-        عرف عند_الضغط: لقب onClick؛
     }
 
     عرف مـدخل_نص: لقب TextInput؛
@@ -223,6 +227,37 @@
     عرف مـركب: لقب Component؛
     @دمج صنف مـركب {
         عرف المشهد: لقب view؛
+        عرف استبق_البناء: لقب beforeBuild؛
+        عرف تذيل_البناء: لقب beforeBuild؛
+        عرف استبق_الإزالة: لقب beforeBuild؛
+        عرف تذيل_الإزالة: لقب beforeBuild؛
+    }
+
+    عرف مـبدال: لقب Switcher؛
+    @دمج صنف مـبدال {
+        عرف حدد_الانتقال: لقب setTransition؛
+        عرف بدل_إلى: لقب switchTo؛
+    }
+
+    عرف انـتقال_مبدال: لقب SwitcherTransition؛
+    @دمج صنف انـتقال_مبدال {
+        عرف طراز_المشهد_الحالي: لقب currentViewStyle؛
+        عرف طراز_المشهد_التالي: لقب incomingViewStyle؛
+        عرف المدة_الكلية: لقب totalDuration؛
+    }
+
+    عرف أنشئ_انتقال_انزلاق_مبدال: لقب createSlideSwitcherTransition؛
+    عرف أنشئ_انتقال_تلاشي_مبدال: لقب createFadeSwitcherTransition؛
+
+    عرف مـبدال_توجيه: لقب RoutingSwitcher؛
+    @دمج صنف مـبدال_توجيه {
+        عرف متحسس_المسار: لقب routeListener؛
+        عرف عند_المسار_المجهول: لقب onUnknownRoute؛
+        عرف تسلسل_المسار_الحالي: لقب currentRouteIndex؛
+        عرف حدد_النمط: لقب setRegex؛
+        عرف مسار: لقب route؛
+        عرف حدد_الانتقال: لقب setTransition؛
+        عرف استنتج_تسلسل_المسار_الحالي: لقب determineCurrentRouteIndex؛
     }
 
     //==========================================================================
@@ -266,13 +301,15 @@
     }
 
     //==========================================================================
-    // وسائط
+    // عامة
 
     عرف نـافذة: لقب Window؛
     @دمج صنف نـافذة {
         عرف النموذج: لقب instance؛
         عرف حدد_المشهد: لقب setView؛
         عرف أزل_المشهد: لقب unsetView؛
+        عرف مسار_الصفحة: لقب locationPath؛
+        عرف ادفع_حالة: لقب pushState؛
         عرف المفاتيح_المكبوتة: لقب keysToSwallow؛
         عرف عند_بدء_الكبسة: لقب onKeyDown؛
         عرف عند_انتهاء_الكبسة: لقب onKeyUp؛
@@ -280,6 +317,27 @@
         عرف عند_تغير_ملء_الشاشة: لقب onFullScreenChange؛
         عرف عند_ربط_مقبض: لقب onGamepadConnected؛
         عرف عند_فصل_مقبض: لقب onGamepadDisconnected؛
+        عرف عند_تغير_المسار: لقب onPathChanged؛
+    }
+
+    عرف مـتحسس_مسار: لقب RouteListener؛
+    @دمج صنف مـتحسس_مسار {
+        عرف نمط: لقب regex؛
+        عرف عند_التوجيه: لقب onRoute؛
+        عرف أطلق_التوجيه: لقب triggerRoute؛
+        عرف هات_المسار_الحالي: لقب getCurrentRoute؛
+    }
+
+    عرف حـمولة_مسار: لقب RoutePayload؛
+    @دمج صنف حـمولة_مسار {
+        عرف المسار_الكامل: لقب fullPath؛
+        عرف المسار: لقب route؛
+    }
+
+    عرف مـوجه: لقب Router؛
+    @دمج صنف مـوجه {
+        عرف مسار: لقب route؛
+        عرف أطلق_التوجيه: لقب triggerRoute؛
     }
 }
 

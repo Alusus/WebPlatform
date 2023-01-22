@@ -24,13 +24,13 @@ func createHeader (): SrdRef[Widget] {
             padding = Quad(5, 0);
             background = PRIMARY_COLOR;
             borderColor = PRIMARY_COLOR;
-            border = Quad(1.5);
+            borderWidth = Quad(1.5);
             borderStyle = "solid";
             display = "flex";
             layout = "column";
         };
         addChildren({
-            Label(String("أمثلة منصة ويب الأسس - مرسم")).{ style.{
+            Label(String("Alusus Web Platform Examples - Canvas")).{ style.{
                 fontColor = Color("fff");
                 fontSize = 21.0;
                 width = "100%";
@@ -77,7 +77,6 @@ func main {
             align = "center";
             display = "flex";
             layout = "column";
-            direction = "rtl";
         };
         addChildren({
             createHeader(),
@@ -85,58 +84,58 @@ func main {
                 style.display = "flex";
                 style.layout = "row";
                 addChildren({
-                    Button(String("شغل الموسيقى")).{
+                    Button(String("Play Music")).{
                         style.{
                             height = "30pt";
                             width = "120pt";
                             background = Color(200, 200, 200);
                             fontSize = 16.0;
                         };
-                        onClick.connect(closure (music: by_ref)&(widget: ref[Button], payload: ref[Int]) {
+                        onClick.connect(closure (music: by_ref)&(widget: ref[Widget], payload: ref[Int]) {
                             music.play(true);
                         });
                     },
-                    Button(String("أوقف الموسيقى")).{
+                    Button(String("Stop Music")).{
                         style.{
                             height = "30pt";
                             width = "120pt";
                             background = Color(200, 200, 200);
                             fontSize = 16.0;
                         };
-                        onClick.connect(closure (music: by_ref)&(widget: ref[Button], payload: ref[Int]) {
+                        onClick.connect(closure (music: by_ref)&(widget: ref[Widget], payload: ref[Int]) {
                             music.stop();
                         });
                     },
-                    Button(String("شغل الصوت")).{
+                    Button(String("Play Sound")).{
                         style.{
                             height = "30pt";
                             width = "120pt";
                             background = Color(200, 200, 200);
                             fontSize = 16.0;
                         };
-                        onClick.connect(closure (sound: by_ref)&(widget: ref[Button], payload: ref[Int]) {
+                        onClick.connect(closure (sound: by_ref)&(widget: ref[Widget], payload: ref[Int]) {
                             sound.play(false);
                         });
                     },
-                    Button(String("شغل الصوت بتكرار")).{
+                    Button(String("Play Repeating Sound")).{
                         style.{
                             height = "30pt";
-                            width = "150pt";
+                            width = "180pt";
                             background = Color(200, 200, 200);
                             fontSize = 16.0;
                         };
-                        onClick.connect(closure (sound: by_ref)&(widget: ref[Button], payload: ref[Int]) {
+                        onClick.connect(closure (sound: by_ref)&(widget: ref[Widget], payload: ref[Int]) {
                             sound.play(true);
                         });
                     },
-                    Button(String("أوقف الصوت")).{
+                    Button(String("Stop Sound")).{
                         style.{
                             height = "30pt";
                             width = "120pt";
                             background = Color(200, 200, 200);
                             fontSize = 16.0;
                         };
-                        onClick.connect(closure (sound: by_ref)&(widget: ref[Button], payload: ref[Int]) {
+                        onClick.connect(closure (sound: by_ref)&(widget: ref[Widget], payload: ref[Int]) {
                             sound.stop();
                         });
                     }
@@ -151,7 +150,7 @@ func main {
                     height = "100%";
                     maxWidth = "1280px";
                     maxHeight = "800px";
-                    border = Quad(2);
+                    borderWidth = Quad(2);
                     borderStyle = "solid";
                     borderColor = Color(0, 0, 0);
                     background = Color(220, 220, 220);
@@ -253,7 +252,7 @@ func main {
         def points: Array [Int]({ 50, 50, 100, 50, 100, 100, 50, 100, 25, 75 });
         canvas.setFillStyle("black", "blue", 0, 0, 100, 100);
         canvas.drawPolygon(5, points.buf, true);
-        def TEXT: "الأسس";
+        def TEXT: "Alusus";
         canvas.drawText(TEXT, "30px AlususMono", 550, 150);
 
         def size: Int = Math.sin(3.14 * x / 320.0) * 40 + 100;

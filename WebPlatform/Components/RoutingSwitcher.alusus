@@ -1,0 +1,90 @@
+@merge module WebPlatform {
+    //==========================================================================
+    // RoutingSwitcher
+    // A switcher that switches the components based on routes.
+    class RoutingSwitcher {
+        @injection def switcher: Switcher;
+
+        // Member Variables
+
+        def RouteCallback: alias closure(RoutePayload): SrdRef[Component];
+        def routeListener: RouteListener;
+        def routes: Map[String, RouteCallback];
+        def onUnknownRoute: closure(ref[RoutingSwitcher], RoutePayload);
+        def currentRouteIndex: Int = -1;
+
+        // Initialization
+
+        routeListener.onRoute.connect(closure (ref[RouteListener], payload: ref[RoutePayload]) {
+            this.switch(payload);
+        });
+
+        handler this~init() {}
+        handler this~init(regex: String) {
+            this.routeListener.regex = regex;
+        }
+
+        // Configuration Functions
+
+        handler this.setRegex(regex: String) {
+            this.routeListener.regex = regex;
+        }
+
+        handler this.route(r: String): ref[RouteCallback] return this.routes(r);
+        handler this.route(r: CharsPtr): ref[RouteCallback] return this.routes(String(r));
+        handler [r: string, t: type] this.route() {
+            this.route(String(r)) = closure(RoutePayload): SrdRef[Component] {
+                return t();
+            };
+        }
+
+        handler this.setTransition(forward: SwitcherTransition, backward: SwitcherTransition) {
+            this.setTransition(String("forward"), forward);
+            this.setTransition(String("backward"), backward);
+        }
+
+        // Operation Functions
+
+        handler this.switch(payload: RoutePayload) {
+            def pos: ArchInt = this.routes.findPos(payload.route);
+            if pos != -1 {
+                def component: SrdRef[Component] = this.routes.valAt(pos)(payload);
+                if pos > this.currentRouteIndex this.switchTo(component, String("forward"))
+                else if pos < this.currentRouteIndex this.switchTo(component, String("backward"));
+                this.currentRouteIndex = pos;
+            } else if not this.onUnknownRoute.isNull() {
+                this.onUnknownRoute(this, payload);
+            }
+        }
+
+        handler (this:Component).beforeBuild() set_ptr {
+            // Handle initial view.
+            if this.routes.getLength() == 0 {
+                this.currentRouteIndex = -1;
+                return;
+            }
+            def payload: RoutePayload = this.routeListener.getCurrentRoute();
+            def pos: Int = this.routes.findPos(payload.route);
+            if pos == -1 pos = 0;
+            this.switchTo(this.routes.valAt(pos)(payload));
+            this.currentRouteIndex = pos;
+        }
+
+        handler this.determineCurrentRouteIndex(): Int {
+            if this.routes.getLength() == 0 return -1;
+            def payload: RoutePayload = this.routeListener.getCurrentRoute();
+            return this.routes.findPos(payload.route);
+        }
+
+        // Class Handlers
+
+        handler this_type(): SrdRef[RoutingSwitcher] {
+            return SrdRef[RoutingSwitcher].construct();
+        }
+
+        handler this_type(r: String): SrdRef[RoutingSwitcher] {
+            return SrdRef[RoutingSwitcher]().{ alloc()~init(r) };
+        }
+    }
+}
+

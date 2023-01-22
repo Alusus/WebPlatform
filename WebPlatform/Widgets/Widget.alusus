@@ -23,6 +23,8 @@
         def onMouseDownId: ArchInt = -1;
         def onMouseUp: Signal[Widget, Int];
         def onMouseUpId: ArchInt = -1;
+        def onClick: Signal[Widget, Int];
+        def onClickId: ArchInt = -1;
 
         handler this~init() {
             this.onResize.owner~no_deref = this;
@@ -31,6 +33,7 @@
             this.onMouseOut.owner~no_deref = this;
             this.onMouseDown.owner~no_deref = this;
             this.onMouseUp.owner~no_deref = this;
+            this.onClick.owner~no_deref = this;
         }
 
         //-------------------
@@ -76,10 +79,23 @@
             this.onSignalConnectionsChanged(this.onMouseOut~ptr, this.onMouseOut.getConnectionCount());
             this.onSignalConnectionsChanged(this.onMouseDown~ptr, this.onMouseDown.getConnectionCount());
             this.onSignalConnectionsChanged(this.onMouseUp~ptr, this.onMouseUp.getConnectionCount());
+            this.onSignalConnectionsChanged(this.onClick~ptr, this.onClick.getConnectionCount());
+        }
+
+        macro handleEventHandlerUnregistration[eventId] {
+            if this.eventId != -1 unregisterElementEventHandler(this.eventId);
+            this.eventId = -1;
         }
 
         handler this.unbuildCommon() {
             if not this._style.isNull() this._style.unbuild();
+            handleEventHandlerUnregistration[onResizeId];
+            handleEventHandlerUnregistration[onMouseMoveId];
+            handleEventHandlerUnregistration[onMouseEnterId];
+            handleEventHandlerUnregistration[onMouseOutId];
+            handleEventHandlerUnregistration[onMouseDownId];
+            handleEventHandlerUnregistration[onMouseUpId];
+            handleEventHandlerUnregistration[onClickId];
         }
 
         handler this.updateCommon() {
@@ -123,6 +139,11 @@
             if signal == this.onMouseUp~ptr {
                 handleSignalConnectionChanged[onMouseUp, "mouseup", {
                     this.onMouseUp.emit(Int().{ this = data.getInt("button") });
+                }];
+            }
+            if signal == this.onClick~ptr {
+                handleSignalConnectionChanged[onClick, "click", {
+                    this.onClick.emit(Int(0));
                 }];
             }
         }

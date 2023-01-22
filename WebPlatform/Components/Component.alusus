@@ -11,16 +11,28 @@
         handler this~init() {}
 
         //-------------------
+        // Abstract Functions
+
+        handler this.beforeBuild() as_ptr {};
+        handler this.afterBuild() as_ptr {};
+        handler this.beforeUnbuild() as_ptr {};
+        handler this.afterUnbuild() as_ptr {};
+
+        //-------------------
         // Function Overrides
 
         handler (this:Widget).build (ownerId: String) set_ptr {
+            this.beforeBuild();
             this.id = ownerId;
             if this.view.obj~ptr != 0 this.view.build(this.id);
+            this.afterBuild();
         }
 
         handler (this:Widget).unbuild() set_ptr {
+            this.beforeUnbuild();
             this.id = String();
             if this.view.obj~ptr != 0 this.view.unbuild();
+            this.afterUnbuild();
         }
     }
 }

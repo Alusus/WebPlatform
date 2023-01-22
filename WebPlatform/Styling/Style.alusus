@@ -18,7 +18,7 @@
         generateStringStyleProp[minHeight, "min-height"];
         generateStringStyleProp[maxWidth, "max-width"];
         generateStringStyleProp[maxHeight, "max-height"];
-        generateQuadStyleProp[border, "border"];
+        generateQuadStyleProp[borderWidth, "border-width"];
         generateColorStyleProp[borderColor, "border-color"];
         generateQuadStyleProp[borderRadius, "border-radius"];
         generateStringStyleProp[borderStyle, "border-style"];
@@ -32,8 +32,10 @@
         generateStringStyleProp[textAlign, "text-align"];
         generateStringStyleProp[direction, "direction"];
         generateQuadStyleProp[padding, "padding"];
-        generateFloatStyleProp[fontSize, "font-size"];
+        generateFloatPtStyleProp[fontSize, "font-size"];
         generateColorStyleProp[fontColor, "color"];
+        generateStringStyleProp[fontFamily, "font-family"];
+        generateFloatStyleProp[opacity, "opacity"];
         generateStringStyleProp[transition, "transition"];
         generateStringStyleProp[transform, "transform"];
         generateStringStyleProp[translate, "translate"];
@@ -143,6 +145,15 @@
     }
 
     macro generateFloatStyleProp [propName, styleName] {
+        handler this.propName = (val: Float) {
+            this.props(String(styleName)) = String.format("%f", val);
+            this.onPropUpdated();
+            return val;
+        }
+        generateStringStyleProp[propName, styleName];
+    }
+
+    macro generateFloatPtStyleProp [propName, styleName] {
         handler this.propName = (val: Float) {
             this.props(String(styleName)) = String.format("%fpt", val);
             this.onPropUpdated();

@@ -511,6 +511,14 @@ wasmApi.httpRedirect = (page) => {
     window.location.replace(toJsString(page));
 }
 
+wasmApi.pushState = (url, state) => {
+  window.history.pushState(JSON.parse(toJsString(state)), null, toJsString(url));
+}
+
+wasmApi.getLocationPath = () => {
+    return toWasmString(window.location.pathname);
+}
+
 wasmApi.setCookie = (cname, cvalue, exdays) => {
   const d = new Date();
   d.setTime(d.getTime() + (parseInt(toJsString(exdays)) * 24 * 60 * 60 * 1000));
@@ -545,6 +553,16 @@ wasmApi.logToConsole = (msg) => {
   console.log(toJsString(msg));
 }
 
+// String APIs
+
+wasmApi.regexMatch = (str, regex, pLastIndex) => {
+  const reg = new RegExp(toJsString(regex));
+  const result = toWasmStringArray(reg.exec(toJsString(str)));
+  const pLastIndexBuf = new Int32Array(wasmMemory.buffer, pLastIndex, 1);
+  pLastIndexBuf[0] = reg.lastIndex;
+  return result;
+}
+
 // Libc Functions
 
 wasmApi.rand = () => {
@@ -577,6 +595,7 @@ const eventPropMap = {
     fullscreenchange: ['enabled'],
     gamepadconnected: ['gamepad'],
     gamepaddisconnected: ['gamepad'],
+    popstate: ['state'],
 };
 
 function stringifyEvent(event) {
@@ -615,6 +634,23 @@ function toWasmString(str) {
     let view = new Uint8Array(wasmMemory.buffer, wasmStrPtr, buffer.length + 1);
     view.set(buffer);
     view[buffer.length] = 0;
+    return wasmStrPtr;
+}
+
+function toWasmStringArray(strs) {
+    if (strs === null || strs === undefined || strs.length === 0) return 0;
+    const totalSize = strs.reduce((r, s) => { return r + s.length + 1; }, 1);
+    const encoder = new TextEncoder();
+    wasmStrPtr = program.instance.exports.realloc(wasmStrPtr, totalSize);
+    let pos = 0;
+    strs.forEach(str => {
+        const buffer = encoder.encode(str);
+        let view = new Uint8Array(wasmMemory.buffer, wasmStrPtr + pos, buffer.length + 1);
+        view.set(buffer);
+        view[buffer.length] = 0;
+        view[buffer.length + 1] = 0;
+        pos += buffer.length + 1;
+    });
     return wasmStrPtr;
 }
 

@@ -159,6 +159,9 @@
         def uri: ptr[array[Char]] = requestInfo~cnt.requestUri;
         def method: ptr[array[Char]] = requestInfo~cnt.requestMethod;
 
+        preprocess { addBeEndpoints(Root~ast) };
+        preprocess { addAssetRoutes(Root~ast) };
+
         if String.isEqual(method, "GET") {
             if String.isEqual(uri, "/api.js") {
                 Http.sendFile(connection, webPlatformPath + "/api.js");
@@ -167,18 +170,21 @@
 
             def i: Int;
             for i = 0, i < uiEndpoints.getLength(), ++i {
-                if uiEndpoints(i).uri == uri {
-                    sendHtmlTemplate(connection, uiEndpoints(i).title, uiEndpoints(i).filename);
-                    return 1;
-                } else if uiEndpoints(i).filename == uri {
+                if uiEndpoints(i).filename == uri {
                     Http.sendFile(connection, String("/tmp") + uri);
                     return 1;
+                } else {
+                    def len: ArchInt = uiEndpoints(i).uri.getLength();
+                    if uiEndpoints(i).uri == uri or (
+                        len > 0 and uiEndpoints(i).uri(len - 1) == '*' and
+                        String.compare(uiEndpoints(i).uri, uri, len - 1) == 0
+                    ) {
+                        sendHtmlTemplate(connection, uiEndpoints(i).title, uiEndpoints(i).filename);
+                        return 1;
+                    }
                 }
             }
         }
-
-        preprocess { addBeEndpoints(Root~ast) };
-        preprocess { addAssetRoutes(Root~ast) };
 
         def content: array[Char, 1024];
         String.assign(content~ptr, "<h1>404 - Not Found</h1><p> you are in \"%s\"", requestInfo~cnt.localUri);
