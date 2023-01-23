@@ -251,14 +251,22 @@
 
     عرف مـبدال_توجيه: لقب RoutingSwitcher؛
     @دمج صنف مـبدال_توجيه {
-        عرف متحسس_المسار: لقب routeListener؛
         عرف عند_المسار_المجهول: لقب onUnknownRoute؛
         عرف تسلسل_المسار_الحالي: لقب currentRouteIndex؛
-        عرف حدد_النمط: لقب setRegex؛
         عرف مسار: لقب route؛
         عرف حدد_الانتقال: لقب setTransition؛
         عرف استنتج_تسلسل_المسار_الحالي: لقب determineCurrentRouteIndex؛
     }
+
+    عرف مـكداس: لقب Stack؛
+    @دمج صنف مـكداس {
+        عرف حدد_الانتقال: لقب setTransition؛
+        عرف أضف: لقب push؛
+        عرف أزل: لقب pop؛
+    }
+
+    عرف أنشئ_انتقال_انزلاق_مكداس: لقب createSlideStackTransition؛
+    عرف أنشئ_انتقال_تلاشي_مكداس: لقب createFadeStackTransition؛
 
     //==========================================================================
     // موارد
@@ -308,8 +316,8 @@
         عرف النموذج: لقب instance؛
         عرف حدد_المشهد: لقب setView؛
         عرف أزل_المشهد: لقب unsetView؛
-        عرف مسار_الصفحة: لقب locationPath؛
-        عرف ادفع_حالة: لقب pushState؛
+        عرف المسار: لقب location؛
+        عرف ادفع_مسارا: لقب pushLocation؛
         عرف المفاتيح_المكبوتة: لقب keysToSwallow؛
         عرف عند_بدء_الكبسة: لقب onKeyDown؛
         عرف عند_انتهاء_الكبسة: لقب onKeyUp؛
@@ -317,26 +325,20 @@
         عرف عند_تغير_ملء_الشاشة: لقب onFullScreenChange؛
         عرف عند_ربط_مقبض: لقب onGamepadConnected؛
         عرف عند_فصل_مقبض: لقب onGamepadDisconnected؛
-        عرف عند_تغير_المسار: لقب onPathChanged؛
-    }
-
-    عرف مـتحسس_مسار: لقب RouteListener؛
-    @دمج صنف مـتحسس_مسار {
-        عرف نمط: لقب regex؛
-        عرف عند_التوجيه: لقب onRoute؛
-        عرف أطلق_التوجيه: لقب triggerRoute؛
-        عرف هات_المسار_الحالي: لقب getCurrentRoute؛
+        عرف عند_تغير_المسار: لقب onLocationChanged؛
     }
 
     عرف حـمولة_مسار: لقب RoutePayload؛
     @دمج صنف حـمولة_مسار {
         عرف المسار_الكامل: لقب fullPath؛
         عرف المسار: لقب route؛
+        عرف المعطيات: لقب params؛
     }
 
     عرف مـوجه: لقب Router؛
     @دمج صنف مـوجه {
         عرف مسار: لقب route؛
+        عرف عند_المسار_المجهول: لقب onUnknownRoute؛
         عرف أطلق_التوجيه: لقب triggerRoute؛
     }
 }

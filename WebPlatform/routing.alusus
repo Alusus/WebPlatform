@@ -1,62 +1,17 @@
 @merge module WebPlatform {
     //==========================================================================
-    // RouteListener
-    // Allows listening to route changes and performing actions accordingly.
-    class RouteListener {
-        // Member Variables
-
-        def pathChangedHandler: closure (ref[Window], ref[Int]) = closure (ref[Window], ref[Int]) {
-            this.triggerRoute();
-        };
-        def regex: String;
-        def onRoute: Signal[RouteListener, RoutePayload];
-
-        // Initialization
-
-        handler this~init() {
-            this.onRoute.owner~no_deref = this;
-            Window.instance.onPathChanged.connect(this.pathChangedHandler);
-        }
-
-        handler this~init(regex: String) {
-            this.regex = regex;
-            this.onRoute.owner~no_deref = this;
-            Window.instance.onPathChanged.connect(this.pathChangedHandler);
-        }
-
-        handler this~terminate() {
-            Window.instance.onPathChanged.disconnect(this.pathChangedHandler);
-        }
-
-        // Member Functions
-
-        handler this.onSignalConnectionsChanged(signal: ptr[Signal[RouteListener, RoutePayload]], connCount: Int) {
-        }
-
-        handler this.triggerRoute() {
-            this.onRoute.emit(this.getCurrentRoute());
-        }
-
-        handler this.getCurrentRoute(): RoutePayload {
-            return RoutePayload()~use_in(self) {
-                fullPath = Window.instance.locationPath;
-                if this.regex != "" route = regexMatch(fullPath, this.regex)(1)
-                else route = fullPath;
-            }
-        }
-    }
-
-    //==========================================================================
     // RoutePayload
     class RoutePayload {
         def fullPath: String;
         def route: String;
+        def params: Array[String];
 
         handler this~init() {}
         handler this~init(ref[this_type]) this = value;
         handler this = ref[this_type] {
             this.fullPath = value.fullPath;
             this.route = value.route;
+            this.params = value.params;
         }
     }
 
@@ -66,31 +21,41 @@
     class Router {
         // Member Variables
 
-        def routeListener: RouteListener;
+        def locationChangedHandler: closure (ref[Window], ref[Int]) = closure (ref[Window], ref[Int]) {
+            this.triggerRoute();
+        };
         def routes: Map[String, closure(RoutePayload)];
         def onUnknownRoute: closure(RoutePayload);
 
         // Initialization
 
-        router.connect(closure (ref[Router], payload: RouterPayload) {
-            this.triggerRoute(payload);
-        });
-
         handler this~init() {
+            Window.instance.onLocationChanged.connect(this.locationChangedHandler);
         }
 
-        handler this~init(regex: String) {
-            this.routeListener.regex = regex;
+        handler this~terminate() {
+            Window.instance.onLocationChanged.disconnect(this.locationChangedHandler);
         }
 
         // Member Functions
 
         handler this.route(r: String): ref[closure(String)] return this.routes(r);
 
-        handler this.triggerRoute(payload: RoutePayload) {
-            def pos: ArchInt = this.routes.findPos(payload.route);
-            if pos != -1 this.routes.valAt(pos)(payload)
-            else if not this.onUnknownRoute.isNull() this.onUnknownRoute(payload);
+        handler this.triggerRoute() {
+            def payload: RoutePayload;
+            payload.fullPath = Window.instance.location;
+            def i: Int;
+            for i = 0, i < this.routes.getLength(), ++i {
+                def result: Array[String] = regexMatch(payload.fullPath, this.routes.keyAt(i));
+                if result.getLength() > 0 {
+                    payload.route = result(0);
+                    result.remove(0);
+                    payload.params = result;
+                    this.routes.valAt(i)(payload);
+                    return;
+                }
+            }
+            if not this.onUnknownRoute.isNull() this.onUnknownRoute(payload);
         }
     }
 }

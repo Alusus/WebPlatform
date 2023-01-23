@@ -12,7 +12,7 @@
             this.onFullScreenChange.owner~no_deref = this;
             this.onGamepadConnected.owner~no_deref = this;
             this.onGamepadDisconnected.owner~no_deref = this;
-            this.onPathChanged.owner~no_deref = this;
+            this.onLocationChanged.owner~no_deref = this;
         }
 
         //-------
@@ -30,8 +30,8 @@
         def onGamepadConnectedId: ArchInt = -1;
         def onGamepadDisconnected: Signal[Window, String];
         def onGamepadDisconnectedId: ArchInt = -1;
-        def onPathChanged: Signal[Window, Int];
-        def onPathChangedId: ArchInt = -1;
+        def onLocationChanged: Signal[Window, Int];
+        def onLocationChangedId: ArchInt = -1;
 
         handler this.onSignalConnectionsChanged(signal: ptr[Signal[Window, String]], connectionCount: Int) {
             if signal == this.onKeyDown~ptr {
@@ -66,9 +66,9 @@
         }
 
         handler this.onSignalConnectionsChanged(signal: ptr[Signal[Window, Int]], connectionCount: Int) {
-            if signal == this.onPathChanged~ptr {
-                handleSignalConnectionChanged[onPathChanged, "popstate", {
-                    this.onPathChanged.emit(Int(0));
+            if signal == this.onLocationChanged~ptr {
+                handleSignalConnectionChanged[onLocationChanged, "popstate", {
+                    this.onLocationChanged.emit(Int(0));
                 }];
             }
         }
@@ -87,13 +87,13 @@
             this.view.release();
         }
 
-        handler this.locationPath: String {
+        handler this.location: String {
             return String(getLocationPath()~cast[CharsPtr]);
         }
 
-        handler this.pushState (url: ptr[array[Char]]) {
+        handler this.pushLocation (url: ptr[array[Char]]) {
             WebPlatform.pushState(url, "{}");
-            this.onPathChanged.emit(Int(0));
+            this.onLocationChanged.emit(Int(0));
         }
     }
 }
