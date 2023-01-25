@@ -75,7 +75,7 @@
         }
 
         handler this.pop() {
-            this.push(String());
+            this.pop(String());
         }
 
         handler this.pop(transitionName: String) {
