@@ -8,27 +8,24 @@
         // Member Variables
 
         def RouteCallback: alias closure(RoutePayload): SrdRef[Component];
-        def routeListener: RouteListener;
+        def locationChangedHandler: closure (ref[Window], ref[Int]) = closure (ref[Window], ref[Int]) {
+            this.triggerRoute();
+        };
         def routes: Map[String, RouteCallback];
         def onUnknownRoute: closure(ref[RoutingSwitcher], RoutePayload);
         def currentRouteIndex: Int = -1;
 
         // Initialization
 
-        routeListener.onRoute.connect(closure (ref[RouteListener], payload: ref[RoutePayload]) {
-            this.switch(payload);
-        });
+        handler this~init() {
+            Window.instance.onLocationChanged.connect(this.locationChangedHandler);
+        }
 
-        handler this~init() {}
-        handler this~init(regex: String) {
-            this.routeListener.regex = regex;
+        handler this~terminate() {
+            Window.instance.onLocationChanged.disconnect(this.locationChangedHandler);
         }
 
         // Configuration Functions
-
-        handler this.setRegex(regex: String) {
-            this.routeListener.regex = regex;
-        }
 
         handler this.route(r: String): ref[RouteCallback] return this.routes(r);
         handler this.route(r: CharsPtr): ref[RouteCallback] return this.routes(String(r));
@@ -45,16 +42,15 @@
 
         // Operation Functions
 
-        handler this.switch(payload: RoutePayload) {
-            def pos: ArchInt = this.routes.findPos(payload.route);
-            if pos != -1 {
+        handler this.triggerRoute() {
+            def payload: RoutePayload;
+            def pos: Int = this.determineCurrentRouteIndex(payload);
+            if pos >= 0 {
                 def component: SrdRef[Component] = this.routes.valAt(pos)(payload);
                 if pos > this.currentRouteIndex this.switchTo(component, String("forward"))
                 else if pos < this.currentRouteIndex this.switchTo(component, String("backward"));
                 this.currentRouteIndex = pos;
-            } else if not this.onUnknownRoute.isNull() {
-                this.onUnknownRoute(this, payload);
-            }
+            } else if not this.onUnknownRoute.isNull() this.onUnknownRoute(this, payload);
         }
 
         handler (this:Component).beforeBuild() set_ptr {
@@ -63,17 +59,33 @@
                 this.currentRouteIndex = -1;
                 return;
             }
-            def payload: RoutePayload = this.routeListener.getCurrentRoute();
-            def pos: Int = this.routes.findPos(payload.route);
+            def payload: RoutePayload;
+            def pos: Int = this.determineCurrentRouteIndex(payload);
             if pos == -1 pos = 0;
             this.switchTo(this.routes.valAt(pos)(payload));
             this.currentRouteIndex = pos;
         }
 
         handler this.determineCurrentRouteIndex(): Int {
-            if this.routes.getLength() == 0 return -1;
-            def payload: RoutePayload = this.routeListener.getCurrentRoute();
-            return this.routes.findPos(payload.route);
+            return this.determineCurrentRouteIndex(nullRef[RoutePayload]);
+        }
+
+        handler this.determineCurrentRouteIndex(rp: ref[RoutePayload]): Int {
+            def payload: RoutePayload;
+            payload.fullPath = Window.instance.location;
+            def i: Int;
+            for i = 0, i < this.routes.getLength(), ++i {
+                def result: Array[String] = regexMatch(payload.fullPath, this.routes.keyAt(i));
+                if result.getLength() > 0 {
+                    payload.route = result(0);
+                    result.remove(0);
+                    payload.params = result;
+                    if rp~ptr != 0 rp = payload;
+                    return i;
+                }
+            }
+            if rp~ptr != 0 rp = payload;
+            return -1;
         }
 
         // Class Handlers

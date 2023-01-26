@@ -9,6 +9,29 @@ use WebPlatform;
 @assetsRoute def assetsRoute: "Assets/";
 
 //==============================================================================
+// Constants
+
+def loremIpsum:
+    "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna"
+    "aliqua. Libero id faucibus nisl tincidunt eget nullam. Dui accumsan sit amet nulla facilisi morbi. Vulputate mi sit"
+    "amet mauris commodo quis imperdiet massa. Eget lorem dolor sed viverra ipsum. Tristique magna sit amet purus gravida"
+    "quis blandit turpis cursus. Iaculis nunc sed augue lacus. Eu nisl nunc mi ipsum faucibus vitae aliquet nec. Proin"
+    "nibh nisl condimentum id venenatis a condimentum vitae. Cursus metus aliquam eleifend mi in nulla posuere"
+    "sollicitudin. Imperdiet nulla malesuada pellentesque elit eget gravida. Ut ornare lectus sit amet. Ultrices dui"
+    "sapien eget mi proin sed. Amet consectetur adipiscing elit duis. Ullamcorper a lacus vestibulum sed arcu."
+    "Scelerisque mauris pellentesque pulvinar pellentesque habitant morbi tristique senectus. Est placerat in egestas"
+    "erat.<br>"
+    "<br>"
+    "Curabitur vitae nunc sed velit dignissim. Et malesuada fames ac turpis. Lorem ipsum dolor sit amet consectetur"
+    "adipiscing elit duis. Maecenas pharetra convallis posuere morbi leo urna molestie at elementum. Vitae aliquet nec"
+    "ullamcorper sit. Egestas egestas fringilla phasellus faucibus scelerisque eleifend donec pretium. Aenean vel elit"
+    "scelerisque mauris pellentesque pulvinar pellentesque habitant. Leo a diam sollicitudin tempor id. Sagittis purus"
+    "sit amet volutpat consequat mauris nunc. Potenti nullam ac tortor vitae purus faucibus ornare. Viverra nam libero"
+    "justo laoreet sit. Scelerisque purus semper eget duis at tellus at urna. Tristique magna sit amet purus gravida"
+    "quis blandit turpis cursus. Orci nulla pellentesque dignissim enim. Orci ac auctor augue mauris augue. Gravida"
+    "neque convallis a cras semper auctor neque vitae.";
+
+//==============================================================================
 // Frontend Components
 
 class MenuButton {
@@ -36,7 +59,7 @@ class MenuButton {
                 fontColor = Color("000");
             }
             onClick.connect(closure (widget: ref[Widget], payload: ref[Int]) {
-                Window.instance.pushState(link);
+                Window.instance.pushLocation(link);
             });
             addChildren({
                 Label(label).{
@@ -91,11 +114,6 @@ class SideButton {
 class Header {
     @injection def component: Component;
     def indicator: SrdRef[Box];
-    def routingSwitcher: SrdRef[RoutingSwitcher];
-    def routeCallback: closure (ref[RouteListener], ref[RoutePayload]) =
-        closure (ref[RouteListener], ref[RoutePayload]) {
-            this.updateIndicator();
-        };
 
     handler this~init() {
         def self: ref[this_type](this);
@@ -177,26 +195,8 @@ class Header {
         };
     }
 
-    handler this~terminate() {
-        if not this.routingSwitcher.isNull() {
-            this.routingSwitcher.routeListener.onRoute.disconnect(this.routeCallback);
-        }
-    }
-
-    handler this.setRoutingSwitcher(rs: SrdRef[RoutingSwitcher]) {
-        if not this.routingSwitcher.isNull() {
-            this.routingSwitcher.routeListener.onRoute.disconnect(this.routeCallback);
-        }
-        this.routingSwitcher = rs;
-        this.routingSwitcher.routeListener.onRoute.connect(this.routeCallback);
-        this.indicator.className = String("indicator") + Int()~use_in(i) {
-            i = this.routingSwitcher.determineCurrentRouteIndex();
-            if i == -1 i = 0;
-        }
-    }
-
-    handler this.updateIndicator() {
-        this.indicator.className = String("indicator") + this.routingSwitcher.currentRouteIndex;
+    handler this.updateIndicator(i: Int) {
+        this.indicator.className = String("indicator") + i;
     }
 
     handler this_type(): SrdRef[Header] {
@@ -204,20 +204,115 @@ class Header {
     }
 }
 
-class Page {
-    @injection def component: Component;
+def article: String(loremIpsum);
 
-    handler this~init(label: String) {
-        this.view = Label(label).{
+class Article {
+    @injection def component: Component;
+    def label: SrdRef[Label];
+
+    handler this~init() {
+        def self: ref[this_type](this);
+        this.view = Box({}).{
             style.{
-                fontColor = Color(0, 0, 0);
-                fontSize = 20.0;
-            }
+                align = "end";
+                display = "flex";
+                layout = "column";
+                height = "100%";
+                overflow = "scroll";
+            };
+            addChildren({
+                SideButton(String("🖉")).{
+                    onButtonClicked = closure() {
+                        Window.instance.pushLocation("/three/edit");
+                    }
+                },
+                Label(article).{
+                    style.{
+                        fontColor = Color(0, 0, 0);
+                        fontSize = 20.0;
+                    }
+                    self.label = this;
+                }
+            });
         };
     }
 
-    handler this_type(label: String): SrdRef[Page] {
-        return SrdRef[Page]().{ alloc()~init(label) };
+    handler this_type(): SrdRef[Article] {
+        return SrdRef[Article].construct();
+    }
+}
+
+class ArticleEditor {
+    @injection def component: Component;
+    def textInput: SrdRef[TextInput];
+    def onUpdated: closure(String);
+
+    handler this~init(str: String) {
+        def self: ref[this_type](this);
+        this.view = Box({}).{
+            style.{
+                width = "100%";
+                height = "100%";
+                align = "end";
+                display = "flex";
+                layout = "column";
+                background = "white";
+            };
+            addChildren({
+                SideButton(String("💾")).{ onButtonClicked = closure() {
+                    self.onUpdated(self.textInput.text);
+                } },
+                TextInput().{
+                    style.{
+                        width = "100%";
+                        height = "100%";
+                        fontSize = 20.0;
+                    };
+                    text = str;
+                    self.textInput = this;
+                },
+            });
+        };
+    }
+
+    handler this_type(label: String): SrdRef[ArticleEditor] {
+        return SrdRef[ArticleEditor]().{ alloc()~init(label) };
+    }
+}
+
+class ArticleView {
+    @injection def component: Component;
+    def articleView: SrdRef[Article];
+
+    handler this~init() {
+        def self: ref[this_type](this);
+        this.view = RoutingStack().{
+            style.{
+                width = "100%";
+                height = "100%";
+            };
+            setTransition(
+                createSlideStackTransition(0.5, true, false),
+                createSlideStackTransition(0.5, true, true)
+            );
+            route(String("^/three")) = closure(RoutePayload): SrdRef[Component] {
+                self.articleView = Article();
+                return self.articleView;
+            };
+            route(String("^/three/edit")) = closure(RoutePayload): SrdRef[Component] {
+                return ArticleEditor(article.replace("<br>", "\n")).{
+                    this.onUpdated = closure(t: String) {
+                        article = t.replace("\n", "<br>");
+                        self.articleView.label.text = article;
+                        Window.instance.pushLocation("/three");
+                    }
+                };
+            };
+        };
+    }
+
+    handler this_type(): SrdRef[ArticleView] {
+        return SrdRef[ArticleView].construct();
     }
 }
 
@@ -257,9 +352,9 @@ class ImageViewer {
                         background = Color("eee");
                     };
                     addChildren({
-                        SideButton(String("1")).{ onButtonClicked = closure() { Window.instance.pushState("/one/img1") } },
-                        SideButton(String("2")).{ onButtonClicked = closure() { Window.instance.pushState("/one/img2") } },
-                        SideButton(String("3")).{ onButtonClicked = closure() { Window.instance.pushState("/one/img3") } },
+                        SideButton(String("1")).{ onButtonClicked = closure() { Window.instance.pushLocation("/one/img1") } },
+                        SideButton(String("2")).{ onButtonClicked = closure() { Window.instance.pushLocation("/one/img2") } },
+                        SideButton(String("3")).{ onButtonClicked = closure() { Window.instance.pushLocation("/one/img3") } },
                     });
                 },
                 Box({}).{
@@ -272,18 +367,17 @@ class ImageViewer {
                                 flex = "auto";
                                 height = "500pt";
                             };
-                            setRegex(String("^/one/([a-z0-9]+)"));
                             setTransition(
                                 createFadeSwitcherTransition(1.0),
                                 createFadeSwitcherTransition(1.0)
                             );
-                            route("img1") = closure(RoutePayload): SrdRef[Component] {
+                            route("^/one/img1$") = closure(RoutePayload): SrdRef[Component] {
                                 return ImgView(String("/Assets/wblogo.svg"));
                             };
-                            route("img2") = closure(RoutePayload): SrdRef[Component] {
+                            route("^/one/img2$") = closure(RoutePayload): SrdRef[Component] {
                                 return ImgView(String("/Assets/future-musume.jpg"));
                             };
-                            route("img3") = closure(RoutePayload): SrdRef[Component] {
+                            route("^/one/img3$") = closure(RoutePayload): SrdRef[Component] {
                                 return ImgView(String("/Assets/bridge.png"));
                             };
                         }
@@ -399,26 +493,6 @@ class CounterView {
 //==============================================================================
 // Frontend Pages
 
-def loremIpsum:
-    "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna"
-    "aliqua. Libero id faucibus nisl tincidunt eget nullam. Dui accumsan sit amet nulla facilisi morbi. Vulputate mi sit"
-    "amet mauris commodo quis imperdiet massa. Eget lorem dolor sed viverra ipsum. Tristique magna sit amet purus gravida"
-    "quis blandit turpis cursus. Iaculis nunc sed augue lacus. Eu nisl nunc mi ipsum faucibus vitae aliquet nec. Proin"
-    "nibh nisl condimentum id venenatis a condimentum vitae. Cursus metus aliquam eleifend mi in nulla posuere"
-    "sollicitudin. Imperdiet nulla malesuada pellentesque elit eget gravida. Ut ornare lectus sit amet. Ultrices dui"
-    "sapien eget mi proin sed. Amet consectetur adipiscing elit duis. Ullamcorper a lacus vestibulum sed arcu."
-    "Scelerisque mauris pellentesque pulvinar pellentesque habitant morbi tristique senectus. Est placerat in egestas"
-    "erat.<br>"
-    "<br>"
-    "Curabitur vitae nunc sed velit dignissim. Et malesuada fames ac turpis. Lorem ipsum dolor sit amet consectetur"
-    "adipiscing elit duis. Maecenas pharetra convallis posuere morbi leo urna molestie at elementum. Vitae aliquet nec"
-    "ullamcorper sit. Egestas egestas fringilla phasellus faucibus scelerisque eleifend donec pretium. Aenean vel elit"
-    "scelerisque mauris pellentesque pulvinar pellentesque habitant. Leo a diam sollicitudin tempor id. Sagittis purus"
-    "sit amet volutpat consequat mauris nunc. Potenti nullam ac tortor vitae purus faucibus ornare. Viverra nam libero"
-    "justo laoreet sit. Scelerisque purus semper eget duis at tellus at urna. Tristique magna sit amet purus gravida"
-    "quis blandit turpis cursus. Orci nulla pellentesque dignissim enim. Orci ac auctor augue mauris augue. Gravida"
-    "neque convallis a cras semper auctor neque vitae.";
-
 @uiEndpoint["/*", "WebPlatform Example"]
 func main {
     setElementAttribute("body", "style", "padding: 0; margin: 0;");
@@ -438,21 +512,22 @@ func main {
                     maxWidth = "600pt";
                     minHeight = "500pt";
                 };
-                setRegex(String("^/([a-z]+)"));
                 setTransition(
                     createSlideSwitcherTransition(0.5, false, false),
                     createSlideSwitcherTransition(0.5, false, true)
                 );
-                route("one") = closure(RoutePayload): SrdRef[Component] {
+                route("^/one") = closure(RoutePayload): SrdRef[Component] {
+                    header.updateIndicator(0);
                     return ImageViewer();
                 };
-                route("two") = closure(RoutePayload): SrdRef[Component] {
+                route("^/two$") = closure(RoutePayload): SrdRef[Component] {
+                    header.updateIndicator(1);
                     return CounterView();
                 };
-                route("three") = closure(RoutePayload): SrdRef[Component] {
-                    return Page(String(loremIpsum));
+                route("^/three") = closure(RoutePayload): SrdRef[Component] {
+                    header.updateIndicator(2);
+                    return ArticleView();
                 };
-                header.setRoutingSwitcher(this);
             }
         });
     });

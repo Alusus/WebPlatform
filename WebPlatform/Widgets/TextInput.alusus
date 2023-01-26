@@ -13,7 +13,7 @@
             this._text = t;
             if this.id.getLength() > 0 setElementAttribute(this.id, "value", t);
         }
-        handler this.getText (): String {
+        handler this.getText (): ref[String] {
             if this.id.getLength() == 0 this._text = String()
             else this._text = String(getElementAttribute(this.id, "value"));
             return this._text;
