@@ -112,7 +112,7 @@ class Header {
                     addChildren({
                         Box({ Label(String("Alusus Web Platform Examples - Chat")).{ style.{
                             fontColor = Color("fff");
-                            fontSize = 21.0;
+                            fontSize = 18.0;
                             height = "100%";
                             padding = Quad(0, 10);
                         } } }),
