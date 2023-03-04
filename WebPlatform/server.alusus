@@ -16,12 +16,31 @@
     def uiEndpoints: Array[UiEndpoint];
     def htmlTemplate: String;
 
+    def AstTemplateMap: alias Map[String, ref[Core.Basic.TiObject]];
+
     func getElementName (obj: ref[Core.Basic.TiObject]): String {
         def node: ref[Core.Data.Node](castRef[obj, Core.Data.Node]);
         def d: ref[Core.Data.Ast.Definition](castRef[node.owner, Core.Data.Ast.Definition]);
         def binding: ref[Core.Basic.Binding](Core.Basic.getInterface[d, Core.Basic.Binding]);
         def name: ref[Core.Basic.TiStr](castRef[binding.getMember("name"), Core.Basic.TiStr]);
         return name.value;
+    }
+
+    func constructElementFullReference (element: ref[Core.Basic.TiObject]): SrdRef[Core.Basic.TiObject] {
+        def node: ref[Core.Data.Node](castRef[element, Core.Data.Node]);
+        if node.owner~ptr == 0 return SrdRef[Core.Basic.TiObject]();
+        def name: String = getElementName(node);
+        def identifier: SrdRef[Core.Data.Ast.Identifier] = Core.Basic.newSrdObj[Core.Data.Ast.Identifier].{
+            value.value = name;
+        };
+        def ownerRef: SrdRef[Core.Basic.TiObject] = constructElementFullReference(node.owner.owner);
+        if ownerRef.isNull() return identifier
+        else return Core.Basic.newSrdObj[Core.Data.Ast.LinkOperator].{
+            Core.Basic.MapContainerOf[this].{
+                setElement("first", ownerRef);
+                setElement("second", identifier);
+            };
+        };
     }
 
     func addUiEndpoints (parent: ref[Core.Basic.TiObject]) {
@@ -77,14 +96,14 @@
             Spp.astMgr.insertAst(
                 ast {
                     if String.isEqual(method, "{{endpointMethod}}") && String.isEqual(uri, "{{endpointUri}}" ) {
-                        __funcName__(connection);
+                        fullref(connection);
                         return 1;
                     }
                 },
-                Srl.Map[Srl.String, ref[Core.Basic.TiObject]]()
+                AstTemplateMap()
                     .set(Srl.String("endpointMethod"), Core.Basic.TiStr(endpointParams(0)))
                     .set(Srl.String("endpointUri"), Core.Basic.TiStr(endpointParams(1)))
-                    .set(Srl.String("funcName"), Core.Basic.TiStr(getElementName(elements(i))))
+                    .set(Srl.String("fullref"), constructElementFullReference(elements(i)))
             );
         }
     }
@@ -109,7 +128,7 @@
                         return 1;
                     }
                 },
-                Srl.Map[Srl.String, ref[Core.Basic.TiObject]]().set(Srl.String("element"), elements(i))
+                AstTemplateMap().set(Srl.String("element"), elements(i))
             );
         }
     }
@@ -126,8 +145,8 @@
         }
     }
 
-    func startServer(options: ref[Array[CharsPtr]]): ptr[Http.Context] {
-        addUiEndpoints(Root~ast);
+    func startServer [parent: ast_ref = Root] (options: ref[Array[CharsPtr]]): ptr[Http.Context] {
+        addUiEndpoints(parent~ast);
         if uiEndpoints.getLength() == 0 {
             System.fail(1, "No UI endpoints found\n");
         }
@@ -135,32 +154,32 @@
 
         options.add(0);
 
-        return Http.createServer(callbackRequest~ptr, options);
+        return Http.createServer(callbackRequest[parent]~ptr, options);
     }
 
-    func startServer(optsCount: Int, opts: ...CharsPtr): ptr[Http.Context] {
+    func startServer [parent: ast_ref = Root] (optsCount: Int, opts: ...CharsPtr): ptr[Http.Context] {
         def options: Array[CharsPtr];
         while optsCount-- > 0 options.add(opts~next_arg[CharsPtr]);
-        return startServer(options);
+        return startServer[parent](options);
     }
 
-    func runServer(optsCount: Int, opts: ...CharsPtr) {
+    func runServer [parent: ast_ref = Root] (optsCount: Int, opts: ...CharsPtr) {
         def options: Array[CharsPtr];
         while optsCount-- > 0 options.add(opts~next_arg[CharsPtr]);
 
-        def context: ptr[Http.Context] = startServer(options);
+        def context: ptr[Http.Context] = startServer[parent](options);
         Console.print("Server started.\npress enter to close server: ");
         Console.getChar(); // stop proccess here waiting user to press enter
         Http.closeServer(context); // stop the server
     }
 
-    func callbackRequest(connection: ptr[Http.Connection]): Int {
+    func callbackRequest [parent: ast_ref = Root] (connection: ptr[Http.Connection]): Int {
         def requestInfo: ptr[Http.RequestInfo] = Http.getRequestInfo(connection);
         def uri: ptr[array[Char]] = requestInfo~cnt.requestUri;
         def method: ptr[array[Char]] = requestInfo~cnt.requestMethod;
 
-        preprocess { addBeEndpoints(Root~ast) };
-        preprocess { addAssetRoutes(Root~ast) };
+        preprocess { addBeEndpoints(parent~ast) };
+        preprocess { addAssetRoutes(parent~ast) };
 
         if String.isEqual(method, "GET") {
             if String.isEqual(uri, "/api.js") {
