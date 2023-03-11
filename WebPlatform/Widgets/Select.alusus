@@ -74,14 +74,12 @@
 
         handler this.getSelectedValue() : String{
             def selectedValue : String;
-            logToConsole("selected getSelectedValue " );
             selectedValue=getSelectedItemValue(this.id);
             return selectedValue;
         }
-        handler this.selectValue(selectedValue : String) {
-            logToConsole(" selectValue " );
-            selectItem(this.id,selectedValue);
 
+        handler this.selectValue(selectedValue : String) {
+            selectItem(this.id,selectedValue);
         }
 
         //-----------------
