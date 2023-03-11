@@ -53,7 +53,9 @@
         }
 
         handler this.switchTo(child: SrdRef[Widget], transitionName: String) {
-            transitionName += this.transitionUniqueSuffix;
+            if transitionName != "" transitionName += this.transitionUniqueSuffix;
+            if this.transitionDurations.findPos(transitionName) == -1 transitionName = "";
+
             if this.transitionTimeout != 0 cancelTimeout(this.transitionTimeout);
             this.endTransition();
 
