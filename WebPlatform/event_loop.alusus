@@ -7,8 +7,13 @@
             // TODO: Use (and implement) json.getArchInt("cbId").
             def index: ArchInt = findEventHandlerIndex(json.getInt("cbId"));
             if index != -1 {
-                eventHandlers(index).cb(json);
-                if !json.getBool("recurring") eventHandlers.remove(index);
+                if json.getBool("recurring") {
+                    eventHandlers(index).cb(json);
+                } else {
+                    def cb: closure (Json) = eventHandlers(index).cb;
+                    eventHandlers.remove(index);
+                    cb(json);
+                }
             }
         }
     }
