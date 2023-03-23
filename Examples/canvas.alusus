@@ -30,7 +30,7 @@ func createHeader (): SrdRef[Widget] {
             layout = "column";
         };
         addChildren({
-            Label(String("Alusus Web Platform Examples - Canvas")).{ style.{
+            Text(String("Alusus Web Platform Examples - Canvas")).{ style.{
                 fontColor = Color("fff");
                 fontSize = 21.0;
                 width = "100%";

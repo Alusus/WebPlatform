@@ -75,7 +75,7 @@
             payload.fullPath = Window.instance.location;
             def i: Int;
             for i = 0, i < this.routes.getLength(), ++i {
-                def result: Array[String] = regexMatch(payload.fullPath, this.routes.keyAt(i));
+                def result: Array[String] = matchRegex(payload.fullPath, this.routes.keyAt(i));
                 if result.getLength() > 0 {
                     payload.route = result(0);
                     result.remove(0);

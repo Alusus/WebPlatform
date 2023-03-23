@@ -12,6 +12,9 @@
         //---------
         // Handlers
 
+        handler this~init() {
+        }
+
         handler this~init(t: String) {
             this.text = t;
         }
@@ -43,6 +46,10 @@
 
         //-----------------
         // Shared Functions
+
+        handler this_type(): SrdRef[Button] {
+            return SrdRef[Button].construct();
+        }
 
         handler this_type(t: String): SrdRef[Button] {
             def r: SrdRef[Button];

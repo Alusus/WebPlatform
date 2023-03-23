@@ -1,0 +1,30 @@
+@merge module WebPlatform {
+    function matchRegex (str: ptr[array[Char]], regex: ptr[array[Char]], lastIndex: ref[Int]): Array[String] {
+        return parseRegexMatchResult(_matchRegex(str, regex, 0, lastIndex));
+    }
+
+    function matchRegex (str: ptr[array[Char]], regex: ptr[array[Char]]): Array[String] {
+        def lastIndex: Int;
+        return matchRegex(str, regex, lastIndex);
+    }
+
+    function matchRegex (str: ptr[array[Char]], regexId: ArchInt, lastIndex: ref[Int]): Array[String] {
+        return parseRegexMatchResult(_matchRegex(str, 0, regexId, lastIndex));
+    }
+
+    function matchRegex (str: ptr[array[Char]], regexId: ArchInt): Array[String] {
+        def lastIndex: Int;
+        return matchRegex(str, regexId, lastIndex);
+    }
+
+    function parseRegexMatchResult (rawResult: ptr[Char]): Array[String] {
+        if rawResult == 0 return Array[String]();
+        def result: Array[String];
+        while rawResult~cnt != 0 {
+            result.add(String(rawResult~cast[ptr[array[Char]]]));
+            while rawResult~cnt != 0 rawResult = rawResult + 1;
+            rawResult = rawResult + 1;
+        }
+        return result;
+    }
+}

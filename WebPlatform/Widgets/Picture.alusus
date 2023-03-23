@@ -9,7 +9,6 @@
         generateProperty[sourceArray, SourceArray, Array[ImageSource]];
         def child: SrdRef[Image];
 
-
         //---------
         // Handlers
 

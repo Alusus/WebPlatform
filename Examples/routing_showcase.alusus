@@ -62,7 +62,7 @@ class MenuButton {
                 Window.instance.pushLocation(link);
             });
             addChildren({
-                Label(label).{
+                Text(label).{
                     className = String("label")
                 }
             });
@@ -99,7 +99,7 @@ class SideButton {
                 self.onButtonClicked();
             });
             addChildren({
-                Label(label).{
+                Text(label).{
                     className = String("label")
                 }
             });
@@ -157,7 +157,7 @@ class Header {
                                 padding = Quad(0, 10);
                             };
                         },
-                        Box({ Label(String("Alusus Web Platform Example")).{ style.{
+                        Box({ Text(String("Alusus Web Platform Example")).{ style.{
                             fontColor = Color("000");
                             fontSize = 21.0;
                             height = "100%";
@@ -208,7 +208,7 @@ def article: String(loremIpsum);
 
 class Article {
     @injection def component: Component;
-    def label: SrdRef[Label];
+    def label: SrdRef[Text];
 
     handler this~init() {
         def self: ref[this_type](this);
@@ -226,7 +226,7 @@ class Article {
                         Window.instance.pushLocation("/three/edit");
                     }
                 },
-                Label(article).{
+                Text(article).{
                     style.{
                         fontColor = Color(0, 0, 0);
                         fontSize = 20.0;
@@ -418,7 +418,7 @@ class DigitView {
                         justify = "center";
                     };
                     addChildren({
-                        Label(label).{
+                        Text(label).{
                             style.{
                                 fontColor = Color(0, 0, 0);
                                 fontSize = 250.0;

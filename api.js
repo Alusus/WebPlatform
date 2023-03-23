@@ -555,8 +555,15 @@ wasmApi.logToConsole = (msg) => {
 
 // String APIs
 
-wasmApi.regexMatch = (str, regex, pLastIndex) => {
-  const reg = new RegExp(toJsString(regex));
+wasmApi.createRegex = (regexStr) => {
+    const regex = new RegExp(toJsString(regexStr));
+    const resourceId = ++resourceCounter;
+    resources[resourceId] = regex;
+    return resourceId;
+}
+
+wasmApi.matchRegex = (str, regexStr, regexId, pLastIndex) => {
+  const reg = regexStr ? new RegExp(toJsString(regexStr)) : resources[regexId];
   const result = toWasmStringArray(reg.exec(toJsString(str)));
   const pLastIndexBuf = new Int32Array(wasmMemory.buffer, pLastIndex, 1);
   pLastIndexBuf[0] = reg.lastIndex;

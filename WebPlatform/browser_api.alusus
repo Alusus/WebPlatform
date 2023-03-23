@@ -91,6 +91,9 @@
     @expname[getVarFromSession] function getVarFromSession (varName: ptr[Char]): ptr[array[Char]];
     @expname[logToConsole] function logToConsole (msg: ptr[Char]);
     // String
-    @expname[regexMatch] function _regexMatch (str: ptr[Char], regex: ptr[Char], lastIndex: ref[Int]): ptr[Char];
+    @expname[createRegex] function createRegex (regexStr: ptr[Char]): ArchInt;
+    @expname[matchRegex] function _matchRegex (
+        str: ptr[Char], regexStr: ptr[Char], regexId: ArchInt, lastIndex: ref[Int]
+    ): ptr[Char];
 }
 

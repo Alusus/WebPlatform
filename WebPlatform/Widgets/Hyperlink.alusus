@@ -13,6 +13,9 @@
         //---------
         // Handlers
 
+        handler this~init() {
+        }
+
         handler this~init(url: String) {
             this.url = url;
         }
@@ -58,6 +61,10 @@
 
         //-----------------
         // Shared Functions
+
+        handler this_type(): SrdRef[Hyperlink] {
+            return SrdRef[Hyperlink].construct();
+        }
 
         handler this_type(url: String, child: temp_ref[SrdRef[Widget]]): SrdRef[Hyperlink] {
             def r: SrdRef[Hyperlink];

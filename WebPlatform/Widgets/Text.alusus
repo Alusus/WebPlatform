@@ -1,9 +1,9 @@
 @merge module WebPlatform {
     //==========================================================================
-    // Label
-    class Label {
+    // Text
+    class Text {
         @injection def widget: Widget;
-        def tag: String;
+        def tag: String("span");
 
         //-----------
         // Properties
@@ -14,11 +14,13 @@
         //----------
         // Handlers
 
-        handler this~init(t: String) {
-            this.tag = String("span");
-            this.text = t;
+        handler this~init() {
             this.ariaHidden = false;
-            this.targetId = String("");
+        }
+
+        handler this~init(t: String) {
+            this.ariaHidden = false;
+            this.text = t;
         }
 
         handler this.onPropUpdated() this.update();
@@ -57,8 +59,12 @@
         //-----------------
         // Shared Functions
 
-        handler this_type(t: String): SrdRef[Label] {
-            def r: SrdRef[Label];
+        handler this_type(): SrdRef[Text] {
+            return SrdRef[Text].construct();
+        }
+
+        handler this_type(t: String): SrdRef[Text] {
+            def r: SrdRef[Text];
             r.alloc()~init(t);
             return r;
         }
