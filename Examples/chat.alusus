@@ -48,21 +48,21 @@ class MenuButton {
                 layout = "row";
                 align = "center";
             };
-            style("icon").{
+            style(">>icon").{
                 padding = Quad(0, 4);
                 width = "20pt";
                 height = "0pt";
                 transition = ".2s";
             }
-            style("label").{
+            style(">>label").{
                 fontSize = 16.0;
                 fontColor = Color("eee");
             }
-            style({ StateSelector.HOVER, "icon" }).{
+            style({ StateSelector.HOVER, ">>icon" }).{
                 height = "20pt";
                 transition = ".2s";
             }
-            style({ StateSelector.HOVER, "label" }).{
+            style({ StateSelector.HOVER, ">>label" }).{
                 fontSize = 16.0;
                 fontColor = Color("fff");
             }
