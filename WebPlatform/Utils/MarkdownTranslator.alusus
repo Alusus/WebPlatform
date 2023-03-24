@@ -1,0 +1,255 @@
+@merge module WebPlatform {
+    //==========================================================================
+    // MarkdownTranslator
+    // Translates MD documents into HTML.
+    class MarkdownTranslator {
+        //----------
+        // Sub Types
+
+        class Rule {
+            def regex: RegExp;
+            def action: closure (Array[String]);
+
+            handler this~init(regexStr: CharsPtr, action: closure (Array[String])) {
+                this.regex.initialize(String("^") + regexStr);
+                this.action = action;
+            }
+
+            handler this_type(regexStr: CharsPtr, action: closure (Array[String])): SrdRef[Rule] {
+                def rule: SrdRef[Rule]
+                rule.alloc()~init(regexStr, action);
+                return rule;
+            }
+        }
+
+        class ElementTags {
+            def opening: String;
+            def closing: String;
+            def sibling: String;
+            handler this~init() {}
+            handler this~init(o: CharsPtr, c: CharsPtr, s: CharsPtr) {
+                this.opening = o;
+                this.closing = c;
+                this.sibling = s;
+            }
+            handler this~init(ref[this_type]) this = value;
+            handler this = ref[this_type] {
+                this.opening = value.opening;
+                this.closing = value.closing;
+                this.sibling = value.sibling;
+            }
+        }
+
+        //-----------------
+        // Member Variables
+
+        def rules: Array[SrdRef[Rule]];
+        def elementTagsMap: Map[String, ElementTags];
+        def elementStack: Array[String];
+        def content: String;
+        def index: Int;
+        def output: String;
+
+        //---------
+        // Handlers
+
+        handler this~init() {
+            this.setup();
+        }
+
+        handler this.translate(c: String): String {
+            this.elementStack.clear();
+            this.content = c;
+            this.output.clear();
+            this.index = 0;
+
+            while this.index < this.content.getLength() {
+                def j: Int;
+                for j = 0, j < this.rules.getLength(), ++j {
+                    if this.runRule(this.rules(j)) continue 2;
+                }
+                this.output += String.format("%c", this.content(this.index));
+                ++this.index;
+            }
+            this.jumpToLevel(String(), 0, false);
+
+            return this.output;
+        }
+
+        handler this.runRule(rule: ref[Rule]): Bool {
+            def matches: Array[String] = rule.regex.match(this.content.buf + this.index);
+            if matches.getLength() > 0 {
+                this.index += matches(0).getLength();
+                rule.action(matches);
+                return true;
+            }
+            return false;
+        }
+
+        handler this.jumpToLevel(newType: String, newLevel: Int, newSibling: Bool) {
+            def i: Int;
+            def j: Int;
+            if newLevel > this.elementStack.getLength() {
+                for i = this.elementStack.getLength(), i < newLevel, ++i {
+                    this.elementStack.add(newType);
+                    this.printTag(this.elementTagsMap(newType).opening, i);
+                }
+            } else {
+                if newLevel < this.elementStack.getLength() {
+                    for i = this.elementStack.getLength() - 1, i >= newLevel, --i {
+                        this.printTag(this.elementTagsMap(this.elementStack(i)).closing, i);
+                        this.elementStack.remove(i);
+                    }
+                }
+                if this.elementStack.getLength() > 0 {
+                    def currentType: String(this.elementStack(this.elementStack.getLength() - 1));
+                    if currentType != newType {
+                        this.printTag(this.elementTagsMap(currentType).closing, this.elementStack.getLength() - 1);
+                        this.printTag(this.elementTagsMap(newType).opening, this.elementStack.getLength() - 1);
+                        this.elementStack(this.elementStack.getLength() - 1) = newType;
+                    } else if newSibling {
+                        this.printTag(this.elementTagsMap(currentType).sibling, this.elementStack.getLength() - 1);
+                    }
+                }
+            }
+            this.printIndent(this.elementStack.getLength());
+        }
+
+        handler this.printTag(tag: String, indent: Int) {
+            this.printIndent(indent);
+            this.output += tag;
+            this.output += "\n";
+        }
+
+        handler this.printIndent() {
+            this.printIndent(this.elementStack.getLength());
+        }
+
+        handler this.printIndent(indent: Int) {
+            def i: Int;
+            for i = 0, i < indent, ++i this.output += " ";
+        }
+
+        handler this.moveBackUtf8Chars(count: Int) {
+            while count > 0 {
+                --this.index;
+                while (this.content(this.index) & 0xC0) == 0x80 { --this.index }
+                --count;
+            }
+        }
+
+        handler this.setup() {
+            this.rules = Array[SrdRef[Rule]]({
+                // h
+                Rule("(#+) ([^\n]+)\n", closure(args: Array[String]) {
+                    this.jumpToLevel(String(), 0, false);
+                    def i: Int = args(1).getLength();
+                    this.output += String.format("\n<h%i>%s</h%i>", i, args(2).buf, i);
+                    this.moveBackUtf8Chars(1);
+                }),
+                // strong and italic
+                Rule("\\*\\*\\*([^*]+)\\*\\*\\*", closure(args: Array[String]) {
+                    this.output += String.format("<em><strong>%s</strong></em>", args(1).buf);
+                }),
+                // strong
+                Rule("\\*\\*([^*]+)\\*\\*", closure(args: Array[String]) {
+                    this.output += String.format("<strong>%s</strong>", args(1).buf);
+                }),
+                // italic
+                Rule("\\*([^*\n]+)\\*", closure(args: Array[String]) {
+                    this.output += String.format("<em>%s</em>", args(1).buf);
+                }),
+                // code
+                Rule("[ \t\r\n]*(\n *)```([^`]*)\n *```", closure(args: Array[String]) {
+                    def i: Int = (args(1).getLength() - 1) / 2;
+                    if i > this.elementStack.getLength() i = this.elementStack.getLength();
+                    this.output += "\n";
+                    this.jumpToLevel(this.elementStack(i - 1), i, false);
+                    this.output += String.format("<pre>%s\n</pre>", args(2).replace(args(1), "\n").buf);
+                    if i == 0 this.output += "\n";
+                }),
+                Rule("`([^`]+)`", closure(args: Array[String]) {
+                    this.output += String.format("<code>%s</code>", args(1).buf);
+                }),
+                Rule("``", closure(args: Array[String]) {
+                    this.output += "`";
+                }),
+                // hr
+                Rule("[ \t\r\n]*\n---\n", closure(args: Array[String]) {
+                    this.output += "\n";
+                    this.jumpToLevel(String(), 0, false);
+                    this.output += "<hr>\n";
+                }),
+                // link
+                Rule("\\[([^\\]\\[\n]*)\\]\\(([^()\n]+)\\)", closure(args: Array[String]) {
+                    if args(1) == "" args(1) = args(2);
+                    this.output += String.format("<a href=\"%s\">%s</a>", args(2).buf, args(1).buf);
+                }),
+                // image
+                Rule("!\\[([^\\]\\[\n]*)\\]\\(([^()\n]+)\\)", closure(args: Array[String]) {
+                    this.output += String.format("<img src=\"%s\" title=\"%s\">", args(2).buf, args(1).buf);
+                }),
+                // ul
+                Rule("([ \t\r\n]*\n)([ ]*)\\* ([^ \t\n])", closure(args: Array[String]) {
+                    def i: Int = 1 + args(2).getLength() / 2;
+                    this.output += "\n";
+                    this.jumpToLevel(String("ul"), i, true);
+                    this.output += args(args.getLength() - 1);
+                }),
+                // ol
+                Rule("([ \t\r\n]*\n)([ ]*)[0-9]+\\. ([^ \t\n])", closure(args: Array[String]) {
+                    def i: Int = 1 + args(2).getLength() / 2;
+                    this.output += "\n";
+                    this.jumpToLevel(String("ol"), i, true);
+                    this.output += args(args.getLength() - 1);
+                }),
+                // blockquote
+                Rule("([ \t\r\n]*\n)([ ]*)(>+) ([^ \t\n])", closure(args: Array[String]) {
+                    def i: Int = args(2).getLength() / 2;
+                    def j: Int = args(args.getLength() - 2).getLength();
+                    this.output += "\n";
+                    this.jumpToLevel(String("blockquote"), i + j, args(1).getLength() > 1);
+                    this.output += args(args.getLength() - 1);
+                }),
+                // ul/ol continuation
+                Rule("\n((  )+)([^ \t\n])", closure(args: Array[String]) {
+                    def i: Int = args(1).getLength() / 2;
+                    this.output += "\n";
+                    if i > this.elementStack.getLength() this.jumpToLevel(String("ul"), i, false)
+                    else this.jumpToLevel(this.elementStack(i - 1), i, false);
+                    this.output += args(args.getLength() - 1);
+                }),
+                // New lines
+                Rule(" [ ]+\n", closure(args: Array[String]) {
+                    this.output += "<br>\n";
+                    this.printIndent();
+                }),
+                Rule("\\\\\n[ \t]*", closure(args: Array[String]) {
+                    this.output += "<br>\n";
+                    this.printIndent();
+                }),
+                Rule("\n[ \t]*\n", closure(args: Array[String]) {
+                    this.output += "\n";
+                    this.jumpToLevel(String(""), 0, false);
+                }),
+                Rule("\n", closure(args: Array[String]) {
+                    if this.elementStack.getLength() > 0 {
+                        this.output += "\n";
+                        this.printIndent();
+                    }
+                }),
+                // all chars
+                Rule(".", closure(args: Array[String]) {
+                    if this.elementStack.getLength() == 0 this.jumpToLevel(String("p"), 1, false);
+                    this.output += args(0);
+                }),
+            });
+
+            this.elementTagsMap = Map[String, ElementTags]()
+                .set(String("p"), ElementTags("<p>", "</p>", "</p><p>"))
+                .set(String("ul"), ElementTags("<ul><li>", "</li></ul>", "</li><li>"))
+                .set(String("ol"), ElementTags("<ol><li>", "</li></ol>", "</li><li>"))
+                .set(String("blockquote"), ElementTags("<blockquote>", "</blockquote>", "</blockquote><blockquote>"));
+        }
+    }
+}

@@ -12,24 +12,30 @@ use WebPlatform;
 // Constants
 
 def loremIpsum:
+    "# Lorem Ipsum\n"
+    "\n"
     "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna"
     "aliqua. Libero id faucibus nisl tincidunt eget nullam. Dui accumsan sit amet nulla facilisi morbi. Vulputate mi sit"
     "amet mauris commodo quis imperdiet massa. Eget lorem dolor sed viverra ipsum. Tristique magna sit amet purus gravida"
-    "quis blandit turpis cursus. Iaculis nunc sed augue lacus. Eu nisl nunc mi ipsum faucibus vitae aliquet nec. Proin"
-    "nibh nisl condimentum id venenatis a condimentum vitae. Cursus metus aliquam eleifend mi in nulla posuere"
-    "sollicitudin. Imperdiet nulla malesuada pellentesque elit eget gravida. Ut ornare lectus sit amet. Ultrices dui"
-    "sapien eget mi proin sed. Amet consectetur adipiscing elit duis. Ullamcorper a lacus vestibulum sed arcu."
-    "Scelerisque mauris pellentesque pulvinar pellentesque habitant morbi tristique senectus. Est placerat in egestas"
-    "erat.<br>"
-    "<br>"
+    "quis blandit turpis cursus. Iaculis nunc sed augue lacus.\n"
+    "\n"
     "Curabitur vitae nunc sed velit dignissim. Et malesuada fames ac turpis. Lorem ipsum dolor sit amet consectetur"
     "adipiscing elit duis. Maecenas pharetra convallis posuere morbi leo urna molestie at elementum. Vitae aliquet nec"
     "ullamcorper sit. Egestas egestas fringilla phasellus faucibus scelerisque eleifend donec pretium. Aenean vel elit"
-    "scelerisque mauris pellentesque pulvinar pellentesque habitant. Leo a diam sollicitudin tempor id. Sagittis purus"
-    "sit amet volutpat consequat mauris nunc. Potenti nullam ac tortor vitae purus faucibus ornare. Viverra nam libero"
-    "justo laoreet sit. Scelerisque purus semper eget duis at tellus at urna. Tristique magna sit amet purus gravida"
-    "quis blandit turpis cursus. Orci nulla pellentesque dignissim enim. Orci ac auctor augue mauris augue. Gravida"
-    "neque convallis a cras semper auctor neque vitae.";
+    "scelerisque mauris pellentesque pulvinar pellentesque habitant.\n"
+    "\n"
+    "## Sub Section\n"
+    "\n"
+    "* item 1\n"
+    "* item 2\n"
+    "* item 3\n"
+    "  * item 3.1\n"
+    "  * item 3.2\n"
+    "\n"
+    "## Credit\n"
+    "\n"
+    "Developed using [Alusus Language](https://alusus.org) and "
+    "[Alusus Web Platform](https://github.com/Alusus/WebPlatform).";
 
 //==============================================================================
 // Frontend Components
@@ -208,7 +214,7 @@ def article: String(loremIpsum);
 
 class Article {
     @injection def component: Component;
-    def label: SrdRef[Text];
+    def docView: SrdRef[DocView];
 
     handler this~init() {
         def self: ref[this_type](this);
@@ -226,12 +232,14 @@ class Article {
                         Window.instance.pushLocation("/three/edit");
                     }
                 },
-                Text(article).{
+                DocView().{
+                    self.docView = this;
                     style.{
+                        width = "100%";
                         fontColor = Color(0, 0, 0);
                         fontSize = 20.0;
                     }
-                    self.label = this;
+                    setMarkdown(article);
                 }
             });
         };
@@ -300,10 +308,10 @@ class ArticleView {
                 return self.articleView;
             };
             route(String("^/three/edit")) = closure(RoutePayload): SrdRef[Component] {
-                return ArticleEditor(article.replace("<br>", "\n")).{
+                return ArticleEditor(article).{
                     this.onUpdated = closure(t: String) {
-                        article = t.replace("\n", "<br>");
-                        self.articleView.label.text = article;
+                        article = t;
+                        self.articleView.docView.setMarkdown(article);
                         Window.instance.pushLocation("/three");
                     }
                 };
