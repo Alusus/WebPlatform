@@ -46,9 +46,8 @@
             def payload: RoutePayload;
             def pos: Int = this.determineCurrentRouteIndex(payload);
             if pos >= 0 {
-                def component: SrdRef[Component] = this.routes.valAt(pos)(payload);
-                if pos > this.currentRouteIndex this.switchTo(component, String("forward"))
-                else if pos < this.currentRouteIndex this.switchTo(component, String("backward"));
+                if pos > this.currentRouteIndex this.switchTo(this.routes.valAt(pos)(payload), String("forward"))
+                else if pos < this.currentRouteIndex this.switchTo(this.routes.valAt(pos)(payload), String("backward"));
                 this.currentRouteIndex = pos;
             } else if not this.onUnknownRoute.isNull() this.onUnknownRoute(this, payload);
         }
