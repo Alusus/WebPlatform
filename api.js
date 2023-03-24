@@ -646,17 +646,18 @@ function toWasmString(str) {
 
 function toWasmStringArray(strs) {
     if (strs === null || strs === undefined || strs.length === 0) return 0;
-    const totalSize = strs.reduce((r, s) => { return r + s.length + 1; }, 1);
+    const totalSize = strs.reduce((r, s) => { return r + s.length + 2; }, 1);
     const encoder = new TextEncoder();
     wasmStrPtr = program.instance.exports.realloc(wasmStrPtr, totalSize);
     let pos = 0;
     strs.forEach(str => {
         const buffer = encoder.encode(str);
-        let view = new Uint8Array(wasmMemory.buffer, wasmStrPtr + pos, buffer.length + 1);
-        view.set(buffer);
-        view[buffer.length] = 0;
+        let view = new Uint8Array(wasmMemory.buffer, wasmStrPtr + pos, buffer.length + 3);
+        view[0] = ' '.charCodeAt(0);
+        view.set(buffer, 1);
         view[buffer.length + 1] = 0;
-        pos += buffer.length + 1;
+        view[buffer.length + 2] = 0;
+        pos += buffer.length + 2;
     });
     return wasmStrPtr;
 }

@@ -21,6 +21,7 @@
         if rawResult == 0 return Array[String]();
         def result: Array[String];
         while rawResult~cnt != 0 {
+            rawResult = rawResult + 1; // Skip the string beginning marker.
             result.add(String(rawResult~cast[ptr[array[Char]]]));
             while rawResult~cnt != 0 rawResult = rawResult + 1;
             rawResult = rawResult + 1;
