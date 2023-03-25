@@ -149,14 +149,17 @@
                 }),
                 // strong and italic
                 Rule("\\*\\*\\*([^*]+)\\*\\*\\*", closure(args: Array[String]) {
+                    if this.elementStack.getLength() == 0 this.jumpToLevel(String("p"), 1, false);
                     this.output += String.format("<em><strong>%s</strong></em>", args(1).buf);
                 }),
                 // strong
                 Rule("\\*\\*([^*]+)\\*\\*", closure(args: Array[String]) {
+                    if this.elementStack.getLength() == 0 this.jumpToLevel(String("p"), 1, false);
                     this.output += String.format("<strong>%s</strong>", args(1).buf);
                 }),
                 // italic
                 Rule("\\*([^*\n]+)\\*", closure(args: Array[String]) {
+                    if this.elementStack.getLength() == 0 this.jumpToLevel(String("p"), 1, false);
                     this.output += String.format("<em>%s</em>", args(1).buf);
                 }),
                 // code
@@ -194,14 +197,14 @@
                     def i: Int = 1 + args(2).getLength() / 2;
                     this.output += "\n";
                     this.jumpToLevel(String("ul"), i, true);
-                    this.output += args(args.getLength() - 1);
+                    this.moveBackUtf8Chars(1);
                 }),
                 // ol
                 Rule("([ \t\r\n]*\n)([ ]*)[0-9]+\\. ([^ \t\n])", closure(args: Array[String]) {
                     def i: Int = 1 + args(2).getLength() / 2;
                     this.output += "\n";
                     this.jumpToLevel(String("ol"), i, true);
-                    this.output += args(args.getLength() - 1);
+                    this.moveBackUtf8Chars(1);
                 }),
                 // blockquote
                 Rule("([ \t\r\n]*\n)([ ]*)(>+) ([^ \t\n])", closure(args: Array[String]) {
@@ -209,7 +212,7 @@
                     def j: Int = args(args.getLength() - 2).getLength();
                     this.output += "\n";
                     this.jumpToLevel(String("blockquote"), i + j, args(1).getLength() > 1);
-                    this.output += args(args.getLength() - 1);
+                    this.moveBackUtf8Chars(1);
                 }),
                 // ul/ol continuation
                 Rule("\n((  )+)([^ \t\n])", closure(args: Array[String]) {
@@ -217,7 +220,7 @@
                     this.output += "\n";
                     if i > this.elementStack.getLength() this.jumpToLevel(String("ul"), i, false)
                     else this.jumpToLevel(this.elementStack(i - 1), i, false);
-                    this.output += args(args.getLength() - 1);
+                    this.moveBackUtf8Chars(1);
                 }),
                 // New lines
                 Rule(" [ ]+\n", closure(args: Array[String]) {
