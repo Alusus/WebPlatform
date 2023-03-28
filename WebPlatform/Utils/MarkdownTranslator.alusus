@@ -242,6 +242,10 @@
                     }
                 }),
                 // all chars
+                Rule("[^\n*`\\]\\[]+", closure(args: Array[String]) {
+                    if this.elementStack.getLength() == 0 this.jumpToLevel(String("p"), 1, false);
+                    this.output += args(0);
+                }),
                 Rule(".", closure(args: Array[String]) {
                     if this.elementStack.getLength() == 0 this.jumpToLevel(String("p"), 1, false);
                     this.output += args(0);
