@@ -22,6 +22,7 @@
         generateColorStyleProp[borderColor, "border-color"];
         generateQuadStyleProp[borderRadius, "border-radius"];
         generateStringStyleProp[borderStyle, "border-style"];
+        generateStringStyleProp[floating, "float"];
         generateStringStyleProp[position, "position"];
         generateStringStyleProp[zIndex, "z-index"];
         generateStringStyleProp[flex, "flex"];
