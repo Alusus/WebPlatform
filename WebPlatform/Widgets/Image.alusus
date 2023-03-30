@@ -14,8 +14,8 @@
 
         handler this~init() {
         }
-        handler this~init(u: ptr[array[Char]]) {
-            this.url = String(u);
+        handler this~init(u: String) {
+            this.url = u;
         }
 
         handler this.onPropUpdated() this.update();
@@ -48,13 +48,13 @@
         //-----------------
         // Shared Functions
 
-        handler this_type(u: ptr[array[Char]]): SrdRef[Image] {
+        handler this_type(u: String): SrdRef[Image] {
             def r: SrdRef[Image];
             r.alloc()~init(u);
             return r;
         }
         handler this_type(): SrdRef[Image] {
-            return Image("");
+            return Image(String());
         }
     }
 }

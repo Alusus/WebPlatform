@@ -70,7 +70,7 @@
         // Shared Functions
 
         handler this_type(): SrdRef[Box] {
-            return this_type({});
+            return Box({});
         }
 
         handler this_type(count: Int, args: ...temp_ref[SrdRef[Widget]]): SrdRef[Box] {
