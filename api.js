@@ -569,7 +569,7 @@ wasmApi.showAlert = (message) =>{
 // String APIs
 
 wasmApi.createRegex = (regexStr) => {
-    const regex = new RegExp(toJsString(regexStr));
+    const regex = new RegExp(toJsString(regexStr), 'g');
     const resourceId = ++resourceCounter;
     resources[resourceId] = regex;
     return resourceId;
@@ -577,6 +577,7 @@ wasmApi.createRegex = (regexStr) => {
 
 wasmApi.matchRegex = (str, regexStr, regexId, pLastIndex) => {
   const reg = regexStr ? new RegExp(toJsString(regexStr)) : resources[regexId];
+  reg.lastIndex = 0;
   const result = toWasmStringArray(reg.exec(toJsString(str)));
   const pLastIndexBuf = new Int32Array(wasmMemory.buffer, pLastIndex, 1);
   pLastIndexBuf[0] = reg.lastIndex;
