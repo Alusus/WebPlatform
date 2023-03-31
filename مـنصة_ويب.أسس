@@ -254,9 +254,9 @@
     @دمج صنف مـركب {
         عرف المشهد: لقب view؛
         عرف استبق_البناء: لقب beforeBuild؛
-        عرف تذيل_البناء: لقب beforeBuild؛
-        عرف استبق_الإزالة: لقب beforeBuild؛
-        عرف تذيل_الإزالة: لقب beforeBuild؛
+        عرف تذيل_البناء: لقب afterBuild؛
+        عرف استبق_الإزالة: لقب beforeUnbuild؛
+        عرف تذيل_الإزالة: لقب afterUnbuild؛
     }
 
     عرف مـبدال: لقب Switcher؛
