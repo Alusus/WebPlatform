@@ -23,8 +23,8 @@
 
         handler (this:Widget).build (ownerId: String) set_ptr {
             this.beforeBuild();
-            this.id = ownerId;
-            if this.view.obj~ptr != 0 this.view.build(this.id);
+            if this.view.obj~ptr != 0 this.view.build(ownerId);
+            this.id = this.view.id;
             this.afterBuild();
         }
 
