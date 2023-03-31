@@ -34,11 +34,6 @@ wasmApi.deleteElement = (elementName) => {
     if (element) element.remove();
 }
 
-wasmApi.showAlert = (message) =>{
-    let isExecuted = confirm(toJsString(message));
-    return isExecuted;
-}
-
 wasmApi.setStyleRule = (elementName, styleSelector, styleCss) => {
     const element = document.getElementById(toJsString(elementName));
     if (!element || !element.sheet) return;
@@ -102,6 +97,11 @@ wasmApi.getSelectedItemValue = (selectId) => {
     var select = document.getElementById(toJsString(selectId));
     var value = select.options[select.selectedIndex].value;
     return toWasmString(value);
+}
+
+wasmApi.scrollElementIntoView = (elementName) => {
+    const element = document.getElementById(toJsString(elementName));
+    if (element) element.scrollIntoView();
 }
 
 // Event Loop APIs
@@ -519,6 +519,14 @@ wasmApi.getLocationPath = () => {
     return toWasmString(window.location.pathname);
 }
 
+wasmApi.getLocationHash = () => {
+    return toWasmString(window.location.hash);
+}
+
+wasmApi.getLocationSearch = () => {
+    return toWasmString(window.location.search);
+}
+
 wasmApi.setCookie = (cname, cvalue, exdays) => {
   const d = new Date();
   d.setTime(d.getTime() + (parseInt(toJsString(exdays)) * 24 * 60 * 60 * 1000));
@@ -551,6 +559,11 @@ wasmApi.getVarFromSession = (varName) => {
 
 wasmApi.logToConsole = (msg) => {
   console.log(toJsString(msg));
+}
+
+wasmApi.showAlert = (message) =>{
+    let isExecuted = confirm(toJsString(message));
+    return isExecuted;
 }
 
 // String APIs

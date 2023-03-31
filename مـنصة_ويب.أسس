@@ -177,6 +177,7 @@
         عرف هات_الأبعاد: لقب getDimensions؛
         عرف التمس_احتكار_المؤشر: لقب requestPointerLock؛
         عرف التمس_ملء_الشاشة: لقب requestFullScreen؛
+        عرف مرر_إلى_المرأى: لقب scrollIntoView؛
     }
 
     عرف صـندوق : لقب Box؛
@@ -349,6 +350,8 @@
         عرف حدد_المشهد: لقب setView؛
         عرف أزل_المشهد: لقب unsetView؛
         عرف المسار: لقب location؛
+        عرف الوسم: لقب hash؛
+        عرف الاستعلام: لقب query؛
         عرف ادفع_مسارا: لقب pushLocation؛
         عرف المفاتيح_المكبوتة: لقب keysToSwallow؛
         عرف عند_بدء_الكبسة: لقب onKeyDown؛
