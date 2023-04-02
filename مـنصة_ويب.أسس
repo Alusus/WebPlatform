@@ -114,6 +114,7 @@
         عرف حجم_الخط: لقب fontSize؛
         عرف لون_الخط: لقب fontColor؛
         عرف فئة_الخط: لقب fontFamily؛
+        عرف وزن_الخط: لقب fontWeight؛
         عرف الشفافية: لقب opacity؛
         عرف الانتقال: لقب transition؛
         عرف التحول: لقب transform؛

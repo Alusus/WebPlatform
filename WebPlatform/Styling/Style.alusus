@@ -36,6 +36,7 @@
         generateFloatPtStyleProp[fontSize, "font-size"];
         generateColorStyleProp[fontColor, "color"];
         generateStringStyleProp[fontFamily, "font-family"];
+        generateStringStyleProp[fontWeight, "font-weight"];
         generateFloatStyleProp[opacity, "opacity"];
         generateStringStyleProp[transition, "transition"];
         generateStringStyleProp[transform, "transform"];
