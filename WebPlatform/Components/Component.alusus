@@ -3,12 +3,24 @@
     // Component
     class Component {
         @injection def widget: Widget;
-        def view: SrdRef[Widget];
+        def _view: SrdRef[Widget];
+        def ownerId: String;
 
         //---------
         // Handlers
 
         handler this~init() {}
+
+        handler this.view = SrdRef[Widget] {
+            if this.id != "" this.unbuild();
+            this._view = value;
+            if this.ownerId != "" this.build(this.ownerId);
+            return this._view;
+        }
+
+        handler this.view:ref[SrdRef[Widget]] {
+            return this._view;
+        }
 
         //-------------------
         // Abstract Functions
@@ -23,15 +35,16 @@
 
         handler (this:Widget).build (ownerId: String) set_ptr {
             this.beforeBuild();
-            if this.view.obj~ptr != 0 this.view.build(ownerId);
-            this.id = this.view.id;
+            if this._view.obj~ptr != 0 this._view.build(ownerId);
+            this.id = this._view.id;
+            this.ownerId = ownerId;
             this.afterBuild();
         }
 
         handler (this:Widget).unbuild() set_ptr {
             this.beforeUnbuild();
             this.id = String();
-            if this.view.obj~ptr != 0 this.view.unbuild();
+            if this._view.obj~ptr != 0 this._view.unbuild();
             this.afterUnbuild();
         }
     }
