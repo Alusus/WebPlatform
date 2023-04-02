@@ -303,11 +303,11 @@ class ArticleView {
                 createSlideStackTransition(0.5, true, false),
                 createSlideStackTransition(0.5, true, true)
             );
-            route(String("^/three")) = closure(RoutePayload): SrdRef[Component] {
+            route(String("^/three")) = closure(RoutePayload): SrdRef[Widget] {
                 self.articleView = Article();
                 return self.articleView;
             };
-            route(String("^/three/edit")) = closure(RoutePayload): SrdRef[Component] {
+            route(String("^/three/edit")) = closure(RoutePayload): SrdRef[Widget] {
                 return ArticleEditor(article).{
                     this.onUpdated = closure(t: String) {
                         article = t;
@@ -379,13 +379,13 @@ class ImageViewer {
                                 createFadeSwitcherTransition(1.0),
                                 createFadeSwitcherTransition(1.0)
                             );
-                            route("^/one/img1$") = closure(RoutePayload): SrdRef[Component] {
+                            route("^/one/img1$") = closure(RoutePayload): SrdRef[Widget] {
                                 return ImgView(String("/Assets/wblogo.svg"));
                             };
-                            route("^/one/img2$") = closure(RoutePayload): SrdRef[Component] {
+                            route("^/one/img2$") = closure(RoutePayload): SrdRef[Widget] {
                                 return ImgView(String("/Assets/future-musume.jpg"));
                             };
-                            route("^/one/img3$") = closure(RoutePayload): SrdRef[Component] {
+                            route("^/one/img3$") = closure(RoutePayload): SrdRef[Widget] {
                                 return ImgView(String("/Assets/bridge.png"));
                             };
                         }
@@ -524,15 +524,15 @@ func main {
                     createSlideSwitcherTransition(0.5, false, false),
                     createSlideSwitcherTransition(0.5, false, true)
                 );
-                route("^/one") = closure(RoutePayload): SrdRef[Component] {
+                route("^/one") = closure(RoutePayload): SrdRef[Widget] {
                     header.updateIndicator(0);
                     return ImageViewer();
                 };
-                route("^/two$") = closure(RoutePayload): SrdRef[Component] {
+                route("^/two$") = closure(RoutePayload): SrdRef[Widget] {
                     header.updateIndicator(1);
                     return CounterView();
                 };
-                route("^/three") = closure(RoutePayload): SrdRef[Component] {
+                route("^/three") = closure(RoutePayload): SrdRef[Widget] {
                     header.updateIndicator(2);
                     return ArticleView();
                 };

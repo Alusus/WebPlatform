@@ -7,7 +7,7 @@
 
         // Member Variables
 
-        def RouteCallback: alias closure(RoutePayload): SrdRef[Component];
+        def RouteCallback: alias closure(RoutePayload): SrdRef[Widget];
         def locationChangedHandler: closure (ref[Window], ref[Int]) = closure (ref[Window], ref[Int]) {
             this.triggerRoute();
         };
@@ -30,7 +30,7 @@
         handler this.route(r: String): ref[RouteCallback] return this.routes(r);
         handler this.route(r: CharsPtr): ref[RouteCallback] return this.routes(String(r));
         handler [r: string, t: type] this.route() {
-            this.route(String(r)) = closure(RoutePayload): SrdRef[Component] {
+            this.route(String(r)) = closure(RoutePayload): SrdRef[Widget] {
                 return t();
             };
         }
