@@ -18,13 +18,13 @@
             def fullSelector: String;
             while count-- > 0 {
                 def selector: CharsPtr = selectors~next_arg[CharsPtr];
-                if String.compare(selector, ">>#", 3) == 0 {
+                if String.compare(selector, ">>$", 3) == 0 {
                     fullSelector += " ";
                     selector = selector + 3;
                 } else if String.compare(selector, ">>", 2) == 0 {
                     fullSelector += " .";
                     selector = selector + 2;
-                } else if String.compare(selector, ">#", 2) == 0 {
+                } else if String.compare(selector, ">$", 2) == 0 {
                     fullSelector += " > ";
                     selector = selector + 2;
                 } else if String.compare(selector, ">", 1) == 0 {
