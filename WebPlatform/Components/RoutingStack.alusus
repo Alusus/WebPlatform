@@ -7,7 +7,7 @@
 
         // Member Variables
 
-        def RouteCallback: alias closure(RoutePayload): SrdRef[Component];
+        def RouteCallback: alias closure(RoutePayload): SrdRef[Widget];
         def locationChangedHandler: closure (ref[Window], ref[Int]) = closure (ref[Window], ref[Int]) {
             this.triggerRoute(false);
         };
@@ -29,7 +29,7 @@
         handler this.route(r: String): ref[RouteCallback] return this.routes(r);
         handler this.route(r: CharsPtr): ref[RouteCallback] return this.routes(String(r));
         handler [r: string, t: type] this.route() {
-            this.route(String(r)) = closure(RoutePayload): SrdRef[Component] {
+            this.route(String(r)) = closure(RoutePayload): SrdRef[Widget] {
                 return t();
             };
         }
@@ -46,15 +46,15 @@
             payload.fullPath = Window.instance.location;
             def i: Int;
             for i = 0, i < this.routes.getLength(), ++i {
-                def result: Array[String] = regexMatch(payload.fullPath, this.routes.keyAt(i));
+                def result: Array[String] = matchRegex(payload.fullPath, this.routes.keyAt(i));
                 if result.getLength() > 0 {
                     payload.route = result(0);
                     result.remove(0);
                     payload.params = result;
                     if this.views.getLength() <= i {
-                        def component: SrdRef[Component] = this.routes.valAt(i)(payload);
-                        if skipTransitions this.push(component)
-                        else this.push(component, String("pushing"));
+                        def widget: SrdRef[Widget] = this.routes.valAt(i)(payload);
+                        if skipTransitions this.push(widget)
+                        else this.push(widget, String("pushing"));
                     }
                 } else {
                     break;

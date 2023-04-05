@@ -34,11 +34,6 @@ wasmApi.deleteElement = (elementName) => {
     if (element) element.remove();
 }
 
-wasmApi.showAlert = (message) =>{
-    let isExecuted = confirm(toJsString(message));
-    return isExecuted;
-}
-
 wasmApi.setStyleRule = (elementName, styleSelector, styleCss) => {
     const element = document.getElementById(toJsString(elementName));
     if (!element || !element.sheet) return;
@@ -102,6 +97,11 @@ wasmApi.getSelectedItemValue = (selectId) => {
     var select = document.getElementById(toJsString(selectId));
     var value = select.options[select.selectedIndex].value;
     return toWasmString(value);
+}
+
+wasmApi.scrollElementIntoView = (elementName) => {
+    const element = document.getElementById(toJsString(elementName));
+    if (element) element.scrollIntoView();
 }
 
 // Event Loop APIs
@@ -519,6 +519,14 @@ wasmApi.getLocationPath = () => {
     return toWasmString(window.location.pathname);
 }
 
+wasmApi.getLocationHash = () => {
+    return toWasmString(window.location.hash);
+}
+
+wasmApi.getLocationSearch = () => {
+    return toWasmString(window.location.search);
+}
+
 wasmApi.setCookie = (cname, cvalue, exdays) => {
   const d = new Date();
   d.setTime(d.getTime() + (parseInt(toJsString(exdays)) * 24 * 60 * 60 * 1000));
@@ -553,10 +561,23 @@ wasmApi.logToConsole = (msg) => {
   console.log(toJsString(msg));
 }
 
+wasmApi.showAlert = (message) =>{
+    let isExecuted = confirm(toJsString(message));
+    return isExecuted;
+}
+
 // String APIs
 
-wasmApi.regexMatch = (str, regex, pLastIndex) => {
-  const reg = new RegExp(toJsString(regex));
+wasmApi.createRegex = (regexStr) => {
+    const regex = new RegExp(toJsString(regexStr), 'g');
+    const resourceId = ++resourceCounter;
+    resources[resourceId] = regex;
+    return resourceId;
+}
+
+wasmApi.matchRegex = (str, regexStr, regexId, pLastIndex) => {
+  const reg = regexStr ? new RegExp(toJsString(regexStr)) : resources[regexId];
+  reg.lastIndex = 0;
   const result = toWasmStringArray(reg.exec(toJsString(str)));
   const pLastIndexBuf = new Int32Array(wasmMemory.buffer, pLastIndex, 1);
   pLastIndexBuf[0] = reg.lastIndex;
@@ -639,17 +660,18 @@ function toWasmString(str) {
 
 function toWasmStringArray(strs) {
     if (strs === null || strs === undefined || strs.length === 0) return 0;
-    const totalSize = strs.reduce((r, s) => { return r + s.length + 1; }, 1);
     const encoder = new TextEncoder();
+    const buffers = strs.map(s => encoder.encode(s));
+    const totalSize = buffers.reduce((r, s) => { return r + s.length + 2; }, 1);
     wasmStrPtr = program.instance.exports.realloc(wasmStrPtr, totalSize);
     let pos = 0;
-    strs.forEach(str => {
-        const buffer = encoder.encode(str);
-        let view = new Uint8Array(wasmMemory.buffer, wasmStrPtr + pos, buffer.length + 1);
-        view.set(buffer);
-        view[buffer.length] = 0;
+    buffers.forEach(buffer => {
+        let view = new Uint8Array(wasmMemory.buffer, wasmStrPtr + pos, buffer.length + 3);
+        view[0] = ' '.charCodeAt(0);
+        view.set(buffer, 1);
         view[buffer.length + 1] = 0;
-        pos += buffer.length + 1;
+        view[buffer.length + 2] = 0;
+        pos += buffer.length + 2;
     });
     return wasmStrPtr;
 }

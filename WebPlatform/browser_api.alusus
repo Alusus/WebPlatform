@@ -10,8 +10,7 @@
     // Element Interaction
     @expname[selectItem] function selectItem (selectId: ptr[Char], selectedValue: ptr[Char]);
     @expname[getSelectedItemValue] function getSelectedItemValue (selectId: ptr[Char]): ptr[array[Char]];
-    // Alert 
-    @expname[showAlert] function showAlert (message: ptr[Char]): Bool;
+    @expname[scrollElementIntoView] function scrollElementIntoView (name: ptr[Char]);
     // Event Loop
     @expname[fetchNextEvent] function fetchNextEvent (): ptr[array[Char]];
     @expname[registerElementEventHandler] function _registerElementEventHandler (
@@ -84,13 +83,19 @@
     @expname[exitFullScreen] function exitFullScreen();
     @expname[httpRedirect] function httpRedirect (address: ptr[Char]);
     @expname[getLocationPath] function getLocationPath (): ptr[Char];
+    @expname[getLocationHash] function getLocationHash (): ptr[Char];
+    @expname[getLocationSearch] function getLocationSearch (): ptr[Char];
     @expname[pushState] function pushState (url: ptr[Char], state: ptr[Char]);
     @expname[setCookie] function setCookie (cName: ptr[Char], vName: ptr[Char], exDay: ptr[Char]);
     @expname[getCookie] function getCookie (cName: ptr[Char]): ptr[array[Char]];
     @expname[addVarToSession] function addVarToSession (varName: ptr[Char], varValue: ptr[Char]);
     @expname[getVarFromSession] function getVarFromSession (varName: ptr[Char]): ptr[array[Char]];
     @expname[logToConsole] function logToConsole (msg: ptr[Char]);
+    @expname[showAlert] function showAlert (message: ptr[Char]): Bool;
     // String
-    @expname[regexMatch] function _regexMatch (str: ptr[Char], regex: ptr[Char], lastIndex: ref[Int]): ptr[Char];
+    @expname[createRegex] function createRegex (regexStr: ptr[Char]): ArchInt;
+    @expname[matchRegex] function _matchRegex (
+        str: ptr[Char], regexStr: ptr[Char], regexId: ArchInt, lastIndex: ref[Int]
+    ): ptr[Char];
 }
 

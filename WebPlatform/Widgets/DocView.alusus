@@ -1,24 +1,30 @@
 @merge module WebPlatform {
     //==========================================================================
-    // Label
-    class Label {
+    // DocView
+    class DocView {
         @injection def widget: Widget;
-        def tag: String;
 
         //-----------
         // Properties
-        generateProperty[text, Text, String];
-        generateProperty[ariaHidden, AriaHidden, bool];
-        generateProperty[targetId, TargetId, String];
+        generateProperty[html, Text, String];
 
         //----------
         // Handlers
 
+        handler this~init() {
+        }
+
         handler this~init(t: String) {
-            this.tag = String("span");
-            this.text = t;
-            this.ariaHidden = false;
-            this.targetId = String("");
+            this.html = t;
+        }
+
+        handler this.setHtml(html: String) {
+            this.html = html;
+        }
+
+        handler this.setMarkdown(md: String) {
+            def mdTranslator: MarkdownTranslator;
+            this.setHtml(mdTranslator.translate(md));
         }
 
         handler this.onPropUpdated() this.update();
@@ -28,7 +34,7 @@
 
         handler (this:Widget).build (ownerId: String) set_ptr {
             this.id = getNewId();
-            createElement(this.tag, this.id, ownerId);
+            createElement("div", this.id, ownerId);
             this.buildCommon();
             this.update();
         }
@@ -44,24 +50,15 @@
         handler (this:Widget).update() set_ptr {
             if this.id.getLength() > 0 {
                 this.updateCommon();
-                setElementAttribute(this.id, "innerHTML", this.text);
-                if this.ariaHidden == true {
-                   setElementAttribute(this.id, String("aria-hidden"), String("true"));
-                }
-                if this.targetId != "" {
-                   setElementAttribute(this.id, String("for"), this.targetId);
-                }
+                setElementAttribute(this.id, "innerHTML", this.html);
             }
         }
 
         //-----------------
         // Shared Functions
 
-        handler this_type(t: String): SrdRef[Label] {
-            def r: SrdRef[Label];
-            r.alloc()~init(t);
-            return r;
+        handler this_type(): SrdRef[DocView] {
+            return SrdRef[DocView].construct();
         }
     }
 }
-

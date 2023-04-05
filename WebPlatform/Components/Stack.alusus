@@ -18,7 +18,7 @@
             overflow = String("clip");
             position = "relative";
         };
-        this.style("stackview").{
+        this.style(">stackview").{
             width = String("100%");
             height = String("100%");
             position = "absolute";
@@ -39,7 +39,7 @@
         handler this.setTransition(name: String, transition: StackTransition) {
             name += this.transitionUniqueSuffix;
             this.transitionDurations(name) = transition.totalDuration;
-            this.style(name) = transition.topViewStyle;
+            this.style(String(">") + name) = transition.topViewStyle;
         }
 
         handler this.push(child: SrdRef[Widget]) {

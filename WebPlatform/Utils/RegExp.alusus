@@ -1,0 +1,36 @@
+@merge module WebPlatform {
+    class RegExp {
+        def resourceId: ArchInt = 0;
+
+        handler this~init() {
+        }
+
+        handler this~init(regStr: ptr[array[Char]]) {
+            this.resourceId = createRegex(regStr);
+        }
+
+        handler this~terminate() {
+            this.release();
+        }
+
+        handler this.initialize(regStr: ptr[array[Char]]) {
+            this.release();
+            this.resourceId = createRegex(regStr);
+        }
+
+        handler this.release() {
+            if this.resourceId == 0 return;
+            releaseResource(this.resourceId);
+            this.resourceId = 0;
+        }
+
+        handler this.match(str: ptr[array[Char]], lastIndex: ref[Int]): Array[String] {
+            return matchRegex(str, this.resourceId, lastIndex);
+        }
+
+        handler this.match(str: ptr[array[Char]]): Array[String] {
+            def lastIndex: Int;
+            return this.match(str, lastIndex);
+        }
+    }
+}

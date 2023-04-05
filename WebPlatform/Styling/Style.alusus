@@ -22,6 +22,7 @@
         generateColorStyleProp[borderColor, "border-color"];
         generateQuadStyleProp[borderRadius, "border-radius"];
         generateStringStyleProp[borderStyle, "border-style"];
+        generateStringStyleProp[floating, "float"];
         generateStringStyleProp[position, "position"];
         generateStringStyleProp[zIndex, "z-index"];
         generateStringStyleProp[flex, "flex"];
@@ -35,6 +36,7 @@
         generateFloatPtStyleProp[fontSize, "font-size"];
         generateColorStyleProp[fontColor, "color"];
         generateStringStyleProp[fontFamily, "font-family"];
+        generateStringStyleProp[fontWeight, "font-weight"];
         generateFloatStyleProp[opacity, "opacity"];
         generateStringStyleProp[transition, "transition"];
         generateStringStyleProp[transform, "transform"];

@@ -12,24 +12,30 @@ use WebPlatform;
 // Constants
 
 def loremIpsum:
+    "# Lorem Ipsum\n"
+    "\n"
     "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna"
     "aliqua. Libero id faucibus nisl tincidunt eget nullam. Dui accumsan sit amet nulla facilisi morbi. Vulputate mi sit"
     "amet mauris commodo quis imperdiet massa. Eget lorem dolor sed viverra ipsum. Tristique magna sit amet purus gravida"
-    "quis blandit turpis cursus. Iaculis nunc sed augue lacus. Eu nisl nunc mi ipsum faucibus vitae aliquet nec. Proin"
-    "nibh nisl condimentum id venenatis a condimentum vitae. Cursus metus aliquam eleifend mi in nulla posuere"
-    "sollicitudin. Imperdiet nulla malesuada pellentesque elit eget gravida. Ut ornare lectus sit amet. Ultrices dui"
-    "sapien eget mi proin sed. Amet consectetur adipiscing elit duis. Ullamcorper a lacus vestibulum sed arcu."
-    "Scelerisque mauris pellentesque pulvinar pellentesque habitant morbi tristique senectus. Est placerat in egestas"
-    "erat.<br>"
-    "<br>"
+    "quis blandit turpis cursus. Iaculis nunc sed augue lacus.\n"
+    "\n"
     "Curabitur vitae nunc sed velit dignissim. Et malesuada fames ac turpis. Lorem ipsum dolor sit amet consectetur"
     "adipiscing elit duis. Maecenas pharetra convallis posuere morbi leo urna molestie at elementum. Vitae aliquet nec"
     "ullamcorper sit. Egestas egestas fringilla phasellus faucibus scelerisque eleifend donec pretium. Aenean vel elit"
-    "scelerisque mauris pellentesque pulvinar pellentesque habitant. Leo a diam sollicitudin tempor id. Sagittis purus"
-    "sit amet volutpat consequat mauris nunc. Potenti nullam ac tortor vitae purus faucibus ornare. Viverra nam libero"
-    "justo laoreet sit. Scelerisque purus semper eget duis at tellus at urna. Tristique magna sit amet purus gravida"
-    "quis blandit turpis cursus. Orci nulla pellentesque dignissim enim. Orci ac auctor augue mauris augue. Gravida"
-    "neque convallis a cras semper auctor neque vitae.";
+    "scelerisque mauris pellentesque pulvinar pellentesque habitant.\n"
+    "\n"
+    "## Sub Section\n"
+    "\n"
+    "* item 1\n"
+    "* item 2\n"
+    "* item 3\n"
+    "  * item 3.1\n"
+    "  * item 3.2\n"
+    "\n"
+    "## Credit\n"
+    "\n"
+    "Developed using [Alusus Language](https://alusus.org) and "
+    "[Alusus Web Platform](https://github.com/Alusus/WebPlatform).";
 
 //==============================================================================
 // Frontend Components
@@ -47,14 +53,14 @@ class MenuButton {
                 cursor = "pointer";
                 transition = ".3s";
             };
-            style("label").{
+            style(">label").{
                 fontSize = 14.0;
                 fontColor = Color("444");
             }
             style({ StateSelector.HOVER }).{
                 transform = "scale(1.3)";
             }
-            style({ StateSelector.HOVER, "label" }).{
+            style({ StateSelector.HOVER, ">label" }).{
                 fontSize = 14.0;
                 fontColor = Color("000");
             }
@@ -62,7 +68,7 @@ class MenuButton {
                 Window.instance.pushLocation(link);
             });
             addChildren({
-                Label(label).{
+                Text(label).{
                     className = String("label")
                 }
             });
@@ -87,11 +93,11 @@ class SideButton {
                 width = "40pt";
                 textAlign = "center";
             };
-            style("label").{
+            style(">label").{
                 fontSize = 14.0;
                 fontColor = Color("444");
             }
-            style({ StateSelector.HOVER, "label" }).{
+            style({ StateSelector.HOVER, ">label" }).{
                 fontSize = 14.0;
                 fontColor = Color("000");
             }
@@ -99,7 +105,7 @@ class SideButton {
                 self.onButtonClicked();
             });
             addChildren({
-                Label(label).{
+                Text(label).{
                     className = String("label")
                 }
             });
@@ -132,7 +138,7 @@ class Header {
             };
             def i: Int;
             for i = 0, i < 3, ++i {
-                style(String("indicator")+i).{
+                style(String(">>indicator")+i).{
                     width = "60pt";
                     height = "3pt";
                     background = Color(0, 0, 150);
@@ -157,7 +163,7 @@ class Header {
                                 padding = Quad(0, 10);
                             };
                         },
-                        Box({ Label(String("Alusus Web Platform Example")).{ style.{
+                        Box({ Text(String("Alusus Web Platform Example")).{ style.{
                             fontColor = Color("000");
                             fontSize = 21.0;
                             height = "100%";
@@ -208,7 +214,7 @@ def article: String(loremIpsum);
 
 class Article {
     @injection def component: Component;
-    def label: SrdRef[Label];
+    def docView: SrdRef[DocView];
 
     handler this~init() {
         def self: ref[this_type](this);
@@ -226,12 +232,14 @@ class Article {
                         Window.instance.pushLocation("/three/edit");
                     }
                 },
-                Label(article).{
+                DocView().{
+                    self.docView = this;
                     style.{
+                        width = "100%";
                         fontColor = Color(0, 0, 0);
                         fontSize = 20.0;
                     }
-                    self.label = this;
+                    setMarkdown(article);
                 }
             });
         };
@@ -295,15 +303,15 @@ class ArticleView {
                 createSlideStackTransition(0.5, true, false),
                 createSlideStackTransition(0.5, true, true)
             );
-            route(String("^/three")) = closure(RoutePayload): SrdRef[Component] {
+            route(String("^/three")) = closure(RoutePayload): SrdRef[Widget] {
                 self.articleView = Article();
                 return self.articleView;
             };
-            route(String("^/three/edit")) = closure(RoutePayload): SrdRef[Component] {
-                return ArticleEditor(article.replace("<br>", "\n")).{
+            route(String("^/three/edit")) = closure(RoutePayload): SrdRef[Widget] {
+                return ArticleEditor(article).{
                     this.onUpdated = closure(t: String) {
-                        article = t.replace("\n", "<br>");
-                        self.articleView.label.text = article;
+                        article = t;
+                        self.articleView.docView.setMarkdown(article);
                         Window.instance.pushLocation("/three");
                     }
                 };
@@ -371,13 +379,13 @@ class ImageViewer {
                                 createFadeSwitcherTransition(1.0),
                                 createFadeSwitcherTransition(1.0)
                             );
-                            route("^/one/img1$") = closure(RoutePayload): SrdRef[Component] {
+                            route("^/one/img1$") = closure(RoutePayload): SrdRef[Widget] {
                                 return ImgView(String("/Assets/wblogo.svg"));
                             };
-                            route("^/one/img2$") = closure(RoutePayload): SrdRef[Component] {
+                            route("^/one/img2$") = closure(RoutePayload): SrdRef[Widget] {
                                 return ImgView(String("/Assets/future-musume.jpg"));
                             };
-                            route("^/one/img3$") = closure(RoutePayload): SrdRef[Component] {
+                            route("^/one/img3$") = closure(RoutePayload): SrdRef[Widget] {
                                 return ImgView(String("/Assets/bridge.png"));
                             };
                         }
@@ -418,7 +426,7 @@ class DigitView {
                         justify = "center";
                     };
                     addChildren({
-                        Label(label).{
+                        Text(label).{
                             style.{
                                 fontColor = Color(0, 0, 0);
                                 fontSize = 250.0;
@@ -516,15 +524,15 @@ func main {
                     createSlideSwitcherTransition(0.5, false, false),
                     createSlideSwitcherTransition(0.5, false, true)
                 );
-                route("^/one") = closure(RoutePayload): SrdRef[Component] {
+                route("^/one") = closure(RoutePayload): SrdRef[Widget] {
                     header.updateIndicator(0);
                     return ImageViewer();
                 };
-                route("^/two$") = closure(RoutePayload): SrdRef[Component] {
+                route("^/two$") = closure(RoutePayload): SrdRef[Widget] {
                     header.updateIndicator(1);
                     return CounterView();
                 };
-                route("^/three") = closure(RoutePayload): SrdRef[Component] {
+                route("^/three") = closure(RoutePayload): SrdRef[Widget] {
                     header.updateIndicator(2);
                     return ArticleView();
                 };

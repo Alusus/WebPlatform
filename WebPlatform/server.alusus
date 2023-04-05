@@ -154,7 +154,7 @@
 
         options.add(0);
 
-        return Http.createServer(callbackRequest[parent]~ptr, options);
+        return Http.startServer(callbackRequest[parent]~ptr, options);
     }
 
     func startServer [parent: ast_ref = Root] (optsCount: Int, opts: ...CharsPtr): ptr[Http.Context] {
@@ -170,7 +170,7 @@
         def context: ptr[Http.Context] = startServer[parent](options);
         Console.print("Server started.\npress enter to close server: ");
         Console.getChar(); // stop proccess here waiting user to press enter
-        Http.closeServer(context); // stop the server
+        Http.stopServer(context); // stop the server
     }
 
     func callbackRequest [parent: ast_ref = Root] (connection: ptr[Http.Connection]): Int {

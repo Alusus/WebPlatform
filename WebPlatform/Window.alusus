@@ -91,6 +91,14 @@
             return String(getLocationPath()~cast[CharsPtr]);
         }
 
+        handler this.hash: String {
+            return String(getLocationHash()~cast[CharsPtr]);
+        }
+
+        handler this.query: String {
+            return String(getLocationSearch()~cast[CharsPtr]);
+        }
+
         handler this.pushLocation (url: ptr[array[Char]]) {
             WebPlatform.pushState(url, "{}");
             this.onLocationChanged.emit(Int(0));

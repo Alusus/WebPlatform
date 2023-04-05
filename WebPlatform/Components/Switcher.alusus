@@ -18,7 +18,7 @@
             overflow = String("clip");
             position = "relative";
         };
-        this.style("switcherview").{
+        this.style(">switcherview").{
             width = String("100%");
             height = String("100%");
             position = "absolute";
@@ -44,8 +44,8 @@
         handler this.setTransition(name: String, transition: SwitcherTransition) {
             name += this.transitionUniqueSuffix;
             this.transitionDurations(name) = transition.totalDuration;
-            this.style(name + "_current") = transition.currentViewStyle;
-            this.style(name + "_incoming") = transition.incomingViewStyle;
+            this.style(String(">") + name + "_current") = transition.currentViewStyle;
+            this.style(String(">") + name + "_incoming") = transition.incomingViewStyle;
         }
 
         handler this.switchTo(child: SrdRef[Widget]) {

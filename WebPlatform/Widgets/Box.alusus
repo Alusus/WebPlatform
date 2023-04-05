@@ -69,6 +69,10 @@
         //-----------------
         // Shared Functions
 
+        handler this_type(): SrdRef[Box] {
+            return Box({});
+        }
+
         handler this_type(count: Int, args: ...temp_ref[SrdRef[Widget]]): SrdRef[Box] {
             def r: SrdRef[Box];
             r.alloc()~init();
