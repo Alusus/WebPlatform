@@ -44,6 +44,7 @@
     @expname[loadAudio] function _loadAudio (url: ptr[Char], cbId: ArchInt): ArchInt;
     @expname[releaseResource] function releaseResource (resourceId: ArchInt);
     @expname[loadFont] function _loadFont (fontName: ptr[Char], url: ptr[Char], cbId: ArchInt);
+    @expname[loadJsScript] function _loadJsScript (url: ptr[Char], cbId: ArchInt);
     @expname[setResourceAttribute] function setResourceAttribute (
         resourceId: ArchInt, name: ptr[Char], value: ptr[Char]
     );
@@ -92,6 +93,8 @@
     @expname[getVarFromSession] function getVarFromSession (varName: ptr[Char]): ptr[array[Char]];
     @expname[logToConsole] function logToConsole (msg: ptr[Char]);
     @expname[showAlert] function showAlert (message: ptr[Char]): Bool;
+    @expname[callCustomJsFn] function callCustomJsFn (fnName: ptr[Char], arg: ptr[Char]): ptr[Char];
+    @expname[callCustomAsyncJsFn] function _callCustomAsyncJsFn (fnName: ptr[Char], arg: ptr[Char], cbId: ArchInt);
     // String
     @expname[createRegex] function createRegex (regexStr: ptr[Char]): ArchInt;
     @expname[matchRegex] function _matchRegex (
