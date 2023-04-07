@@ -16,6 +16,20 @@
     def uiEndpoints: Array[UiEndpoint];
     def htmlTemplate: String;
 
+    class AssetRoute {
+        def uri: String;
+        def path: String;
+        handler this~init() {}
+        handler this~init(uri: String, path: String) this.set(uri, path);
+        handler this~init(ref[AssetRoute]) this.set(value.uri, value.path);
+        handler this=ref[AssetRoute] this.set(value.uri, value.path);
+        handler this.set (uri: String, path: String) {
+            this.uri = uri;
+            this.path = path;
+        }
+    }
+    def assetRoutes: Array[AssetRoute];
+
     def AstTemplateMap: alias Map[String, ref[Core.Basic.TiObject]];
 
     func getElementName (obj: ref[Core.Basic.TiObject]): String {
@@ -120,28 +134,31 @@
             if !Core.Basic.isDerivedFrom[elements(i), Core.Data.Ast.StringLiteral] {
                 System.fail(1, "Invalid asset route");
             }
-            validateAssetRoute(Core.Basic.dynCastRef[elements(i), Core.Data.Ast.StringLiteral].value.value);
-            Spp.astMgr.insertAst(
-                ast {
-                    if String.isEqual(method, "GET") && String.find(uri, element) == (uri+1) && Fs.exists(uri+1) {
-                        Http.sendFile(connection, uri+1);
-                        return 1;
-                    }
-                },
-                AstTemplateMap().set(Srl.String("element"), elements(i))
-            );
+            def path: String = Core.Basic.dynCastRef[elements(i), Core.Data.Ast.StringLiteral].value.value;
+            if path(0) == '/' || path(0) == '.' {
+                System.fail(1, String("Invalid asset route element; path should not start with / or .: ") + path);
+            }
+            addAssetRoute(String("/") + path, path);
         }
     }
 
-    func validateAssetRoute(route: String) {
-        if route.getLength() == 0 {
+    func addAssetRoute (uri: String, path: String) {
+        validateAssetRoute(uri, path);
+        assetRoutes.add(AssetRoute(uri, path));
+    }
+
+    func validateAssetRoute(uri: String, path: String) {
+        if uri.getLength() == 0 {
             System.fail(1, "Invalid asset route; path is empty");
         }
-        if route(0) == '/' or route(0) == '.' {
-            System.fail(1, String("Invalid asset route; path should not start with / or .: ") + route);
+        if uri(0) != '/' {
+            System.fail(1, String("Invalid asset route; uri should start with /: ") + uri);
         }
-        if route(route.getLength() - 1) != '/' {
-            System.fail(1, String("Invalid asset route; path should end with /: ") + route);
+        if uri(uri.getLength() - 1) != '/' {
+            System.fail(1, String("Invalid asset route; uri should end with /: ") + uri);
+        }
+        if path(path.getLength() - 1) != '/' {
+            System.fail(1, String("Invalid asset route; path should end with /: ") + path);
         }
     }
 
@@ -178,8 +195,9 @@
         def uri: ptr[array[Char]] = requestInfo~cnt.requestUri;
         def method: ptr[array[Char]] = requestInfo~cnt.requestMethod;
 
+        addAssetRoutes(parent~ast);
+
         preprocess { addBeEndpoints(parent~ast) };
-        preprocess { addAssetRoutes(parent~ast) };
 
         if String.isEqual(method, "GET") {
             if String.isEqual(uri, "/api.js") {
@@ -188,6 +206,16 @@
             }
 
             def i: Int;
+            for i = 0, i < assetRoutes.getLength(), ++i {
+                if String.find(uri, assetRoutes(i).uri) == uri {
+                    def fileName: String = assetRoutes(i).path + (uri + assetRoutes(i).uri.getLength());
+                    if Fs.exists(fileName) {
+                        Http.sendFile(connection, fileName);
+                        return 1;
+                    }
+                }
+            }
+
             for i = 0, i < uiEndpoints.getLength(), ++i {
                 if uiEndpoints(i).filename == uri {
                     Http.sendFile(connection, String("/tmp") + uri);

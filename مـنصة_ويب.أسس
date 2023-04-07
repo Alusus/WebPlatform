@@ -15,6 +15,7 @@
     عرف ألغ_المؤقت: لقب cancelTimeout؛
     عرف أرسل_نداء: لقب sendRequest؛
     عرف حمل_خط: لقب loadFont؛
+    عرف أضف_مسار_موارد: لقب addAssetRoute؛
 
     عرف ألغ_احتكار_المؤشر: لقب exitPointerLock؛
     عرف ألغ_ملء_الشاشة: لقب exitFullScreen؛
