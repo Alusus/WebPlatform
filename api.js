@@ -339,6 +339,15 @@ wasmApi.loadFont = (fontName, url, cbId) => {
     });
 }
 
+wasmApi.loadJsScript = (url, cbId) => {
+    const script = document.createElement('script');
+    document.body.appendChild(script);
+    script.onload = function() {
+        onEvent(cbId, false, 'loadJsScript', "");
+    };
+    script.src = toJsString(url);
+}
+
 wasmApi.setResourceAttribute = (resourceId, name, value) => {
     resources[resourceId].setAttribute(toJsString(name), toJsString(value))
 }
@@ -561,9 +570,19 @@ wasmApi.logToConsole = (msg) => {
   console.log(toJsString(msg));
 }
 
-wasmApi.showAlert = (message) =>{
+wasmApi.showAlert = (message) => {
     let isExecuted = confirm(toJsString(message));
     return isExecuted;
+}
+
+wasmApi.callCustomJsFn = (fnName, arg) => {
+    return toWasmString(window[toJsString(fnName)](toJsString(arg)));
+}
+
+wasmApi.callCustomAsyncJsFn = (fnName, arg, cbId) => {
+    window[toJsString(fnName)](toJsString(arg)).then((result) => {
+        onEvent(cbId, false, 'callCustomAsyncJsFn', { result });
+    });
 }
 
 // String APIs
@@ -609,6 +628,7 @@ const eventPropMap = {
     loadImage: ['resourceId'],
     loadFont: [],
     loadAudio: ['resourceId'],
+    loadJsScript: [],
     sendRequest: ['status', 'headers', 'body'],
     timer: [],
     resizeObserver: [],
@@ -617,6 +637,7 @@ const eventPropMap = {
     gamepadconnected: ['gamepad'],
     gamepaddisconnected: ['gamepad'],
     popstate: ['state'],
+    callCustomAsyncJsFn: ['result'],
 };
 
 function stringifyEvent(event) {

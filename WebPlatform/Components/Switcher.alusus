@@ -11,6 +11,7 @@
         def transitionView: SrdRef[Box];
         def transitionTimeout: ArchInt = 0;
         def transitionDurations: Map[String, Int];
+        def shouldPreserveChild: closure (child: ref[Widget]): Bool;
 
         this.style.{
             display = String("flex");
@@ -24,11 +25,15 @@
             position = "absolute";
             flex = String("none");
         };
+        this.style(">hiddenview").{
+            display = "none";
+        };
         this.view = Box({})~use_in(self) {
             style = this.style;
             addChildren({
                 Box({})~use_in(self) {
                     className = String("switcherview");
+                    addChildren({ Box() });
                     this.innerView = self;
                 }
             });
@@ -60,7 +65,18 @@
             this.endTransition();
 
             castRef[this.view.obj, Box]~use_in(self) {
-                addChildren({
+                // Find the view, if any.
+                def i: Int;
+                for i = 0, i < children.getLength(), ++i {
+                    if children(i).obj~cast[ref[Box]].children(0).obj~ptr == child.obj~ptr {
+                        if transitionName != "" children(i).className = transitionName + "_incoming switcherview"
+                        else children(i).className = String("switcherview");
+                        this.transitionView = castSrdRef[children(i), Box];
+                        break;
+                    }
+                }
+                // Create a new view if we didn't find one.
+                if i == children.getLength() addChildren({
                     Box({})~use_in(self) {
                         if transitionName != "" className = transitionName + "_incoming switcherview"
                         else className = String("switcherview");
@@ -82,7 +98,12 @@
 
         handler this.endTransition() {
             if this.transitionView.isNull() return;
-            castRef[this.view.obj, Box].removeChildren({ this.innerView });
+            def child: ref[Widget](this.innerView.obj~cast[ref[Box]].children(0));
+            if not this.shouldPreserveChild.isNull() and this.shouldPreserveChild(child) {
+                this.innerView.className = String("hiddenview");
+            } else {
+                castRef[this.view.obj, Box].removeChildren({ this.innerView });
+            }
             this.innerView = this.transitionView;
             this.innerView.className = String("switcherview");
             this.transitionView.release();

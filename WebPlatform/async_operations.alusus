@@ -62,5 +62,30 @@
         });
         return p;
     }
-}
 
+    function loadJsScript (url: ptr[Char], cb: closure (Json)) {
+        def index: ArchInt = addEventHandler(cb);
+        _loadJsScript(url, eventHandlers(index).id);
+    }
+
+    function loadJsScript (url: ptr[Char]): SrdRef[Promise[Int]] {
+        def p: SrdRef[Promise[Int]] = Promise[Int].new();
+        loadJsScript(url, closure (json: Json) {
+            p.resolve(0);
+        });
+        return p;
+    }
+
+    function callCustomAsyncJsFn (fnName: ptr[Char], arg: ptr[Char], cb: closure (Json)) {
+        def index: ArchInt = addEventHandler(cb);
+        _callCustomAsyncJsFn(fnName, arg, eventHandlers(index).id);
+    }
+
+    function callCustomAsyncJsFn (fnName: ptr[Char], arg: ptr[Char]): SrdRef[Promise[String]] {
+        def p: SrdRef[Promise[String]] = Promise[String].new();
+        callCustomAsyncJsFn(fnName, arg, closure (json: Json) {
+            p.resolve(json.getObject("eventData").getString("result"));
+        });
+        return p;
+    }
+}

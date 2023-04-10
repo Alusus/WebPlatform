@@ -15,6 +15,10 @@
     عرف ألغ_المؤقت: لقب cancelTimeout؛
     عرف أرسل_نداء: لقب sendRequest؛
     عرف حمل_خط: لقب loadFont؛
+    عرف حمل_بريمج_جافاسكريبت: لقب loadJsScript؛
+    عرف استدع_دالة_جافاسكريبت: لقب callCustomJsFn؛
+    عرف استدع_دالة_جافاسكريبت_لامتزامنة: لقب callCustomAsyncJsFn؛
+    عرف أضف_مسار_موارد: لقب addAssetRoute؛
 
     عرف ألغ_احتكار_المؤشر: لقب exitPointerLock؛
     عرف ألغ_ملء_الشاشة: لقب exitFullScreen؛
@@ -264,6 +268,7 @@
     @دمج صنف مـبدال {
         عرف حدد_الانتقال: لقب setTransition؛
         عرف بدل_إلى: لقب switchTo؛
+        عرف أيجب_الاحتفاظ_بالفرع: لقب shouldPreserveChild؛
     }
 
     عرف انـتقال_مبدال: لقب SwitcherTransition؛
