@@ -164,6 +164,7 @@
 
     func startServer [parent: ast_ref = Root] (options: ref[Array[CharsPtr]]): ptr[Http.Context] {
         addUiEndpoints(parent~ast);
+        addAssetRoutes(parent~ast);
         if uiEndpoints.getLength() == 0 {
             System.fail(1, "No UI endpoints found\n");
         }
@@ -194,8 +195,6 @@
         def requestInfo: ptr[Http.RequestInfo] = Http.getRequestInfo(connection);
         def uri: ptr[array[Char]] = requestInfo~cnt.requestUri;
         def method: ptr[array[Char]] = requestInfo~cnt.requestMethod;
-
-        addAssetRoutes(parent~ast);
 
         preprocess { addBeEndpoints(parent~ast) };
 
