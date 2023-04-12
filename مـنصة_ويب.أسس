@@ -104,6 +104,10 @@
         عرف لون_الإطار: لقب borderColor؛
         عرف نصف_قطر_الإطار: لقب borderRadius؛
         عرف طراز_الإطار: لقب borderStyle؛
+        عرف سمك_الآوتلاين: لقب outlineWidth؛
+        عرف إزاحة_الآوتلاين: لقب outlineOffset؛
+        عرف لون_الآوتلاين: لقب outlineColor؛
+        عرف طراز_الآوتلاين: لقب outlineStyle؛
         عرف الطوفان: لقب floating؛
         عرف الموقع: لقب position؛
         عرف تسلسل_العمق: لقب zIndex؛
@@ -113,6 +117,7 @@
         عرف الهامش: لقب margin؛
         عرف المحاذاة: لقب align؛
         عرف محاذاة_النص: لقب textAlign؛
+        عرف زخرفة_النص: لقب textDecoration؛
         عرف الاتجاه: لقب direction؛
         عرف الحشوة: لقب padding؛
         عرف حجم_الخط: لقب fontSize؛
