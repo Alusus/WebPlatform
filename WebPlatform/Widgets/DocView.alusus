@@ -23,7 +23,7 @@
         }
 
         handler this.setMarkdown(md: String) {
-            def mdTranslator: MarkdownTranslator;
+            def mdTranslator: MarkdownTranslator[RegExp];
             this.setHtml(mdTranslator.translate(md));
         }
 

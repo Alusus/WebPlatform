@@ -11,6 +11,7 @@ import "Apm";
 import "closure";
 Apm.importFile("Alusus/Http");
 Apm.importFile("Alusus/Json");
+Apm.importFile("Alusus/MarkdownTranslator");
 Apm.importFile("Alusus/Promises");
 
 import "WebPlatform/server";
@@ -45,7 +46,6 @@ import "WebPlatform/Resources/AudioResource";
 import "WebPlatform/Utils/Signal";
 import "WebPlatform/Utils/string_operations";
 import "WebPlatform/Utils/RegExp";
-import "WebPlatform/Utils/MarkdownTranslator";
 import "WebPlatform/Drawing";
 import "WebPlatform/Window";
 import "WebPlatform/routing";

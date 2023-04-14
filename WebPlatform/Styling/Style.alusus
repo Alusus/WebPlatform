@@ -22,6 +22,10 @@
         generateColorStyleProp[borderColor, "border-color"];
         generateQuadStyleProp[borderRadius, "border-radius"];
         generateStringStyleProp[borderStyle, "border-style"];
+        generateQuadStyleProp[outlineWidth, "outline-width"];
+        generateQuadStyleProp[outlineOffset, "outline-offset"];
+        generateColorStyleProp[outlineColor, "outline-color"];
+        generateStringStyleProp[outlineStyle, "outline-style"];
         generateStringStyleProp[floating, "float"];
         generateStringStyleProp[position, "position"];
         generateStringStyleProp[zIndex, "z-index"];
@@ -31,9 +35,11 @@
         generateQuadStyleProp[margin, "margin"];
         generateStringStyleProp[align, "align-items"];
         generateStringStyleProp[textAlign, "text-align"];
+        generateStringStyleProp[textDecoration, "text-decoration"];
         generateStringStyleProp[direction, "direction"];
         generateQuadStyleProp[padding, "padding"];
         generateFloatPtStyleProp[fontSize, "font-size"];
+        generateFloatPtStyleProp[lineHeight, "line-height"];
         generateColorStyleProp[fontColor, "color"];
         generateStringStyleProp[fontFamily, "font-family"];
         generateStringStyleProp[fontWeight, "font-weight"];
