@@ -39,6 +39,7 @@
         generateStringStyleProp[direction, "direction"];
         generateQuadStyleProp[padding, "padding"];
         generateFloatPtStyleProp[fontSize, "font-size"];
+        generateFloatPtStyleProp[lineHeight, "line-height"];
         generateColorStyleProp[fontColor, "color"];
         generateStringStyleProp[fontFamily, "font-family"];
         generateStringStyleProp[fontWeight, "font-weight"];
