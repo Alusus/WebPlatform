@@ -2,7 +2,9 @@
 
 عرف مـنصة_ويب: لقب WebPlatform؛
 @دمج وحدة مـنصة_ويب {
+    عرف أنشئ_عنصر: لقب createElement؛
     عرف حدد_ميزة_عنصر: لقب setElementAttribute؛
+    عرف حدد_متن_طراز: لقب setStyleRule؛
 
     عرف نفذ_حلقة_معالجة_الأحداث: لقب runEventLoop؛
     عرف عالج_الاحداث: لقب dispatchEvents؛
