@@ -9,6 +9,7 @@
         // Properties
 
         generateProperty[url, Url, String];
+        generateProperty[newTab, NewTab, Bool];
 
         //---------
         // Handlers
@@ -56,6 +57,8 @@
                 this.updateCommon();
                 setElementAttribute(this.id, "href", this.url);
                 setElementAttribute(this.id, "style", "text-decoration: none;");
+                if this.newTab setElementAttribute(this.id, "target", "_blank")
+                else setElementAttribute(this.id, "target", "");
             }
         }
 

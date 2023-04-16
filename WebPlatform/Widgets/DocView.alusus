@@ -23,7 +23,12 @@
         }
 
         handler this.setMarkdown(md: String) {
+            this.setMarkdown(md, false);
+        }
+
+        handler this.setMarkdown(md: String, linksInNewTab: Bool) {
             def mdTranslator: MarkdownTranslator[RegExp];
+            mdTranslator.linksInNewTab = linksInNewTab;
             this.setHtml(mdTranslator.translate(md));
         }
 
