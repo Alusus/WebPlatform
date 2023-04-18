@@ -89,7 +89,7 @@ class Header {
     handler this~init() {
         this.view = Box({}).{
             style.{
-                width = "100%";
+                width = "calc(100% - 3pt)";
                 height = "85pt";
                 padding = Quad(4, 0, 0, 0);
                 background = PRIMARY_COLOR;
@@ -241,7 +241,7 @@ func main {
             Header(),
             Box({}).{
                 style.{
-                    width = "100%";
+                    width = "calc(100% - 10pt)";
                     height = "auto-flex";
                     padding = Quad(5);
                     display = "flex";
@@ -284,7 +284,7 @@ func main {
                 });
             },
             TextEntry().{
-                width = String("100%");
+                width = String("calc(100% - 3pt)");
                 height = String("50pt");
                 onNewEntry = closure (newData: String) {
                     sendRequest(
