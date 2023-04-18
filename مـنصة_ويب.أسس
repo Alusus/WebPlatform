@@ -21,6 +21,8 @@
     عرف استدع_دالة_جافاسكريبت: لقب callCustomJsFn؛
     عرف استدع_دالة_جافاسكريبت_لامتزامنة: لقب callCustomAsyncJsFn؛
     عرف أضف_مسار_موارد: لقب addAssetRoute؛
+    عرف هات_لغات_المستخدم: لقب getUserLanguages؛
+    عرف هات_اللغة_المفضلة: لقب getPreferredLanguage؛
 
     عرف ألغ_احتكار_المؤشر: لقب exitPointerLock؛
     عرف ألغ_ملء_الشاشة: لقب exitFullScreen؛
@@ -357,6 +359,8 @@
     عرف نـافذة: لقب Window؛
     @دمج صنف نـافذة {
         عرف النموذج: لقب instance؛
+        عرف مخزن_الجلسة: لقب sessionStorage؛
+        عرف المخزن_المحلي: لقب localStorage؛
         عرف حدد_المشهد: لقب setView؛
         عرف أزل_المشهد: لقب unsetView؛
         عرف المسار: لقب location؛
@@ -371,6 +375,16 @@
         عرف عند_ربط_مقبض: لقب onGamepadConnected؛
         عرف عند_فصل_مقبض: لقب onGamepadDisconnected؛
         عرف عند_تغير_المسار: لقب onLocationChanged؛
+    }
+
+    عرف مـخزن: لقب Storage؛
+    @دمج صنف مـخزن {
+        عرف هات_الطول: لقب getLength؛
+        عرف هات_مفتاحا: لقب getKey؛
+        عرف هات_عنصرا: لقب getItem؛
+        عرف حدد_عنصرا: لقب setItem؛
+        عرف أزل_عنصرا: لقب removeItem؛
+        عرف فرغ: لقب clear؛
     }
 
     عرف حـمولة_مسار: لقب RoutePayload؛

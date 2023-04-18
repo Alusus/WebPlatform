@@ -585,6 +585,10 @@ wasmApi.callCustomAsyncJsFn = (fnName, arg, cbId) => {
     });
 }
 
+wasmApi.getUserLanguages = () => {
+    return toWasmStringArray(navigator.languages);
+}
+
 // String APIs
 
 wasmApi.createRegex = (regexStr) => {
@@ -601,6 +605,32 @@ wasmApi.matchRegex = (str, regexStr, regexId, pLastIndex) => {
   const pLastIndexBuf = new Int32Array(wasmMemory.buffer, pLastIndex, 1);
   pLastIndexBuf[0] = reg.lastIndex;
   return result;
+}
+
+// Storage APIs
+
+wasmApi.getStorageLength = (storageType) => {
+    return (storageType == 1 ? window.localStorage : window.sessionStorage).length;
+}
+
+wasmApi.getStorageKey = (storageType, index) => {
+    return toWasmString((storageType == 1 ? window.localStorage : window.sessionStorage).key(index));
+}
+
+wasmApi.getStorageItem = (storageType, key) => {
+    return toWasmString((storageType == 1 ? window.localStorage : window.sessionStorage).getItem(toJsString(key)));
+}
+
+wasmApi.setStorageItem = (storageType, key, value) => {
+    (storageType == 1 ? window.localStorage : window.sessionStorage).setItem(toJsString(key), toJsString(value));
+}
+
+wasmApi.removeStorageItem = (storageType, key) => {
+    (storageType == 1 ? window.localStorage : window.sessionStorage).removeItem(toJsString(key));
+}
+
+wasmApi.clearStorage = (storageType) => {
+    (storageType == 1 ? window.localStorage : window.sessionStorage).clear();
 }
 
 // Libc Functions

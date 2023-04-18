@@ -95,10 +95,17 @@
     @expname[showAlert] function showAlert (message: ptr[Char]): Bool;
     @expname[callCustomJsFn] function callCustomJsFn (fnName: ptr[Char], arg: ptr[Char]): ptr[Char];
     @expname[callCustomAsyncJsFn] function _callCustomAsyncJsFn (fnName: ptr[Char], arg: ptr[Char], cbId: ArchInt);
+    @expname[getUserLanguages] function _getUserLanguages (): ptr[Char];
     // String
     @expname[createRegex] function createRegex (regexStr: ptr[Char]): ArchInt;
     @expname[matchRegex] function _matchRegex (
         str: ptr[Char], regexStr: ptr[Char], regexId: ArchInt, lastIndex: ref[Int]
     ): ptr[Char];
+    // Storage
+    @expname[getStorageLength] function getStorageLength (storageType: Int): Int;
+    @expname[getStorageKey] function getStorageKey (storageType: Int, index: Int): ptr[Char];
+    @expname[getStorageItem] function getStorageItem (storageType: Int, key: ptr[Char]): ptr[Char];
+    @expname[setStorageItem] function setStorageItem (storageType: Int, key: ptr[Char], value: ptr[Char]);
+    @expname[removeStorageItem] function removeStorageItem (storageType: Int, key: ptr[Char]);
+    @expname[clearStorage] function clearStorage (storageType: Int);
 }
-

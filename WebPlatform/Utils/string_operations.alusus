@@ -1,6 +1,6 @@
 @merge module WebPlatform {
     function matchRegex (str: ptr[array[Char]], regex: ptr[array[Char]], lastIndex: ref[Int]): Array[String] {
-        return parseRegexMatchResult(_matchRegex(str, regex, 0, lastIndex));
+        return parseStringArray(_matchRegex(str, regex, 0, lastIndex));
     }
 
     function matchRegex (str: ptr[array[Char]], regex: ptr[array[Char]]): Array[String] {
@@ -9,7 +9,7 @@
     }
 
     function matchRegex (str: ptr[array[Char]], regexId: ArchInt, lastIndex: ref[Int]): Array[String] {
-        return parseRegexMatchResult(_matchRegex(str, 0, regexId, lastIndex));
+        return parseStringArray(_matchRegex(str, 0, regexId, lastIndex));
     }
 
     function matchRegex (str: ptr[array[Char]], regexId: ArchInt): Array[String] {
@@ -17,7 +17,7 @@
         return matchRegex(str, regexId, lastIndex);
     }
 
-    function parseRegexMatchResult (rawResult: ptr[Char]): Array[String] {
+    function parseStringArray (rawResult: ptr[Char]): Array[String] {
         if rawResult == 0 return Array[String]();
         def result: Array[String];
         while rawResult~cnt != 0 {

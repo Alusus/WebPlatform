@@ -1,0 +1,18 @@
+@merge module WebPlatform {
+    func getUserLanguages(): Array[String] {
+        return parseStringArray(_getUserLanguages());
+    }
+
+    func getPreferredLanguage(availableLangues: Array[String]): String {
+        def preferredLanguages: Array[String] = getUserLanguages();
+        def i: Int;
+        for i = 0, i < preferredLanguages.getLength(), ++i {
+            def lang: String = preferredLanguages(i).slice(0, 2).toLowerCase();
+            def j: Int;
+            for j = 0, j < availableLangues.getLength(), ++j {
+                if lang == availableLangues(j) return lang;
+            }
+        }
+        return availableLangues(0);
+    }
+}
