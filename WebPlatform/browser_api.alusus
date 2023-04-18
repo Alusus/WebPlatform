@@ -95,6 +95,7 @@
     @expname[showAlert] function showAlert (message: ptr[Char]): Bool;
     @expname[callCustomJsFn] function callCustomJsFn (fnName: ptr[Char], arg: ptr[Char]): ptr[Char];
     @expname[callCustomAsyncJsFn] function _callCustomAsyncJsFn (fnName: ptr[Char], arg: ptr[Char], cbId: ArchInt);
+    @expname[getUserLanguages] function _getUserLanguages (): ptr[Char];
     // String
     @expname[createRegex] function createRegex (regexStr: ptr[Char]): ArchInt;
     @expname[matchRegex] function _matchRegex (

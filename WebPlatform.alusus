@@ -52,6 +52,7 @@ import "WebPlatform/routing";
 import "WebPlatform/event_handling";
 import "WebPlatform/event_loop";
 import "WebPlatform/async_operations";
+import "WebPlatform/i18n";
 
 @merge module WebPlatform {
     use Srl;

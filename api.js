@@ -585,6 +585,10 @@ wasmApi.callCustomAsyncJsFn = (fnName, arg, cbId) => {
     });
 }
 
+wasmApi.getUserLanguages = () => {
+    return toWasmStringArray(navigator.languages);
+}
+
 // String APIs
 
 wasmApi.createRegex = (regexStr) => {
