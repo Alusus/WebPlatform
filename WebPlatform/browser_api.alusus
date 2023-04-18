@@ -101,5 +101,11 @@
     @expname[matchRegex] function _matchRegex (
         str: ptr[Char], regexStr: ptr[Char], regexId: ArchInt, lastIndex: ref[Int]
     ): ptr[Char];
+    // Storage
+    @expname[getStorageLength] function getStorageLength (storageType: Int): Int;
+    @expname[getStorageKey] function getStorageKey (storageType: Int, index: Int): ptr[Char];
+    @expname[getStorageItem] function getStorageItem (storageType: Int, key: ptr[Char]): ptr[Char];
+    @expname[setStorageItem] function setStorageItem (storageType: Int, key: ptr[Char], value: ptr[Char]);
+    @expname[removeStorageItem] function removeStorageItem (storageType: Int, key: ptr[Char]);
+    @expname[clearStorage] function clearStorage (storageType: Int);
 }
-

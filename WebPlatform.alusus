@@ -48,6 +48,7 @@ import "WebPlatform/Utils/string_operations";
 import "WebPlatform/Utils/RegExp";
 import "WebPlatform/Drawing";
 import "WebPlatform/Window";
+import "WebPlatform/Storage";
 import "WebPlatform/routing";
 import "WebPlatform/event_handling";
 import "WebPlatform/event_loop";

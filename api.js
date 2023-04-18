@@ -607,6 +607,32 @@ wasmApi.matchRegex = (str, regexStr, regexId, pLastIndex) => {
   return result;
 }
 
+// Storage APIs
+
+wasmApi.getStorageLength = (storageType) => {
+    return (storageType == 1 ? window.localStorage : window.sessionStorage).length;
+}
+
+wasmApi.getStorageKey = (storageType, index) => {
+    return toWasmString((storageType == 1 ? window.localStorage : window.sessionStorage).key(index));
+}
+
+wasmApi.getStorageItem = (storageType, key) => {
+    return toWasmString((storageType == 1 ? window.localStorage : window.sessionStorage).getItem(toJsString(key)));
+}
+
+wasmApi.setStorageItem = (storageType, key, value) => {
+    (storageType == 1 ? window.localStorage : window.sessionStorage).setItem(toJsString(key), toJsString(value));
+}
+
+wasmApi.removeStorageItem = (storageType, key) => {
+    (storageType == 1 ? window.localStorage : window.sessionStorage).removeItem(toJsString(key));
+}
+
+wasmApi.clearStorage = (storageType) => {
+    (storageType == 1 ? window.localStorage : window.sessionStorage).clear();
+}
+
 // Libc Functions
 
 wasmApi.rand = () => {

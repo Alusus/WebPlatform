@@ -1,0 +1,33 @@
+@merge module WebPlatform {
+    class Storage {
+        def storageType: Int;
+
+        handler this~init(st: Int) {
+            this.storageType = st;
+        }
+
+        handler this.getLength(): Int {
+            return getStorageLength(this.storageType);
+        }
+
+        handler this.getKey(index: Int): String {
+            return String(getStorageKey(this.storageType, index)~cast[CharsPtr]);
+        }
+
+        handler this.getItem(key: CharsPtr): String {
+            return String(getStorageItem(this.storageType, key)~cast[CharsPtr]);
+        }
+
+        handler this.setItem(key: CharsPtr, value: CharsPtr) {
+            setStorageItem(this.storageType, key, value);
+        }
+
+        handler this.removeItem(key: CharsPtr) {
+            removeStorageItem(this.storageType, key);
+        }
+
+        handler this.clear() {
+            clearStorage(this.storageType);
+        }
+    }
+}

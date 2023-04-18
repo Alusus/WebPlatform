@@ -4,6 +4,8 @@
         def id: ptr[array[Char]] = "window";
         def view: SrdRef[Widget];
         def keysToSwallow: String;
+        def sessionStorage: Storage(0);
+        def localStorage: Storage(1);
 
         handler this~init(dummy: ptr) {
             this.onKeyDown.owner~no_deref = this;
