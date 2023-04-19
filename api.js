@@ -589,6 +589,10 @@ wasmApi.getUserLanguages = () => {
     return toWasmStringArray(navigator.languages);
 }
 
+wasmApi.isDarkColorSchemePreferred = () => {
+    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+}
+
 // String APIs
 
 wasmApi.createRegex = (regexStr) => {

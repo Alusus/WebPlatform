@@ -96,6 +96,7 @@
     @expname[callCustomJsFn] function callCustomJsFn (fnName: ptr[Char], arg: ptr[Char]): ptr[Char];
     @expname[callCustomAsyncJsFn] function _callCustomAsyncJsFn (fnName: ptr[Char], arg: ptr[Char], cbId: ArchInt);
     @expname[getUserLanguages] function _getUserLanguages (): ptr[Char];
+    @expname[isDarkColorSchemePreferred] function isDarkColorSchemePreferred (): Bool;
     // String
     @expname[createRegex] function createRegex (regexStr: ptr[Char]): ArchInt;
     @expname[matchRegex] function _matchRegex (

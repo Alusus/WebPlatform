@@ -23,6 +23,7 @@
     عرف أضف_مسار_موارد: لقب addAssetRoute؛
     عرف هات_لغات_المستخدم: لقب getUserLanguages؛
     عرف هات_اللغة_المفضلة: لقب getPreferredLanguage؛
+    عرف هل_يفضل_نمط_الألوان_الداكن: لقب isDarkColorSchemePreferred؛
 
     عرف ألغ_احتكار_المؤشر: لقب exitPointerLock؛
     عرف ألغ_ملء_الشاشة: لقب exitFullScreen؛
