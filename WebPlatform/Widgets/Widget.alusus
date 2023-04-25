@@ -50,7 +50,10 @@
 
         handler this.style: SrdRef[StyleSet] {
             if this._style.isNull() {
-                this._style = SrdRef[StyleSet].construct();
+                this._style = StyleSet();
+                this._style.enableInline(closure(css: String) {
+                    if this.id != "" setElementAttribute(this.id, "style", css);
+                });
                 if this.id != "" {
                     this._style.build();
                     this.updateCommon();
