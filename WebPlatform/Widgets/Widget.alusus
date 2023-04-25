@@ -104,7 +104,7 @@
         handler this.updateCommon() {
             if this.id != "" {
                 if this._style.isNull() setElementAttribute(this.id, "class", this.className)
-                else setElementAttribute(this.id, "class", this.className + " " + this._style.className);
+                else setElementAttribute(this.id, "class", this.className + " " + this._style.id);
             }
         }
 

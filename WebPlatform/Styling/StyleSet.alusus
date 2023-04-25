@@ -5,7 +5,8 @@
     class StyleSet {
         @injection def mainStyle: Style;
         def otherStyles: Map[String, Style];
-        def className: String = getNewId();
+        def id: String = getNewId();
+        def selector: String = String(".") + id;
         def buildCounter: Int = 0;
         def onInlineStyle: closure (css: String);
 
@@ -15,7 +16,7 @@
                 if this.isInlined() {
                     this.onInlineStyle(this.mainStyle.getCssString());
                 } else {
-                    setStyleRule(this.className, String(".") + this.className, this.mainStyle.getCssString());
+                    setStyleRule(this.id, this.selector, this.mainStyle.getCssString());
                 }
             };
         }
@@ -58,19 +59,18 @@
             // If we are currently in inline mode we need to switch back to css class mode otherwise
             // styles won't be correct since inline styles take precedence over css classes.
             if this.buildCounter > 0 and this.isInlined() {
-                createElement("style", this.className, "body");
+                createElement("style", this.id, "head");
                 this.onInlineStyle(String());
-                def selector: String = String(".") + this.className;
-                this.buildStyle(this.mainStyle, this.className, selector);
+                this.buildStyle(this.mainStyle, this.id, this.selector);
             }
 
             return this.otherStyles(fullSelector)~use_in(style) {
-                def completeSelector: String = String(".") + this.className + fullSelector;
+                def completeSelector: String = this.selector + fullSelector;
                 onUpdated = closure() {
                     if this.buildCounter == 0 return;
-                    setStyleRule(this.className, completeSelector, style.getCssString());
+                    setStyleRule(this.id, completeSelector, style.getCssString());
                 };
-                if this.buildCounter > 0 this.buildStyle(style, this.className, completeSelector);
+                if this.buildCounter > 0 this.buildStyle(style, this.id, completeSelector);
             };
         }
 
@@ -83,12 +83,11 @@
                 return;
             }
 
-            createElement("style", this.className, "body");
-            def selector: String = String(".") + this.className;
-            this.buildStyle(this.mainStyle, this.className, selector);
+            createElement("style", this.id, "head");
+            this.buildStyle(this.mainStyle, this.id, this.selector);
             def i: Int;
             for i = 0, i < this.otherStyles.getLength(), i++ {
-                this.buildStyle(this.otherStyles.valAt(i), this.className, selector + this.otherStyles.keyAt(i));
+                this.buildStyle(this.otherStyles.valAt(i), this.id, this.selector + this.otherStyles.keyAt(i));
             }
         }
 
@@ -103,7 +102,7 @@
                 this.otherStyles.valAt(i).inUse = false;
             }
 
-            if not this.isInlined() deleteElement(this.className);
+            if not this.isInlined() deleteElement(this.id);
         }
 
         handler this.buildStyle(style: ref[Style], id: String, selector: String) {

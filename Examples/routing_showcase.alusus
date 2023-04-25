@@ -503,9 +503,12 @@ class CounterView {
 
 @uiEndpoint["/*", "WebPlatform Example"]
 func main {
-    setElementAttribute("body", "style", "padding: 0; margin: 0;");
     def switcher: SrdRef[Switcher];
     def header: SrdRef[Header];
+    Window.instance.style.{
+        padding = "0";
+        margin = "0";
+    };
     Window.instance.setView(Box({}).{
         style.{
             display = "flex";

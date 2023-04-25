@@ -39,7 +39,7 @@
         handler this.build() {
             if this.buildCounter++ > 0 return;
 
-            createElement("style", this.name, "body");
+            createElement("style", this.name, "head");
             this.update();
         }
 

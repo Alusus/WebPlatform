@@ -1,6 +1,7 @@
 @merge module WebPlatform {
     class Window {
         @shared def instance: Window(0~cast[ptr]);
+        def _style: SrdRef[StyleSet];
         def id: ptr[array[Char]] = "window";
         def view: SrdRef[Widget];
         def keysToSwallow: String;
@@ -77,6 +78,18 @@
 
         //---------
         // Handlers
+
+        handler this.style: SrdRef[StyleSet] {
+            if this._style.isNull() {
+                this._style = StyleSet();
+                this._style.selector = "body";
+                this._style.enableInline(closure(css: String) {
+                    setElementAttribute("body", "style", css);
+                });
+                this._style.build();
+            }
+            return this._style;
+        }
 
         handler this.setView(v: SrdRef[Widget]) {
             this.unsetView();

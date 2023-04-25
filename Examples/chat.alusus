@@ -226,10 +226,12 @@ func encodeHtml(str: String): String {
 
 @uiEndpoint["/", "WebPlatform Example - Chat"]
 func main {
-    setElementAttribute("body", "style", "padding: 0; margin: 0;");
-
     def onFetch: closure (json: Json);
 
+    Window.instance.style.{
+        padding = "0";
+        margin = "0";
+    };
     Window.instance.setView(Box({}).{
         style.{
             height = "100%";
@@ -307,8 +309,10 @@ func main {
 
 @uiEndpoint["/about", "WebPlatform Example - Chat"]
 func about {
-    setElementAttribute("body", "style", "padding: 0; margin: 0;");
-
+    Window.instance.style.{
+        padding = "0";
+        margin = "0";
+    };
     Window.instance.setView(Box({}).{
         style.{
             display = "flex";

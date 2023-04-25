@@ -15,8 +15,6 @@ use WebPlatform;
 def PRIMARY_COLOR: Color("8e50ef");
 
 func createHeader (): SrdRef[Widget] {
-    setElementAttribute("body", "style", "padding: 0; margin: 0;");
-
     return Box({}).{
         style.{
             width = "100%";
@@ -72,6 +70,10 @@ func main {
 
     // Build the view
     def canvas: SrdRef[Canvas];
+    Window.instance.style.{
+        padding = "0";
+        margin = "0";
+    };
     Window.instance.setView(Box({}).{
         style.{
             align = "center";
