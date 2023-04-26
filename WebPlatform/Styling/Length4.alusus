@@ -1,0 +1,68 @@
+@merge module WebPlatform {
+    //==========================================================================
+    // Length4
+    // A tuple of four float values used for UI length values. It's used
+    // elements with four values, like the border thickness, padding, margin,
+    // etc.
+    class Length4 {
+        def top: Float;
+        def right: Float;
+        def bottom: Float;
+        def left: Float;
+        def unit: CharsPtr;
+
+        macro defineInitializer[name, u] {
+            func name(v: Float): Length4 {
+                return Length4().{ top = right = bottom = left = v; unit = u };
+            }
+
+            func name(v: Float, h: Float): Length4 {
+                return Length4().{ top = bottom = v; left = right = h; unit = u };
+            }
+
+            func name(t: Float, r: Float, b: Float, l: Float): Length4 {
+                return Length4().{ top = t; right = r; bottom = b; left = l; unit = u };
+            }
+        }
+
+        defineInitializer[px, "px"];
+        defineInitializer[pt, "pt"];
+        defineInitializer[mm, "mm"];
+        defineInitializer[vw, "vw"];
+        defineInitializer[vh, "vh"];
+        defineInitializer[vmin, "vmin"];
+        defineInitializer[vmax, "vmax"];
+        defineInitializer[em, "em"];
+
+        handler this = temp_ref[Length4] {
+            this.top = value.top;
+            this.right = value.right;
+            this.bottom = value.bottom;
+            this.left = value.left;
+            this.unit = value.unit;
+        }
+
+        handler this == ref[Length4] : bool {
+            if this.top == value.top && this.right == value.right && this.bottom == value.bottom &&
+                this.left == value.left && this.unit == value.unit {
+                    return true;
+                }
+            return false;
+        }
+
+        handler this != ref[Length4] : bool {
+            return !(this == value);
+        }
+
+        handler this.toString(): String {
+            return String.format(
+                "%f%s %f%s %f%s %f%s",
+                this.top, this.unit,
+                this.right, this.unit,
+                this.bottom, this.unit,
+                this.left, this.unit
+            );
+        }
+    }
+}
+

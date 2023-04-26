@@ -51,17 +51,17 @@ class MenuButton {
                 textAlign = "center";
                 width = "60pt";
                 cursor = "pointer";
-                transition = ".3s";
+                transformTransition = Transition(0.3);
             };
             style(">label").{
-                fontSize = 14.0;
+                fontSize = Length.pt(14.0);
                 fontColor = Color("444");
             }
             style({ StateSelector.HOVER }).{
                 transform = "scale(1.3)";
             }
             style({ StateSelector.HOVER, ">label" }).{
-                fontSize = 14.0;
+                fontSize = Length.pt(14.0);
                 fontColor = Color("000");
             }
             onClick.connect(closure (widget: ref[Widget], payload: ref[Int]) {
@@ -94,11 +94,11 @@ class SideButton {
                 textAlign = "center";
             };
             style(">label").{
-                fontSize = 14.0;
+                fontSize = Length.pt(14.0);
                 fontColor = Color("444");
             }
             style({ StateSelector.HOVER, ">label" }).{
-                fontSize = 14.0;
+                fontSize = Length.pt(14.0);
                 fontColor = Color("000");
             }
             onClick.connect(closure (widget: ref[Widget], payload: ref[Int]) {
@@ -127,8 +127,8 @@ class Header {
             style.{
                 width = "100%";
                 height = "85pt";
-                padding = Quad(4, 0, 0, 0);
-                borderWidth = Quad(0, 0, 3, 0);
+                padding = Length4.pt(4, 0, 0, 0);
+                borderWidth = Length4.pt(0, 0, 3, 0);
                 borderStyle = "solid";
                 borderColor = Color("666");
                 justify = "space-between";
@@ -143,7 +143,7 @@ class Header {
                     height = "3pt";
                     background = Color(0, 0, 150);
                     transform=String.format("translateX(%ipt)", i * 60);
-                    transition=String(".5s");
+                    transformTransition = Transition(0.5);
                 };
             }
 
@@ -160,14 +160,14 @@ class Header {
                             url = String("/Assets/wblogo.svg");
                             style.{
                                 height = "50pt";
-                                padding = Quad(0, 10);
+                                padding = Length4.pt(0, 10);
                             };
                         },
                         Box({ Text(String("Alusus Web Platform Example")).{ style.{
                             fontColor = Color("000");
-                            fontSize = 21.0;
+                            fontSize = Length.pt(21.0);
                             height = "100%";
-                            padding = Quad(0, 10);
+                            padding = Length4.pt(0, 10);
                         } } })
                     });
                 },
@@ -189,7 +189,7 @@ class Header {
                         layout = "row";
                         justify = "start";
                         width = "180pt";
-                        padding = Quad(0, 0, 4, 0);
+                        padding = Length4.pt(0, 0, 4, 0);
                     };
                     addChildren({
                         Box({}).{
@@ -237,7 +237,7 @@ class Article {
                     style.{
                         width = "100%";
                         fontColor = Color(0, 0, 0);
-                        fontSize = 20.0;
+                        fontSize = Length.pt(20.0);
                     }
                     setMarkdown(article);
                 }
@@ -274,7 +274,7 @@ class ArticleEditor {
                     style.{
                         width = "100%";
                         height = "100%";
-                        fontSize = 20.0;
+                        fontSize = Length.pt(20.0);
                     };
                     text = str;
                     self.textInput = this;
@@ -417,10 +417,10 @@ class DigitView {
                     style.{
                         width = "90%";
                         height = "90%";
-                        borderRadius = Quad(30);
+                        borderRadius = Length4.pt(30);
                         borderColor = Color("444");
                         borderStyle = "solid";
-                        borderWidth = Quad(10);
+                        borderWidth = Length4.pt(10);
                         display = "flex";
                         align = "center";
                         justify = "center";
@@ -429,7 +429,7 @@ class DigitView {
                         Text(label).{
                             style.{
                                 fontColor = Color(0, 0, 0);
-                                fontSize = 250.0;
+                                fontSize = Length.pt(250.0);
                             }
                         }
                     });

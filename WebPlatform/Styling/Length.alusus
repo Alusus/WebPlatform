@@ -1,0 +1,43 @@
+@merge module WebPlatform {
+    //==========================================================================
+    // Length
+    // A float value used for UI length values.
+    class Length {
+        def val: Float;
+        def unit: CharsPtr;
+
+        macro defineInitializer[name, u] {
+            func name(v: Float): Length {
+                return Length().{ val = v; unit = u };
+            }
+        }
+
+        defineInitializer[px, "px"];
+        defineInitializer[pt, "pt"];
+        defineInitializer[mm, "mm"];
+        defineInitializer[vw, "vw"];
+        defineInitializer[vh, "vh"];
+        defineInitializer[vmin, "vmin"];
+        defineInitializer[vmax, "vmax"];
+        defineInitializer[em, "em"];
+
+        handler this = temp_ref[Length] {
+            this.val = value.val;
+            this.unit = value.unit;
+        }
+
+        handler this == ref[Length] : bool {
+            if this.val == value.val && this.unit == value.unit return true;
+            return false;
+        }
+
+        handler this != ref[Length] : bool {
+            return !(this == value);
+        }
+
+        handler this.toString(): String {
+            return String.format("%f%s", this.val, this.unit);
+        }
+    }
+}
+

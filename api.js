@@ -341,7 +341,7 @@ wasmApi.loadFont = (fontName, url, cbId) => {
 
 wasmApi.loadJsScript = (url, cbId) => {
     const script = document.createElement('script');
-    document.body.appendChild(script);
+    document.head.appendChild(script);
     script.onload = function() {
         onEvent(cbId, false, 'loadJsScript', "");
     };

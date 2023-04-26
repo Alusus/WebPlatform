@@ -6,24 +6,25 @@
         // Variables
 
         def props: Map[String, String];
+        def transitions: Map[String, String];
         def inUse: Bool = false;
         def onUpdated: closure();
 
         // Properties
 
-        generateStringStyleProp[width, "width"];
-        generateStringStyleProp[height, "height"];
-        generateStringStyleProp[minWidth, "min-width"];
-        generateStringStyleProp[minHeight, "min-height"];
-        generateStringStyleProp[maxWidth, "max-width"];
-        generateStringStyleProp[maxHeight, "max-height"];
-        generateQuadStyleProp[borderWidth, "border-width"];
-        generateColorStyleProp[borderColor, "border-color"];
-        generateQuadStyleProp[borderRadius, "border-radius"];
+        generateTypedStyleProp[width, "width", Length];
+        generateTypedStyleProp[height, "height", Length];
+        generateTypedStyleProp[minWidth, "min-width", Length];
+        generateTypedStyleProp[minHeight, "min-height", Length];
+        generateTypedStyleProp[maxWidth, "max-width", Length];
+        generateTypedStyleProp[maxHeight, "max-height", Length];
+        generateTypedStyleProp[borderWidth, "border-width", Length4];
+        generateTypedStyleProp[borderRadius, "border-radius", Length4];
+        generateTypedStyleProp[borderColor, "border-color", Color];
         generateStringStyleProp[borderStyle, "border-style"];
-        generateQuadStyleProp[outlineWidth, "outline-width"];
-        generateQuadStyleProp[outlineOffset, "outline-offset"];
-        generateColorStyleProp[outlineColor, "outline-color"];
+        generateTypedStyleProp[outlineWidth, "outline-width", Length4];
+        generateTypedStyleProp[outlineOffset, "outline-offset", Length4];
+        generateTypedStyleProp[outlineColor, "outline-color", Color];
         generateStringStyleProp[outlineStyle, "outline-style"];
         generateStringStyleProp[floating, "float"];
         generateStringStyleProp[position, "position"];
@@ -31,30 +32,29 @@
         generateStringStyleProp[flex, "flex"];
         generateStringStyleProp[layout, "flex-direction"];
         generateStringStyleProp[justify, "justify-content"];
-        generateQuadStyleProp[margin, "margin"];
+        generateTypedStyleProp[margin, "margin", Length4];
+        generateTypedStyleProp[padding, "padding", Length4];
         generateStringStyleProp[align, "align-items"];
         generateStringStyleProp[textAlign, "text-align"];
         generateStringStyleProp[textDecoration, "text-decoration"];
         generateStringStyleProp[direction, "direction"];
-        generateQuadStyleProp[padding, "padding"];
-        generateFloatPtStyleProp[fontSize, "font-size"];
-        generateFloatPtStyleProp[lineHeight, "line-height"];
-        generateColorStyleProp[fontColor, "color"];
+        generateTypedStyleProp[fontSize, "font-size", Length];
+        generateTypedStyleProp[lineHeight, "line-height", Length];
+        generateTypedStyleProp[fontColor, "color", Color];
         generateStringStyleProp[fontFamily, "font-family"];
         generateStringStyleProp[fontWeight, "font-weight"];
         generateFloatStyleProp[opacity, "opacity"];
-        generateStringStyleProp[transition, "transition"];
         generateStringStyleProp[transform, "transform"];
         generateStringStyleProp[translate, "translate"];
         generateStringStyleProp[overflow, "overflow"];
         generateStringStyleProp[boxShadow, "box-shadow"];
         generateStringStyleProp[display, "display"];
         generateStringStyleProp[cursor, "cursor"];
-        generateStringStyleProp[top, "top"];
-        generateStringStyleProp[left, "left"];
-        generateStringStyleProp[right, "right"];
-        generateStringStyleProp[bottom, "bottom"];
-        generateColorStyleProp[background, "background"];
+        generateTypedStyleProp[top, "top", Length];
+        generateTypedStyleProp[left, "left", Length];
+        generateTypedStyleProp[right, "right", Length];
+        generateTypedStyleProp[bottom, "bottom", Length];
+        generateTypedStyleProp[background, "background", Color];
         generateStringStyleProp[wordBreak, "word-break"];
 
         def vanimation: SrdRef[Animation];
@@ -94,6 +94,14 @@
             for i = 0, i < this.props.getLength(), ++i {
                 styleRep += this.props.keyAt(i) + ":" + this.props.valAt(i) + ";";
             }
+            if this.transitions.getLength() > 0 {
+                styleRep += "transition:";
+                for i = 0, i < this.transitions.getLength(), ++i {
+                    if i != 0 styleRep += ",";
+                    styleRep += this.transitions.keyAt(i) + " " + this.transitions.valAt(i);
+                }
+                styleRep += ";";
+            }
             if !this.vanimation.isNull() {
                 styleRep += String.format("animation-name:%s;", this.vanimation.name.buf);
                 styleRep += String.format("animation-duration:%fs;", this.vanimation.totalDuration);
@@ -116,16 +124,19 @@
             this.onPropUpdated();
             return val;
         }
+        handler this.__propName__Transition = (val: ref[Transition]) {
+            this.transitions(String(styleName)) = val.toString();
+            this.onPropUpdated();
+            return val;
+        }
         handler this.propName: ref[String] {
             return this.props(String(styleName));
         }
     }
 
-    macro generateColorStyleProp [propName, styleName] {
-        handler this.propName = (val: ref[Color]) {
-            this.props(String(styleName)) = String.format(
-                "rgba(%i, %i, %i, %i)", val.red, val.green, val.blue, val.alpha
-            );
+    macro generateTypedStyleProp [propName, styleName, Tp] {
+        handler this.propName = (val: temp_ref[Tp]) {
+            this.props(String(styleName)) = val.toString();
             this.onPropUpdated();
             return val;
         }
@@ -134,31 +145,10 @@
 
     macro generateFloatStyleProp [propName, styleName] {
         handler this.propName = (val: Float) {
-            this.props(String(styleName)) = String.format("%f", val);
-            this.onPropUpdated();
-            return val;
-        }
-        generateStringStyleProp[propName, styleName];
-    }
-
-    macro generateFloatPtStyleProp [propName, styleName] {
-        handler this.propName = (val: Float) {
-            this.props(String(styleName)) = String.format("%fpt", val);
-            this.onPropUpdated();
-            return val;
-        }
-        generateStringStyleProp[propName, styleName];
-    }
-
-    macro generateQuadStyleProp [propName, styleName] {
-        handler this.propName = (val: ref[Quad]) {
-            this.props(String(styleName)) = String.format(
-                "%fpt %fpt %fpt %fpt", val.top, val.right, val.bottom, val.left
-            );
+            this.props(String(styleName)) = String() + val;
             this.onPropUpdated();
             return val;
         }
         generateStringStyleProp[propName, styleName];
     }
 }
-

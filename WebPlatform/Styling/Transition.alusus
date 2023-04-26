@@ -1,0 +1,44 @@
+@merge module WebPlatform {
+    //==========================================================================
+    // Transition
+    class Transition {
+        def duration: Float = 0;
+        def fn: String;
+        def delay: Float = 0;
+
+        handler this~init() {}
+
+        handler this~init(d: Float) {
+            this.duration = d;
+        }
+
+        handler this~init(d: Float, f: String, l: Float) {
+            this.duration = d;
+            this.fn = f;
+            this.delay = l;
+        }
+
+        handler this~init(v: ref[this_type]) {
+            this = v;
+        }
+
+        handler this = temp_ref[Transition] {
+            this.duration = value.duration;
+            this.fn = value.fn;
+            this.delay = value.delay;
+        }
+
+        handler this == ref[Transition] : bool {
+            return this.duration = value.duration && this.fn == value.fn && this.delay == value.delay;
+        }
+
+        handler this != ref[Transition] : bool {
+            return !(this == value);
+        }
+
+        handler this.toString(): String {
+            if this.fn == "" return String.format("%fs", this.duration)
+            else return String.format("%fs fn %fs", this.duration, this.fn.buf, this.delay);
+        }
+    }
+}

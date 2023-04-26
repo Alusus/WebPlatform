@@ -42,28 +42,27 @@ class MenuButton {
     handler this~init(link: String, label: String, icon: String) {
         this.view = Box({}).{
             style.{
-                padding = Quad(3);
+                padding = Length4.pt(3);
                 background = LIGHT_COLOR;
                 display = "flex";
                 layout = "row";
                 align = "center";
             };
             style(">>icon").{
-                padding = Quad(0, 4);
-                width = "20pt";
-                height = "0pt";
-                transition = ".2s";
+                padding = Length4.pt(0, 4);
+                width = Length.pt(20);
+                height = Length.pt(0);
+                heightTransition = Transition(0.2);
             }
             style(">>label").{
-                fontSize = 16.0;
+                fontSize = Length.pt(16.0);
                 fontColor = Color("eee");
             }
             style({ StateSelector.HOVER, ">>icon" }).{
-                height = "20pt";
-                transition = ".2s";
+                height = Length.pt(20)
             }
             style({ StateSelector.HOVER, ">>label" }).{
-                fontSize = 16.0;
+                fontSize = Length.pt(16.0);
                 fontColor = Color("fff");
             }
             addChildren({
@@ -91,9 +90,9 @@ class Header {
             style.{
                 width = "calc(100% - 3pt)";
                 height = "85pt";
-                padding = Quad(4, 0, 0, 0);
+                padding = Length4.pt(4, 0, 0, 0);
                 background = PRIMARY_COLOR;
-                borderWidth = Quad(1.5);
+                borderWidth = Length4.pt(1.5);
                 borderStyle = "solid";
                 borderColor = PRIMARY_COLOR;
                 justify = "space-between";
@@ -112,15 +111,15 @@ class Header {
                     addChildren({
                         Box({ Text(String("Alusus Web Platform Examples - Chat")).{ style.{
                             fontColor = Color("fff");
-                            fontSize = 18.0;
+                            fontSize = Length.pt(18.0);
                             height = "100%";
-                            padding = Quad(0, 10);
+                            padding = Length4.pt(0, 10);
                         } } }),
                         Image().{
                             url = String("/Assets/wblogo.svg");
                             style.{
                                 height = "50pt";
-                                padding = Quad(0, 10);
+                                padding = Length4.pt(0, 10);
                             };
                         }
                     });
@@ -169,7 +168,7 @@ class TextEntry {
                 display = "flex";
                 layout = "row";
                 justify = "space-between";
-                borderWidth = Quad(1.5);
+                borderWidth = Length4.pt(1.5);
                 borderStyle = "solid";
                 borderColor = PRIMARY_COLOR;
                 background = PRIMARY_COLOR;
@@ -181,7 +180,7 @@ class TextEntry {
                         width = "100%";
                         height = "100%";
                         background = Color("fff");
-                        fontSize = 12.0;
+                        fontSize = Length.pt(12.0);
                     };
                     onKeyUp.connect(closure (widget: ref[TextInput], payload: ref[String]) {
                         if payload == "Shift+Enter" {
@@ -196,7 +195,7 @@ class TextEntry {
                         height = "100%";
                         width = "50pt";
                         background = Color(200, 200, 200);
-                        fontSize = 16.0;
+                        fontSize = Length.pt(16.0);
                         justify = "center";
                     };
                     onClick.connect(closure (widget: ref[Widget], payload: ref[Int]) {
@@ -245,7 +244,7 @@ func main {
                 style.{
                     width = "calc(100% - 10pt)";
                     height = "auto-flex";
-                    padding = Quad(5);
+                    padding = Length4.pt(5);
                     display = "flex";
                     layout = "column";
                     flex = "auto";
@@ -258,7 +257,7 @@ func main {
                             width = "100%";
                             height = "20pt";
                             fontColor = Color(200, 50, 50);
-                            fontSize = 10.0;
+                            fontSize = Length.pt(10.0);
                         };
                     },
                     Text(String()).{
@@ -266,7 +265,7 @@ func main {
                             width = "100%";
                             height = "100%";
                             fontColor = Color(50, 50, 50);
-                            fontSize = 20.0;
+                            fontSize = Length.pt(20.0);
                         };
                         onFetch = closure (json: Json) {
                             def status: Int = json.getObject("eventData").getInt("status");
@@ -322,11 +321,11 @@ func about {
             Header(),
             Text(String("Chat Example")).{ style.{
                 fontColor = Color(0, 0, 0);
-                fontSize = 30.0;
+                fontSize = Length.pt(30.0);
             } },
             Text(String("Built using Alusus Web Platform")).{ style.{
                 fontColor = Color(0, 0, 0);
-                fontSize = 20.0;
+                fontSize = Length.pt(20.0);
             } }
         })
     });
