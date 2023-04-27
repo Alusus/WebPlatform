@@ -1,6 +1,4 @@
 @merge module WebPlatform {
-    //==========================================================================
-    // Color
     class Color {
         def red: Int = 0;
         def green: Int = 0;

@@ -1,27 +1,53 @@
 @merge module WebPlatform {
     //==========================================================================
     // Length4
-    // A tuple of four float values used for UI length values. It's used
+    // A tuple of four length values used for UI length values. It's used
     // elements with four values, like the border thickness, padding, margin,
     // etc.
     class Length4 {
-        def top: Float;
-        def right: Float;
-        def bottom: Float;
-        def left: Float;
-        def unit: CharsPtr;
+        def top: SrdRef[Length];
+        def right: SrdRef[Length];
+        def bottom: SrdRef[Length];
+        def left: SrdRef[Length];
+
+        handler this~init(v: SrdRef[Length]) {
+            this.top = this.right = this.bottom = this.left = v;
+        }
+
+        handler this~init(v: SrdRef[Length], h: SrdRef[Length]) {
+            this.top = this.bottom = v;
+            this.left = this.right = h;
+        }
+
+        handler this~init(t: SrdRef[Length], r: SrdRef[Length], b: SrdRef[Length], l: SrdRef[Length]) {
+            this.top = t;
+            this.right = r;
+            this.bottom = b;
+            this.left = l;
+        }
+
+        handler this~init(that: ref[this_type]) {
+            this = that;
+        }
+
+        handler this = temp_ref[Length4] {
+            this.top = value.top;
+            this.right = value.right;
+            this.bottom = value.bottom;
+            this.left = value.left;
+        }
 
         macro defineInitializer[name, u] {
             func name(v: Float): Length4 {
-                return Length4().{ top = right = bottom = left = v; unit = u };
+                return Length4(Length(v, u));
             }
 
             func name(v: Float, h: Float): Length4 {
-                return Length4().{ top = bottom = v; left = right = h; unit = u };
+                return Length4(Length(v, u), Length(h, u));
             }
 
             func name(t: Float, r: Float, b: Float, l: Float): Length4 {
-                return Length4().{ top = t; right = r; bottom = b; left = l; unit = u };
+                return Length4(Length(t, u), Length(r, u), Length(b, u), Length(l, u));
             }
         }
 
@@ -33,34 +59,15 @@
         defineInitializer[vmin, "vmin"];
         defineInitializer[vmax, "vmax"];
         defineInitializer[em, "em"];
-
-        handler this = temp_ref[Length4] {
-            this.top = value.top;
-            this.right = value.right;
-            this.bottom = value.bottom;
-            this.left = value.left;
-            this.unit = value.unit;
-        }
-
-        handler this == ref[Length4] : bool {
-            if this.top == value.top && this.right == value.right && this.bottom == value.bottom &&
-                this.left == value.left && this.unit == value.unit {
-                    return true;
-                }
-            return false;
-        }
-
-        handler this != ref[Length4] : bool {
-            return !(this == value);
-        }
+        defineInitializer[percent, "%"];
 
         handler this.toString(): String {
             return String.format(
-                "%f%s %f%s %f%s %f%s",
-                this.top, this.unit,
-                this.right, this.unit,
-                this.bottom, this.unit,
-                this.left, this.unit
+                "%s %s %s %s",
+                this.top.toString().buf,
+                this.right.toString().buf,
+                this.bottom.toString().buf,
+                this.left.toString().buf
             );
         }
     }

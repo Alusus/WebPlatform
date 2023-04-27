@@ -1,0 +1,151 @@
+@merge module WebPlatform {
+    macro setupStringEnum {
+        def val: String;
+        handler this~init(v: CharsPtr) { this.val = v; }
+        handler this.toString(): String { return this.val; }
+    }
+
+    macro enumStringValue[name, val] {
+        @shared def name: this_type(val);
+    }
+
+    class Position {
+        setupStringEnum[];
+        enumStringValue[STATIC, "static"];
+        enumStringValue[RELATIVE, "relative"];
+        enumStringValue[FIXED, "fixed"];
+        enumStringValue[ABSOLUTE, "absolute"];
+        enumStringValue[STICKY, "sticky"];
+    }
+
+    class Overflow {
+        setupStringEnum[];
+        enumStringValue[VISIBLE, "visible"];
+        enumStringValue[HIDDEN, "hidden"];
+        enumStringValue[CLIP, "clip"];
+        enumStringValue[SCROLL, "scroll"];
+        enumStringValue[AUTO, "auto"];
+    }
+
+    class Display {
+        setupStringEnum[];
+        enumStringValue[INLINE, "INLINE"];
+        enumStringValue[BLOCK, "block"];
+        enumStringValue[FLEX, "flex"];
+        enumStringValue[GRID, "grid"];
+        enumStringValue[NONE, "none"];
+    }
+
+    class Layout {
+        setupStringEnum[];
+        enumStringValue[ROW, "row"];
+        enumStringValue[ROW_REVERSE, "row-reverse"];
+        enumStringValue[COLUMN, "column"];
+        enumStringValue[COLUMN_REVERSE, "column-reverse"];
+    }
+
+    class Align {
+        setupStringEnum[];
+        enumStringValue[START, "start"];
+        enumStringValue[CENTER, "center"];
+        enumStringValue[END, "end"];
+        enumStringValue[STRETCH, "stretch"];
+    }
+
+    class Justify {
+        setupStringEnum[];
+        enumStringValue[START, "start"];
+        enumStringValue[CENTER, "center"];
+        enumStringValue[END, "end"];
+        enumStringValue[STRETCH, "stretch"];
+        enumStringValue[SPACE_BETWEEN, "space-between"];
+        enumStringValue[SPACE_AROUND, "space-around"];
+        enumStringValue[SPACE_EVENLY, "space_evenly"];
+    }
+
+    class Cursor {
+        setupStringEnum[];
+        enumStringValue[AUTO, "auto"];
+        enumStringValue[DEFAULT, "default"];
+        enumStringValue[HELP, "help"];
+        enumStringValue[POINTER, "pointer"];
+        enumStringValue[PROGRESS, "progress"];
+        enumStringValue[WAIT, "wait"];
+        enumStringValue[CROSSHAIR, "crosshair"];
+        enumStringValue[TEXT, "text"];
+        enumStringValue[MOVE, "move"];
+        enumStringValue[NOT_ALLOWED, "not-allowed"];
+        enumStringValue[GRAB, "grab"];
+        enumStringValue[GRABBING, "grabbing"];
+        enumStringValue[EW_RESIZE, "ew-resize"];
+        enumStringValue[NS_RESIZE, "ns-resize"];
+        enumStringValue[NESW_RESIZE, "nesw-resize"];
+        enumStringValue[NWSE_RESIZE, "nwse-resize"];
+        enumStringValue[ZOOM_IN, "zoom-in"];
+        enumStringValue[ZOOM_OUT, "zoom-out"];
+    }
+
+    class BorderStyle {
+        setupStringEnum[];
+        enumStringValue[DOTTED, "dotted"];
+        enumStringValue[DASHED, "dashed"];
+        enumStringValue[SOLID, "solid"];
+        enumStringValue[DOUBLE, "double"];
+        enumStringValue[GROOVE, "groove"];
+        enumStringValue[RIDGE, "ridge"];
+        enumStringValue[NONE, "none"];
+        enumStringValue[HIDDEN, "hidden"];
+    }
+
+    class WordBreak {
+        setupStringEnum[];
+        enumStringValue[NORMAL, "normal"];
+        enumStringValue[BREAK_ALL, "break-all"];
+        enumStringValue[KEEP_ALL, "keep-all"];
+        enumStringValue[BREAK_WORD, "break-word"];
+    }
+
+    class Direction {
+        setupStringEnum[];
+        enumStringValue[LTR, "ltr"];
+        enumStringValue[RTL, "rtl"];
+    }
+
+    class TextDecoration {
+        setupStringEnum[];
+        enumStringValue[NONE, "none"];
+        enumStringValue[UNDERLINE, "underline"];
+        enumStringValue[OVERLINE, "overline"];
+        enumStringValue[LINE_THROUGH, "line-through"];
+    }
+
+    class TextDecorationStyle {
+        setupStringEnum[];
+        enumStringValue[SOLID, "solid"];
+        enumStringValue[DOUBLE, "double"];
+        enumStringValue[DOTTED, "dotted"];
+        enumStringValue[DASHED, "dashed"];
+        enumStringValue[WAVY, "wavy"];
+    }
+
+    class TextAlign {
+        setupStringEnum[];
+        enumStringValue[LEFT, "left"];
+        enumStringValue[RIGHT, "right"];
+        enumStringValue[CENTER, "center"];
+        enumStringValue[JUSTIFY, "justify"];
+    }
+
+    def FontWeight: {
+        def NORMAL: 400;
+        def BOLD: 700;
+    }
+
+    class Floating {
+        setupStringEnum[];
+        enumStringValue[NONE, "none"];
+        enumStringValue[LEFT, "left"];
+        enumStringValue[RIGHT, "right"];
+    }
+}
+

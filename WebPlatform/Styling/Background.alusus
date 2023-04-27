@@ -1,0 +1,74 @@
+@merge module WebPlatform {
+    class Background {
+        def wkThis: WkRef[Background];
+        handler this.toString(): String as_ptr;
+
+        handler this_type(c: ref[Color]): SrdRef[Background] {
+            return SrdRef[BackgroundColor].construct().{ this.wkThis = this; color = c; };
+        }
+
+        handler this_type(u: String, repX: Bool, repY: Bool): SrdRef[Background] {
+            return SrdRef[BackgroundImage].construct().{
+                this.wkThis = this;
+                url = u;
+                repeatX = repX;
+                repeatY = repY;
+            };
+        }
+
+        handler this_type(d: Int, c: Int, args: ...any): SrdRef[Background] {
+            return SrdRef[BackgroundLinearGradient].construct().{
+                this.wkThis = this;
+                deg = d;
+                while c >= 2 {
+                    colors.add(args~next_arg[Color]);
+                    percents.add(args~next_arg[Int]);
+                    c -= 2;
+                }
+            };
+        }
+    }
+
+    class BackgroundColor {
+        @injection def background: Background;
+        def color: Color;
+
+        handler (this:Background).toString(): String set_ptr {
+            return this.color.toString();
+        }
+    }
+
+    class BackgroundImage {
+        @injection def background: Background;
+        def url: String;
+        def repeatX: Bool;
+        def repeatY: Bool;
+
+        handler (this:Background).toString(): String set_ptr {
+            return String.format(
+                "%s %s url(\"%s\")",
+                CharsPtr()~use_in(self) { if this.repeatX self = "repeat" else self = "no-repeat" },
+                CharsPtr()~use_in(self) { if this.repeatY self = "repeat" else self = "no-repeat" },
+                this.url.buf
+            );
+        }
+    }
+
+    class BackgroundLinearGradient {
+        @injection def background: Background;
+        def deg: Int;
+        def colors: Array[Color];
+        def percents: Array[Int];
+
+        handler (this:Background).toString(): String set_ptr {
+            def res: String = String.format("linear-gradient(%ideg", this.deg);
+            def i: Int;
+            for i = 0, i < this.colors.getLength(), ++i {
+                res += String.format(",%s %i%%", this.colors(i).toString().buf, this.percents(i));
+            }
+            res += ")";
+            logToConsole(res);
+            return res;
+        }
+    }
+}

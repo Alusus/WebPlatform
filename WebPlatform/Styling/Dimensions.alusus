@@ -1,6 +1,4 @@
 @merge module WebPlatform {
-    //==========================================================================
-    // Dimensions
     class Dimensions {
         def width: Int = 0;
         def height: Int = 0;

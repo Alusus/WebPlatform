@@ -13,17 +13,18 @@
         def transitionDurations: Map[String, Int];
 
         this.style.{
-            display = String("flex");
-            layout = String("row");
-            overflow = String("clip");
-            position = "relative";
+            display = Display.FLEX;
+            layout = Layout.ROW;
+            overflowX = Overflow.CLIP;
+            overflowY = Overflow.CLIP;
+            position = Position.RELATIVE;;
         };
         this.style(">stackview").{
-            width = String("100%");
-            height = String("100%");
-            position = "absolute";
-            left = "0";
-            flex = String("none");
+            width = Length.percent(100);
+            height = Length.percent(100);
+            position = Position.ABSOLUTE;
+            left = Length.pt(0);
+            flex = Flex(0, 0);
         };
         this.view = Box({})~use_in(self) {
             style = this.style;
@@ -138,14 +139,14 @@
     // Default Transitions
 
     func createSlideStackTransition (duration: Float, vertical: Bool, backward: Bool): StackTransition {
-        def start: CharsPtr;
-        def end: CharsPtr;
+        def start: SrdRef[Length];
+        def end: SrdRef[Length];
         if backward {
-            start = "0";
-            end = "100%";
+            start = Length.pt(0);
+            end = Length.percent(100);
         } else {
-            start = "100%";
-            end = "0";
+            start = Length.percent(100);
+            end = Length.pt(0);
         }
         return StackTransition().{
             totalDuration = duration * 1000000;

@@ -1,0 +1,65 @@
+@merge module WebPlatform {
+    class Shadow {
+        def inset: Bool = false;
+        def offsetX: SrdRef[Length];
+        def offsetY: SrdRef[Length];
+        def blurRadius: SrdRef[Length];
+        def spreadRadius: SrdRef[Length];
+        def color: Color;
+
+        handler this~init() {}
+        handler this~init(ox: SrdRef[Length], oy: SrdRef[Length], c: Color) {
+            this.offsetX = ox;
+            this.offsetY = oy;
+            this.color = c;
+        }
+        handler this~init(ox: SrdRef[Length], oy: SrdRef[Length], br: SrdRef[Length], sr: SrdRef[Length], c: Color) {
+            this.offsetX = ox;
+            this.offsetY = oy;
+            this.blurRadius = br;
+            this.spreadRadius = sr;
+            this.color = c;
+        }
+        handler this~init(
+            i: Bool, ox: SrdRef[Length], oy: SrdRef[Length], br: SrdRef[Length], sr: SrdRef[Length], c: Color
+        ) {
+            this.inset = i;
+            this.offsetX = ox;
+            this.offsetY = oy;
+            this.blurRadius = br;
+            this.spreadRadius = sr;
+            this.color = c;
+        }
+
+        handler this~init(temp_ref[Shadow]) {
+            this = value;
+        }
+
+        handler this = temp_ref[Shadow] {
+            this.inset = value.inset;
+            this.offsetX = value.offsetX;
+            this.offsetY = value.offsetY;
+            this.blurRadius = value.blurRadius;
+            this.spreadRadius = value.spreadRadius;
+            this.color = value.color;
+        }
+
+        handler this.toString(): String {
+            if this.blurRadius.isNull() or this.spreadRadius.isNull() {
+                return String.format(
+                    "%s %s %s %s",
+                    CharsPtr()~use_in(self) { if this.inset self = "inset" else self = "" },
+                    this.offsetX.toString().buf, this.offsetY.toString().buf, this.color.toString().buf
+                );
+            } else {
+                return String.format(
+                    "%s %s %s %s %s %s",
+                    CharsPtr()~use_in(self) { if this.inset self = "inset" else self = "" },
+                    this.offsetX.toString().buf, this.offsetY.toString().buf,
+                    this.blurRadius.toString().buf, this.spreadRadius.toString().buf,
+                    this.color.toString().buf
+                );
+            }
+        }
+    }
+}

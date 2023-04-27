@@ -1,6 +1,4 @@
 @merge module WebPlatform {
-    //==========================================================================
-    // Transition
     class Transition {
         def duration: Float = 0;
         def fn: String;

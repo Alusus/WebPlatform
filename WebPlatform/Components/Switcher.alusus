@@ -14,19 +14,20 @@
         def shouldPreserveChild: closure (child: ref[Widget]): Bool;
 
         this.style.{
-            display = String("flex");
-            layout = String("row");
-            overflow = String("clip");
-            position = "relative";
+            display = Display.FLEX;
+            layout = Layout.ROW;
+            overflowX = Overflow.CLIP;
+            overflowY = Overflow.CLIP;
+            position = Position.RELATIVE;
         };
         this.style(">switcherview").{
-            width = String("100%");
-            height = String("100%");
-            position = "absolute";
-            flex = String("none");
+            width = Length.percent(100);
+            height = Length.percent(100);
+            position = Position.ABSOLUTE;
+            flex = Flex(0, 0);
         };
         this.style(">hiddenview").{
-            display = "none";
+            display = Display.NONE;
         };
         this.view = Box({})~use_in(self) {
             style = this.style;
@@ -142,29 +143,29 @@
     // Default Transitions
 
     func createSlideSwitcherTransition (duration: Float, vertical: Bool, backward: Bool): SwitcherTransition {
-        def currentEnd: CharsPtr;
-        def incomingStart: CharsPtr;
+        def currentEnd: SrdRef[Length];
+        def incomingStart: SrdRef[Length];
         if backward {
-            currentEnd = "100%";
-            incomingStart = "-100%";
+            currentEnd = Length.percent(100);
+            incomingStart = Length.percent(-100);
         } else {
-            currentEnd = "-100%";
-            incomingStart = "100%";
+            currentEnd = Length.percent(-100);
+            incomingStart = Length.percent(100);
         }
         return SwitcherTransition().{
             totalDuration = duration * 1000000;
             currentViewStyle.{
                 if vertical top = currentEnd else left = currentEnd;
                 animation = Animation(duration, Array[Style]({
-                    Style().{ if vertical top = "0" else left = "0" },
+                    Style().{ if vertical top = Length.pt(0) else left = Length.pt(0) },
                     Style().{ if vertical top = currentEnd else left = currentEnd }
                 }));
             };
             incomingViewStyle.{
-                if vertical top = "0" else left = "0";
+                if vertical top = Length.pt(0) else left = Length.pt(0);
                 animation = Animation(duration, Array[Style]({
                     Style().{ if vertical top = incomingStart else left = incomingStart },
-                    Style().{ if vertical top = "0" else left = "0" }
+                    Style().{ if vertical top = Length.pt(0) else left = Length.pt(0) }
                 }));
             }
         }
@@ -174,7 +175,7 @@
         return SwitcherTransition().{
             totalDuration = duration * 1000000;
             currentViewStyle.{
-                left = "0";
+                left = Length.pt(0);
                 opacity = 0.0;
                 animation = Animation(duration, Array[Style]({
                     Style().{ opacity = 1.0 },
@@ -182,7 +183,7 @@
                 }));
             };
             incomingViewStyle.{
-                left = "0";
+                left = Length.pt(0);
                 animation = Animation(duration, Array[Style]({
                     Style().{ opacity = 0.0 },
                     Style().{ opacity = 1.0 }
