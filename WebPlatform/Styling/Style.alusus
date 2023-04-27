@@ -5,63 +5,66 @@
     class Style {
         // Variables
 
-        def id: String;
-        def selector: String;
         def props: Map[String, String];
+        def transitions: Map[String, String];
+        def inUse: Bool = false;
         def onUpdated: closure();
 
         // Properties
 
-        generateStringStyleProp[width, "width"];
-        generateStringStyleProp[height, "height"];
-        generateStringStyleProp[minWidth, "min-width"];
-        generateStringStyleProp[minHeight, "min-height"];
-        generateStringStyleProp[maxWidth, "max-width"];
-        generateStringStyleProp[maxHeight, "max-height"];
-        generateQuadStyleProp[borderWidth, "border-width"];
-        generateColorStyleProp[borderColor, "border-color"];
-        generateQuadStyleProp[borderRadius, "border-radius"];
-        generateStringStyleProp[borderStyle, "border-style"];
-        generateQuadStyleProp[outlineWidth, "outline-width"];
-        generateQuadStyleProp[outlineOffset, "outline-offset"];
-        generateColorStyleProp[outlineColor, "outline-color"];
-        generateStringStyleProp[outlineStyle, "outline-style"];
-        generateStringStyleProp[floating, "float"];
-        generateStringStyleProp[position, "position"];
-        generateStringStyleProp[zIndex, "z-index"];
-        generateStringStyleProp[flex, "flex"];
-        generateStringStyleProp[layout, "flex-direction"];
-        generateStringStyleProp[justify, "justify-content"];
-        generateQuadStyleProp[margin, "margin"];
-        generateStringStyleProp[align, "align-items"];
-        generateStringStyleProp[textAlign, "text-align"];
-        generateStringStyleProp[textDecoration, "text-decoration"];
-        generateStringStyleProp[direction, "direction"];
-        generateQuadStyleProp[padding, "padding"];
-        generateFloatPtStyleProp[fontSize, "font-size"];
-        generateFloatPtStyleProp[lineHeight, "line-height"];
-        generateColorStyleProp[fontColor, "color"];
+        generateTypedStyleProp[width, "width", Length];
+        generateTypedStyleProp[height, "height", Length];
+        generateTypedStyleProp[minWidth, "min-width", Length];
+        generateTypedStyleProp[minHeight, "min-height", Length];
+        generateTypedStyleProp[maxWidth, "max-width", Length];
+        generateTypedStyleProp[maxHeight, "max-height", Length];
+        generateTypedStyleProp[borderWidth, "border-width", Length4];
+        generateTypedStyleProp[borderRadius, "border-radius", Length4];
+        generateTypedStyleProp[borderColor, "border-color", Color];
+        generateTypedStyleProp[borderStyle, "border-style", BorderStyle];
+        generateTypedStyleProp[outlineWidth, "outline-width", Length4];
+        generateTypedStyleProp[outlineOffset, "outline-offset", Length4];
+        generateTypedStyleProp[outlineColor, "outline-color", Color];
+        generateTypedStyleProp[outlineStyle, "outline-style", BorderStyle];
+        generateTypedStyleProp[floating, "float", Floating];
+        generateTypedStyleProp[position, "position", Position];
+        generateIntStyleProp[zIndex, "z-index"];
+        generateTypedStyleProp[flex, "flex", Flex];
+        generateTypedStyleProp[layout, "flex-direction", Layout];
+        generateTypedStyleProp[justify, "justify-content", Justify];
+        generateTypedStyleProp[margin, "margin", Length4];
+        generateTypedStyleProp[padding, "padding", Length4];
+        generateTypedStyleProp[align, "align-items", Align];
+        generateTypedStyleProp[textAlign, "text-align", TextAlign];
+        generateTypedStyleProp[textDecoration, "text-decoration", TextDecoration];
+        generateTypedStyleProp[textDecorationColor, "text-decoration-color", Color];
+        generateTypedStyleProp[textDecorationStyle, "text-decoration-style", TextDecorationStyle];
+        generateTypedStyleProp[textDecorationThickness, "text-decoration-thickness", Length];
+        generateTypedStyleProp[direction, "direction", Direction];
+        generateTypedStyleProp[fontSize, "font-size", Length];
+        generateTypedStyleProp[lineHeight, "line-height", Length];
+        generateTypedStyleProp[fontColor, "color", Color];
         generateStringStyleProp[fontFamily, "font-family"];
-        generateStringStyleProp[fontWeight, "font-weight"];
+        generateIntStyleProp[fontWeight, "font-weight"];
         generateFloatStyleProp[opacity, "opacity"];
-        generateStringStyleProp[transition, "transition"];
         generateStringStyleProp[transform, "transform"];
-        generateStringStyleProp[translate, "translate"];
-        generateStringStyleProp[overflow, "overflow"];
-        generateStringStyleProp[boxShadow, "box-shadow"];
-        generateStringStyleProp[display, "display"];
-        generateStringStyleProp[cursor, "cursor"];
-        generateStringStyleProp[top, "top"];
-        generateStringStyleProp[left, "left"];
-        generateStringStyleProp[right, "right"];
-        generateStringStyleProp[bottom, "bottom"];
-        generateColorStyleProp[background, "background"];
+        generateTypedStyleProp[overflowX, "overflow-x", Overflow];
+        generateTypedStyleProp[overflowY, "overflow-y", Overflow];
+        generateTypedStyleProp[boxShadow, "box-shadow", Shadow];
+        generateTypedStyleProp[display, "display", Display];
+        generateTypedStyleProp[cursor, "cursor", Cursor];
+        generateTypedStyleProp[top, "top", Length];
+        generateTypedStyleProp[left, "left", Length];
+        generateTypedStyleProp[right, "right", Length];
+        generateTypedStyleProp[bottom, "bottom", Length];
+        generateTypedStyleProp[background, "background", Background];
+        generateTypedStyleProp[wordBreak, "word-break", WordBreak];
 
         def vanimation: SrdRef[Animation];
         handler this.animation = (val: SrdRef[Animation]) {
-            if !this.vanimation.isNull() and this.id != "" this.vanimation.unbuild();
+            if !this.vanimation.isNull() and this.inUse this.vanimation.unbuild();
             this.vanimation = val;
-            if !this.vanimation.isNull() and this.id != "" this.vanimation.build();
+            if !this.vanimation.isNull() and this.inUse this.vanimation.build();
             this.onPropUpdated();
             return this.vanimation;
         }
@@ -79,33 +82,13 @@
 
         handler this = ref[Style] {
             this.props = value.props;
-            this.vanimation = value.vanimation;
-            this.onPropUpdated();
+            this.animation = value.animation;
         }
 
         // Functions
 
         handler this.onPropUpdated() {
             if !this.onUpdated.isNull() this.onUpdated();
-            this.update();
-        }
-
-        handler this.build(id: String, selector: String) {
-            this.id = id;
-            this.selector = selector;
-            if !this.vanimation.isNull() this.vanimation.build();
-            this.update();
-        }
-
-        handler this.unbuild() {
-            if this.id == "" return;
-            if !this.vanimation.isNull() this.vanimation.unbuild();
-            removeStyleRule(this.id, this.selector);
-        }
-
-        handler this.update() {
-            if this.id == "" return;
-            setStyleRule(this.id, this.selector, this.getCssString());
         }
 
         handler this.getCssString(): String {
@@ -114,16 +97,75 @@
             for i = 0, i < this.props.getLength(), ++i {
                 styleRep += this.props.keyAt(i) + ":" + this.props.valAt(i) + ";";
             }
+            if this.transitions.getLength() > 0 {
+                styleRep += "transition:";
+                for i = 0, i < this.transitions.getLength(), ++i {
+                    if i != 0 styleRep += ",";
+                    styleRep += this.transitions.keyAt(i) + " " + this.transitions.valAt(i);
+                }
+                styleRep += ";";
+            }
             if !this.vanimation.isNull() {
                 styleRep += String.format("animation-name:%s;", this.vanimation.name.buf);
                 styleRep += String.format("animation-duration:%fs;", this.vanimation.totalDuration);
             }
             return styleRep;
         }
+
+        handler [styleProp: ast] this.setRawStyle(val: String) {
+            def styleName: String = preprocess {
+                use Core.Basic;
+                use Core.Data.Ast;
+                def elements: Array[ref[Core.Basic.TiObject]] = Spp.astMgr.findElements(
+                    styleProp~ast,
+                    this_type~ast,
+                    Spp.SeekerFlags.SKIP_OWNERS | Spp.SeekerFlags.SKIP_USES | Spp.SeekerFlags.SKIP_CHILDREN
+                );
+                if elements.getLength() == 0 {
+                    Spp.buildMgr.raiseBuildNotice("SPPA1007", 1, styleProp~ast);
+                    return;
+                }
+                def i: Int;
+                for i = 0, i < elements.getLength(), ++i {
+                    def mod: ref[TiObject](Spp.astMgr.findModifierForElement(elements(i), "style"));
+                    if mod~ptr == 0 continue;
+                    def params: Array[String];
+                    Spp.astMgr.getModifierStringParams(mod, params);
+                    if params.getLength() == 0 continue;
+                    Spp.astMgr.insertAst(
+                        (ast strLiteral),
+                        Srl.Map[String, ref[TiObject]]().set(String("strLiteral"), StringLiteral(params(0)))
+                    );
+                    break;
+                }
+                if i == elements.getLength() {
+                    Spp.buildMgr.raiseBuildNotice("SPPA1002", 1, styleProp~ast);
+                }
+            };
+            this.props(styleName) = val;
+            this.onPropUpdated();
+        }
+
+        handler this.setRawStyle(styleName: String, styleVal: String) {
+            this.props(styleName) = styleVal;
+            this.onPropUpdated();
+        }
     }
 
     //==========================================================================
     // Helper Macros
+
+    macro generateStyleProp [propName, styleName] {
+        handler this.__propName__Transition = (val: ref[Transition]) {
+            this.transitions(String(styleName)) = val.toString();
+            this.onPropUpdated();
+            return val;
+        }
+        @style[styleName]
+        handler this.propName: ref[String] {
+            return this.props(String(styleName));
+        }
+    }
 
     macro generateStringStyleProp [propName, styleName] {
         handler this.propName = (val: CharsPtr) {
@@ -136,49 +178,33 @@
             this.onPropUpdated();
             return val;
         }
-        handler this.propName: ref[String] {
-            return this.props(String(styleName));
-        }
+        generateStyleProp[propName, styleName];
     }
 
-    macro generateColorStyleProp [propName, styleName] {
-        handler this.propName = (val: ref[Color]) {
-            this.props(String(styleName)) = String.format(
-                "rgba(%i, %i, %i, %i)", val.red, val.green, val.blue, val.alpha
-            );
+    macro generateTypedStyleProp [propName, styleName, Tp] {
+        handler this.propName = (val: temp_ref[Tp]) {
+            this.props(String(styleName)) = val.toString();
             this.onPropUpdated();
             return val;
         }
-        generateStringStyleProp[propName, styleName];
+        generateStyleProp[propName, styleName];
     }
 
     macro generateFloatStyleProp [propName, styleName] {
         handler this.propName = (val: Float) {
-            this.props(String(styleName)) = String.format("%f", val);
+            this.props(String(styleName)) = String() + val;
             this.onPropUpdated();
             return val;
         }
-        generateStringStyleProp[propName, styleName];
+        generateStyleProp[propName, styleName];
     }
 
-    macro generateFloatPtStyleProp [propName, styleName] {
-        handler this.propName = (val: Float) {
-            this.props(String(styleName)) = String.format("%fpt", val);
+    macro generateIntStyleProp [propName, styleName] {
+        handler this.propName = (val: Int) {
+            this.props(String(styleName)) = String() + val;
             this.onPropUpdated();
             return val;
         }
-        generateStringStyleProp[propName, styleName];
-    }
-
-    macro generateQuadStyleProp [propName, styleName] {
-        handler this.propName = (val: ref[Quad]) {
-            this.props(String(styleName)) = String.format(
-                "%fpt %fpt %fpt %fpt", val.top, val.right, val.bottom, val.left
-            );
-            this.onPropUpdated();
-            return val;
-        }
-        generateStringStyleProp[propName, styleName];
+        generateStyleProp[propName, styleName];
     }
 }
-

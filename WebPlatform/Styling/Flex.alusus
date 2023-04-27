@@ -1,0 +1,48 @@
+@merge module WebPlatform {
+    class Flex {
+        def grow: Float;
+        def shrink: Float;
+        def basis: SrdRef[Length];
+
+        handler this~init() {}
+        handler this~init(g: Float) {
+            this.grow = g;
+            this.shrink = -1;
+        }
+        handler this~init(g: Float, s: Float) {
+            this.grow = g;
+            this.shrink = s;
+        }
+        handler this~init(g: Float, b: SrdRef[Length]) {
+            this.grow = g;
+            this.shrink = -1;
+            this.basis = b;
+        }
+        handler this~init(g: Float, s: Float, b: SrdRef[Length]) {
+            this.grow = g;
+            this.shrink = s;
+            this.basis = b;
+        }
+
+        handler this~init(temp_ref[Flex]) {
+            this = value;
+        }
+        handler this = temp_ref[Flex] {
+            this.grow = value.grow;
+            this.shrink = value.shrink;
+            this.basis = value.basis;
+        }
+
+        handler this.toString(): String {
+            if this.shrink >= 0 and not this.basis.isNull() {
+                return String.format("%f %f %s", this.grow, this.shrink, this.basis.toString().buf);
+            } else if this.shrink >= 0 {
+                return String.format("%f %f", this.grow, this.shrink);
+            } else if not this.basis.isNull() {
+                return String.format("%f %s", this.grow, this.basis.toString().buf);
+            } else {
+                return String.format("%f", this.grow);
+            }
+        }
+    }
+}

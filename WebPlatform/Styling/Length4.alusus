@@ -1,0 +1,75 @@
+@merge module WebPlatform {
+    //==========================================================================
+    // Length4
+    // A tuple of four length values used for UI length values. It's used
+    // elements with four values, like the border thickness, padding, margin,
+    // etc.
+    class Length4 {
+        def top: SrdRef[Length];
+        def right: SrdRef[Length];
+        def bottom: SrdRef[Length];
+        def left: SrdRef[Length];
+
+        handler this~init(v: SrdRef[Length]) {
+            this.top = this.right = this.bottom = this.left = v;
+        }
+
+        handler this~init(v: SrdRef[Length], h: SrdRef[Length]) {
+            this.top = this.bottom = v;
+            this.left = this.right = h;
+        }
+
+        handler this~init(t: SrdRef[Length], r: SrdRef[Length], b: SrdRef[Length], l: SrdRef[Length]) {
+            this.top = t;
+            this.right = r;
+            this.bottom = b;
+            this.left = l;
+        }
+
+        handler this~init(that: ref[this_type]) {
+            this = that;
+        }
+
+        handler this = temp_ref[Length4] {
+            this.top = value.top;
+            this.right = value.right;
+            this.bottom = value.bottom;
+            this.left = value.left;
+        }
+
+        macro defineInitializer[name, u] {
+            func name(v: Float): Length4 {
+                return Length4(Length(v, u));
+            }
+
+            func name(v: Float, h: Float): Length4 {
+                return Length4(Length(v, u), Length(h, u));
+            }
+
+            func name(t: Float, r: Float, b: Float, l: Float): Length4 {
+                return Length4(Length(t, u), Length(r, u), Length(b, u), Length(l, u));
+            }
+        }
+
+        defineInitializer[px, "px"];
+        defineInitializer[pt, "pt"];
+        defineInitializer[mm, "mm"];
+        defineInitializer[vw, "vw"];
+        defineInitializer[vh, "vh"];
+        defineInitializer[vmin, "vmin"];
+        defineInitializer[vmax, "vmax"];
+        defineInitializer[em, "em"];
+        defineInitializer[percent, "%"];
+
+        handler this.toString(): String {
+            return String.format(
+                "%s %s %s %s",
+                this.top.toString().buf,
+                this.right.toString().buf,
+                this.bottom.toString().buf,
+                this.left.toString().buf
+            );
+        }
+    }
+}
+

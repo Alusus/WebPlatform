@@ -46,22 +46,22 @@ class MenuButton {
     handler this~init(link: String, label: String) {
         this.view = Box({}).{
             style.{
-                layout = "row";
-                align = "center";
-                textAlign = "center";
-                width = "60pt";
-                cursor = "pointer";
-                transition = ".3s";
+                layout = Layout.ROW;
+                align = Align.CENTER;
+                textAlign = TextAlign.CENTER;
+                width = Length.pt(60);
+                cursor = Cursor.POINTER;
+                transformTransition = Transition(0.3);
             };
             style(">label").{
-                fontSize = 14.0;
+                fontSize = Length.pt(14.0);
                 fontColor = Color("444");
             }
             style({ StateSelector.HOVER }).{
-                transform = "scale(1.3)";
+                transform = Transform.scale(1.3);
             }
             style({ StateSelector.HOVER, ">label" }).{
-                fontSize = 14.0;
+                fontSize = Length.pt(14.0);
                 fontColor = Color("000");
             }
             onClick.connect(closure (widget: ref[Widget], payload: ref[Int]) {
@@ -88,17 +88,17 @@ class SideButton {
         def self: ref[this_type](this);
         this.view = Box({}).{
             style.{
-                align = "center";
-                cursor = "pointer";
-                width = "40pt";
-                textAlign = "center";
+                align = Align.CENTER;
+                cursor = Cursor.POINTER;
+                width = Length.pt(40);
+                textAlign = TextAlign.CENTER;
             };
             style(">label").{
-                fontSize = 14.0;
+                fontSize = Length.pt(14.0);
                 fontColor = Color("444");
             }
             style({ StateSelector.HOVER, ">label" }).{
-                fontSize = 14.0;
+                fontSize = Length.pt(14.0);
                 fontColor = Color("000");
             }
             onClick.connect(closure (widget: ref[Widget], payload: ref[Int]) {
@@ -125,57 +125,57 @@ class Header {
         def self: ref[this_type](this);
         this.view = Box({}).{
             style.{
-                width = "100%";
-                height = "85pt";
-                padding = Quad(4, 0, 0, 0);
-                borderWidth = Quad(0, 0, 3, 0);
-                borderStyle = "solid";
+                width = Length.percent(100);
+                height = Length.pt(85);
+                padding = Length4.pt(4, 0, 0, 0);
+                borderWidth = Length4.pt(0, 0, 3, 0);
+                borderStyle = BorderStyle.SOLID;
                 borderColor = Color("666");
-                justify = "space-between";
-                align = "center";
-                display = "flex";
-                layout = "column";
+                justify = Justify.SPACE_BETWEEN;
+                align = Align.CENTER;
+                display = Display.FLEX;
+                layout = Layout.COLUMN;
             };
             def i: Int;
             for i = 0, i < 3, ++i {
                 style(String(">>indicator")+i).{
-                    width = "60pt";
-                    height = "3pt";
-                    background = Color(0, 0, 150);
-                    transform=String.format("translateX(%ipt)", i * 60);
-                    transition=String(".5s");
+                    width = Length.pt(60);
+                    height = Length.pt(3);
+                    background = Background(Color(0, 0, 150));
+                    transform = Transform.translate(Length.pt(i * 60), Length.pt(0));
+                    transformTransition = Transition(0.5);
                 };
             }
 
             addChildren({
                 Box({}).{
                     style.{
-                        display = "flex";
-                        layout = "row";
-                        justify = "space-between";
-                        align = "center";
+                        display = Display.FLEX;
+                        layout = Layout.ROW;
+                        justify = Justify.SPACE_BETWEEN;
+                        align = Align.CENTER;
                     };
                     addChildren({
                         Image().{
                             url = String("/Assets/wblogo.svg");
                             style.{
-                                height = "50pt";
-                                padding = Quad(0, 10);
+                                height = Length.pt(50);
+                                padding = Length4.pt(0, 10);
                             };
                         },
                         Box({ Text(String("Alusus Web Platform Example")).{ style.{
                             fontColor = Color("000");
-                            fontSize = 21.0;
-                            height = "100%";
-                            padding = Quad(0, 10);
+                            fontSize = Length.pt(21.0);
+                            height = Length.percent(100);
+                            padding = Length4.pt(0, 10);
                         } } })
                     });
                 },
                 Box({}).{
                     style.{
-                        display = "flex";
-                        layout = "row";
-                        justify = "center";
+                        display = Display.FLEX;
+                        layout = Layout.ROW;
+                        justify = Justify.CENTER;
                     };
                     addChildren({
                         MenuButton(String("/one"), String("One")),
@@ -185,11 +185,11 @@ class Header {
                 },
                 Box({}).{
                     style.{
-                        display = "flex";
-                        layout = "row";
-                        justify = "start";
-                        width = "180pt";
-                        padding = Quad(0, 0, 4, 0);
+                        display = Display.FLEX;
+                        layout = Layout.ROW;
+                        justify = Justify.START;
+                        width = Length.pt(180);
+                        padding = Length4.pt(0, 0, 4, 0);
                     };
                     addChildren({
                         Box({}).{
@@ -220,11 +220,11 @@ class Article {
         def self: ref[this_type](this);
         this.view = Box({}).{
             style.{
-                align = "end";
-                display = "flex";
-                layout = "column";
-                height = "100%";
-                overflow = "scroll";
+                align = Align.END;
+                display = Display.FLEX;
+                layout = Layout.COLUMN;
+                height = Length.percent(100);
+                overflowY = Overflow.SCROLL;
             };
             addChildren({
                 SideButton(String("🖉")).{
@@ -235,9 +235,9 @@ class Article {
                 DocView().{
                     self.docView = this;
                     style.{
-                        width = "100%";
+                        width = Length.percent(100);
                         fontColor = Color(0, 0, 0);
-                        fontSize = 20.0;
+                        fontSize = Length.pt(20.0);
                     }
                     setMarkdown(article);
                 }
@@ -259,12 +259,12 @@ class ArticleEditor {
         def self: ref[this_type](this);
         this.view = Box({}).{
             style.{
-                width = "100%";
-                height = "100%";
-                align = "end";
-                display = "flex";
-                layout = "column";
-                background = "white";
+                width = Length.percent(100);
+                height = Length.percent(100);
+                align = Align.END;
+                display = Display.FLEX;
+                layout = Layout.COLUMN;
+                background = Background(Color("fff"));
             };
             addChildren({
                 SideButton(String("💾")).{ onButtonClicked = closure() {
@@ -272,9 +272,9 @@ class ArticleEditor {
                 } },
                 TextInput().{
                     style.{
-                        width = "100%";
-                        height = "100%";
-                        fontSize = 20.0;
+                        width = Length.percent(100);
+                        height = Length.percent(100);
+                        fontSize = Length.pt(20.0);
                     };
                     text = str;
                     self.textInput = this;
@@ -296,8 +296,8 @@ class ArticleView {
         def self: ref[this_type](this);
         this.view = RoutingStack().{
             style.{
-                width = "100%";
-                height = "100%";
+                width = Length.percent(100);
+                height = Length.percent(100);
             };
             setTransition(
                 createSlideStackTransition(0.5, true, false),
@@ -331,8 +331,8 @@ class ImgView {
         this.view = Image().{
             url = path;
             style.{
-                width = "100%";
-                height = "100%";
+                width = Length.percent(100);
+                height = Length.percent(100);
             };
         };
     }
@@ -348,16 +348,16 @@ class ImageViewer {
     handler this~init() {
         this.view = Box({}).{
             style.{
-                width = "100%";
-                height = "100%";
-                display = "flex";
-                layout = "row";
+                width = Length.percent(100);
+                height = Length.percent(100);
+                display = Display.FLEX;
+                layout = Layout.ROW;
             };
             addChildren({
                 Box({}).{
                     style.{
-                        layout = "column";
-                        background = Color("eee");
+                        layout = Layout.COLUMN;
+                        background = Background(Color("eee"));
                     };
                     addChildren({
                         SideButton(String("1")).{ onButtonClicked = closure() { Window.instance.pushLocation("/one/img1") } },
@@ -367,13 +367,13 @@ class ImageViewer {
                 },
                 Box({}).{
                     style.{
-                        flex = "auto";
+                        flex = Flex(1, 1);
                     };
                     addChildren({
                         RoutingSwitcher().{
                             style.{
-                                flex = "auto";
-                                height = "500pt";
+                                flex = Flex(1, 1);
+                                height = Length.pt(500);
                             };
                             setTransition(
                                 createFadeSwitcherTransition(1.0),
@@ -406,30 +406,30 @@ class DigitView {
     handler this~init(label: String) {
         this.view = Box({}).{
             style.{
-                width = "100%";
-                height = "100%";
-                display = "flex";
-                align = "center";
-                justify = "center";
+                width = Length.percent(100);
+                height = Length.percent(100);
+                display = Display.FLEX;
+                align = Align.CENTER;
+                justify = Justify.CENTER;
             };
             addChildren({
                 Box({}).{
                     style.{
-                        width = "90%";
-                        height = "90%";
-                        borderRadius = Quad(30);
+                        width = Length.percent(90);
+                        height = Length.percent(90);
+                        borderRadius = Length4.pt(30);
                         borderColor = Color("444");
-                        borderStyle = "solid";
-                        borderWidth = Quad(10);
-                        display = "flex";
-                        align = "center";
-                        justify = "center";
+                        borderStyle = BorderStyle.SOLID;
+                        borderWidth = Length4.pt(10);
+                        display = Display.FLEX;
+                        align = Align.CENTER;
+                        justify = Justify.CENTER;
                     };
                     addChildren({
                         Text(label).{
                             style.{
                                 fontColor = Color(0, 0, 0);
-                                fontSize = 250.0;
+                                fontSize = Length.pt(250.0);
                             }
                         }
                     });
@@ -452,16 +452,16 @@ class CounterView {
         def self: ref[this_type](this);
         this.view = Box({}).{
             style.{
-                width = "100%";
-                height = "100%";
-                display = "flex";
-                layout = "row";
+                width = Length.percent(100);
+                height = Length.percent(100);
+                display = Display.FLEX;
+                layout = Layout.ROW;
             };
             addChildren({
                 Box({}).{
                     style.{
-                        layout = "column";
-                        background = Color("eee");
+                        layout = Layout.COLUMN;
+                        background = Background(Color("eee"));
                     };
                     addChildren({
                         SideButton(String("-")).{ onButtonClicked = closure() {
@@ -474,13 +474,13 @@ class CounterView {
                 },
                 Box({}).{
                     style.{
-                        flex = "auto";
+                        flex = Flex(1, 1);
                     };
                     addChildren({
                         Switcher().{
                             style.{
-                                flex = "auto";
-                                height = "500pt";
+                                flex = Flex(1, 1);
+                                height = Length.pt(500);
                             };
                             setTransition(String("forward"), createSlideSwitcherTransition(0.5, true, false));
                             setTransition(String("backward"), createSlideSwitcherTransition(0.5, true, true));
@@ -503,22 +503,25 @@ class CounterView {
 
 @uiEndpoint["/*", "WebPlatform Example"]
 func main {
-    setElementAttribute("body", "style", "padding: 0; margin: 0;");
     def switcher: SrdRef[Switcher];
     def header: SrdRef[Header];
+    Window.instance.style.{
+        padding = Length4.pt(0);
+        margin = Length4.pt(0);
+    };
     Window.instance.setView(Box({}).{
         style.{
-            display = "flex";
-            layout = "column";
-            align = "center";
+            display = Display.FLEX;
+            layout = Layout.COLUMN;
+            align = Align.CENTER;
         };
         addChildren({
             Header().{ header = this },
             RoutingSwitcher().{
                 style.{
-                    width = "100%";
-                    maxWidth = "600pt";
-                    minHeight = "500pt";
+                    width = Length.percent(100);
+                    maxWidth = Length.pt(600);
+                    minHeight = Length.pt(500);
                 };
                 setTransition(
                     createSlideSwitcherTransition(0.5, false, false),

@@ -42,28 +42,27 @@ class MenuButton {
     handler this~init(link: String, label: String, icon: String) {
         this.view = Box({}).{
             style.{
-                padding = Quad(3);
-                background = LIGHT_COLOR;
-                display = "flex";
-                layout = "row";
-                align = "center";
+                padding = Length4.pt(3);
+                background = Background(LIGHT_COLOR);
+                display = Display.FLEX;
+                layout = Layout.ROW;
+                align = Align.CENTER;
             };
             style(">>icon").{
-                padding = Quad(0, 4);
-                width = "20pt";
-                height = "0pt";
-                transition = ".2s";
+                padding = Length4.pt(0, 4);
+                width = Length.pt(20);
+                height = Length.pt(0);
+                heightTransition = Transition(0.2);
             }
             style(">>label").{
-                fontSize = 16.0;
+                fontSize = Length.pt(16.0);
                 fontColor = Color("eee");
             }
             style({ StateSelector.HOVER, ">>icon" }).{
-                height = "20pt";
-                transition = ".2s";
+                height = Length.pt(20)
             }
             style({ StateSelector.HOVER, ">>label" }).{
-                fontSize = 16.0;
+                fontSize = Length.pt(16.0);
                 fontColor = Color("fff");
             }
             addChildren({
@@ -89,47 +88,47 @@ class Header {
     handler this~init() {
         this.view = Box({}).{
             style.{
-                width = "calc(100% - 3pt)";
-                height = "85pt";
-                padding = Quad(4, 0, 0, 0);
-                background = PRIMARY_COLOR;
-                borderWidth = Quad(1.5);
-                borderStyle = "solid";
+                width = Length.percent(100) - Length.pt(3);
+                height = Length.pt(85);
+                padding = Length4.pt(4, 0, 0, 0);
+                background = Background(PRIMARY_COLOR);
+                borderWidth = Length4.pt(1.5);
+                borderStyle = BorderStyle.SOLID;
                 borderColor = PRIMARY_COLOR;
-                justify = "space-between";
-                display = "flex";
-                layout = "column";
+                justify = Justify.SPACE_BETWEEN;
+                display = Display.FLEX;
+                layout = Layout.COLUMN;
             };
 
             addChildren({
                 Box({}).{
                     style.{
-                        display = "flex";
-                        layout = "row";
-                        justify = "space-between";
-                        align = "center";
+                        display = Display.FLEX;
+                        layout = Layout.ROW;
+                        justify = Justify.SPACE_BETWEEN;
+                        align = Align.CENTER;
                     };
                     addChildren({
                         Box({ Text(String("Alusus Web Platform Examples - Chat")).{ style.{
                             fontColor = Color("fff");
-                            fontSize = 18.0;
-                            height = "100%";
-                            padding = Quad(0, 10);
+                            fontSize = Length.pt(18.0);
+                            height = Length.percent(100);
+                            padding = Length4.pt(0, 10);
                         } } }),
                         Image().{
                             url = String("/Assets/wblogo.svg");
                             style.{
-                                height = "50pt";
-                                padding = Quad(0, 10);
+                                height = Length.pt(50);
+                                padding = Length4.pt(0, 10);
                             };
                         }
                     });
                 },
                 Box({}).{
                     style.{
-                        display = "flex";
-                        layout = "row";
-                        justify = "space-between";
+                        display = Display.FLEX;
+                        layout = Layout.ROW;
+                        justify = Justify.SPACE_BETWEEN;
                     };
                     addChildren({
                         MenuButton(String("/"), String("Main"), String("/Assets/chat.svg")),
@@ -151,12 +150,12 @@ class TextEntry {
     def onNewEntry: closure (String);
     def textInput: SrdRef[TextInput];
 
-    handler this.width = String {
+    handler this.width = SrdRef[Length] {
         this.view.style.width = value;
         return value;
     }
 
-    handler this.height = String {
+    handler this.height = SrdRef[Length] {
         this.view.style.height = value;
         return value;
     }
@@ -166,22 +165,22 @@ class TextEntry {
 
         this.view = Box({}).{
             style.{
-                display = "flex";
-                layout = "row";
-                justify = "space-between";
-                borderWidth = Quad(1.5);
-                borderStyle = "solid";
+                display = Display.FLEX;
+                layout = Layout.ROW;
+                justify = Justify.SPACE_BETWEEN;
+                borderWidth = Length4.pt(1.5);
+                borderStyle = BorderStyle.SOLID;
                 borderColor = PRIMARY_COLOR;
-                background = PRIMARY_COLOR;
+                background = Background(PRIMARY_COLOR);
             };
             addChildren({
                 TextInput().{
                     self.textInput = this;
                     style.{
-                        width = "100%";
-                        height = "100%";
-                        background = Color("fff");
-                        fontSize = 12.0;
+                        width = Length.percent(100);
+                        height = Length.percent(100);
+                        background = Background(Color("fff"));
+                        fontSize = Length.pt(12.0);
                     };
                     onKeyUp.connect(closure (widget: ref[TextInput], payload: ref[String]) {
                         if payload == "Shift+Enter" {
@@ -193,11 +192,11 @@ class TextEntry {
                 },
                 Button(String("Send")).{
                     style.{
-                        height = "100%";
-                        width = "50pt";
-                        background = Color(200, 200, 200);
-                        fontSize = 16.0;
-                        justify = "center";
+                        height = Length.percent(100);
+                        width = Length.pt(50);
+                        background = Background(Color(200, 200, 200));
+                        fontSize = Length.pt(16.0);
+                        justify = Justify.CENTER;
                     };
                     onClick.connect(closure (widget: ref[Widget], payload: ref[Int]) {
                         def newData: String = String("- ") + encodeHtml(self.textInput.getText()).trim();
@@ -226,45 +225,46 @@ func encodeHtml(str: String): String {
 
 @uiEndpoint["/", "WebPlatform Example - Chat"]
 func main {
-    setElementAttribute("body", "style", "padding: 0; margin: 0;");
-
     def onFetch: closure (json: Json);
 
+    Window.instance.style.{
+        padding = Length4.pt(0);
+        margin = Length4.pt(0);
+    };
     Window.instance.setView(Box({}).{
         style.{
-            height = "100%";
-            justify = "space-between";
-            display = "flex";
-            layout = "column";
+            height = Length.percent(100);
+            justify = Justify.SPACE_BETWEEN;
+            display = Display.FLEX;
+            layout = Layout.COLUMN;
         };
         addChildren({
             Header(),
             Box({}).{
                 style.{
-                    width = "calc(100% - 10pt)";
-                    height = "auto-flex";
-                    padding = Quad(5);
-                    display = "flex";
-                    layout = "column";
-                    flex = "auto";
+                    width = Length.percent(100) - Length.pt(10);
+                    padding = Length4.pt(5);
+                    display = Display.FLEX;
+                    layout = Layout.COLUMN;
+                    flex = Flex(1);
                 };
                 def notificationLabel: SrdRef[Text];
                 addChildren({
                     Text(String()).{
                         notificationLabel = this;
                         style.{
-                            width = "100%";
-                            height = "20pt";
+                            width = Length.percent(100);
+                            height = Length.pt(20);
                             fontColor = Color(200, 50, 50);
-                            fontSize = 10.0;
+                            fontSize = Length.pt(10.0);
                         };
                     },
                     Text(String()).{
                         style.{
-                            width = "100%";
-                            height = "100%";
+                            width = Length.percent(100);
+                            height = Length.percent(100);
                             fontColor = Color(50, 50, 50);
-                            fontSize = 20.0;
+                            fontSize = Length.pt(20.0);
                         };
                         onFetch = closure (json: Json) {
                             def status: Int = json.getObject("eventData").getInt("status");
@@ -284,8 +284,8 @@ func main {
                 });
             },
             TextEntry().{
-                width = String("calc(100% - 3pt)");
-                height = String("50pt");
+                width = Length.percent(100) - Length.pt(3);
+                height = Length.pt(50);
                 onNewEntry = closure (newData: String) {
                     sendRequest(
                         "POST", "/messages", "Content-Type: application/text", newData, 10000,
@@ -307,22 +307,24 @@ func main {
 
 @uiEndpoint["/about", "WebPlatform Example - Chat"]
 func about {
-    setElementAttribute("body", "style", "padding: 0; margin: 0;");
-
+    Window.instance.style.{
+        padding = Length4.pt(0);
+        margin = Length4.pt(0);
+    };
     Window.instance.setView(Box({}).{
         style.{
-            display = "flex";
-            layout = "column";
+            display = Display.FLEX;
+            layout = Layout.COLUMN;
         };
         addChildren({
             Header(),
             Text(String("Chat Example")).{ style.{
                 fontColor = Color(0, 0, 0);
-                fontSize = 30.0;
+                fontSize = Length.pt(30.0);
             } },
             Text(String("Built using Alusus Web Platform")).{ style.{
                 fontColor = Color(0, 0, 0);
-                fontSize = 20.0;
+                fontSize = Length.pt(20.0);
             } }
         })
     });

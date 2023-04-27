@@ -1,0 +1,50 @@
+@merge module WebPlatform {
+    module Transform {
+        func matrix(a: Float, b: Float, c: Float, d: Float, tx: Float, ty: Float): String {
+            return String.format("matrix(%f, %f, %f, %f, %f, %f);", a, b, c, d, tx, ty);
+        }
+
+        func matrix(
+            a1: Float, b1: Float, c1: Float, d1: Float,
+            a2: Float, b2: Float, c2: Float, d2: Float,
+            a3: Float, b3: Float, c3: Float, d3: Float,
+            a4: Float, b4: Float, c4: Float, d4: Float
+        ): String {
+            return String.format(
+                "matrix(%f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f, %f);",
+                a1, b1, c1, d1,
+                a2, b2, c2, d2,
+                a3, b3, c3, d3,
+                a4, b4, c4, d4
+            );
+        }
+
+        func rotate(deg: Float): String {
+            return String.format("rotate(%fdeg);", deg);
+        }
+
+        func rotate(x: Float, y: Float, z: Float, deg: Float): String {
+            return String.format("rotate3d(%f, %f, %f, %fdeg);", x, y, z, deg);
+        }
+
+        func scale(x: Float): String {
+            return String.format("scale(%f);", x);
+        }
+
+        func scale(x: Float, y: Float): String {
+            return String.format("scale(%f, %f);", x, y);
+        }
+
+        func scale(x: Float, y: Float, z: Float): String {
+            return String.format("scale3d(%f, %f, %f);", x, y, z);
+        }
+
+        func translate(x: ref[Length], y: ref[Length]): String {
+            return String.format("translate(%s, %s);", x.toString().buf, y.toString().buf);
+        }
+
+        func translate(x: ref[Length], y: ref[Length], z: ref[Length]): String {
+            return String.format("translate3d(%s, %s, %s);", x.toString().buf, y.toString().buf, z.toString().buf);
+        }
+    }
+}

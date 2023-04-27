@@ -10,8 +10,8 @@
         //-----------
         // Properties
 
-        generateProperty[bitmapWidth, BitmapWidth, String];
-        generateProperty[bitmapHeight, BitmapHeight, String];
+        generateProperty[bitmapWidth, BitmapWidth, SrdRef[Length]];
+        generateProperty[bitmapHeight, BitmapHeight, SrdRef[Length]];
 
         //---------
         // Handlers
@@ -44,8 +44,8 @@
         handler (this:Widget).update() set_ptr {
             if this.id.getLength() > 0 {
                 this.updateCommon();
-                setElementAttribute(this.id, "width", this.bitmapWidth);
-                setElementAttribute(this.id, "height", this.bitmapHeight);
+                setElementAttribute(this.id, "width", this.bitmapWidth.toString());
+                setElementAttribute(this.id, "height", this.bitmapHeight.toString());
             }
         }
 

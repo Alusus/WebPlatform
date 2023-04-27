@@ -15,28 +15,26 @@ use WebPlatform;
 def PRIMARY_COLOR: Color("8e50ef");
 
 func createHeader (): SrdRef[Widget] {
-    setElementAttribute("body", "style", "padding: 0; margin: 0;");
-
     return Box({}).{
         style.{
-            width = "100%";
-            height = "40pt";
-            padding = Quad(5, 0);
-            background = PRIMARY_COLOR;
+            width = Length.percent(100);
+            height = Length.pt(40);
+            padding = Length4.pt(5, 0);
+            background = Background(PRIMARY_COLOR);
             borderColor = PRIMARY_COLOR;
-            borderWidth = Quad(1.5);
-            borderStyle = "solid";
-            display = "flex";
-            layout = "column";
+            borderWidth = Length4.pt(1.5);
+            borderStyle = BorderStyle.SOLID;
+            display = Display.FLEX;
+            layout = Layout.COLUMN;
         };
         addChildren({
             Text(String("Alusus Web Platform Examples - Canvas")).{ style.{
                 fontColor = Color("fff");
-                fontSize = 21.0;
-                width = "100%";
-                height = "100%";
-                background = PRIMARY_COLOR;
-                margin = Quad(5, 15);
+                fontSize = Length.pt(21.0);
+                width = Length.percent(100);
+                height = Length.percent(100);
+                background = Background(PRIMARY_COLOR);
+                margin = Length4.pt(5, 15);
             } },
         });
     }~cast[SrdRef[Widget]];
@@ -72,24 +70,28 @@ func main {
 
     // Build the view
     def canvas: SrdRef[Canvas];
+    Window.instance.style.{
+        padding = Length4.pt(0);
+        margin = Length4.pt(0);
+    };
     Window.instance.setView(Box({}).{
         style.{
-            align = "center";
-            display = "flex";
-            layout = "column";
+            align = Align.CENTER;
+            display = Display.FLEX;
+            layout = Layout.COLUMN;
         };
         addChildren({
             createHeader(),
             Box({}).{
-                style.display = "flex";
-                style.layout = "row";
+                style.display = Display.FLEX;
+                style.layout = Layout.ROW;
                 addChildren({
                     Button(String("Play Music")).{
                         style.{
-                            height = "30pt";
-                            width = "120pt";
-                            background = Color(200, 200, 200);
-                            fontSize = 16.0;
+                            height = Length.pt(30);
+                            width = Length.pt(120);
+                            background = Background(Color(200, 200, 200));
+                            fontSize = Length.pt(16.0);
                         };
                         onClick.connect(closure (music: by_ref)&(widget: ref[Widget], payload: ref[Int]) {
                             music.play(true);
@@ -97,10 +99,10 @@ func main {
                     },
                     Button(String("Stop Music")).{
                         style.{
-                            height = "30pt";
-                            width = "120pt";
-                            background = Color(200, 200, 200);
-                            fontSize = 16.0;
+                            height = Length.pt(30);
+                            width = Length.pt(120);
+                            background = Background(Color(200, 200, 200));
+                            fontSize = Length.pt(16.0);
                         };
                         onClick.connect(closure (music: by_ref)&(widget: ref[Widget], payload: ref[Int]) {
                             music.stop();
@@ -108,10 +110,10 @@ func main {
                     },
                     Button(String("Play Sound")).{
                         style.{
-                            height = "30pt";
-                            width = "120pt";
-                            background = Color(200, 200, 200);
-                            fontSize = 16.0;
+                            height = Length.pt(30);
+                            width = Length.pt(120);
+                            background = Background(Color(200, 200, 200));
+                            fontSize = Length.pt(16.0);
                         };
                         onClick.connect(closure (sound: by_ref)&(widget: ref[Widget], payload: ref[Int]) {
                             sound.play(false);
@@ -119,10 +121,10 @@ func main {
                     },
                     Button(String("Play Repeating Sound")).{
                         style.{
-                            height = "30pt";
-                            width = "180pt";
-                            background = Color(200, 200, 200);
-                            fontSize = 16.0;
+                            height = Length.pt(30);
+                            width = Length.pt(180);
+                            background = Background(Color(200, 200, 200));
+                            fontSize = Length.pt(16.0);
                         };
                         onClick.connect(closure (sound: by_ref)&(widget: ref[Widget], payload: ref[Int]) {
                             sound.play(true);
@@ -130,10 +132,10 @@ func main {
                     },
                     Button(String("Stop Sound")).{
                         style.{
-                            height = "30pt";
-                            width = "120pt";
-                            background = Color(200, 200, 200);
-                            fontSize = 16.0;
+                            height = Length.pt(30);
+                            width = Length.pt(120);
+                            background = Background(Color(200, 200, 200));
+                            fontSize = Length.pt(16.0);
                         };
                         onClick.connect(closure (sound: by_ref)&(widget: ref[Widget], payload: ref[Int]) {
                             sound.stop();
@@ -143,17 +145,17 @@ func main {
             }
             Canvas().{
                 canvas = this;
-                bitmapWidth = String("1280px");
-                bitmapHeight = String("800px");
+                bitmapWidth = Length.px(1280);
+                bitmapHeight = Length.px(800);
                 style.{
-                    width = "100%";
-                    height = "100%";
-                    maxWidth = "1280px";
-                    maxHeight = "800px";
-                    borderWidth = Quad(2);
-                    borderStyle = "solid";
+                    width = Length.percent(100);
+                    height = Length.percent(100);
+                    maxWidth = Length.px(1280);
+                    maxHeight = Length.px(800);
+                    borderWidth = Length4.pt(2);
+                    borderStyle = BorderStyle.SOLID;
                     borderColor = Color(0, 0, 0);
-                    background = Color(220, 220, 220);
+                    background = Background(Color(220, 220, 220));
                 };
                 def dim: Dimensions(1, 1);
                 onMouseMove.connect(closure (
@@ -281,4 +283,3 @@ func main {
 
 Console.print("Starting server on port 8010...\nURL: http://localhost:8010/\n");
 runServer({ "listening_ports", "8010", "static_file_max_age", "0" });
-

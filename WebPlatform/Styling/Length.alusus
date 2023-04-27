@@ -1,0 +1,97 @@
+@merge module WebPlatform {
+    //==========================================================================
+    // Length
+    // A float value used for UI length values.
+    class Length {
+        def wkThis: WkRef[Length];
+        handler this.toString(): String as_ptr;
+
+        handler this_type(v: Float, u: CharsPtr): SrdRef[LengthConst] {
+            return SrdRef[LengthConst].construct().{ this.wkThis = this; val = v; unit = u };
+        }
+
+        macro defineInitializer[name, u] {
+            func name(v: Float): SrdRef[LengthConst] {
+                return SrdRef[LengthConst].construct().{ this.wkThis = this; val = v; unit = u };
+            }
+        }
+
+        defineInitializer[px, "px"];
+        defineInitializer[pt, "pt"];
+        defineInitializer[mm, "mm"];
+        defineInitializer[vw, "vw"];
+        defineInitializer[vh, "vh"];
+        defineInitializer[vmin, "vmin"];
+        defineInitializer[vmax, "vmax"];
+        defineInitializer[em, "em"];
+        defineInitializer[percent, "%"];
+
+        handler this + SrdRef[Length]: SrdRef[LengthOpLength] {
+            return SrdRef[LengthOpLength].construct()~use_in(self) {
+                self.wkThis = self;
+                len1 = this.wkThis;
+                len2 = value;
+                op = '+';
+            };
+        }
+
+        handler this - SrdRef[Length]: SrdRef[LengthOpLength] {
+            return SrdRef[LengthOpLength].construct()~use_in(self) {
+                self.wkThis = self;
+                len1 = this.wkThis;
+                len2 = value;
+                op = '-';
+            };
+        }
+
+        handler this * Float: SrdRef[LengthOpFloat] {
+            return SrdRef[LengthOpFloat].construct()~use_in(self) {
+                self.wkThis = self;
+                len1 = this.wkThis;
+                param = value;
+                op = '*';
+            };
+        }
+
+        handler this / Float: SrdRef[LengthOpFloat] {
+            return SrdRef[LengthOpFloat].construct()~use_in(self) {
+                self.wkThis = self;
+                len1 = this.wkThis;
+                param = value;
+                op = '/';
+            };
+        }
+    }
+
+    class LengthConst {
+        @injection def length: Length;
+        def val: Float;
+        def unit: CharsPtr;
+
+        handler (this:Length).toString(): String set_ptr {
+            return String.format("%f%s", this.val, this.unit);
+        }
+    }
+
+    class LengthOpLength {
+        @injection def length: Length;
+        def len1: SrdRef[Length];
+        def len2: SrdRef[Length];
+        def op: Char;
+
+        handler (this:Length).toString(): String set_ptr {
+            return String.format("calc(%s %c %s)", this.len1.toString().buf, this.op, this.len2.toString().buf);
+        }
+    }
+
+    class LengthOpFloat {
+        @injection def length: Length;
+        def len1: SrdRef[Length];
+        def param: Float;
+        def op: Char;
+
+        handler (this:Length).toString(): String set_ptr {
+            return String.format("calc(%s %c %f)", this.len1.toString().buf, this.op, this.param);
+        }
+    }
+}

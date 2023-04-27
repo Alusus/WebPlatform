@@ -1,6 +1,4 @@
 @merge module WebPlatform {
-    //==========================================================================
-    // Color
     class Color {
         def red: Int = 0;
         def green: Int = 0;
@@ -74,7 +72,7 @@
             return result;
         }
 
-        handler this~cast[String] {
+        handler this.toString(): String {
             @shared def hex: Array[Char]({
                 '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'
             });
@@ -93,4 +91,3 @@
         }
     }
 }
-
