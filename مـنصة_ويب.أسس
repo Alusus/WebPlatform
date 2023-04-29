@@ -6,6 +6,11 @@
 
 عرف مـنصة_ويب: لقب WebPlatform؛
 @دمج وحدة مـنصة_ويب {
+    عرف مسار_منصة_ويب: لقب webPlatformPath؛
+    عرف مسار_الموارد_الرئيسية: لقب mainAssetsPath؛
+    عرف مسار_ويب_أسمبلي: لقب wasmPath؛
+    عرف هات_اعتماديات_البناء: لقب getBuildDependencies؛
+
     عرف أنشئ_عنصر: لقب createElement؛
     عرف حدد_ميزة_عنصر: لقب setElementAttribute؛
     عرف حدد_متن_طراز: لقب setStyleRule؛
