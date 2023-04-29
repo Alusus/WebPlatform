@@ -79,17 +79,23 @@
     func addUiEndpoint (fn: ref[Core.Basic.TiObject], uri: String, title: String) {
         def binding: ref[Core.Basic.Binding](Core.Basic.getInterface[fn, Core.Basic.Binding]);
         binding.setMember("name", Core.Basic.TiStr("wasmStart"));
-        def wasm: Build.Wasm(fn, "/tmp/endpoint.wasm");
-        wasm.addDependency(webPlatformPath + String("/stdlib-min.wasm"));
+        def wasm: Build.Wasm(fn, wasmPath + "_intermediate.wasm");
+        wasm.addDependency(webPlatformPath + String("stdlib-min.wasm"));
         wasm.addFlags({ String("--export=malloc"), String("--export=realloc") });
         wasm.generate();
         def wasmFilename: String = String("/") + getElementName(fn) + ".wasm";
         if System.exec(
-            webPlatformPath + "/Tools/bin/wasm-opt -O --asyncify /tmp/endpoint.wasm -o /tmp" + wasmFilename
+            webPlatformPath + "Tools/bin/wasm-opt -O --asyncify " + wasmPath + "_intermediate.wasm -o " + wasmPath + wasmFilename
         ) != 0 {
             System.fail(1, "Post-build pass failed\n");
         }
-        uiEndpoints.add(UiEndpoint(uri, wasmFilename, title));
+        Spp.astMgr.insertAst(
+            (ast uiEndpoints.add(UiEndpoint(String(uri), String(wasmFilename), String(title)))),
+            AstTemplateMap()
+                .set(String("uri"), Core.Data.Ast.StringLiteral(uri))
+                .set(String("wasmFilename"), Core.Data.Ast.StringLiteral(wasmFilename))
+                .set(String("title"), Core.Data.Ast.StringLiteral(title))
+        );
     }
 
     func addBeEndpoints (parent: ref[Core.Basic.TiObject]) {
@@ -138,7 +144,11 @@
             if path(0) == '/' || path(0) == '.' {
                 System.fail(1, String("Invalid asset route element; path should not start with / or .: ") + path);
             }
-            addAssetRoute(String("/") + path, path);
+            Spp.astMgr.insertAst(
+                (ast addAssetRoute(String("/") + path, String(path))),
+                Map[String, ref[Core.Basic.TiObject]]()
+                    .set(String("path"), Core.Data.Ast.StringLiteral(path))
+            );
         }
     }
 
@@ -162,13 +172,21 @@
         }
     }
 
+    func prepareMainAssets {
+        if mainAssetsPath == webPlatformPath return;
+        System.exec(String.format("mkdir -p \"%s\"", mainAssetsPath.buf));
+        System.exec(String.format("cp %s/wasm.html \"%s/wasm.html\"", webPlatformPath.buf, mainAssetsPath.buf));
+        System.exec(String.format("cp %s/api.js \"%s/api.js\"", webPlatformPath.buf, mainAssetsPath.buf));
+    }
+
     func startServer [parent: ast_ref = Root] (options: ref[Array[CharsPtr]]): ptr[Http.Context] {
-        addUiEndpoints(parent~ast);
-        addAssetRoutes(parent~ast);
+        preprocess { prepareMainAssets() };
+        preprocess { addUiEndpoints(parent~ast) };
+        preprocess { addAssetRoutes(parent~ast) };
         if uiEndpoints.getLength() == 0 {
             System.fail(1, "No UI endpoints found\n");
         }
-        htmlTemplate = Fs.readFile(webPlatformPath + "/wasm.html");
+        htmlTemplate = Fs.readFile(mainAssetsPath + "wasm.html");
 
         options.add(0);
 
@@ -200,7 +218,7 @@
 
         if String.isEqual(method, "GET") {
             if String.isEqual(uri, "/api.js") {
-                Http.sendFile(connection, webPlatformPath + "/api.js");
+                Http.sendFile(connection, mainAssetsPath + "api.js");
                 return 1;
             }
 
@@ -217,7 +235,7 @@
 
             for i = 0, i < uiEndpoints.getLength(), ++i {
                 if uiEndpoints(i).filename == uri {
-                    Http.sendFile(connection, String("/tmp") + uri);
+                    Http.sendFile(connection, wasmPath + uri);
                     return 1;
                 } else {
                     def len: ArchInt = uiEndpoints(i).uri.getLength();
