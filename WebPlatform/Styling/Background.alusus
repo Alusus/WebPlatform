@@ -67,7 +67,6 @@
                 res += String.format(",%s %i%%", this.colors(i).toString().buf, this.percents(i));
             }
             res += ")";
-            logToConsole(res);
             return res;
         }
     }
