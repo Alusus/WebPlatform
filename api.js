@@ -113,15 +113,17 @@ wasmApi.fetchNextEvent = () => {
     return toWasmString(result);
 }
 
-wasmApi.registerElementEventHandler = (elementName, eventName, cbId) => {
+wasmApi.registerElementEventHandler = (elementName, eventName, preventDefault, cbId) => {
     const jsElementName = toJsString(elementName);
     const jsEventName = toJsString(eventName);
     if (jsElementName === 'window') {
         window[`on${jsEventName}`] = (event) => {
+            if (preventDefault) event.preventDefault();
             onEvent(cbId, true, jsEventName, event);
         };
     } else {
         document.getElementById(jsElementName)[`on${jsEventName}`] = (event) => {
+            if (preventDefault) event.preventDefault();
             onEvent(cbId, true, jsEventName, event);
         };
     }

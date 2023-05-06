@@ -38,43 +38,4 @@
             return this.slots.getLength();
         }
     }
-
-    //==========================================================================
-    // handleSignalConnectionChanged
-    // A helper macro for handling an event in onSignalConnectionsChanged.
-    macro handleSignalConnectionChanged [signalName, eventHtmlIentifier, emitSignal] {
-        if connectionCount > 0 and this.__signalName__Id == -1 {
-            this.__signalName__Id = registerElementEventHandler(
-                this.id,
-                eventHtmlIentifier,
-                closure (json: Json) {
-                    def data: Json = json.getObject("eventData");
-                    emitSignal;
-                }
-            );
-        } else if connectionCount == 0 and this.__signalName__Id != -1 {
-            unregisterElementEventHandler(this.__signalName__Id);
-        }
-    }
-
-
-    //==========================================================================
-    // handleKeySignalConnectionChanged
-    // A helper macro for handling a key event in onSignalConnectionsChanged.
-    macro handleKeySignalConnectionChanged [signalName, eventHtmlIentifier, keysToSwallow, emitSignal] {
-        if connectionCount > 0 and this.__signalName__Id == -1 {
-            this.__signalName__Id = registerElementKeyEventHandler(
-                this.id,
-                eventHtmlIentifier,
-                keysToSwallow,
-                closure (json: Json) {
-                    def data: Json = json.getObject("eventData");
-                    emitSignal;
-                }
-            );
-        } else if connectionCount == 0 and this.__signalName__Id != -1 {
-            unregisterElementEventHandler(this.__signalName__Id);
-        }
-    }
 }
-

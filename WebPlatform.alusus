@@ -53,12 +53,14 @@ import "WebPlatform/Resources/AudioResource";
 import "WebPlatform/Utils/Signal";
 import "WebPlatform/Utils/string_operations";
 import "WebPlatform/Utils/RegExp";
+import "WebPlatform/EventHandling/event_handlers";
+import "WebPlatform/EventHandling/dom_events";
+import "WebPlatform/EventHandling/dom_event_signals";
+import "WebPlatform/EventHandling/event_loop";
 import "WebPlatform/Drawing";
 import "WebPlatform/Window";
 import "WebPlatform/Storage";
 import "WebPlatform/routing";
-import "WebPlatform/event_handling";
-import "WebPlatform/event_loop";
 import "WebPlatform/async_operations";
 import "WebPlatform/i18n";
 
@@ -66,9 +68,9 @@ import "WebPlatform/i18n";
     use Srl;
     use Promises;
 
-    def webPlatformPath: Srl.String = getThisSourceDirectory[];
-    def mainAssetsPath: Srl.String = webPlatformPath;
-    def wasmPath: Srl.String = "/tmp/WebPlatform/";
+    def webPlatformPath: String = getThisSourceDirectory[];
+    def mainAssetsPath: String = webPlatformPath;
+    def wasmPath: String = "/tmp/WebPlatform/";
 
     func getBuildDependencies(): Array[String] {
         return Http.getBuildDependencies();
