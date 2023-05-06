@@ -224,7 +224,7 @@
 
             def i: Int;
             for i = 0, i < assetRoutes.getLength(), ++i {
-                if String.find(uri, assetRoutes(i).uri) == uri {
+                if String.find(uri, assetRoutes(i).uri) == uri and assetRoutes(i).uri != uri {
                     def fileName: String = assetRoutes(i).path + (uri + assetRoutes(i).uri.getLength());
                     if Fs.exists(fileName) {
                         Http.sendFile(connection, fileName);
