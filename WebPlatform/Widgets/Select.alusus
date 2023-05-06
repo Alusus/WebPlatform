@@ -10,7 +10,7 @@
         generateProperty[items, Items, Map[String,String]];
         generateProperty[ariaHidden, AriaHidden, bool];
 
-        def onChanged: Signal[Select, Int];
+        def onChanged: DomEventSignal[Select, Int];
         def onChangedId: ArchInt = -1;
 
         //---------

@@ -68,7 +68,7 @@ class MenuButton {
             addChildren({
                 Hyperlink(link, Text(label).{
                     className = String("label")
-                }),
+                }).{ style.textDecoration = TextDecoration.NONE },
                 Hyperlink(link, Image().{
                     url = icon;
                     className = String("icon");

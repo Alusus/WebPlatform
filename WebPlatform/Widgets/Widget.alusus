@@ -11,19 +11,19 @@
         generateProperty[className, ClassName, String];
 
         // Events
-        def onResize: Signal[Widget, Int];
+        def onResize: DomEventSignal[Widget, Int];
         def onResizeId: ArchInt = -1;
-        def onMouseMove: Signal[Widget, MouseMovePayload];
+        def onMouseMove: DomEventSignal[Widget, MouseMovePayload];
         def onMouseMoveId: ArchInt = -1;
-        def onMouseEnter: Signal[Widget, Int];
+        def onMouseEnter: DomEventSignal[Widget, Int];
         def onMouseEnterId: ArchInt = -1;
-        def onMouseOut: Signal[Widget, Int];
+        def onMouseOut: DomEventSignal[Widget, Int];
         def onMouseOutId: ArchInt = -1;
-        def onMouseDown: Signal[Widget, Int];
+        def onMouseDown: DomEventSignal[Widget, Int];
         def onMouseDownId: ArchInt = -1;
-        def onMouseUp: Signal[Widget, Int];
+        def onMouseUp: DomEventSignal[Widget, Int];
         def onMouseUpId: ArchInt = -1;
-        def onClick: Signal[Widget, Int];
+        def onClick: DomEventSignal[Widget, Int];
         def onClickId: ArchInt = -1;
 
         handler this~init() {

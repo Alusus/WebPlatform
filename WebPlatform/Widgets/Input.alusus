@@ -29,11 +29,11 @@
             return this.getText();
         }
 
-        def onChanged: Signal[Input, Int];
+        def onChanged: DomEventSignal[Input, Int];
         def onChangedId: ArchInt = -1;
-        def onKeyPress: Signal[Input, String];
+        def onKeyPress: DomEventSignal[Input, String];
         def onKeyPressId: ArchInt = -1;
-        def onKeyUp: Signal[Input, String];
+        def onKeyUp: DomEventSignal[Input, String];
         def onKeyUpId: ArchInt = -1;
 
         //---------

@@ -1,62 +1,14 @@
 @merge module WebPlatform {
-    //==========================================================================
-    // Event Handlers
-
-    class EventHandler {
-        def cb: closure (Json);
-        def id: ArchInt;
-        def info: SrdRef[Void];
-
-        handler this~init() {}
-        handler this~init(cb: closure(Json), id: ArchInt) {
-            this.cb = cb;
-            this.id = id;
-        }
-        handler this~init(that: ref[EventHandler]) this = that;
-        handler this = ref[EventHandler] {
-            this.cb = value.cb;
-            this.id = value.id;
-        }
-    }
-
-    def eventIdCounter: ArchInt(0);
-    def eventHandlers: Array[EventHandler];
-
-    function addEventHandler (cb: closure (Json)): ArchInt {
-        ++eventIdCounter;
-        eventHandlers.add(EventHandler(cb, eventIdCounter));
-        return eventHandlers.getLength() - 1;
-    }
-
-    function findEventHandlerIndex(id: ArchInt): ArchInt {
-        def start: ArchInt = 0;
-        def end: ArchInt = eventHandlers.getLength() - 1;
-        if end < 0 or id < eventHandlers(start).id or id > eventHandlers(end).id return -1;
-        if id == eventHandlers(start).id return start;
-        if id == eventHandlers(end).id return end;
-
-        while end > start + 1 {
-            def mid: ArchInt = (start + end) >> 1;
-            if id > eventHandlers(mid).id start = mid
-            else if id < eventHandlers(mid).id end = mid
-            else return mid;
-        }
-        return -1;
-    }
-
-    //==========================================================================
-    // DOM Element Events
-
     class ElementEventIdentification {
         def elementName: String;
         def eventName: String;
     }
 
     function registerElementEventHandler (
-        elementName: ptr[array[Char]], eventName: ptr[array[Char]], cb: closure (Json)
+        elementName: ptr[array[Char]], eventName: ptr[array[Char]], preventDefault: Bool, cb: closure (Json)
     ): ArchInt {
         def index: ArchInt = addEventHandler(cb);
-        _registerElementEventHandler(elementName, eventName, eventHandlers(index).id);
+        _registerElementEventHandler(elementName, eventName, preventDefault, eventHandlers(index).id);
         def eventIdentification: SrdRef[ElementEventIdentification];
         eventIdentification.construct();
         eventIdentification.elementName = elementName;
@@ -107,4 +59,3 @@
         eventHandlers.remove(i);
     }
 }
-
