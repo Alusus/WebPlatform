@@ -16,7 +16,7 @@
     عرف حدد_متن_طراز: لقب setStyleRule؛
 
     عرف نفذ_حلقة_معالجة_الأحداث: لقب runEventLoop؛
-    عرف عالج_الاحداث: لقب dispatchEvents؛
+    عرف عالج_الأحداث: لقب dispatchEvents؛
     عرف انتظر_حدثا: لقب waitForEvent؛
     عرف انتظر: لقب await؛
     عرف شغل_الخادم: لقب runServer؛
@@ -586,8 +586,8 @@
 
     عرف رسـم: لقب Drawing؛
     @دمج صنف رسـم {
-        عرف ارسم_خط: لقب drawLine؛
-        عرف ارسم_مضلع: لقب drawPolygon؛
+        عرف ارسم_خطا: لقب drawLine؛
+        عرف ارسم_مضلعا: لقب drawPolygon؛
         عرف ارسم_مستطيلا_مليئا: لقب drawFilledRect؛
         عرف فرغ_مستطيلا: لقب clearRect؛
         عرف ارسم_دائرة: لقب drawCircle؛
