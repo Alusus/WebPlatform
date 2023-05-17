@@ -326,6 +326,7 @@ wasmApi.registerElementAsResource = (elementName) => {
 
 wasmApi.loadAudio = (url, cbId) => {
     const audio = document.createElement('audio');
+    audio.preload = "auto";
     const resourceId = ++resourceCounter;
     audio.onloadeddata = () => {
         onEvent(cbId, false, 'loadAudio', { resourceId });
@@ -468,6 +469,7 @@ wasmApi.playAudio = (audioId, loop) => {
         audio = audio.cloneNode();
     }
     audio.loop = loop;
+    audio.currentTime = 0;
     audio.play();
 }
 
@@ -475,6 +477,18 @@ wasmApi.stopAudio = (audioId) => {
     var audio = resources[audioId];
     audio.pause();
     audio.currentTime = 0;
+}
+
+wasmApi.setAudioVolume = (audioId, volume) => {
+    resources[audioId].volume = volume;
+}
+
+wasmApi.getAudioVolume = (audioId) => {
+    return resources[audioId].volume;
+}
+
+wasmApi.isAudioPlaying = (audioId) => {
+    return !resources[audioId].paused;
 }
 
 // Gamepad APIs

@@ -75,6 +75,9 @@
     // Audio Operations
     @expname[playAudio] function playAudio (audioId: ArchInt, loop: Bool);
     @expname[stopAudio] function stopAudio (audioId: ArchInt);
+    @expname[setAudioVolume] function setAudioVolume (audioId: ArchInt, volume: Float);
+    @expname[getAudioVolume] function getAudioVolume (audioId: ArchInt): Float;
+    @expname[isAudioPlaying] function isAudioPlaying (audioId: ArchInt): Bool;
     // Gamepads
     @expname[getGamepadsCount] function getGamepadsCount (): Int;
     @expname[getGamepadId] function getGamepadId (gpIndex: Int): ptr[array[Char]];

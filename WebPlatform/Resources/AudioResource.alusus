@@ -28,6 +28,18 @@
         handler this.stop() {
             stopAudio(this.id);
         }
+
+        handler this.volume = Float {
+            setAudioVolume(this.id, value);
+            return value;
+        }
+        handler this.volume:Float {
+            return getAudioVolume(this.id);
+        }
+
+        handler this.isPlaying(): Bool {
+            return isAudioPlaying(this.id);
+        }
     }
 }
 
