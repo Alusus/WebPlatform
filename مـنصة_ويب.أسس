@@ -17,6 +17,7 @@
 
     عرف نفذ_حلقة_معالجة_الأحداث: لقب runEventLoop؛
     عرف عالج_الاحداث: لقب dispatchEvents؛
+    عرف انتظر_حدثا: لقب waitForEvent؛
     عرف انتظر: لقب await؛
     عرف شغل_الخادم: لقب runServer؛
     عرف ابدأ_الخادم: لقب startServer؛
@@ -557,6 +558,7 @@
 
     عرف مـورد_صورة: لقب ImageResource؛
     @دمج صنف مـورد_صورة {
+        عرف معرف: لقب id؛
         عرف حمل: لقب load؛
         عرف هيئ_من_مرسم: لقب initFromCanvas؛
         عرف هات_الأبعاد: لقب getDimensions؛
