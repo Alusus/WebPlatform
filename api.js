@@ -519,6 +519,10 @@ wasmApi.getGamepadButton = (gamepadIndex, buttonIndex) => {
 
 // Misc APIs
 
+wasmApi.getTimestamp = () => {
+    return BigInt(Date.now());
+}
+
 wasmApi.requestPointerLock = (elementName) => {
     const jsElementName = toJsString(elementName);
     document.getElementById(jsElementName).requestPointerLock();

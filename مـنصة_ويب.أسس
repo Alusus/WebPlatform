@@ -34,6 +34,7 @@
     عرف هات_اللغة_المفضلة: لقب getPreferredLanguage؛
     عرف هل_يفضل_نمط_الألوان_الداكن: لقب isDarkColorSchemePreferred؛
 
+    عرف هات_الختم_الزمني: لقب getTimestamp؛
     عرف ألغ_احتكار_المؤشر: لقب exitPointerLock؛
     عرف ألغ_ملء_الشاشة: لقب exitFullScreen؛
 

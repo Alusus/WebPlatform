@@ -86,6 +86,7 @@
     @expname[getGamepadAxis] function getGamepadAxis (gpIndex: Int, axisIndex: Int): Float;
     @expname[getGamepadButton] function getGamepadButton (gpIndex: Int, btnIndex: Int): Float;
     // Misc
+    @expname[getTimestamp] function getTimestamp (): Int[64];
     @expname[requestPointerLock] function requestPointerLock (elementName: ptr[Char]);
     @expname[exitPointerLock] function exitPointerLock();
     @expname[requestFullScreen] function requestFullScreen (elementName: ptr[Char]);
