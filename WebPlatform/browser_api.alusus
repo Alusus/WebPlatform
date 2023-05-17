@@ -37,6 +37,7 @@
     @expname[loadImage] function _loadImage (url: ptr[Char], cbId: ArchInt): ArchInt;
     @expname[getImageDimensions] function getImageDimensions (imgId: Int, result: ref[Dimensions]);
     @expname[createCanvasResource] function createCanvasResource (width: Int, height: Int): ArchInt;
+    @expname[resizeCanvasResource] function resizeCanvasResource (canvasId: ArchInt, width: Int, height: Int);
     @expname[createImageResourceFromCanvasResource] function createImageResourceFromCanvasResource (
         canvasId: ArchInt
     ): ArchInt;
@@ -53,8 +54,12 @@
     @expname[drawPolygon] function drawPolygon (
         canvasId: ArchInt, pointCount: Int, points: ref[array[Int]], filled: Bool
     );
-    @expname[drawCircle] function drawCircle (canvasId: ArchInt, x1: Int, y1: Int, x2: Int, y2: Int);
-    @expname[drawText] function drawText (canvasId: ArchInt, text: ptr[Char], font: ptr[Char], x: Int, y: Int);
+    @expname[drawFilledRect] function drawFilledRect (canvasId: ArchInt, x: Int, y: Int, w: Int, h: Int);
+    @expname[clearRect] function clearRect (canvasId: ArchInt, x: Int, y: Int, w: Int, h: Int);
+    @expname[drawCircle] function drawCircle (canvasId: ArchInt, x: Int, y: Int, r: Int);
+    @expname[drawText] function drawText (
+        canvasId: ArchInt, text: ptr[Char], font: ptr[Char], x: Int, y: Int, rtl: Bool
+    );
     @expname[measureText] function measureText (
         canvasId: ArchInt, text: ptr[Char], font: ptr[Char], result: ref[Dimensions]
     );

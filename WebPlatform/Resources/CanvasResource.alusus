@@ -10,9 +10,15 @@
         handler this~init(w: Int, h: Int) {
             this.init(w, h);
         }
+
         handler this.init(w: Int, h: Int) {
             if this.id != 0 releaseResource(this.id);
             this.id = createCanvasResource(w, h);
+        }
+
+        handler this.resize(w: Int, h: Int) {
+            if this.id == 0 this.id = createCanvasResource(w, h)
+            else resizeCanvasResource(this.id, w, h);
         }
 
         handler this~terminate() {

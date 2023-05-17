@@ -10,12 +10,24 @@
             WebPlatform.drawPolygon(this.getResourceId(), pointCount, points, filled);
         }
 
-        handler this.drawCircle(x1: Int, y1: Int, x2: Int, y2: Int) {
-            WebPlatform.drawCircle(this.getResourceId(), x1, y1, x2, y2);
+        handler this.drawFilledRect(x: Int, y: Int, w: Int, h: Int) {
+            WebPlatform.drawFilledRect(this.getResourceId(), x, y, w, h);
+        }
+
+        handler this.clearRect(x: Int, y: Int, w: Int, h: Int) {
+            WebPlatform.clearRect(this.getResourceId(), x, y, w, h);
+        }
+
+        handler this.drawCircle(x: Int, y: Int, r: Int) {
+            WebPlatform.drawCircle(this.getResourceId(), x, y, r);
         }
 
         handler this.drawText(text: ptr[Char], font: ptr[Char], x: Int, y: Int) {
-            WebPlatform.drawText(this.getResourceId(), text, font, x, y);
+            WebPlatform.drawText(this.getResourceId(), text, font, x, y, 0);
+        }
+
+        handler this.drawText(text: ptr[Char], font: ptr[Char], x: Int, y: Int, rtl: Bool) {
+            WebPlatform.drawText(this.getResourceId(), text, font, x, y, rtl);
         }
 
         handler this.measureText(text: ptr[Char], font: ptr[Char]): Dimensions {
