@@ -12,7 +12,7 @@ use Srl;
 function downloadPackage (url: ptr[array[Char]], targetDir: ptr[array[Char]]) {
     def result: ptr[array[Char]];
     def size: Int;
-    if !Net.get(url, "/tmp/package.zip") {
+    if !Net.getFile(url, "/tmp/package.zip") {
       System.fail(1, String("Failed to download ") + url);
     };
 
@@ -82,6 +82,7 @@ if !Fs.exists(String.format("%s/dist/stdlib-min.wasm", stdlibPath.buf)) {
     ));
     // Build other functions.
     def fnFilenames: Array[String]({
+        String("stdlib/abs"),
         String("string/memcpy"),
         String("string/memset"),
         String("string/memrchr"),
@@ -101,13 +102,21 @@ if !Fs.exists(String.format("%s/dist/stdlib-min.wasm", stdlibPath.buf)) {
         String("string/strncat"),
         String("string/strlen"),
         String("string/strchrnul"),
+        String("math/sin"),
         String("math/sinf"),
+        String("math/__sin"),
         String("math/__sindf"),
+        String("math/cos"),
         String("math/cosf"),
+        String("math/__cos"),
         String("math/__cosdf"),
+        String("math/__rem_pio2"),
         String("math/__rem_pio2f"),
         String("math/__rem_pio2_large"),
-        String("math/scalbn")
+        String("math/scalbn"),
+        String("math/powf"),
+        // String("math/abs"),
+        String("math/fabsf")
     });
     def i: Int;
     for i = 0, i < fnFilenames.getLength(), ++i {
