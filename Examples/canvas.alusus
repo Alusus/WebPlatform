@@ -177,11 +177,11 @@ func main {
                 onMouseOut.connect(closure (widget: ref[Widget], payload: ref[Int]) {
                     this.style.borderColor = Color(255, 0, 0);
                 });
-                onMouseDown.connect(closure (pressed: by_ref)&(widget: ref[Widget], payload: ref[Int]) {
-                    if payload == 0 pressed = 1;
+                onMouseDown.connect(closure (pressed: by_ref)&(widget: ref[Widget], payload: ref[MouseButtonPayload]) {
+                    if payload.button == 0 pressed = 1;
                 });
-                onMouseUp.connect(closure (pressed: by_ref)&(widget: ref[Widget], payload: ref[Int]) {
-                    if payload == 0 pressed = 0;
+                onMouseUp.connect(closure (pressed: by_ref)&(widget: ref[Widget], payload: ref[MouseButtonPayload]) {
+                    if payload.button == 0 pressed = 0;
                 });
                 onResize.connect(closure (dim: by_ref)&(widget: ref[Widget], payload: ref[Int]) {
                     dim = this.getDimensions();
