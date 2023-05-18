@@ -302,6 +302,12 @@ wasmApi.createCanvasResource = (width, height) => {
     return resourceId;
 }
 
+wasmApi.resizeCanvasResource = (canvasId, width, height) => {
+    const canvas = resources[canvasId];
+    canvas.width = width;
+    canvas.height = height;
+}
+
 wasmApi.createImageResourceFromCanvasResource = (canvasId) => {
     const canvas = resources[canvasId];
     const image = new Image();
@@ -320,6 +326,7 @@ wasmApi.registerElementAsResource = (elementName) => {
 
 wasmApi.loadAudio = (url, cbId) => {
     const audio = document.createElement('audio');
+    audio.preload = "auto";
     const resourceId = ++resourceCounter;
     audio.onloadeddata = () => {
         onEvent(cbId, false, 'loadAudio', { resourceId });
@@ -378,19 +385,32 @@ wasmApi.drawPolygon = (canvasId, pointCount, points, filled) => {
     else ctx.stroke();
 }
 
-wasmApi.drawCircle = (canvasId, x1, y1, x2, y2) => {
+wasmApi.drawFilledRect = (canvasId, x, y, w, h) => {
+    var canvas = resources[canvasId];
+    var ctx = canvas.getContext("2d");
+    ctx.fillRect(x, y, w, h);
+}
+
+wasmApi.clearRect = (canvasId, x, y, w, h) => {
+    var canvas = resources[canvasId];
+    var ctx = canvas.getContext("2d");
+    ctx.clearRect(x, y, w, h);
+}
+
+wasmApi.drawCircle = (canvasId, x, y, r) => {
     var canvas = resources[canvasId];
     var ctx = canvas.getContext("2d");
     ctx.beginPath();
-    ctx.arc(x1, y1, x2, 0, 2 * Math.PI);
+    ctx.arc(x, y, r, 0, 2 * Math.PI);
     ctx.stroke();
 }
 
-wasmApi.drawText = (canvasId, text, font, x, y) => {
+wasmApi.drawText = (canvasId, text, font, x, y, rtl) => {
     var canvas = resources[canvasId];
     var ctx = canvas.getContext("2d");
     ctx.font = toJsString(font);
     ctx.textBaseline = "top";
+    ctx.direction = rtl ? "rtl" : "ltr";
     ctx.fillText(toJsString(text), x, y);
 }
 
@@ -449,6 +469,7 @@ wasmApi.playAudio = (audioId, loop) => {
         audio = audio.cloneNode();
     }
     audio.loop = loop;
+    audio.currentTime = 0;
     audio.play();
 }
 
@@ -456,6 +477,18 @@ wasmApi.stopAudio = (audioId) => {
     var audio = resources[audioId];
     audio.pause();
     audio.currentTime = 0;
+}
+
+wasmApi.setAudioVolume = (audioId, volume) => {
+    resources[audioId].volume = volume;
+}
+
+wasmApi.getAudioVolume = (audioId) => {
+    return resources[audioId].volume;
+}
+
+wasmApi.isAudioPlaying = (audioId) => {
+    return !resources[audioId].paused;
 }
 
 // Gamepad APIs
@@ -485,6 +518,10 @@ wasmApi.getGamepadButton = (gamepadIndex, buttonIndex) => {
 }
 
 // Misc APIs
+
+wasmApi.getTimestamp = () => {
+    return BigInt(Date.now());
+}
 
 wasmApi.requestPointerLock = (elementName) => {
     const jsElementName = toJsString(elementName);

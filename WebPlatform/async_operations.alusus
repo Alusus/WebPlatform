@@ -6,6 +6,16 @@
         _sendRequest(method, uri, headers, body, timeoutInMs, eventHandlers(index).id);
     }
 
+    function sendRequest (
+        method: ptr[Char], uri: ptr[Char], headers: ptr[Char], body: ptr[Char], timeoutInMs: Int
+    ): SrdRef[Promise[Json]] {
+        def p: SrdRef[Promise[Json]] = Promise[Json].new();
+        sendRequest(method, uri, headers, body, timeoutInMs, closure (json: Json) {
+            p.resolve(json);
+        });
+        return p;
+    }
+
     function startTimer (duration: Word, cb: closure (Json)): ArchInt {
         def index: ArchInt = addEventHandler(cb);
         def timerInfo: SrdRef[Word];
