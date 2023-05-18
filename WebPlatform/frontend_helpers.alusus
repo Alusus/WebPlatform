@@ -52,5 +52,28 @@
             this.deltaY = value.deltaY;
         }
     }
-}
 
+    //==========================================================================
+    // MouseButtonPayload
+    // The payload of the mouse-down and mouse-up events.
+    class MouseButtonPayload {
+        def button: Int = 0;
+        def posX: Float = 0;
+        def posY: Float = 0;
+
+        handler this~init() {}
+        handler this~init(b: Int, x: Float, y: Float) {
+            this.button = b;
+            this.posX = x;
+            this.posY = y;
+        }
+        handler this~init(temp_ref[MouseButtonPayload]) {
+            this = value;
+        }
+        handler this = temp_ref[MouseButtonPayload] {
+            this.button = value.button;
+            this.posX = value.posX;
+            this.posY = value.posY;
+        }
+    }
+}

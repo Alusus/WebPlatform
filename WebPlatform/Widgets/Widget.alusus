@@ -19,9 +19,9 @@
         def onMouseEnterId: ArchInt = -1;
         def onMouseOut: DomEventSignal[Widget, Int];
         def onMouseOutId: ArchInt = -1;
-        def onMouseDown: DomEventSignal[Widget, Int];
+        def onMouseDown: DomEventSignal[Widget, MouseButtonPayload];
         def onMouseDownId: ArchInt = -1;
-        def onMouseUp: DomEventSignal[Widget, Int];
+        def onMouseUp: DomEventSignal[Widget, MouseButtonPayload];
         def onMouseUpId: ArchInt = -1;
         def onClick: DomEventSignal[Widget, Int];
         def onClickId: ArchInt = -1;
@@ -134,16 +134,6 @@
                     this.onMouseOut.emit(Int(0));
                 }];
             }
-            if signal == this.onMouseDown~ptr {
-                handleSignalConnectionChanged[onMouseDown, "mousedown", {
-                    this.onMouseDown.emit(Int().{ this = data.getInt("button") });
-                }];
-            }
-            if signal == this.onMouseUp~ptr {
-                handleSignalConnectionChanged[onMouseUp, "mouseup", {
-                    this.onMouseUp.emit(Int().{ this = data.getInt("button") });
-                }];
-            }
             if signal == this.onClick~ptr {
                 handleSignalConnectionChanged[onClick, "click", {
                     this.onClick.emit(Int(0));
@@ -161,6 +151,30 @@
                         posY = data.getInt("offsetY");
                         deltaX = data.getInt("movementX");
                         deltaY = data.getInt("movementY");
+                    });
+                }];
+            }
+        }
+
+        handler this.onSignalConnectionsChanged(signal: ptr[Signal[Widget, MouseButtonPayload]], connectionCount: Int) {
+            if this.id == "" return;
+
+            if signal == this.onMouseDown~ptr {
+                handleSignalConnectionChanged[onMouseDown, "mousedown", {
+                    this.onMouseDown.emit(MouseButtonPayload().{
+                        button = data.getInt("button");
+                        posX = data.getInt("offsetX");
+                        posY = data.getInt("offsetY");
+                    });
+                }];
+            }
+
+            if signal == this.onMouseUp~ptr {
+                handleSignalConnectionChanged[onMouseUp, "mouseup", {
+                    this.onMouseUp.emit(MouseButtonPayload().{
+                        button = data.getInt("button");
+                        posX = data.getInt("offsetX");
+                        posY = data.getInt("offsetY");
                     });
                 }];
             }
