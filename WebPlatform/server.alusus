@@ -251,7 +251,7 @@
         }
 
         def content: array[Char, 1024];
-        String.assign(content~ptr, "<h1>404 - Not Found</h1><p> you are in \"%s\"", requestInfo~cnt.localUri);
+        String.assign(content~ptr, "<h1>404 - Not Found</h1><p> you are in \"%.512s\"", requestInfo~cnt.localUri);
         Http.print(connection, "HTTP/1.1 404 Not Found\r\n");
         Http.print(connection, "Content-Type: text/html\r\n");
         Http.print(connection, "Content-Length: %d\r\n\r\n", String.getLength(content~ptr));
