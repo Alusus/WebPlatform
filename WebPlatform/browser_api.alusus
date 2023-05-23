@@ -34,7 +34,7 @@
     @expname[setTimeout] function _setTimeout (duration: Word, cbId: ArchInt): Word;
     @expname[cancelTimeout] function _cancelTimeout (id: Word);
     // Resource Management
-    @expname[loadImage] function _loadImage (url: ptr[Char], cbId: ArchInt): ArchInt;
+    @expname[loadImage] function _loadImage (url: ptr[Char], cbId: ArchInt);
     @expname[getImageDimensions] function getImageDimensions (imgId: Int, result: ref[Dimensions]);
     @expname[createCanvasResource] function createCanvasResource (width: Int, height: Int): ArchInt;
     @expname[resizeCanvasResource] function resizeCanvasResource (canvasId: ArchInt, width: Int, height: Int);
@@ -42,7 +42,7 @@
         canvasId: ArchInt
     ): ArchInt;
     @expname[registerElementAsResource] function registerElementAsResource (id: ptr[Char]): ArchInt;
-    @expname[loadAudio] function _loadAudio (url: ptr[Char], cbId: ArchInt): ArchInt;
+    @expname[loadAudio] function _loadAudio (url: ptr[Char], cbId: ArchInt);
     @expname[releaseResource] function releaseResource (resourceId: ArchInt);
     @expname[loadFont] function _loadFont (fontName: ptr[Char], url: ptr[Char], cbId: ArchInt);
     @expname[loadJsScript] function _loadJsScript (url: ptr[Char], cbId: ArchInt);

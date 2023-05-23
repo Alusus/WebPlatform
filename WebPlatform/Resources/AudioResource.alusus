@@ -14,9 +14,18 @@
             this.url = u;
             loadAudio(u, closure (json: Json) {
                 def data: Json = json.getObject("eventData");
-                if this.id != 0 releaseResource(this.id);
-                this.id = data.getInt("resourceId");
-                p.resolve(0);
+                if this.id != 0 {
+                    releaseResource(this.id);
+                    this.id = 0;
+                }
+                if data.getBool("success") {
+                    this.id = data.getInt("resourceId");
+                    p.resolve(0);
+                } else p.reject(castSrdRef[SrdRef[GenericError]().{
+                    construct();
+                    code = 1;
+                    message = String("Loading failed");
+                }, Error]);
             });
             return p;
         }

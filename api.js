@@ -279,11 +279,13 @@ wasmApi.loadImage = (url, cbId) => {
     const image = new Image();
     const resourceId = ++resourceCounter;
     image.onload = () => {
-      onEvent(cbId, false, 'loadImage', { resourceId });
+      resources[resourceId] = image;
+      onEvent(cbId, false, 'loadImage', { resourceId, success: true });
+    };
+    image.onerror = () => {
+      onEvent(cbId, false, 'loadImage', { success: false });
     };
     image.src = toJsString(url);
-    resources[resourceId] = image;
-    return resourceId;
 }
 
 wasmApi.getImageDimensions = (imgId, pResult) => {
@@ -329,11 +331,13 @@ wasmApi.loadAudio = (url, cbId) => {
     audio.preload = "auto";
     const resourceId = ++resourceCounter;
     audio.onloadeddata = () => {
-        onEvent(cbId, false, 'loadAudio', { resourceId });
+        resources[resourceId] = audio;
+        onEvent(cbId, false, 'loadAudio', { resourceId, success: true });
+    };
+    audio.onerror = () => {
+      onEvent(cbId, false, 'loadAudio', { success: false });
     };
     audio.src = toJsString(url);
-    resources[resourceId] = audio;
-    return resourceId;
 }
 
 wasmApi.releaseResource = (resourceId) => {
@@ -344,7 +348,9 @@ wasmApi.loadFont = (fontName, url, cbId) => {
     const font = new FontFace(toJsString(fontName), `url(${toJsString(url)})`);
     font.load().then(() => {
         document.fonts.add(font);
-        onEvent(cbId, false, 'loadFont', {});
+        onEvent(cbId, false, 'loadFont', { success: true });
+    }).catch((err) => {
+        onEvent(cbId, false, 'loadFont', { success: false });
     });
 }
 
@@ -352,7 +358,11 @@ wasmApi.loadJsScript = (url, cbId) => {
     const script = document.createElement('script');
     document.head.appendChild(script);
     script.onload = function() {
-        onEvent(cbId, false, 'loadJsScript', "");
+        onEvent(cbId, false, 'loadJsScript', { success: true });
+    };
+    script.onerror = () => {
+      onEvent(cbId, false, 'loadJsScript', { success: false });
+      document.head.removeChild(script);
     };
     script.src = toJsString(url);
 }
@@ -698,10 +708,10 @@ const eventPropMap = {
     keypress: ['code', 'shiftKey', 'ctrlKey', 'altKey'],
     change: [],
     click: [],
-    loadImage: ['resourceId'],
-    loadFont: [],
-    loadAudio: ['resourceId'],
-    loadJsScript: [],
+    loadImage: ['resourceId', 'success'],
+    loadFont: ['success'],
+    loadAudio: ['resourceId', 'success'],
+    loadJsScript: ['success'],
     sendRequest: ['status', 'headers', 'body'],
     timer: [],
     resizeObserver: [],

@@ -50,14 +50,14 @@
         eventHandlers.remove(i);
     }
 
-    function loadImage (url: ptr[Char], cb: closure (Json)): ArchInt {
+    function loadImage (url: ptr[Char], cb: closure (Json)) {
         def index: ArchInt = addEventHandler(cb);
-        return _loadImage(url, eventHandlers(index).id);
+        _loadImage(url, eventHandlers(index).id);
     }
 
-    function loadAudio (url: ptr[Char], cb: closure (Json)): ArchInt {
+    function loadAudio (url: ptr[Char], cb: closure (Json)) {
         def index: ArchInt = addEventHandler(cb);
-        return _loadAudio(url, eventHandlers(index).id);
+        _loadAudio(url, eventHandlers(index).id);
     }
 
     function loadFont (fontName: ptr[Char], url: ptr[Char], cb: closure (Json)) {
@@ -68,7 +68,13 @@
     function loadFont (fontName: ptr[Char], url: ptr[Char]): SrdRef[Promise[Int]] {
         def p: SrdRef[Promise[Int]] = Promise[Int].new();
         loadFont(fontName, url, closure (json: Json) {
-            p.resolve(0);
+            def data: Json = json.getObject("eventData");
+            if data.getBool("success") p.resolve(0)
+            else p.reject(castSrdRef[SrdRef[GenericError]().{
+                construct();
+                code = 1;
+                message = String("Loading failed");
+            }, Error]);
         });
         return p;
     }
@@ -81,7 +87,13 @@
     function loadJsScript (url: ptr[Char]): SrdRef[Promise[Int]] {
         def p: SrdRef[Promise[Int]] = Promise[Int].new();
         loadJsScript(url, closure (json: Json) {
-            p.resolve(0);
+            def data: Json = json.getObject("eventData");
+            if data.getBool("success") p.resolve(0)
+            else p.reject(castSrdRef[SrdRef[GenericError]().{
+                construct();
+                code = 1;
+                message = String("Loading failed");
+            }, Error]);
         });
         return p;
     }
