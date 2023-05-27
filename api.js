@@ -327,17 +327,26 @@ wasmApi.registerElementAsResource = (elementName) => {
 }
 
 wasmApi.loadAudio = (url, cbId) => {
-    const audio = document.createElement('audio');
-    audio.preload = "auto";
-    const resourceId = ++resourceCounter;
-    audio.onloadeddata = () => {
-        resources[resourceId] = audio;
-        onEvent(cbId, false, 'loadAudio', { resourceId, success: true });
-    };
-    audio.onerror = () => {
-      onEvent(cbId, false, 'loadAudio', { success: false });
-    };
-    audio.src = toJsString(url);
+    // We want to load the entire audio file rather than stream it, so we need to fetch the audio
+    // as data then assign the data to the audio object rather than setting the audio's src
+    // property to the URL, otherwise the audio may be streamed rather than fully loaded
+    // upfront.
+    const jsUrl = toJsString(url);
+    fetch(jsUrl).then((res) => {
+        if (!res.ok) {
+            throw new Error(`Request for ${toJsString(url)} failed with status ${res.status}`);
+        }
+        return res.blob().then((blob) => {
+            const audio = document.createElement('audio');
+            audio.src = URL.createObjectURL(blob);
+            const resourceId = ++resourceCounter;
+            resources[resourceId] = audio;
+            onEvent(cbId, false, 'loadAudio', { resourceId, success: true });
+        });
+    }).catch((err) => {
+        console.log(err);
+        onEvent(cbId, false, 'loadAudio', { success: false });
+    });
 }
 
 wasmApi.releaseResource = (resourceId) => {
