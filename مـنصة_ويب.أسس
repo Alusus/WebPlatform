@@ -8,7 +8,7 @@
 @دمج وحدة مـنصة_ويب {
     عرف مسار_منصة_ويب: لقب webPlatformPath؛
     عرف مسار_الموارد_الرئيسية: لقب mainAssetsPath؛
-    عرف مسار_ويب_أسمبلي: لقب wasmPath؛
+    عرف مسار_المنافذ_المرئية: لقب uiEndpointsPath؛
     عرف هات_اعتماديات_البناء: لقب getBuildDependencies؛
 
     عرف أنشئ_عنصر: لقب createElement؛
@@ -34,6 +34,8 @@
     عرف هات_لغات_المستخدم: لقب getUserLanguages؛
     عرف هات_اللغة_المفضلة: لقب getPreferredLanguage؛
     عرف هل_يفضل_نمط_الألوان_الداكن: لقب isDarkColorSchemePreferred؛
+    عرف هات_نمط_العرض_التقدمي_للتطبيق: لقب getPwaDisplayMode؛
+    عرف اعرض_واجهة_التنصيب: لقب showInstallPrompt؛
 
     عرف هات_الختم_الزمني: لقب getTimestamp؛
     عرف ألغ_احتكار_المؤشر: لقب exitPointerLock؛
@@ -623,6 +625,7 @@
         عرف الوسم: لقب hash؛
         عرف الاستعلام: لقب query؛
         عرف ادفع_مسارا: لقب pushLocation؛
+        عرف حجم: لقب resize؛
         عرف المفاتيح_المكبوتة: لقب keysToSwallow؛
         عرف عند_بدء_الكبسة: لقب onKeyDown؛
         عرف عند_انتهاء_الكبسة: لقب onKeyUp؛
@@ -631,6 +634,7 @@
         عرف عند_ربط_مقبض: لقب onGamepadConnected؛
         عرف عند_فصل_مقبض: لقب onGamepadDisconnected؛
         عرف عند_تغير_المسار: لقب onLocationChanged؛
+        عرف عند_استلام_رسالة: لقب onMessage؛
     }
 
     عرف مـخزن: لقب Storage؛

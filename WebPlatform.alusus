@@ -70,7 +70,7 @@ import "WebPlatform/i18n";
 
     def webPlatformPath: String = getThisSourceDirectory[];
     def mainAssetsPath: String = webPlatformPath;
-    def wasmPath: String = "/tmp/WebPlatform/";
+    def uiEndpointsPath: String = "/tmp/WebPlatform/";
 
     func getBuildDependencies(): Array[String] {
         return Http.getBuildDependencies();

@@ -224,7 +224,8 @@ func encodeHtml(str: String): String {
 //==============================================================================
 // Frontend Pages
 
-@uiEndpoint["/", "WebPlatform Example - Chat"]
+@uiEndpoint["/"]
+@title["WebPlatform Example - Chat"]
 func main {
     def onFetch: closure (json: Json);
 
@@ -306,7 +307,8 @@ func main {
     runEventLoop();
 }
 
-@uiEndpoint["/about", "WebPlatform Example - Chat"]
+@uiEndpoint["/about"]
+@title["WebPlatform Example - Chat"]
 func about {
     Window.instance.style.{
         padding = Length4.pt(0);
@@ -337,7 +339,7 @@ func about {
 // Project Control
 
 mainAssetsPath = "Build/Assets/"؛
-wasmPath = "Build/Wasm/"؛
+uiEndpointsPath = "Build/UiEndpoints/"؛
 
 func startChatServer {
     Console.print("Starting server on port 8010...\nURL: http://localhost:8010/\n");
@@ -347,7 +349,7 @@ func startChatServer {
 @expname[main]
 func start (argCount: Int، args: ptr[array[CharsPtr]]): Int {
     mainAssetsPath = "Assets/"؛
-    wasmPath = "Wasm/"؛
+    uiEndpointsPath = "UiEndpoints/"؛
 
     startChatServer()؛
     return 0؛

@@ -9,6 +9,7 @@ let asyncifyDataPtr; // Where the unwind/rewind data structure will live.
 let sleeping = false;
 let eventWaiting = false;
 let wasmStrPtr = null;
+let installPrompt = null;
 
 const resizeObserver = new ResizeObserver(entries => {
     for (let entry of entries) {
@@ -327,17 +328,26 @@ wasmApi.registerElementAsResource = (elementName) => {
 }
 
 wasmApi.loadAudio = (url, cbId) => {
-    const audio = document.createElement('audio');
-    audio.preload = "auto";
-    const resourceId = ++resourceCounter;
-    audio.onloadeddata = () => {
-        resources[resourceId] = audio;
-        onEvent(cbId, false, 'loadAudio', { resourceId, success: true });
-    };
-    audio.onerror = () => {
-      onEvent(cbId, false, 'loadAudio', { success: false });
-    };
-    audio.src = toJsString(url);
+    // We want to load the entire audio file rather than stream it, so we need to fetch the audio
+    // as data then assign the data to the audio object rather than setting the audio's src
+    // property to the URL, otherwise the audio may be streamed rather than fully loaded
+    // upfront.
+    const jsUrl = toJsString(url);
+    fetch(jsUrl).then((res) => {
+        if (!res.ok) {
+            throw new Error(`Request for ${toJsString(url)} failed with status ${res.status}`);
+        }
+        return res.blob().then((blob) => {
+            const audio = document.createElement('audio');
+            audio.src = URL.createObjectURL(blob);
+            const resourceId = ++resourceCounter;
+            resources[resourceId] = audio;
+            onEvent(cbId, false, 'loadAudio', { resourceId, success: true });
+        });
+    }).catch((err) => {
+        console.log(err);
+        onEvent(cbId, false, 'loadAudio', { success: false });
+    });
 }
 
 wasmApi.releaseResource = (resourceId) => {
@@ -642,6 +652,29 @@ wasmApi.isDarkColorSchemePreferred = () => {
     return window.matchMedia('(prefers-color-scheme: dark)').matches;
 }
 
+wasmApi.getPwaDisplayMode = () => {
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
+    if (document.referrer.startsWith('android-app://')) {
+        return toWasmString('twa');
+    } else if (navigator.standalone || isStandalone) {
+        return toWasmString('standalone');
+    }
+    return toWasmString('browser');
+}
+
+wasmApi.resizeWindow = (width, height) => {
+    window.resizeTo
+}
+
+wasmApi.showInstallPrompt = () => {
+    if (installPrompt) {
+        installPrompt.prompt();
+        return true;
+    } else {
+        return false;
+    }
+}
+
 // String APIs
 
 wasmApi.createRegex = (regexStr) => {
@@ -698,6 +731,7 @@ wasmApi.exit = ()=>{}
 // Helper Functions
 
 const eventPropMap = {
+    message: ['data'],
     mousemove: ['offsetX', 'offsetY', 'movementX', 'movementY'],
     mouseenter: [],
     mouseout: [],
@@ -783,8 +817,8 @@ function toWasmStringArray(strs) {
 // Main Functions
 
 async function loadWasm(filename, importTable) {
-    let request = await fetch(filename);
-    let binary = await request.arrayBuffer();
+    let response = await fetch(filename);
+    let binary = await response.arrayBuffer();
     return WebAssembly.instantiate( binary, { "env": importTable } );
 }
 
@@ -802,5 +836,24 @@ async function start(moduleName) {
 
     program.instance.exports.wasmStart();
     program.instance.exports.asyncify_stop_unwind();
+}
+
+function initWebApp(serviceWorkerUrl, scope) {
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+            navigator.serviceWorker.register(serviceWorkerUrl, { scope })
+                .catch(function(error) {
+                    console.error('Service Worker registration failed:', error);
+                });
+        });
+    }
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+        // Prevents the default mini-infobar or install dialog from appearing on mobile
+        e.preventDefault();
+        // Save the event because you'll need to trigger it later.
+        installPrompt = e;
+        window.postMessage({ type: 'pwainstallprompt' }, '*');
+    });
 }
 

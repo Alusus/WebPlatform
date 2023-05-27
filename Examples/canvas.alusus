@@ -45,7 +45,8 @@ class Position {
     def y: Int;
 }
 
-@uiEndpoint["/", "WebPlatform Example - Canvas"]
+@uiEndpoint["/"]
+@title["WebPlatform Example - Canvas"]
 func main {
     // Load assets from the server.
     def img: ImageResource;
