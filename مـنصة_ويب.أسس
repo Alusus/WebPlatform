@@ -631,6 +631,7 @@
         عرف عند_ربط_مقبض: لقب onGamepadConnected؛
         عرف عند_فصل_مقبض: لقب onGamepadDisconnected؛
         عرف عند_تغير_المسار: لقب onLocationChanged؛
+        عرف عند_استلام_رسالة: لقب onMessage؛
     }
 
     عرف مـخزن: لقب Storage؛

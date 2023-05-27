@@ -707,6 +707,7 @@ wasmApi.exit = ()=>{}
 // Helper Functions
 
 const eventPropMap = {
+    message: ['data'],
     mousemove: ['offsetX', 'offsetY', 'movementX', 'movementY'],
     mouseenter: [],
     mouseout: [],

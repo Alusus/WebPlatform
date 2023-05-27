@@ -16,6 +16,7 @@
             this.onGamepadConnected.owner~no_deref = this;
             this.onGamepadDisconnected.owner~no_deref = this;
             this.onLocationChanged.owner~no_deref = this;
+            this.onMessage.owner~no_deref = this;
         }
 
         //-------
@@ -35,6 +36,8 @@
         def onGamepadDisconnectedId: ArchInt = -1;
         def onLocationChanged: DomEventSignal[Window, Int];
         def onLocationChangedId: ArchInt = -1;
+        def onMessage: DomEventSignal[Window, Json];
+        def onMessageId: ArchInt = -1;
 
         handler this.onSignalConnectionsChanged(signal: ptr[Signal[Window, String]], connectionCount: Int) {
             if signal == this.onKeyDown~ptr {
@@ -72,6 +75,14 @@
             if signal == this.onLocationChanged~ptr {
                 handleSignalConnectionChanged[onLocationChanged, "popstate", {
                     this.onLocationChanged.emit(Int(0));
+                }];
+            }
+        }
+
+        handler this.onSignalConnectionsChanged(signal: ptr[Signal[Window, Json]], connectionCount: Int) {
+            if signal == this.onMessage~ptr {
+                handleSignalConnectionChanged[onMessage, "message", {
+                    this.onMessage.emit(data.getObject("data"));
                 }];
             }
         }
