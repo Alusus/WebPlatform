@@ -129,6 +129,10 @@
             WebPlatform.pushState(url, "{}");
             this.onLocationChanged.emit(Int(0));
         }
+
+        handler this.resize(width: Int, height: Int) {
+            resizeWindow(width, height);
+        }
     }
 }
 

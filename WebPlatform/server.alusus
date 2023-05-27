@@ -1,34 +1,18 @@
 @merge module WebPlatform {
-    class UiEndpoint {
-        def uri: String;
-        def filename: String;
-        def title: String;
-        handler this~init() {}
-        handler this~init(uri: String, filename: String, title: String) this.set(uri, filename, title);
-        handler this~init(ref[UiEndpoint]) this.set(value.uri, value.filename, value.title);
-        handler this=ref[UiEndpoint] this.set(value.uri, value.filename, value.title);
-        handler this.set (uri: String, filename: String, title: String) {
-            this.uri = uri;
-            this.filename = filename;
-            this.title = title;
-        }
-    }
-    def uiEndpoints: Array[UiEndpoint];
-    def htmlTemplate: String;
-
-    class AssetRoute {
+    class Route {
         def uri: String;
         def path: String;
         handler this~init() {}
         handler this~init(uri: String, path: String) this.set(uri, path);
-        handler this~init(ref[AssetRoute]) this.set(value.uri, value.path);
-        handler this=ref[AssetRoute] this.set(value.uri, value.path);
+        handler this~init(ref[Route]) this.set(value.uri, value.path);
+        handler this=ref[Route] this.set(value.uri, value.path);
         handler this.set (uri: String, path: String) {
             this.uri = uri;
             this.path = path;
         }
     }
-    def assetRoutes: Array[AssetRoute];
+    def assetRoutes: Array[Route];
+    def uiEndpoints: Array[Route];
 
     def AstTemplateMap: alias Map[String, ref[Core.Basic.TiObject]];
 
@@ -57,6 +41,14 @@
         };
     }
 
+    func getModifierParams (element: ref[Core.Basic.TiObject], enKwd: CharsPtr, arKwd: CharsPtr): Array[String] {
+        def modifier: ref[Core.Basic.TiObject](Spp.astMgr.findModifierForElement(element, enKwd));
+        if modifier~ptr == 0 modifier~no_deref = Spp.astMgr.findModifierForElement(element, arKwd);
+        def endpointParams: Array[String];
+        Spp.astMgr.getModifierStringParams(modifier, endpointParams);
+        return endpointParams;
+    }
+
     func addUiEndpoints (parent: ref[Core.Basic.TiObject]) {
         def elements: Array[ref[Core.Basic.TiObject]] = Spp.astMgr.findElements(
             ast { modifier == "uiEndpoint" || modifier == "منفذ_مرئي" },
@@ -65,37 +57,115 @@
         );
         def i: Int;
         for i = 0, i < elements.getLength(), ++i {
-            def modifier: ref[Core.Basic.TiObject](Spp.astMgr.findModifierForElement(elements(i), "uiEndpoint"));
-            if modifier~ptr == 0 modifier~no_deref = Spp.astMgr.findModifierForElement(elements(i), "منفذ_مرئي");
-            def endpointParams: Array[String];
-            if !Spp.astMgr.getModifierStringParams(modifier, endpointParams)
-                || endpointParams.getLength() < 2 {
-                System.fail(1, "Invalid UI endpoint params");
+            def uriParams: Array[String] = getModifierParams(elements(i), "uiEndpoint", "منفذ_مرئي");
+            if uriParams.getLength() < 1 {
+                System.fail(1, "Invalid @uiEndpoint params");
             }
-            addUiEndpoint(elements(i), endpointParams(0), endpointParams(1));
+
+            def titleParams: Array[String] = getModifierParams(elements(i), "title", "عنوان");
+            def title: String;
+            if titleParams.getLength() >= 1 title = titleParams(0) else title = "Alusus WebPlatform";
+
+            def iconParams: Array[String] = getModifierParams(elements(i), "icon", "أيقونة");
+            def icon: String;
+            if iconParams.getLength() >= 1 icon = iconParams(0);
+
+            def appParams: Array[String] = getModifierParams(elements(i), "webApp", "تطبيق_ويب");
+            def appManifest: String;
+            if appParams.getLength() > 0 appManifest = appParams(0);
+
+            def preCacheFilenames: Array[String] = getModifierParams(elements(i), "preCache", "خزن_مسبق");
+            def dynCacheFilenames: Array[String] = getModifierParams(elements(i), "dynCache", "خزن_تفاعلي");
+
+            addUiEndpoint(elements(i), uriParams(0), title, icon, appManifest, preCacheFilenames, dynCacheFilenames);
         }
     }
 
-    func addUiEndpoint (fn: ref[Core.Basic.TiObject], uri: String, title: String) {
+    func addUiEndpoint (
+        fn: ref[Core.Basic.TiObject], uri: String, title: String, iconFilename: String,
+        manifestFilename: String, preCacheFilenames: Array[String], dynCacheFilenames: Array[String]
+    ) {
+        def fnName: String = generateWasm(fn);
+        if iconFilename != "" {
+            def icon: String;
+            iconFilename.split("/").{ icon = this(this.getLength() - 1) };
+            System.exec(String.format("cp %s \"%s%s\"", iconFilename.buf, uiEndpointsPath.buf, icon.buf));
+            iconFilename = icon;
+        }
+        if manifestFilename != "" {
+            System.exec(String.format("cp %s \"%s%s-manifest.json\"", manifestFilename.buf, uiEndpointsPath.buf, fnName.buf));
+            preCacheFilenames.add({
+                uri,
+                String("/api.js"),
+                String.format("/%s.wasm", fnName.buf),
+                String.format("/%s-manifest.json", fnName.buf),
+            });
+            if iconFilename != "" preCacheFilenames.add(String.format("/") + iconFilename);
+            generateServiceWorker(fnName, preCacheFilenames, dynCacheFilenames);
+        }
+        generateHtml(fnName, title, iconFilename, manifestFilename != "");
+        Spp.astMgr.insertAst(
+            (ast uiEndpoints.add(Route(String(uri), String(path)))),
+            AstTemplateMap()
+                .set(String("uri"), Core.Data.Ast.StringLiteral(uri))
+                .set(String("path"), Core.Data.Ast.StringLiteral(fnName + ".html"))
+        );
+    }
+
+    func generateWasm(fn: ref[Core.Basic.TiObject]): String {
         def binding: ref[Core.Basic.Binding](Core.Basic.getInterface[fn, Core.Basic.Binding]);
         binding.setMember("name", Core.Basic.TiStr("wasmStart"));
-        def wasm: Build.Wasm(fn, wasmPath + "_intermediate.wasm");
+        def wasm: Build.Wasm(fn, uiEndpointsPath + "_intermediate.wasm");
         wasm.addDependency(webPlatformPath + String("stdlib-min.wasm"));
         wasm.addFlags({ String("--export=malloc"), String("--export=realloc") });
         wasm.generate();
-        def wasmFilename: String = String("/") + getElementName(fn) + ".wasm";
+        def fnName: String = getElementName(fn);
         if System.exec(
-            webPlatformPath + "Tools/bin/wasm-opt -O --asyncify " + wasmPath + "_intermediate.wasm -o " + wasmPath + wasmFilename
+            webPlatformPath + "Tools/bin/wasm-opt -O --asyncify " + uiEndpointsPath + "_intermediate.wasm -o " +
+            uiEndpointsPath + fnName + ".wasm"
         ) != 0 {
             System.fail(1, "Post-build pass failed\n");
         }
-        Spp.astMgr.insertAst(
-            (ast uiEndpoints.add(UiEndpoint(String(uri), String(wasmFilename), String(title)))),
-            AstTemplateMap()
-                .set(String("uri"), Core.Data.Ast.StringLiteral(uri))
-                .set(String("wasmFilename"), Core.Data.Ast.StringLiteral(wasmFilename))
-                .set(String("title"), Core.Data.Ast.StringLiteral(title))
+        return fnName;
+    }
+
+    func generateServiceWorker(fnName: String, preCacheFilenames: Array[String], dynCacheFilenames: Array[String]) {
+        def workerTemplate: String = Fs.readFile(webPlatformPath + "service-worker.js");
+        def content: String = String.format(
+            workerTemplate, createJsStringArray(preCacheFilenames).buf, createJsStringArray(dynCacheFilenames).buf
         );
+        Fs.createFile(
+            String.format("%s%s-service-worker.js", uiEndpointsPath.buf, fnName.buf),
+            content.buf, content.getLength()
+        );
+    }
+
+    func createJsStringArray(strs: Array[String]): String {
+        def result: String = "[";
+        def i: Int;
+        for i = 0, i < strs.getLength(), ++i {
+            if i != 0 result += ",\n";
+            result += "\"";
+            result += strs(i).replace("\\", "\\\\").replace("\"", "\\\"");
+            result += "\"";
+        }
+        result += "]";
+        return result;
+    }
+
+    func generateHtml(fnName: String, title: String, icon: String, webApp: Bool) {
+        def htmlTemplate: String = Fs.readFile(webPlatformPath + "wasm.html");
+        def extraHeaders: String;
+        if icon != "" extraHeaders += String.format("<link rel=\"icon\" href=\"/%s\" />", icon.buf);
+        def extraScript: String;
+        if webApp {
+            extraHeaders += String.format("<link rel=\"manifest\" href=\"/%s-manifest.json\" />", fnName.buf);
+            extraScript += String.format("initWebApp(\"/%s-service-worker.js\", \"/\");", fnName.buf);
+        }
+        def content: String = String.format(
+            htmlTemplate, title.buf, extraHeaders.buf, extraScript.buf, String.format("/%s.wasm", fnName.buf).buf
+        );
+        Fs.createFile(uiEndpointsPath + fnName + ".html", content.buf, content.getLength());
     }
 
     func addBeEndpoints (parent: ref[Core.Basic.TiObject]) {
@@ -154,7 +224,7 @@
 
     func addAssetRoute (uri: String, path: String) {
         validateAssetRoute(uri, path);
-        assetRoutes.add(AssetRoute(uri, path));
+        assetRoutes.add(Route(uri, path));
     }
 
     func validateAssetRoute(uri: String, path: String) {
@@ -186,7 +256,6 @@
         if uiEndpoints.getLength() == 0 {
             System.fail(1, "No UI endpoints found\n");
         }
-        htmlTemplate = Fs.readFile(mainAssetsPath + "wasm.html");
 
         options.add(0);
 
@@ -222,6 +291,14 @@
                 return 1;
             }
 
+            if !String.isEqual(uri, "/") {
+                def fileName: String = uiEndpointsPath + uri;
+                if Fs.exists(fileName) {
+                    Http.sendFile(connection, fileName);
+                    return 1;
+                }
+            }
+
             def i: Int;
             for i = 0, i < assetRoutes.getLength(), ++i {
                 if String.find(uri, assetRoutes(i).uri) == uri and assetRoutes(i).uri != uri {
@@ -234,18 +311,13 @@
             }
 
             for i = 0, i < uiEndpoints.getLength(), ++i {
-                if uiEndpoints(i).filename == uri {
-                    Http.sendFile(connection, wasmPath + uri);
+                def len: ArchInt = uiEndpoints(i).uri.getLength();
+                if uiEndpoints(i).uri == uri or (
+                    len > 0 and uiEndpoints(i).uri(len - 1) == '*' and
+                    String.compare(uiEndpoints(i).uri, uri, len - 1) == 0
+                ) {
+                    Http.sendFile(connection, uiEndpointsPath + uiEndpoints(i).path);
                     return 1;
-                } else {
-                    def len: ArchInt = uiEndpoints(i).uri.getLength();
-                    if uiEndpoints(i).uri == uri or (
-                        len > 0 and uiEndpoints(i).uri(len - 1) == '*' and
-                        String.compare(uiEndpoints(i).uri, uri, len - 1) == 0
-                    ) {
-                        sendHtmlTemplate(connection, uiEndpoints(i).title, uiEndpoints(i).filename);
-                        return 1;
-                    }
                 }
             }
         }
@@ -259,17 +331,4 @@
 
         return 1;
     }
-
-    func sendHtmlTemplate (connection: ptr[Http.Connection], title: ptr[array[Char]], wasmFilename: ptr[array[Char]]) {
-        def content: String = String.format(htmlTemplate, title, wasmFilename);
-        def responseTemplate:
-            "HTTP/1.1 200 OK\r\n"
-            "Content-Type: text/html\r\n"
-            "Content-Length: %d\r\n"
-            "Connection: close\r\n"
-            "Accept-Ranges: bytes\r\n\r\n"
-            "%s";
-        Http.print(connection, responseTemplate, content.getLength(), content.buf);
-    }
 }
-
