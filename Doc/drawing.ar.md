@@ -4,39 +4,41 @@
 
 [[رجوع]](../readme.ar.md)
 
+<div dir=rtl>
+
 ## رسـم (Drawing)
 
 يستعمل هذا المكون (mixin) لتوفير عمليات الرسم لمختلف الأشكال في المرسم.
 
 #### ارسم_خطا (drawLine)
 
-<div dir=rtl>
-
 ```
 عملية هذا.ارسم_خطا(س1: صـحيح، ع1: صـحيح، س2: صـحيح، ع2: صـحيح)؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 handler this.drawLine(x1: Int, y1: Int, x2: Int, y2: Int);
 ```
 
+</div>
+
 دالة تستعمل لرسم خط بين نقطتين.
 
 #### ارسم_مضلعا (drawPolygon)
-
-<div dir=rtl>
 
 ```
 عملية هذا.ارسم_مضلعا(عدد_النقاط: صـحيح، النقاط: سند[مصفوفة[صـحيح]]، ممتلئ: ثـنائي)؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 handler this.drawPolygon(pointCount: Int, points: ref[array[Int]], filled: Bool);
 ```
+
+</div>
 
 دالة لرسم مضلع.
 
@@ -50,67 +52,67 @@ handler this.drawPolygon(pointCount: Int, points: ref[array[Int]], filled: Bool)
 
 #### ارسم_مستطيلا_مليئا (drawFilledRect)
 
-<div dir=rtl>
-
 ```
 عملية هذا.ارسم_مستطيلا_مليئا(س: صـحيح، ع: صـحيح، عرض: صـحيح، ارتفاع: صـحيح)؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 handler this.drawFilledRect(x: Int, y: Int, w: Int, h: Int);
 ```
 
+</div>
+
 دالة لرسم مستطيل مليء بناءً على النقطة العليا من اليسار و العرض و الارتفاع.
 
 #### فرغ_مستطيلا (clearRect)
-
-<div dir=rtl>
 
 ```
 عملية هذا.فرغ_مستطيلا(س: صـحيح، ع: صـحيح، عرض: صـحيح، ارتفاع: صـحيح)؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 handler this.clearRect(x: Int, y: Int, w: Int, h: Int);
 ```
 
+</div>
+
 دالة لتفريغ مستطيل بناءً على النقطة العليا من اليسار و العرض و الارتفاع.
 
 #### ارسم_دائرة (drawCircle)
-
-<div dir=rtl>
 
 ```
 عملية هذا.ارسم_دائرة(س: صـحيح، ع: صـحيح، نصف_قطر: صـحيح)؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 handler this.drawCircle(x: Int, y: Int, r: Int);
 ```
 
+</div>
+
 دالة لرسم دائرة بناءً على إحداثيات المركز و نصف القطر.
 
 #### ارسم_كتابة (drawText)
-
-<div dir=rtl>
 
 ```
 عملية هذا.ارسم_كتابة(نص: مؤشر[مـحرف]، خط: مؤشر[مـحرف]، س: صـحيح، ص: صـحيح)؛
 عملية هذا.ارسم_كتابة(نص: مؤشر[مـحرف]، خط: مؤشر[مـحرف]، س: صـحيح، ص: صـحيح، من_اليمين: ثـنائي)؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 handler this.drawText(text: ptr[Char], font: ptr[Char], x: Int, y: Int);
 handler this.drawText(text: ptr[Char], font: ptr[Char], x: Int, y: Int, rtl: Bool);
 ```
+
+</div>
 
 دالة لرسم نص.
 
@@ -126,98 +128,99 @@ handler this.drawText(text: ptr[Char], font: ptr[Char], x: Int, y: Int, rtl: Boo
 
 #### قس_أبعاد_كتابة (measureText)
 
-<div dir=rtl>
-
 ```
 عملية هذا.قس_أبعاد_كتابة(نص: مؤشر[مـحرف]، خط: مؤشر[مـحرف]): أبـعاد؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 handler this.measureText(text: ptr[Char], font: ptr[Char]): Dimensions;
 ```
 
+</div>
+
 دالة لقياس أبعاد نص بناء على النص و الخط المستعمل.
 
 #### حدد_الاتجاه (setDirection)
-
-<div dir=rtl>
 
 ```
 عملية هذا.حدد_الاتجاه(اتجاه: مؤشر[مـحرف])؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 handler this.setDirection(dir: ptr[Char]);
 ```
 
+</div>
+
 تحديد اتجاه النص المبدئي لهذا المرسم.
 
 #### حدد_نمط_الملء (setFillStyle)
-
-<div dir=rtl>
 
 ```
 عملية هذا.حدد_نمط_الملء(لون1: مؤشر[مـحرف]، لون2: مؤشر[مـحرف]، س1: صـحيح، ع1: صـحيح، س2: صـحيح، ع2: صـحيح)؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 handler this.setFillStyle(c1:ptr[Char], c2:ptr[Char], x1: Int, y1: Int, x2: Int, y2: Int);
 ```
+
+</div>
 
 تحديد نمط الملء بتدرج ما بين اللونين المعطيين. يبدأ التدرج باللون الأول من النقطة الأولى ويتدرج
 باتجاه الشعاع الواصل بين النقطتين لينتهي باللون الثاني عند النقطة الثانية.
 
 #### حدد_نمط_القلم (setStrokeStyle)
 
-<div dir=rtl>
-
+<div dir=ltr>
 ```
 عملية هذا.حدد_نمط_القلم(طراز_القلم: مؤشر[مـحرف])؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 handler this.setStrokeStyle(ss: ptr[Char]);
 ```
 
+</div>
+
 دالة لتحديد نمط القلم المستعمل في الرسم.
 
 #### حدد_عرض_القلم (setLineWidth)
-
-<div dir=rtl>
 
 ```
 عملية هذا.حدد_عرض_القلم(عرض_الخط: صـحيح)؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 handler this.setLineWidth(lw: Int);
 ```
 
+</div>
+
 دالة لتحديد عرض القلم المستعمل في الرسم.
 
 #### ارسم_صورة (drawImage)
-
-<div dir=rtl>
 
 ```
 عملية هذا.ارسم_صورة(صورة: سند[مـورد_صورة]، س: صـحيح، ع: صـحيح، عرض: صـحيح، ارتفاع: صـحيح، ألفا: عـائم)؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 handler this.drawImage(img: ref[ImageResource], x: Int, y: Int, w: Int, h: Int, alpha: Float);
 ```
+
+</div>
 
 ترسم الصورة المعطاة، محجمة لتناسب الموضع والأبعاد المحددة. تطبق قيمة ألفا المعطاة على الصورة، فإن
 امتلكت الصورة قناة ألفا دُمجت مع قيمة ألفا المعطاة.
@@ -232,17 +235,19 @@ handler this.drawImage(img: ref[ImageResource], x: Int, y: Int, w: Int, h: Int, 
 
 #### فرغ (clear)
 
-<div dir=rtl>
-
 ```
 عملية هذا.فرغ()؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 handler this.clear();
 ```
 
+</div>
+
 تفرغ مساحة الرسم الحالية بالكامل.
+
+</div>
 

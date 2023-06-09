@@ -4,6 +4,8 @@
 
 [[رجوع]](../readme.ar.md)
 
+<div dir=rtl>
+
 ## الـودجات (Widgets)
 
 ### ودجـة (Widget)
@@ -22,113 +24,113 @@
 
 ##### عند_تغير_الأبعاد (onResize)
 
-<div dir=rtl>
-
 ```
 عرف عند_تغير_الأبعاد: إشـارة_حدث_دوم[ودجـة، صـحيح]؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 def onResize: DomEventSignal[Widget, Int];
 ```
 
+</div>
+
 إشارة بأن أبعاد الودجة تغيرت. الحمولة مهملة في هذا الحدث.
 
 ##### عند_تحريك_المؤشر (onMouseMove)
-
-<div dir=rtl>
 
 ```
 عرف عند_تحريك_المؤشر: إشـارة_حدث_دوم[ودجـة، حـمولة_تحريك_المؤشر]؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 def onMouseMove: DomEventSignal[Widget, MouseMovePayload];
 ```
 
+</div>
+
 إشارة بأن المؤشر تحرك.
 
 ##### عند_دخول_المؤشر (onMouseEnter)
-
-<div dir=rtl>
 
 ```
 عرف عند_دخول_المؤشر: إشـارة_حدث_دوم[ودجـة، صـحيح]؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 def onMouseEnter: DomEventSignal[Widget, Int];
 ```
 
+</div>
+
 إشارة بأن المؤشر دخل المنطقة الخاصة بالودجة. الحمولة مهملة في هذا الحدث.
 
 ##### عند_خروج_المؤشر (onMouseOut)
-
-<div dir=rtl>
 
 ```
 عرف عند_خروج_المؤشر: إشـارة_حدث_دوم[ودجـة، صـحيح]؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 def onMouseOut: DomEventSignal[Widget, Int];
 ```
 
+</div>
+
 إشارة بأن المؤشر خرج من المنطقة الخاصة بالودجة. الحملة مهملة في هذا الحدث.
 
 ##### عند_بدء_النقرة (onMouseDown)
-
-<div dir=rtl>
 
 ```
 عرف عند_بدء_النقرة: إشـارة_حدث_دوم[ودجـة، حـمولة_زر_المؤشر]؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 def onMouseDown: DomEventSignal[Widget, MouseButtonPayload];
 ```
 
+</div>
+
 إشارة بأنه تم بدء النقر بالمؤشر.
 
 ##### عند_انتهاء_النقرة (onMouseUp)
-
-<div dir=rtl>
 
 ```
 عرف عند_انتهاء_النقرة: إشـارة_حدث_دوم[ودجـة، حـمولة_زر_المؤشر]؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 def onMouseUp: DomEventSignal[Widget, MouseButtonPayload];
 ```
 
+</div>
+
 إشارة بأن النقر انتهى.
 
 ##### عند_الضغط (onClick)
-
-<div dir=rtl>
 
 ```
 عرف عند_الضغط: إشـارة_حدث_دوم[ودجـة، صـحيح]؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 def onClick: DomEventSignal[Widget, Int];
 ```
+
+</div>
 
 إشارة بأن ضغطة بزر الفأرة قد حدثت. الحمولة مهملة في هذا الحدث.
 
@@ -136,84 +138,84 @@ def onClick: DomEventSignal[Widget, Int];
 
 ##### الطراز (style)
 
-<div dir=rtl>
-
 ```
 عملية هذا.الطراز: سـندنا[طـقم_طرز]؛
 عملية هذا.الطراز = سـندنا[طـقم_طرز]؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 handler this.style: SrdRef[StyleSet];
 handler this.style = SrdRef[StyleSet];
 ```
 
+</div>
+
 تستخدم لتعديل طقم الطرز المخصص لهذه الودجة. يمكن تعيين طقم طرز مشترك مع ودجات أخرى. في حال محاولة
 تغيير طقم الطرز الخاص بالودجة قبل تعيين طقم طرز لها سيُنشأ طقم طرز تلقائيًا لهذه الودجة.
 
 ##### هات_الأبعاد (getDimensions)
 
-<div dir=rtl>
-
 ```
 دالة هذا.هات_الأبعاد(): أبـعاد؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 handler this.getDimensions(): Dimensions;
 ```
 
+</div>
+
 دالة لجلب الأبعاد الحالية للودجة.
 
 ##### التمس_احتكار_المؤشر (requestPointerLock)
-
-<div dir=rtl>
 
 ```
 عملية هذا.التمس_احتكار_المؤشر()؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 handler this.requestPointerLock();
 ```
 
+</div>
+
 طلب احتكار المؤشر. يؤدي هذا لإزالة مؤشر الفأرة مع استمرار الودجة باستلام إشعارات تحرك المؤشر.
 
 ##### التمس_ملء_الشاشة (requestFullScreen)
-
-<div dir=rtl>
 
 ```
 عملية هذا.التمس_ملء_الشاشة()؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 handler this.requestFullScreen();
 ```
 
+</div>
+
 طلب الانتقال إلى وضع ملء الشاشة. سيؤدي هذا لتكبير الودجة لتملأ الشاشة.
 
 ##### مرر_إلى_المرأى (scrollIntoView)
-
-<div dir=rtl>
 
 ```
 عملية هذا.مرر_إلى_المرأى();
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 handler this.scrollIntoView();
 ```
+
+</div>
 
 طريقة تسمح بالنزول في الصفحة الحاوية لمجموعة عناصر إلى العنصر الذي استدعى هذه الطريقة ليصبح مرئياً.
 
@@ -230,17 +232,17 @@ handler this.scrollIntoView();
 
 ##### أضف_فروع (addChildren)
 
-<div dir=rtl>
-
 ```
 عملية هذا.أضف_فروع(عدد: صـحيح، فروع: ...سند_مؤقت[سـندنا[ودجـة]])؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 handler this.addChildren (count: Int, children: ...temp_ref[SrdRef[Widget]]);
 ```
+
+</div>
 
 طريقة لإضافة فرع جديد أو أكثر ضمن هذا الصنف.
 
@@ -252,17 +254,18 @@ handler this.addChildren (count: Int, children: ...temp_ref[SrdRef[Widget]]);
 
 ##### أزل_فروع (removeChildren)
 
-<div dir=rtl>
-
 ```
 عملية هذا.أزل_فروع(عدد: صـحيح، فروع: ...سند_مؤقت[سـندنا[ودجـة]])؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 handler this.removeChildren (count: Int, children: ...temp_ref[SrdRef[Widget]]);
 ```
+
+</div>
+
 طريقة لإزالة فرع أو أكثر من الصنف.
 
 المعطيات:
@@ -334,33 +337,33 @@ handler this.removeChildren (count: Int, children: ...temp_ref[SrdRef[Widget]]);
 
 ##### عند_الغيير (onChanged)
 
-<div dir=rtl>
-
 ```
 عرف عند_الغيير: إشـارة_حدث_دوم[مـدخل_نـص، صـحيح]؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 def onChanged: DomEventSignal[TextInput, Int];
 ```
 
+</div>
+
 يُثار هذا الحدث عند تغير النص المدخل. الحمولة مهملة في هذا الحدث.
 
 ##### عند_كبس_مفتاح (onKeyPress)
-
-<div dir=rtl>
 
 ```
 عرف عند_كبس_مفتاح: إشـارة_حدث_دوم[مـدخل_نـص، نـص]؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 def onKeyPress: DomEventSignal[TextInput, String];
 ```
+
+</div>
 
 يُثار هذا الحدث عند كبس زر في لوحة المفاتيح.
 
@@ -368,17 +371,17 @@ def onKeyPress: DomEventSignal[TextInput, String];
 
 ##### عند_انتهاء_الكبسة (onKeyUp)
 
-<div dir=rtl>
-
 ```
 عرف عند_انتهاء_الكبسة: إشـارة_حدث_دوم[مـدخل_نـص، نـص]؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 def onKeyUp: DomEventSignal[TextInput, String];
 ```
+
+</div>
 
 يُثار هذا الحدث عند انتهاء كبسة زر في لوحة المفاتيح.
 
@@ -401,33 +404,33 @@ def onKeyUp: DomEventSignal[TextInput, String];
 
 ##### عند_الغيير (onChanged)
 
-<div dir=rtl>
-
 ```
 عرف عند_الغيير: إشـارة_حدث_دوم[مـدخل، صـحيح]؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 def onChanged: DomEventSignal[Input, Int];
 ```
 
+</div>
+
 يُثار الحدث عند تغير القيمة المدخلة. الحمولة مهملة في هذا الحدث.
 
 ##### عند_كبس_مفتاح (onKeyPress)
-
-<div dir=rtl>
 
 ```
 عرف عند_كبس_مفتاح: إشـارة_حدث_دوم[مـدخل، نـص]؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 def onKeyPress: DomEventSignal[Input, String];
 ```
+
+</div>
 
 يُثار عند كبس زر على لوحة المفاتيح.
 
@@ -435,17 +438,17 @@ def onKeyPress: DomEventSignal[Input, String];
 
 ##### عند_انتهاء_الكبسة (onKeyUp)
 
-<div dir=rtl>
-
 ```
 عرف عند_انتهاء_الكبسة: إشـارة_حدث_دوم[مـدخل، نـص]؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 def onKeyUp: DomEventSignal[Input, String];
 ```
+
+</div>
 
 يُثار هذا الحدث عند انتهاء كبسة زر في لوحة المفاتيح.
 
@@ -464,50 +467,51 @@ def onKeyUp: DomEventSignal[Input, String];
 
 ##### عند_الغيير (onChanged)
 
-<div dir=rtl>
-
 ```
 عرف عند_الغيير: إشـارة_حدث_دوم[خيارات، صـحيح]؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 def onChanged: DomEventSignal[Select, Int];
 ```
+
+</div>
+
 يُثار عند تغير القيمة المختارة. الحمولة مهملة في هذا الحدث.
 
 #### العمليات
 
 ##### هات_القيمة_المختارة (getSelectedValue)
 
-<div dir=rtl>
-
 ```
 عملية هذا.هات_القيمة_المختارة(): نـص؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 handler this.getSelectedValue(): String;
 ```
 
+</div>
+
 ترجع القيمة الحالية لاختيار المستخدم.
 
 ##### اختر_قيمة (selectValue)
-
-<div dir=rtl>
 
 ```
 عملية هذا.اختر_قيمة(القيمة_الجديدة: نـص)؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 handler this.selectValue(newValue: String);
 ```
+
+</div>
 
 تغيير الخيار الحالي.
 
@@ -530,17 +534,17 @@ handler this.selectValue(newValue: String);
 
 ##### حدد_الفرع (setChild)
 
-<div dir=rtl>
-
 ```
 عملية هذا.حدد_الفرع(الفرع: سند_مؤقت[سـندنا[ودجـة]])؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 handler this.setChild (child: temp_ref[SrdRef[Widget]]);
 ```
+
+</div>
 
 تحديد قيمة الفرع.
 
@@ -553,35 +557,35 @@ handler this.setChild (child: temp_ref[SrdRef[Widget]]);
 
 ##### حدد_لتنف (setHtml)
 
-<div dir=rtl>
-
 ```
 عملية هذا.حدد_لتنف(لتنف: نـص)؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 handler this.setHtml(html: String);
 ```
 
+</div>
+
 حدد قيمة HTML للمشهد.
 
 ##### حدد_ماركداون (setMarkdown)
-
-<div dir=rtl>
 
 ```
 عملية هذا.حدد_ماركداون(ماركداون: نـص)؛
 عملية هذا.حدد_ماركداون(ماركداون: نـص، روابط_في_لسان_جديد: ثـنائي)؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 handler this.setMarkdown(md: String);
 handler this.setMarkdown(md: String, linksInNewTab: Bool);
 ```
+
+</div>
 
 تحديدة قيمة ماركداون للمشهد. الصيغة الثانية من هذه الدالة تسمح بتحديد ما إن كانت الروابط تقتح
 في لسان جديد أم في نفس اللسان. الصيغة الأولى تفتح الروابط في نفس اللسان.
@@ -590,8 +594,6 @@ handler this.setMarkdown(md: String, linksInNewTab: Bool);
 ## أصناف متعلقة
 
 ### حـمولة_تحريك_المؤشر (MouseMovePayload)
-
-<div dir=rtl>
 
 ```
 صنف حـمولة_تحريك_المؤشر {
@@ -602,7 +604,7 @@ handler this.setMarkdown(md: String, linksInNewTab: Bool);
 }
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 class MouseMovePayload {
@@ -612,6 +614,8 @@ class MouseMovePayload {
     def deltaY: Float = 0;
 }
 ```
+
+</div>
 
 يحمل هذا الصنف معلومات حدث تحريك المؤشر.
 
@@ -625,8 +629,6 @@ class MouseMovePayload {
 
 ### حـمولة_زر_المؤشر (MouseButtonPayload)
 
-<div dir=rtl>
-
 ```
 صنف حـمولة_زر_المؤشر {
     عرف الزر: صـحيح = 0؛
@@ -635,7 +637,7 @@ class MouseMovePayload {
 }
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 class MouseButtonPayload {
@@ -644,6 +646,9 @@ class MouseButtonPayload {
     def posY: Float = 0;
 }
 ```
+
+</div>
+
 يحمل هذا الصنف معلومات حدث نقر المؤشر.
 
 `الزر` (`button`) الزر الذي تم الضغط عليه.
@@ -651,4 +656,6 @@ class MouseButtonPayload {
 `موقع_س` (`posX`) إحداثيات المؤشر على المحور س.
 
 `موقع_ص` (`posY`) إحداثيات المؤشر على المحور ص.
+
+</div>
 
