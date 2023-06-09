@@ -4,7 +4,7 @@
 
 [[Back]](../readme.md)
 
-##Signals
+## Signals
 
 Signals enable the user to receive events from the asynchronous operations, wether from the UI or
 other async operations.

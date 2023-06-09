@@ -4,7 +4,9 @@
 
 [[رجوع]](../readme.ar.md)
 
-## المركبات (Components)
+<div dir=rtl>
+
+## المركّبات (Components)
 
 المركبات تمكن المستخدم من إنشاء أجزاء من واجهة المستخدم قابلة لإعادة الاستخدام، ما يسهل على المستخدم
 إنشاء واجهات مستخدم أكثر تعقيدًا. المركب يحتوي على مشهد يتكون من ودجة واحدة أو شجرة من الودجات
@@ -20,8 +22,6 @@
 بالإضافة لكل ذلك نقوم بتعريف طريقة تعيد سند إلى هذا المركب.
 
 مثال على ذلك:
-
-<div dir=rtl>
 
 ```
 // نقوم بتعريف مركب يمثل ترويسة
@@ -59,7 +59,7 @@
 
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 class Header {
@@ -95,6 +95,7 @@ class Header {
 }
 ```
 
+</div>
 
 ### مـبدال (Switcher)
 
@@ -109,6 +110,9 @@ class Header {
     عرف أيجب_الاحتفاظ_بالفرع(فرع: سند[ودجـة])؛
 }
 ```
+
+<div dir=ltr>
+
 ```
 class Switcher {
     handler this.setTransition(name: String, transition: SwitcherTransition);
@@ -118,20 +122,21 @@ class Switcher {
 }
 ```
 
+</div>
 
 #### حدد_الانتقال (setTransition)
-
-<div dir=rtl>
 
 ```
 عملية هذا.حدد_الانتقال(اسم_الانتقال: نـص، الانتقال: انـتقال_مبدال)؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 handler this.setTransition(name: String, transition: SwitcherTransition);
 ```
+
+</div>
 
 إضافة مؤثرات انتقال للاستخدام لاحقًا في دالة `بدل_إلى` (`switchTo`).
 
@@ -144,19 +149,19 @@ handler this.setTransition(name: String, transition: SwitcherTransition);
 
 #### بدل_إلى (switchTo)
 
-<div dir=rtl>
-
 ```
 عملية هذا.بدل_إلى(فرع: سـندنا[ودجـة])؛
 عملية هذا.بدل_إلى(فرع: سـندنا[ودجـة]، اسم_الانتقال: نـص)؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 handler this.switchTo(child: SrdRef[Widget]);
 handler this.switchTo(child: SrdRef[Widget], transitionName: String);
 ```
+
+</div>
 
 تبديل المشهد الحالي إلى مشهد جديد. الصيغة الأولى تبدل المشهد دون أي مؤثرات انتقال، بينما بدل
 الصيغة الثانية المشهد مع مؤثرات الانتقال المحددة بالاسم المعطى. الاسم يجب أن يطابق أحد المؤثرات
@@ -164,17 +169,17 @@ handler this.switchTo(child: SrdRef[Widget], transitionName: String);
 
 #### أيجب_الاحتفاظ_بالفرع (shouldPreserveChild)
 
-<div dir=rtl>
-
 ```
 عرف أيجب_الاحتفاظ_بالفرع: مغلفة (الفرع: سند[ودجـة]): ثـنائي؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 def shouldPreserveChild: closure (child: ref[Widget]): Bool;
 ```
+
+</div>
 
 مغلفة للاستدعاء العكسي، تُستدعى عند خروج مشهد من الصورة (أي بعد التبديل إلى مشهد آخر) لتحديد ما إن
 كنا نرغب بحذف المشهد القديم أم إبقاؤه مخفيا للاستخدام لاحقًا. في بعض الحالات قد ترغب بإبقاء المشهد
@@ -188,8 +193,6 @@ def shouldPreserveChild: closure (child: ref[Widget]): Bool;
 
 ### انـتقال_مبدال (SwitcherTransition)
 
-<div dir=rtl>
-
 ```
 صنف انـتقال_مبدال {
     عرف طراز_المشهد_الحالي: طـراز؛
@@ -198,7 +201,7 @@ def shouldPreserveChild: closure (child: ref[Widget]): Bool;
 }
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 class SwitcherTransition {
@@ -207,6 +210,8 @@ class SwitcherTransition {
     def totalDuration: Int;
 }
 ```
+
+</div>
 
 يحمل هذا الصنف خصائص الانتقال المستخدم في مبدال. يعتمد تعريف الانتقال على الطرز وما تملكه من خصائص
 للتحريك والمؤثرات.
@@ -229,17 +234,17 @@ class SwitcherTransition {
 
 #### عند_المسار_المجهول (onUnknownRoute)
 
-<div dir=rtl>
-
 ```
 عرف عند_المسار_المجهول: مغلف(سند[مـبدال_توجيه]، حـمولة_مسار)؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 def onUnknownRoute: closure(ref[RoutingSwitcher], RoutePayload);
 ```
+
+</div>
 
 مغلفة للاستدعاء العكسي تُستدعى عندما يكون المسار غير معروف بالنسبة للمبدال.
 
@@ -249,15 +254,13 @@ def onUnknownRoute: closure(ref[RoutingSwitcher], RoutePayload);
 
 #### مسار (route)
 
-<div dir=rtl>
-
 ```
 عرف مسار(مسار: نـص): سند[مـنادى_مسار]؛
 عرف مسار(مسار: مـؤشر[مـحرف]): سند[مـنادى_مسار]؛
 عرف مـنادى_مسار: لقب مغلفة(حـمولة_مسار): سـندنا[ودجـة]؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 handler this.route(r: String): ref[RouteCallback];
@@ -265,41 +268,43 @@ handler this.route(r: CharsPtr): ref[RouteCallback];
 def RouteCallback: alias closure(RoutePayload): SrdRef[Widget];
 ```
 
+</div>
+
 تحديد الدالة العكسية التي ستُستدعى عند تغير المسار إلى المسار المُعطى في هذه الدالة. دالة `مسار`
 تُرجع سندًا للمغلفة كي يتمكن المستخدم من تحديد قيمة للمغلفة. يجب على المغلفة أن ترجع سندا إلى
 الودجة التي ستُعرض في المبدال. معطى دالة `مسار` تعبير نمطي (regular expression).
 
 #### حدد_الانتقال (setTransition)
 
-<div dir=rtl>
-
 ```
 عرف حدد_الانتقال(أمامي: انـتقال_مبدال، خلفي: انـتقال_مبدال)؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 handler this.setTransition(forward: SwitcherTransition, backward: SwitcherTransition);
 ```
 
+</div>
+
 تحديد الانتقالين المطلوبين في حالتي الذهاب إلى الرابط السابق أو التالي.
 
 #### استنتج_تسلسل_المسار_الحالي (determineCurrentRouteIndex)
-
-<div dir=rtl>
 
 ```
 عرف استنتج_تسلسل_المسار_الحالي(): صـحيح؛
 عرف استنتج_تسلسل_المسار_الحالي(حمولة_مسار: سند[حـمولة_مسار]): صـحيح؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 handler this.determineCurrentRouteIndex(): Int;
 handler this.determineCurrentRouteIndex(rp: ref[RoutePayload]): Int;
 ```
+
+</div>
 
 تستنتج تسلسل المسار الحالي نسبة للمسارات المعرفة في هذا المبدال. الصيغة الثانية تسمح بإرجاع بيانات
 المسار الحالي بالإضافة لتسلسله.
@@ -312,17 +317,17 @@ handler this.determineCurrentRouteIndex(rp: ref[RoutePayload]): Int;
 
 #### حدد_الانتقال (setTransition)
 
-<div dir=rtl>
-
 ```
 عرف حدد_الانتقال(اسم: نـص، انتقال: انـتقال_مـكداس)؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 handler this.setTransition(name: String, transition: StackTransition);
 ```
+
+</div>
 
 إضافة مؤثرات انتقال للاستخدام لاحقًا في دالة `أضف` (`push`).
 
@@ -334,19 +339,19 @@ handler this.setTransition(name: String, transition: StackTransition);
 
 #### أضف (push)
 
-<div dir=rtl>
-
 ```
 عرف أضف(فرع: سـندنا[ودجـة])؛
 عرف أضف(فرع: سـندنا[ودجـة]، اسم_الانتقال: نـص)؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 handler this.push(child: SrdRef[Widget]);
 handler this.push(child: SrdRef[Widget], transitionName: String);
 ```
+
+</div>
 
 تستمل لإضافة مشهد إلى المكداس. المشهد المضاف يظهر أمام المشاهد الحالية. الصيغة الثانية من الدالة
 تسمح بتحديد الانتقال (المؤثرات الحركية) المطلوبة. بدون تحديد الانتقال ستتم الإضافة بشكل لحظي دون أي
@@ -355,19 +360,19 @@ handler this.push(child: SrdRef[Widget], transitionName: String);
 
 #### أزل (pop)
 
-<div dir=rtl>
-
 ```
 عرف أزل()؛
 عرف أزل(اسم_الانتقال: نـص)؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 handler this.pop();
 handler this.pop(transitionName: String);
 ```
+
+</div>
 
 تستعمل لإزالة مشهد من قمة المكداس. الصيغة الأولى تزيل المشهد لحظيا دون مؤثرات بينما تسمح الصيغة
 الثانية بتحديد الانتقال المراد تطبيقه. اسم الانتقال يجب أن يطابق اسم أحد الانتقالات المضافة بدالة
@@ -380,23 +385,21 @@ handler this.pop(transitionName: String);
 
 #### عند_المسار_المجهول (onUnknownRoute)
 
-<div dir=rtl>
-
 ```
 عرف عند_المسار_المجهول: مغلف(سند[مـبدال_مـكداس]، حـمولة_مسار)؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 def onUnknownRoute: closure(ref[RoutingStack], RoutePayload);
 ```
 
+</div>
+
 مغلفة للاستدعاء العكسي تُستدعى عندما يكون المسار غير معروف بالنسبة للمكداس.
 
 #### مسار (route)
-
-<div dir=rtl>
 
 ```
 عرف مسار(مسار: نـص): سند[مـنادى_مسار]؛
@@ -404,13 +407,15 @@ def onUnknownRoute: closure(ref[RoutingStack], RoutePayload);
 عرف مـنادى_مسار: لقب مغلفة(حـمولة_مسار): سـندنا[ودجـة]؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 handler this.route(r: String): ref[RouteCallback];
 handler this.route(r: CharsPtr): ref[RouteCallback];
 def RouteCallback: alias closure(RoutePayload): SrdRef[Widget];
 ```
+
+</div>
 
 تحديد الدالة العكسية التي ستُستدعى عند تغير المسار إلى المسار المُعطى في هذه الدالة. دالة `مسار`
 تُرجع سندًا للمغلفة كي يتمكن المستخدم من تحديد قيمة للمغلفة. يجب على المغلفة أن ترجع سندا إلى
@@ -429,16 +434,19 @@ def RouteCallback: alias closure(RoutePayload): SrdRef[Widget];
 
 #### حدد_الانتقال (setTransition)
 
-<div dir=rtl>
-
 ```
 عرف حدد_الانتقال(إضافة: انـتقال_مكداس، إزالة: انـتقال_مكداس)؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 handler this.setTransition(pushing: StackTransition, popping: StackTransition);
 ```
+
+</div>
+
 تستعمل هذه الطريقة لتحديد الانتقال لحالتي الإضافة والإزالة.
+
+</div>
 

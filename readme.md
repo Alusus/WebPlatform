@@ -1,5 +1,7 @@
 # WebPlatform
 
+[[عربي]](readme.ar.md)
+
 A platform for web development.
 
 This library contains enables building full-stack web applications, which includes
