@@ -177,7 +177,6 @@ handler this.setFillStyle(c1:ptr[Char], c2:ptr[Char], x1: Int, y1: Int, x2: Int,
 
 #### حدد_نمط_القلم (setStrokeStyle)
 
-<div dir=ltr>
 ```
 عملية هذا.حدد_نمط_القلم(طراز_القلم: مؤشر[مـحرف])؛
 ```
