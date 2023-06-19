@@ -104,12 +104,12 @@ handler this.unsetView();
 
 دالة لإزالة المشهد المعروض حالياً.
 
-#### المسار (location)
+#### الموقع (location)
 
 <div dir=rtl>
 
 ```
-عملية هذا.المسار: نـص؛
+عملية هذا.الموقع: نـص؛
 ```
 
 </div>
@@ -118,39 +118,104 @@ handler this.unsetView();
 handler this.location: String;
 ```
 
-المسار الحالي.
+العنوان الكامل الحالي كما هو في شريط العنوان في المتصفح. يشمل هذا البروتوكول والخادم والمسار والاستعلامات والوسم.
 
-#### الوسم (hash)
+#### بروتوكول_الموقع (locationProtocol)
 
 <div dir=rtl>
 
 ```
-عملية هذا.الوسم: نـص؛
+عملية هذا.بروتوكول_الموقع: نـص؛
 ```
 
 </div>
 
 ```
-handler this.hash: String;
+handler this.locationProtocol: String;
+```
+
+خصلة تستعيد البروتوكول (http أو https) من العنوان.
+
+#### خادم_الموقع (locationHost)
+
+<div dir=rtl>
+
+```
+عملية هذا.خادم_الموقع: نـص؛
+```
+
+</div>
+
+```
+handler this.locationHost: String;
+```
+
+خصلة تستعيد عنوان الخادم فقط دون بقية عناصر العنوان. أي تستعيد فقط الـDNS.
+
+#### مسار_الموقع (locationPath)
+
+<div dir=rtl>
+
+```
+عملية هذا.مسار_الموقع: نـص؛
+```
+
+</div>
+
+```
+handler this.locationPath: String;
+```
+
+خصلة تستعيد مسار الصفحة دون عنوان الخادم أو بقية عناصر العنوان.
+
+#### استعلام_الموقع (locationQuery)
+
+<div dir=rtl>
+
+```
+عرف هذا.استعلام_الموقع: نـص؛
+```
+
+</div>
+
+```
+handler this.locationQuery: String;
+```
+
+تستعيد الجزء من العنوان الذي يلي علامة ؟.
+
+#### وسم_الموقع (locationHash)
+
+<div dir=rtl>
+
+```
+عملية هذا.وسم_الموقع: نـص؛
+```
+
+</div>
+
+```
+handler this.locationHash: String;
 ```
 
 خصلة تستعيد الجزء من العنوان الذي يلي علامة #.
 
-#### الاستعلام (query)
+#### هات_متغير_استعلام (getQueryParam)
 
 <div dir=rtl>
 
 ```
-عرف هذا.الاستعلام: نـص؛
+عملية هذا.هات_متغير_استعلام(اسم_المتغير: مـؤشر_محارف): نـص؛
 ```
 
 </div>
 
 ```
-handler this.query: String;
+handler this.getQueryParam(paramName: CharsPtr): String;
 ```
 
-تستعيد الجزء من العنوان الذي يلي علامة ؟.
+ترجع هذه الدالة قيمة واحد من متغيرات الاستعلام (query params) من العنوان. ترجع نصًا فارغًا إن لم يوجد متغير بالاسم
+المعطى.
 
 #### ادفع_مسارا (pushLocation)
 

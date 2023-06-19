@@ -583,16 +583,32 @@ wasmApi.pushState = (url, state) => {
   window.history.pushState(JSON.parse(toJsString(state)), null, toJsString(url));
 }
 
+wasmApi.getLocationHref = () => {
+    return toWasmString(window.location.href);
+}
+
+wasmApi.getLocationProtocol = () => {
+    return toWasmString(window.location.protocol);
+}
+
+wasmApi.getLocationHost = () => {
+    return toWasmString(window.location.host);
+}
+
 wasmApi.getLocationPath = () => {
     return toWasmString(window.location.pathname);
+}
+
+wasmApi.getLocationSearch = () => {
+    return toWasmString(window.location.search);
 }
 
 wasmApi.getLocationHash = () => {
     return toWasmString(window.location.hash);
 }
 
-wasmApi.getLocationSearch = () => {
-    return toWasmString(window.location.search);
+wasmApi.getQueryParam = (paramName) => {
+    return toWasmString(new URLSearchParams(window.location.search).get(toJsString(paramName)));
 }
 
 wasmApi.setCookie = (cname, cvalue, exdays) => {

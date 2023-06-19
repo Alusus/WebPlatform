@@ -624,9 +624,13 @@
         عرف المخزن_المحلي: لقب localStorage؛
         عرف حدد_المشهد: لقب setView؛
         عرف أزل_المشهد: لقب unsetView؛
-        عرف المسار: لقب location؛
-        عرف الوسم: لقب hash؛
-        عرف الاستعلام: لقب query؛
+        عرف الموقع: لقب location؛
+        عرف بروتوكول_الموقع: لقب locationProtocol؛
+        عرف خادم_الموقع: لقب locationHost؛
+        عرف مسار_الموقع: لقب locationPath؛
+        عرف استعلام_الموقع: لقب locationQuery؛
+        عرف وسم_الموقع: لقب locationHash؛
+        عرف هات_متغير_استعلام: لقب getQueryParam؛
         عرف ادفع_مسارا: لقب pushLocation؛
         عرف حجم: لقب resize؛
         عرف المفاتيح_المكبوتة: لقب keysToSwallow؛

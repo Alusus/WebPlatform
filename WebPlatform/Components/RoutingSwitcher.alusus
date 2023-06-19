@@ -71,7 +71,7 @@
 
         handler this.determineCurrentRouteIndex(rp: ref[RoutePayload]): Int {
             def payload: RoutePayload;
-            payload.fullPath = Window.instance.location;
+            payload.fullPath = Window.instance.locationPath;
             def i: Int;
             for i = 0, i < this.routes.getLength(), ++i {
                 def result: Array[String] = matchRegex(payload.fullPath, this.routes.keyAt(i));

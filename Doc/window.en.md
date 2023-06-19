@@ -59,23 +59,55 @@ Removes the main view of the app.
 handler this.location: String;
 ```
 
-Fetches the current location.
+Fetches the complete URL of the current page.
 
-#### hash
+#### locationProtocol
 
 ```
-handler this.hash: String;
+handler this.locationProtocol: String;
+```
+
+Fetches the protocol of the current URL (http or https).
+
+#### locationHost
+
+```
+handler this.locationHost: String;
+```
+
+Fetches the host from the current URL.
+
+#### locationPath
+
+```
+handler this.locationPath: String;
+```
+
+Fetches the path from the current URL.
+
+#### locationQuery
+
+```
+handler this.locationQuery: String;
+```
+
+Fetches the query string from the URL, i.e the part of the URL follwing the ? mark.
+
+#### locationHash
+
+```
+handler this.locationHash: String;
 ```
 
 Fetches the part of the URL following the # symbol.
 
-#### query
+#### getQueryParam
 
 ```
-handler this.query: String;
+handler this.getQueryParam(paramName: CharsPtr): String;
 ```
 
-Fetches the query string from the URL, i.e the part of the URL follwing the ? mark.
+Fetches the value of a specific query param. Returns an empty string if no param was found with the given name.
 
 #### pushLocation
 
