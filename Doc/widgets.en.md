@@ -372,6 +372,25 @@ Sets a Markdown document as the scene. The second form allows specifying whether
 document opens in the same browser tab or a new one. The first form opens links in the same tab.
 
 
+### Browser
+
+An area in which you can view another web page, i.e. an iframe.
+
+#### Properties
+
+* `url`: `String`. The URL of the page to view.
+
+#### Operations
+
+##### postMessage
+
+```
+handler this.postMessage(msgType: CharsPtr, msgBody: CharsPtr);
+```
+
+Posts an arbitrary message to the window of the loaded site.
+
+
 ## Related Classes
 
 ### MouseMovePayload

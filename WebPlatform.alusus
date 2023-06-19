@@ -42,6 +42,7 @@ import "WebPlatform/Widgets/TextInput";
 import "WebPlatform/Widgets/Select";
 import "WebPlatform/Widgets/Canvas";
 import "WebPlatform/Widgets/DocView";
+import "WebPlatform/Widgets/Browser";
 import "WebPlatform/Components/Component";
 import "WebPlatform/Components/Switcher";
 import "WebPlatform/Components/RoutingSwitcher";
