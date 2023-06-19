@@ -150,6 +150,14 @@
         handler this.resize(width: Int, height: Int) {
             resizeWindow(width, height);
         }
+
+        handler this.postMessage(msgType: CharsPtr, msgBody: CharsPtr) {
+            WebPlatform.postMessage("window", msgType, msgBody);
+        }
+
+        handler this.postMessageToParent(msgType: CharsPtr, msgBody: CharsPtr) {
+            WebPlatform.postMessage("parent", msgType, msgBody);
+        }
     }
 }
 

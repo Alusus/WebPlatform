@@ -650,6 +650,20 @@ wasmApi.showAlert = (message) => {
     return isExecuted;
 }
 
+wasmApi.postMessage = (wasmTarget, wasmMessageType, wasmMessageBody) => {
+    const target = toJsString(wasmTarget);
+    const messageType = toJsString(wasmMessageType);
+    const messageBody = toJsString(wasmMessageBody);
+    if (target === "window") {
+        window.postMessage({ type: messageType, body: messageBody }, '*');
+    } else if (target === "parent") {
+        window.parent.postMessage({ type: messageType, body: messageBody }, '*');
+    } else {
+        const element = document.getElementById(target);
+        if (element) element.contentWindow.postMessage({ type: messageType, body: messageBody }, '*');
+    }
+}
+
 wasmApi.callCustomJsFn = (fnName, arg) => {
     return toWasmString(window[toJsString(fnName)](toJsString(arg)));
 }

@@ -642,6 +642,8 @@
         عرف عند_فصل_مقبض: لقب onGamepadDisconnected؛
         عرف عند_تغير_المسار: لقب onLocationChanged؛
         عرف عند_استلام_رسالة: لقب onMessage؛
+        عرف أرسل_رسالة: لقب postMessage؛
+        عرف ارسل_رسالة_للمالك: لقب postMessageToParent؛
     }
 
     عرف مـخزن: لقب Storage؛

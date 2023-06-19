@@ -118,6 +118,25 @@ handler this.pushLocation (url: ptr[array[Char]]);
 A function to add a path to the browser's history. This function allows changing the browser's
 address without reloading the page.
 
+#### postMessage
+
+```
+handler this.postMessage (msgType: CharsPtr, msgBody: CharsPtr);
+```
+
+Used to send arbitrary messages to the current window. The message will be sent as a JSON object having two
+properties: type & body, whose values are from the function params.
+
+#### postMessageToParent
+
+```
+handler this.postMessageToParent (msgType: CharsPtr, msgBody: CharsPtr);
+```
+
+Similar to `postMessage` except that it sends the message to the owner of this window, which only applies
+in cases where this site is opened inside the iframe of another site, in which case the message is sent
+to the site owning the iframe.
+
 #### onKeyDown
 
 ```
@@ -174,4 +193,12 @@ def onLocationChanged: DomEventSignal[Window, Int];
 
 Triggered when the browser's path changes without page reload. This event is triggered when the
 pushLocation function is called or when the user presses the browser's back or forward button.
+
+#### onMessage
+
+```
+def onMessage: DomEventSignal[Window, Json];
+```
+
+Triggered when a message is posted to this window.
 

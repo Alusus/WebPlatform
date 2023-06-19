@@ -106,6 +106,7 @@
     @expname[getVarFromSession] function getVarFromSession (varName: ptr[Char]): ptr[array[Char]];
     @expname[logToConsole] function logToConsole (msg: ptr[Char]);
     @expname[showAlert] function showAlert (message: ptr[Char]): Bool;
+    @expname[postMessage] function postMessage (target: ptr[Char], msgType: ptr[Char], msgBody: ptr[Char]);
     @expname[callCustomJsFn] function callCustomJsFn (fnName: ptr[Char], arg: ptr[Char]): ptr[Char];
     @expname[callCustomAsyncJsFn] function _callCustomAsyncJsFn (fnName: ptr[Char], arg: ptr[Char], cbId: ArchInt);
     @expname[getUserLanguages] function _getUserLanguages (): ptr[Char];
