@@ -32,7 +32,7 @@ Apm.importFile("Alusus/WebPlatform");
 * [[الإشـارات (Signals)]](Doc/signals.ar.md)
 * [[نافذة (Window)]](Doc/window.ar.md)
 * [[التوجيه في تطبيقات العميل الغني (Rich Client)]](Doc/routing.ar.md)
-* [[الدوال والمتغيرات العمومية]](Doc/global_funcs.ar.md)
+* [[الدالات والماكروهات والمتغيرات العمومية]](Doc/global_funcs.ar.md)
 * [[مـخزن (Storage)]](Doc/storage.ar.md)
 * [[الموارد (Resources)]](Doc/resources.ar.md)
 * [[رسـم (Drawing)]](Doc/drawing.ar.md)

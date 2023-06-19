@@ -159,6 +159,16 @@ Return value:
 `ptr[Http.Context]` a pointer to the context that can be used to communicate with the server.
 
 
+### registerEndpointsModule
+
+```
+macro registerEndpointsModule[m]
+```
+
+This macro is used to register additional modules containing endpoints (backend or UI endpoints). This can be called
+multiple times to register multiple modules before starting the server, i.e. before calling `startServer`.
+
+
 ### startTimer
 
 ```

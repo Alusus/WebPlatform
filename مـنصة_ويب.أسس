@@ -19,6 +19,7 @@
     عرف عالج_الأحداث: لقب dispatchEvents؛
     عرف انتظر_حدثا: لقب waitForEvent؛
     عرف انتظر: لقب await؛
+    عرف أضف_وحدة_منافذ: لقب registerEndpointsModule؛
     عرف شغل_الخادم: لقب runServer؛
     عرف ابدأ_الخادم: لقب startServer؛
     عرف ابدأ_المؤقت_المتكرر: لقب startTimer؛
