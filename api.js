@@ -583,16 +583,32 @@ wasmApi.pushState = (url, state) => {
   window.history.pushState(JSON.parse(toJsString(state)), null, toJsString(url));
 }
 
+wasmApi.getLocationHref = () => {
+    return toWasmString(window.location.href);
+}
+
+wasmApi.getLocationProtocol = () => {
+    return toWasmString(window.location.protocol);
+}
+
+wasmApi.getLocationHost = () => {
+    return toWasmString(window.location.host);
+}
+
 wasmApi.getLocationPath = () => {
     return toWasmString(window.location.pathname);
+}
+
+wasmApi.getLocationSearch = () => {
+    return toWasmString(window.location.search);
 }
 
 wasmApi.getLocationHash = () => {
     return toWasmString(window.location.hash);
 }
 
-wasmApi.getLocationSearch = () => {
-    return toWasmString(window.location.search);
+wasmApi.getQueryParam = (paramName) => {
+    return toWasmString(new URLSearchParams(window.location.search).get(toJsString(paramName)));
 }
 
 wasmApi.setCookie = (cname, cvalue, exdays) => {
@@ -632,6 +648,20 @@ wasmApi.logToConsole = (msg) => {
 wasmApi.showAlert = (message) => {
     let isExecuted = confirm(toJsString(message));
     return isExecuted;
+}
+
+wasmApi.postMessage = (wasmTarget, wasmMessageType, wasmMessageBody) => {
+    const target = toJsString(wasmTarget);
+    const messageType = toJsString(wasmMessageType);
+    const messageBody = toJsString(wasmMessageBody);
+    if (target === "window") {
+        window.postMessage({ type: messageType, body: messageBody }, '*');
+    } else if (target === "parent") {
+        window.parent.postMessage({ type: messageType, body: messageBody }, '*');
+    } else {
+        const element = document.getElementById(target);
+        if (element) element.contentWindow.postMessage({ type: messageType, body: messageBody }, '*');
+    }
 }
 
 wasmApi.callCustomJsFn = (fnName, arg) => {

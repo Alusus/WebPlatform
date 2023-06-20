@@ -26,6 +26,7 @@
     }
 
     function await [Rtype: type = Int] (p: SrdRef[Promise[Rtype]]): Rtype {
+        if p.status != Status.NEW return p.result;
         while 1 {
             waitForEvent();
             dispatchEvents();

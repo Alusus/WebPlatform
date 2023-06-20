@@ -15,9 +15,11 @@
         // Handlers
 
         handler this~init() {
+            this.newTab = false;
         }
 
         handler this~init(url: String) {
+            this.newTab = false;
             this.url = url;
         }
 

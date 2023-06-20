@@ -114,15 +114,32 @@
         }
 
         handler this.location: String {
+            return String(getLocationHref()~cast[CharsPtr]);
+        }
+
+        handler this.locationProtocol: String {
+            return String(getLocationProtocol()~cast[CharsPtr]);
+        }
+
+        handler this.locationHost: String {
+            return String(getLocationHost()~cast[CharsPtr]);
+        }
+
+        handler this.locationPath: String {
             return String(getLocationPath()~cast[CharsPtr]);
         }
 
-        handler this.hash: String {
+        handler this.locationQuery: String {
+            return String(getLocationSearch()~cast[CharsPtr]);
+        }
+
+        handler this.locationHash: String {
             return String(getLocationHash()~cast[CharsPtr]);
         }
 
-        handler this.query: String {
-            return String(getLocationSearch()~cast[CharsPtr]);
+        handler this.getQueryParam (paramName: CharsPtr): String {
+            def val: CharsPtr = WebPlatform.getQueryParam(paramName)~cast[CharsPtr];
+            if val == 0 return String() else return String(val);
         }
 
         handler this.pushLocation (url: ptr[array[Char]]) {
@@ -132,6 +149,14 @@
 
         handler this.resize(width: Int, height: Int) {
             resizeWindow(width, height);
+        }
+
+        handler this.postMessage(msgType: CharsPtr, msgBody: CharsPtr) {
+            WebPlatform.postMessage("window", msgType, msgBody);
+        }
+
+        handler this.postMessageToParent(msgType: CharsPtr, msgBody: CharsPtr) {
+            WebPlatform.postMessage("parent", msgType, msgBody);
         }
     }
 }

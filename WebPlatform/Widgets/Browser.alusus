@@ -1,0 +1,67 @@
+@merge module WebPlatform {
+    //==========================================================================
+    // Browser
+    // An area for viewing another web page, i.e. an IFrame.
+    class Browser {
+        @injection def widget: Widget;
+
+        //-----------
+        // Properties
+
+        generateProperty[url, Url, String];
+
+        //---------
+        // Handlers
+
+        handler this~init() {
+        }
+        handler this~init(u: String) {
+            this.url = u;
+        }
+
+        handler this.onPropUpdated() this.update();
+
+        handler this.postMessage(msgType: CharsPtr, msgBody: CharsPtr) {
+            if this.id == "" return;
+            WebPlatform.postMessage(this.id, msgType, msgBody);
+        }
+
+        //-------------------
+        // Function Overrides
+
+        handler (this:Widget).build (ownerId: String) set_ptr {
+            this.id = getNewId();
+            createElement("iframe", this.id, ownerId);
+            this.buildCommon();
+            this.update();
+        }
+
+        handler (this:Widget).unbuild() set_ptr {
+            if this.id.getLength() > 0 {
+                deleteElement(this.id);
+                this.unbuildCommon();
+                this.id = String();
+            }
+        }
+
+        handler (this:Widget).update() set_ptr {
+            if this.id.getLength() > 0 {
+                this.updateCommon();
+                setElementAttribute(this.id, "src", this.url);
+            }
+        }
+
+        //-----------------
+        // Shared Functions
+
+        handler this_type(u: String): SrdRef[Browser] {
+            def r: SrdRef[Browser];
+            r.alloc()~init(u);
+            return r;
+        }
+        handler this_type(): SrdRef[Browser] {
+            return Browser(String());
+        }
+    }
+}
+

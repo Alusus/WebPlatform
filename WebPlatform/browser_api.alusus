@@ -92,9 +92,13 @@
     @expname[requestFullScreen] function requestFullScreen (elementName: ptr[Char]);
     @expname[exitFullScreen] function exitFullScreen();
     @expname[httpRedirect] function httpRedirect (address: ptr[Char]);
+    @expname[getLocationHref] function getLocationHref (): ptr[Char];
+    @expname[getLocationProtocol] function getLocationProtocol (): ptr[Char];
+    @expname[getLocationHost] function getLocationHost (): ptr[Char];
     @expname[getLocationPath] function getLocationPath (): ptr[Char];
-    @expname[getLocationHash] function getLocationHash (): ptr[Char];
     @expname[getLocationSearch] function getLocationSearch (): ptr[Char];
+    @expname[getLocationHash] function getLocationHash (): ptr[Char];
+    @expname[getQueryParam] function getQueryParam (paramName: ptr[Char]): ptr[Char];
     @expname[pushState] function pushState (url: ptr[Char], state: ptr[Char]);
     @expname[setCookie] function setCookie (cName: ptr[Char], vName: ptr[Char], exDay: ptr[Char]);
     @expname[getCookie] function getCookie (cName: ptr[Char]): ptr[array[Char]];
@@ -102,6 +106,7 @@
     @expname[getVarFromSession] function getVarFromSession (varName: ptr[Char]): ptr[array[Char]];
     @expname[logToConsole] function logToConsole (msg: ptr[Char]);
     @expname[showAlert] function showAlert (message: ptr[Char]): Bool;
+    @expname[postMessage] function postMessage (target: ptr[Char], msgType: ptr[Char], msgBody: ptr[Char]);
     @expname[callCustomJsFn] function callCustomJsFn (fnName: ptr[Char], arg: ptr[Char]): ptr[Char];
     @expname[callCustomAsyncJsFn] function _callCustomAsyncJsFn (fnName: ptr[Char], arg: ptr[Char], cbId: ArchInt);
     @expname[getUserLanguages] function _getUserLanguages (): ptr[Char];

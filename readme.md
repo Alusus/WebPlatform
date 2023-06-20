@@ -25,7 +25,7 @@ Apm.importFile("Alusus/WebPlatform");
 * [[Signals]](Doc/signals.en.md)
 * [[Window]](Doc/window.en.md)
 * [[Routing in Rich Client Applications]](Doc/routing.en.md)
-* [[Global Functions and Variables]](Doc/global_funcs.en.md)
+* [[Global Functions, Macros, and Variables]](Doc/global_funcs.en.md)
 * [[Storage]](Doc/storage.en.md)
 * [[Resources]](Doc/resources.en.md)
 * [[Drawing]](Doc/drawing.en.md)

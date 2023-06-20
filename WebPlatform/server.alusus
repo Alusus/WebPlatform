@@ -14,6 +14,12 @@
     def assetRoutes: Array[Route];
     def uiEndpoints: Array[Route];
 
+    def endpointsModules: Array[ref[Core.Basic.TiObject]];
+    func _registerEndpointsModule(m: ref[Core.Basic.TiObject]) {
+        endpointsModules.add(m);
+    }
+    macro registerEndpointsModule[m] _registerEndpointsModule(m~ast);
+
     def AstTemplateMap: alias Map[String, ref[Core.Basic.TiObject]];
 
     func getElementName (obj: ref[Core.Basic.TiObject]): String {
@@ -251,7 +257,11 @@
 
     func startServer [parent: ast_ref = Root] (options: ref[Array[CharsPtr]]): ptr[Http.Context] {
         preprocess { prepareMainAssets() };
-        preprocess { addUiEndpoints(parent~ast) };
+        preprocess {
+            addUiEndpoints(parent~ast);
+            def i: Int;
+            for i = 0, i < endpointsModules.getLength(), ++i addUiEndpoints(endpointsModules(i));
+        };
         preprocess { addAssetRoutes(parent~ast) };
         if uiEndpoints.getLength() == 0 {
             System.fail(1, "No UI endpoints found\n");
@@ -283,7 +293,11 @@
         def uri: ptr[array[Char]] = requestInfo~cnt.requestUri;
         def method: ptr[array[Char]] = requestInfo~cnt.requestMethod;
 
-        preprocess { addBeEndpoints(parent~ast) };
+        preprocess {
+            addBeEndpoints(parent~ast);
+            def i: Int;
+            for i = 0, i < endpointsModules.getLength(), ++i addBeEndpoints(endpointsModules(i));
+        };
 
         if String.isEqual(method, "GET") {
             if String.isEqual(uri, "/api.js") {
