@@ -14,13 +14,14 @@
             }
         }
 
-        handler this.connect(slot: closure (ref[ownerType], payload: ref[payloadType])) {
+        handler this.connect(slot: closure (ref[ownerType], payload: ref[payloadType])): ArchInt {
             def i: Int;
             for i = 0, i < this.slots.getLength(), ++i {
-                if this.slots(i) == slot return;
+                if this.slots(i) == slot return slot.data.obj~ptr~cast[ArchInt];
             }
             this.slots.add(slot);
             this.owner.onSignalConnectionsChanged(this~ptr, this.slots.getLength());
+            return slot.data.obj~ptr~cast[ArchInt];
         }
 
         handler this.disconnect(slot: closure (ref[ownerType], payload: ref[payloadType])) {
@@ -33,7 +34,18 @@
                 }
             }
         }
-        
+
+        handler this.disconnect(id: ArchInt) {
+            def i: Int;
+            for i = 0, i < this.slots.getLength(), ++i {
+                if this.slots(i).data.obj~ptr~cast[ArchInt] == id {
+                    this.slots.remove(i);
+                    this.owner.onSignalConnectionsChanged(this~ptr, this.slots.getLength());
+                    return;
+                }
+            }
+        }
+
         handler this.getConnectionCount (): Int {
             return this.slots.getLength();
         }
