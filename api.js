@@ -762,11 +762,11 @@ wasmApi.exit = ()=>{}
 
 const eventPropMap = {
     message: ['data'],
-    mousemove: ['offsetX', 'offsetY', 'movementX', 'movementY'],
     mouseenter: [],
     mouseout: [],
     mousedown: ['button', 'offsetX', 'offsetY'],
     mouseup: ['button', 'offsetX', 'offsetY'],
+    mousemove: ['offsetX', 'offsetY', 'movementX', 'movementY'],
     keydown: ['code', 'shiftKey', 'ctrlKey', 'altKey'],
     keyup: ['code', 'shiftKey', 'ctrlKey', 'altKey'],
     keypress: ['code', 'shiftKey', 'ctrlKey', 'altKey'],
@@ -778,6 +778,10 @@ const eventPropMap = {
     loadJsScript: ['success'],
     sendRequest: ['status', 'headers', 'body'],
     timer: [],
+    touchstart: (e) => stringifyTouchEventData(e),
+    touchend: (e) => stringifyTouchEventData(e),
+    touchmove: (e) => stringifyTouchEventData(e),
+    touchcancel: (e) => stringifyTouchEventData(e),
     resizeObserver: [],
     pointerlockchange: ['enabled'],
     fullscreenchange: ['enabled'],
@@ -789,10 +793,35 @@ const eventPropMap = {
 
 function stringifyEvent(event) {
     const obj = { cbId: event.cbId, recurring: event.recurring, eventName: event.eventName, eventData: {} };
-    for (let k of eventPropMap[event.eventName]) {
-        obj.eventData[k] = event.eventData[k];
+    if (typeof eventPropMap[event.eventName] === 'function') {
+        obj.eventData = eventPropMap[event.eventName](event);
+    } else {
+        for (let k of eventPropMap[event.eventName]) {
+            obj.eventData[k] = event.eventData[k];
+        }
     }
     return JSON.stringify(obj);
+}
+
+function stringifyTouchEventData(event) {
+    const touches = [];
+    for (let i = 0; i < event.eventData.touches.length; ++i) {
+        const touch = event.eventData.touches.item(i);
+        touches.push({
+            identifier: touch.identifier,
+            screenX: touch.screenX,
+            screenY: touch.screenY,
+            clientX: touch.clientX,
+            clientY: touch.clientY,
+            pageX: touch.pageX,
+            pageY: touch.pageY,
+            radiusX: touch.radiusX,
+            radiusY: touch.radiusY,
+            rotationAngle: touch.rotationAngle,
+            force: touch.force,
+        });
+    }
+    return touches;
 }
 
 function onEvent (cbId, recurring, eventName, event) {

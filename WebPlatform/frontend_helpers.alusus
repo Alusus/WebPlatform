@@ -76,4 +76,39 @@
             this.posY = value.posY;
         }
     }
+
+    //==========================================================================
+    // TouchPayload
+    // The payload of a single touch in a touch event.
+    class TouchPayload {
+        def identifier: String;
+        def screenX: Float;
+        def screenY: Float;
+        def clientX: Float;
+        def clientY: Float;
+        def pageX: Float;
+        def pageY: Float;
+        def radiusX: Float;
+        def radiusY: Float;
+        def rotationAngle: Float;
+        def force: Float;
+
+        handler this~init() {}
+        handler this~init(temp_ref[TouchPayload]) {
+            this = value;
+        }
+        handler this = temp_ref[TouchPayload] {
+            this.identifier = value.identifier;
+            this.screenX = value.screenX;
+            this.screenY = value.screenY;
+            this.clientX = value.clientX;
+            this.clientY = value.clientY;
+            this.pageX = value.pageX;
+            this.pageY = value.pageY;
+            this.radiusX = value.radiusX;
+            this.radiusY = value.radiusY;
+            this.rotationAngle = value.rotationAngle;
+            this.force = value.force;
+        }
+    }
 }

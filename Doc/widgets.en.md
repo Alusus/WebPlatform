@@ -28,14 +28,6 @@ def onResize: DomEventSignal[Widget, Int];
 
 Signals that the widget's dimensions changed.
 
-##### onMouseMove
-
-```
-def onMouseMove: DomEventSignal[Widget, MouseMovePayload];
-```
-
-Signals that the cursor moved over the widget.
-
 ##### onMouseEnter
 
 ```
@@ -67,6 +59,38 @@ def onMouseUp: DomEventSignal[Widget, MouseButtonPayload];
 ```
 
 Signals that the mouse button has been released.
+
+##### onMouseMove
+
+```
+def onMouseMove: DomEventSignal[Widget, MouseMovePayload];
+```
+
+Signals that the cursor moved over the widget.
+
+##### onTouchStart
+
+```
+def onTouchStart: DomEventSignal[Widget, Array[TouchPayload]];
+```
+
+Signals the start of a touch on devices with touch screens.
+
+##### onTouchEnd
+
+```
+def onTouchEnd: DomEventSignal[Widget, Array[TouchPayload]];
+```
+
+Signals the end of a touch on devices with touch screens.
+
+##### onTouchMove
+
+```
+def onTouchMove: DomEventSignal[Widget, Array[TouchPayload]];
+```
+
+Signals the change of touch positions on devices with touch screens.
 
 ##### onClick
 
@@ -432,4 +456,57 @@ A class that holds mouse button payload information.
 `posX` cursor x coordinate.
 
 `posY` cursor y coordinate.
+
+
+### TouchPayload
+
+```
+class TouchPayload {
+    def identifier: String;
+    def screenX: Float;
+    def screenY: Float;
+    def clientX: Float;
+    def clientY: Float;
+    def pageX: Float;
+    def pageY: Float;
+    def radiusX: Float;
+    def radiusY: Float;
+    def rotationAngle: Float;
+    def force: Float;
+}
+```
+
+This class carries information of a single touch in a touch event. A touch event has an array of
+this type representing all touches happening simultaneously.
+
+`identifier` A unique identifier to enable differentiating touchs from each other in consecutive
+touch events.
+
+`screenX` The X coordinate of the touch relative to the screen.
+
+`screenY` The Y coordinate of the touch relative to the screen.
+
+`clientX` The X coordinate of the touch relative to the browser.
+
+`clientY` The Y coordinate of the touch relative to the browser.
+
+`pageX` The X coordinate of the touch relative to the document. This value takes into consideration
+the scroll status of the page and gives the coordinate as if the entire page is visible on the
+screen.
+
+`pageY` The Y coordinate of the touch relative to the document. This value takes into consideration
+the scroll status of the page and gives the coordinate as if the entire page is visible on the
+screen.
+
+`radiusX` The X radius of the ellipse that most closely circumscribes the area of contact with the
+screen.
+
+`radiusY` The Y radius of the ellipse that most closely circumscribes the area of contact with the
+screen.
+
+`rotatoinAngle` The angle (in degrees) that the ellipse described by radiusX and radiusY must be
+rotated, clockwise, to most accurately cover the area of contact between the user and the surface.
+
+`force` The amount of pressure being applied to the surface by the user, as a float between 0.0
+(no pressure) and 1.0 (maximum pressure).
 

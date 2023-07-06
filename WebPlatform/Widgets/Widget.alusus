@@ -13,8 +13,6 @@
         // Events
         def onResize: DomEventSignal[Widget, Int];
         def onResizeId: ArchInt = -1;
-        def onMouseMove: DomEventSignal[Widget, MouseMovePayload];
-        def onMouseMoveId: ArchInt = -1;
         def onMouseEnter: DomEventSignal[Widget, Int];
         def onMouseEnterId: ArchInt = -1;
         def onMouseOut: DomEventSignal[Widget, Int];
@@ -23,16 +21,27 @@
         def onMouseDownId: ArchInt = -1;
         def onMouseUp: DomEventSignal[Widget, MouseButtonPayload];
         def onMouseUpId: ArchInt = -1;
+        def onMouseMove: DomEventSignal[Widget, MouseMovePayload];
+        def onMouseMoveId: ArchInt = -1;
+        def onTouchStart: DomEventSignal[Widget, Array[TouchPayload]];
+        def onTouchStartId: ArchInt = -1;
+        def onTouchEnd: DomEventSignal[Widget, Array[TouchPayload]];
+        def onTouchEndId: ArchInt = -1;
+        def onTouchMove: DomEventSignal[Widget, Array[TouchPayload]];
+        def onTouchMoveId: ArchInt = -1;
         def onClick: DomEventSignal[Widget, Int];
         def onClickId: ArchInt = -1;
 
         handler this~init() {
             this.onResize.owner~no_deref = this;
-            this.onMouseMove.owner~no_deref = this;
             this.onMouseEnter.owner~no_deref = this;
             this.onMouseOut.owner~no_deref = this;
             this.onMouseDown.owner~no_deref = this;
             this.onMouseUp.owner~no_deref = this;
+            this.onMouseMove.owner~no_deref = this;
+            this.onTouchStart.owner~no_deref = this;
+            this.onTouchEnd.owner~no_deref = this;
+            this.onTouchMove.owner~no_deref = this;
             this.onClick.owner~no_deref = this;
         }
 
@@ -77,11 +86,14 @@
         handler this.buildCommon() {
             if not this._style.isNull() this._style.build();
             this.onSignalConnectionsChanged(this.onResize~ptr, this.onResize.getConnectionCount());
-            this.onSignalConnectionsChanged(this.onMouseMove~ptr, this.onMouseMove.getConnectionCount());
             this.onSignalConnectionsChanged(this.onMouseEnter~ptr, this.onMouseEnter.getConnectionCount());
             this.onSignalConnectionsChanged(this.onMouseOut~ptr, this.onMouseOut.getConnectionCount());
             this.onSignalConnectionsChanged(this.onMouseDown~ptr, this.onMouseDown.getConnectionCount());
             this.onSignalConnectionsChanged(this.onMouseUp~ptr, this.onMouseUp.getConnectionCount());
+            this.onSignalConnectionsChanged(this.onMouseMove~ptr, this.onMouseMove.getConnectionCount());
+            this.onSignalConnectionsChanged(this.onTouchStart~ptr, this.onTouchStart.getConnectionCount());
+            this.onSignalConnectionsChanged(this.onTouchEnd~ptr, this.onTouchEnd.getConnectionCount());
+            this.onSignalConnectionsChanged(this.onTouchMove~ptr, this.onTouchMove.getConnectionCount());
             this.onSignalConnectionsChanged(this.onClick~ptr, this.onClick.getConnectionCount());
         }
 
@@ -93,11 +105,14 @@
         handler this.unbuildCommon() {
             if not this._style.isNull() this._style.unbuild();
             handleEventHandlerUnregistration[onResizeId];
-            handleEventHandlerUnregistration[onMouseMoveId];
             handleEventHandlerUnregistration[onMouseEnterId];
             handleEventHandlerUnregistration[onMouseOutId];
             handleEventHandlerUnregistration[onMouseDownId];
             handleEventHandlerUnregistration[onMouseUpId];
+            handleEventHandlerUnregistration[onMouseMoveId];
+            handleEventHandlerUnregistration[onTouchStartId];
+            handleEventHandlerUnregistration[onTouchEndId];
+            handleEventHandlerUnregistration[onTouchMoveId];
             handleEventHandlerUnregistration[onClickId];
         }
 
@@ -175,6 +190,55 @@
                         button = data.getInt("button");
                         posX = data.getInt("offsetX");
                         posY = data.getInt("offsetY");
+                    });
+                }];
+            }
+        }
+
+        handler this.onSignalConnectionsChanged(signal: ptr[Signal[Widget, Array[TouchPayload]]], connectionCount: Int) {
+            if this.id == "" return;
+            macro convertJsonToPayload {
+                def i: Int = 0;
+                while 1 {
+                    def item: Json = data.getObject(i);
+                    if item.jsonString == "" break;
+                    payload.add(TouchPayload().{
+                        identifier = item.getString("identifier");
+                        screenX = item.getFloat("screenX");
+                        screenY = item.getFloat("screenY");
+                        clientX = item.getFloat("clientX");
+                        clientY = item.getFloat("clientY");
+                        pageX = item.getFloat("pageX");
+                        pageY = item.getFloat("pageY");
+                        radiusX = item.getFloat("radiusX");
+                        radiusY = item.getFloat("radiusY");
+                        rotationAngle = item.getFloat("rotationAngle");
+                        force = item.getFloat("force");
+                    });
+                    ++i;
+                }
+            }
+
+            if signal == this.onTouchStart~ptr {
+                handleSignalConnectionChanged[onTouchStart, "touchstart", {
+                    this.onTouchStart.emit(Array[TouchPayload]()~use_in(payload) no_injection {
+                        convertJsonToPayload[];
+                    });
+                }];
+            }
+
+            if signal == this.onTouchEnd~ptr {
+                handleSignalConnectionChanged[onTouchEnd, "touchend", {
+                    this.onTouchEnd.emit(Array[TouchPayload]()~use_in(payload) no_injection {
+                        convertJsonToPayload[];
+                    });
+                }];
+            }
+
+            if signal == this.onTouchMove~ptr {
+                handleSignalConnectionChanged[onTouchMove, "touchmove", {
+                    this.onTouchMove.emit(Array[TouchPayload]()~use_in(payload) no_injection {
+                        convertJsonToPayload[];
                     });
                 }];
             }
