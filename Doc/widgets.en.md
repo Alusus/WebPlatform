@@ -421,10 +421,10 @@ Posts an arbitrary message to the window of the loaded site.
 
 ```
 class MouseMovePayload {
-    def posX: Float = 0;
-    def posY: Float = 0;
-    def deltaX: Float = 0;
-    def deltaY: Float = 0;
+    def posX: Float;
+    def posY: Float;
+    def deltaX: Float;
+    def deltaY: Float;
 }
 ```
 
@@ -443,9 +443,9 @@ A class that holds mouse move payload information.
 
 ```
 class MouseButtonPayload {
-    def button: Int = 0;
-    def posX: Float = 0;
-    def posY: Float = 0;
+    def button: Int;
+    def posX: Float;
+    def posY: Float;
 }
 ```
 
