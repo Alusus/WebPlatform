@@ -22,11 +22,7 @@
                 if data.getBool("success") {
                     this.id = data.getInt("resourceId");
                     p.resolve(0);
-                } else p.reject(castSrdRef[SrdRef[GenericError]().{
-                    construct();
-                    code = 1;
-                    message = String("Loading failed");
-                }, Error]);
+                } else p.reject(GenericError.new(Errors.IMAGE_LOAD, "Loading failed"));
             });
             return p;
         }

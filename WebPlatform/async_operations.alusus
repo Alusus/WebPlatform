@@ -70,11 +70,7 @@
         loadFont(fontName, url, closure (json: Json) {
             def data: Json = json.getObject("eventData");
             if data.getBool("success") p.resolve(0)
-            else p.reject(castSrdRef[SrdRef[GenericError]().{
-                construct();
-                code = 1;
-                message = String("Loading failed");
-            }, Error]);
+            else p.reject(GenericError.new(Errors.FONT_LOAD, "Loading failed"));
         });
         return p;
     }
@@ -89,11 +85,7 @@
         loadJsScript(url, closure (json: Json) {
             def data: Json = json.getObject("eventData");
             if data.getBool("success") p.resolve(0)
-            else p.reject(castSrdRef[SrdRef[GenericError]().{
-                construct();
-                code = 1;
-                message = String("Loading failed");
-            }, Error]);
+            else p.reject(GenericError.new(Errors.JS_SCRIPT_LOAD, "Loading failed"));
         });
         return p;
     }

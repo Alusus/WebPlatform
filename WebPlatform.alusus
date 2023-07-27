@@ -4,6 +4,7 @@ import "Srl/Array";
 import "Srl/System";
 import "Srl/Fs";
 import "Srl/refs";
+import "Srl/errors";
 import "Core/Data";
 import "Spp";
 import "Build";
@@ -75,6 +76,13 @@ import "WebPlatform/i18n";
 
     func getBuildDependencies(): Array[String] {
         return Http.getBuildDependencies();
+    }
+
+    module Errors {
+        def AUDIO_LOAD: "webplatform_audio_load";
+        def IMAGE_LOAD: "webplatform_image_load";
+        def FONT_LOAD: "webplatform_font_load";
+        def JS_SCRIPT_LOAD: "webplatform_js_script_load";
     }
 }
 
