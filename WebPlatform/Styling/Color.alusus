@@ -57,17 +57,11 @@
             return !(this == value);
         }
 
-        handler this.convertHexToDecimal(letter: Char): Int {
-            if letter >= '0' and letter <= '9' return letter - '0'
-            else if letter >= 'a' and letter <= 'f' return 10 + letter - 'a'
-            else if letter >= 'A' and letter <= 'F' return 10 + letter - 'A'
-            else return 0;
-        }
         handler this.convertHexToDecimal(count: Int, letters: ...Char): Int {
             def result: Int = 0;
             while count-- > 0 {
                 result *= 16;
-                result += this.convertHexToDecimal(letters~next_arg[Char]);
+                result += String.parseHexDigit(letters~next_arg[Char]);
             }
             return result;
         }
