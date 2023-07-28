@@ -543,6 +543,15 @@ wasmApi.getTimestamp = () => {
     return BigInt(Date.now());
 }
 
+wasmApi.getDate = (type, timestamp) => {
+    const date = Number(timestamp) === -1 ? new Date() : new Date(Number(timestamp));
+    switch (toJsString(type)) {
+        case 'iso': return toWasmString(date.toISOString());
+        case 'locale': return toWasmString(date.toLocaleString());
+        default: return toWasmString(date.toString());
+    }
+}
+
 wasmApi.requestPointerLock = (elementName) => {
     const jsElementName = toJsString(elementName);
     document.getElementById(jsElementName).requestPointerLock();

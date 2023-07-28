@@ -39,6 +39,7 @@
     عرف اعرض_واجهة_التنصيب: لقب showInstallPrompt؛
 
     عرف هات_الختم_الزمني: لقب getTimestamp؛
+    عرف هات_التاريخ: لقب getDate؛
     عرف ألغ_احتكار_المؤشر: لقب exitPointerLock؛
     عرف ألغ_ملء_الشاشة: لقب exitFullScreen؛
 
