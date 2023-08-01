@@ -140,17 +140,17 @@
             }
 
             if signal == this.onMouseEnter~ptr {
-                handleSignalConnectionChanged[onMouseEnter, "mouseenter", {
+                handleSignalConnectionChanged[this.id, onMouseEnter, "mouseenter", {
                     this.onMouseEnter.emit(Int(0));
                 }];
             }
             if signal == this.onMouseOut~ptr {
-                handleSignalConnectionChanged[onMouseOut, "mouseout", {
+                handleSignalConnectionChanged[this.id, onMouseOut, "mouseout", {
                     this.onMouseOut.emit(Int(0));
                 }];
             }
             if signal == this.onClick~ptr {
-                handleSignalConnectionChanged[onClick, "click", {
+                handleSignalConnectionChanged[this.id, onClick, "click", {
                     this.onClick.emit(Int(0));
                 }];
             }
@@ -160,7 +160,7 @@
             if this.id == "" return;
 
             if signal == this.onMouseMove~ptr {
-                handleSignalConnectionChanged[onMouseMove, "mousemove", {
+                handleSignalConnectionChanged[this.id, onMouseMove, "mousemove", {
                     this.onMouseMove.emit(MouseMovePayload().{
                         posX = data.getInt("offsetX");
                         posY = data.getInt("offsetY");
@@ -175,7 +175,7 @@
             if this.id == "" return;
 
             if signal == this.onMouseDown~ptr {
-                handleSignalConnectionChanged[onMouseDown, "mousedown", {
+                handleSignalConnectionChanged[this.id, onMouseDown, "mousedown", {
                     this.onMouseDown.emit(MouseButtonPayload().{
                         button = data.getInt("button");
                         posX = data.getInt("offsetX");
@@ -185,7 +185,7 @@
             }
 
             if signal == this.onMouseUp~ptr {
-                handleSignalConnectionChanged[onMouseUp, "mouseup", {
+                handleSignalConnectionChanged[this.id, onMouseUp, "mouseup", {
                     this.onMouseUp.emit(MouseButtonPayload().{
                         button = data.getInt("button");
                         posX = data.getInt("offsetX");
@@ -220,7 +220,7 @@
             }
 
             if signal == this.onTouchStart~ptr {
-                handleSignalConnectionChanged[onTouchStart, "touchstart", {
+                handleSignalConnectionChanged[this.id, onTouchStart, "touchstart", {
                     this.onTouchStart.emit(Array[TouchPayload]()~use_in(payload) no_injection {
                         convertJsonToPayload[];
                     });
@@ -228,7 +228,7 @@
             }
 
             if signal == this.onTouchEnd~ptr {
-                handleSignalConnectionChanged[onTouchEnd, "touchend", {
+                handleSignalConnectionChanged[this.id, onTouchEnd, "touchend", {
                     this.onTouchEnd.emit(Array[TouchPayload]()~use_in(payload) no_injection {
                         convertJsonToPayload[];
                     });
@@ -236,7 +236,7 @@
             }
 
             if signal == this.onTouchMove~ptr {
-                handleSignalConnectionChanged[onTouchMove, "touchmove", {
+                handleSignalConnectionChanged[this.id, onTouchMove, "touchmove", {
                     this.onTouchMove.emit(Array[TouchPayload]()~use_in(payload) no_injection {
                         convertJsonToPayload[];
                     });

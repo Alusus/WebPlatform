@@ -28,7 +28,7 @@
             if this.id == "" return;
 
             if signal == this.onChanged~ptr {
-                handleSignalConnectionChanged[onChanged, "change", {
+                handleSignalConnectionChanged[this.id, onChanged, "change", {
                     this.onChanged.emit(Int(0));
                 }];
             }

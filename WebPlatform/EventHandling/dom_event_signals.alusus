@@ -10,10 +10,10 @@
     //==========================================================================
     // handleSignalConnectionChanged
     // A helper macro for handling an event in onSignalConnectionsChanged.
-    macro handleSignalConnectionChanged [signalName, eventHtmlIentifier, emitSignal] {
+    macro handleSignalConnectionChanged [elementId, signalName, eventHtmlIentifier, emitSignal] {
         if connectionCount > 0 and this.__signalName__Id == -1 {
             this.__signalName__Id = registerElementEventHandler(
-                this.id,
+                elementId,
                 eventHtmlIentifier,
                 this.signalName.defaultPrevented,
                 closure (json: Json) {
@@ -28,12 +28,12 @@
 
 
     //==========================================================================
-    // handleKeySignalConnectionChanged
+    // handleSignalConnectionChanged
     // A helper macro for handling a key event in onSignalConnectionsChanged.
-    macro handleKeySignalConnectionChanged [signalName, eventHtmlIentifier, keysToSwallow, emitSignal] {
+    macro handleSignalConnectionChanged [elementId, signalName, eventHtmlIentifier, keysToSwallow, emitSignal] {
         if connectionCount > 0 and this.__signalName__Id == -1 {
             this.__signalName__Id = registerElementKeyEventHandler(
-                this.id,
+                elementId,
                 eventHtmlIentifier,
                 keysToSwallow,
                 closure (json: Json) {

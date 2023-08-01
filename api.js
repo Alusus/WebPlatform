@@ -122,6 +122,11 @@ wasmApi.registerElementEventHandler = (elementName, eventName, preventDefault, c
             if (preventDefault) event.preventDefault();
             onEvent(cbId, true, jsEventName, event);
         };
+    } else if (jsElementName === 'document') {
+        document[`on${jsEventName}`] = (event) => {
+            if (preventDefault) event.preventDefault();
+            onEvent(cbId, true, jsEventName, event);
+        };
     } else {
         document.getElementById(jsElementName)[`on${jsEventName}`] = (event) => {
             if (preventDefault) event.preventDefault();
@@ -139,6 +144,11 @@ wasmApi.registerElementKeyEventHandler = (elementName, eventName, keysToSwallow,
             if (toSwallow.includes(event.code)) event.preventDefault();
             onEvent(cbId, true, jsEventName, event);
         };
+    } else if (jsElementName === 'document') {
+        document[`on${jsEventName}`] = (event) => {
+            if (toSwallow.includes(event.code)) event.preventDefault();
+            onEvent(cbId, true, jsEventName, event);
+        };
     } else {
         document.getElementById(jsElementName)[`on${jsEventName}`] = (event) => {
             if (toSwallow.includes(event.code)) event.preventDefault();
@@ -152,6 +162,8 @@ wasmApi.unregisterElementEventHandler = (elementName, eventName) => {
     const jsEventName = toJsString(eventName);
     if (jsElementName === 'window') {
         window[`on${jsEventName}`] = null;
+    } else if (jsElementName === 'document') {
+        document[`on${jsEventName}`] = null;
     } else {
         const element=document.getElementById(jsElementName)
         if (!element) return;
@@ -661,6 +673,10 @@ wasmApi.getVarFromSession = (varName) => {
     return sessionStorage.getItem(toJsString(varName));
 }
 
+wasmApi.getVisibilityState = () => {
+    return toWasmString(document.visibilityState);
+}
+
 wasmApi.logToConsole = (msg) => {
   console.log(toJsString(msg));
 }
@@ -809,6 +825,7 @@ const eventPropMap = {
     gamepaddisconnected: ['gamepad'],
     popstate: ['state'],
     callCustomAsyncJsFn: ['result'],
+    visibilitychange: [],
 };
 
 function stringifyEvent(event) {
