@@ -42,6 +42,8 @@
     عرف هات_التاريخ: لقب getDate؛
     عرف ألغ_احتكار_المؤشر: لقب exitPointerLock؛
     عرف ألغ_ملء_الشاشة: لقب exitFullScreen؛
+    عرف التمس_يقظة_الشاشة: لقب requestWakeLock؛
+    عرف ألغ_يقظة_الشاشة: لقب exitWakeLock؛
 
     عرف هات_عدد_المقابض: لقب getGamepadsCount؛
     عرف هات_رمز_المقبض: لقب getGamepadId؛

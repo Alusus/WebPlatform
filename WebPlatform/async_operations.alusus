@@ -102,4 +102,30 @@
         });
         return p;
     }
+
+    function requestWakeLock(cb: closure (Json)) {
+        def index: ArchInt = addEventHandler(cb);
+        _requestWakeLock(eventHandlers(index).id);
+    }
+
+    function requestWakeLock(): SrdRef[Promise[Bool]] {
+        def p: SrdRef[Promise[Bool]] = Promise[Bool].new();
+        requestWakeLock(closure (json: Json) {
+            p.resolve(json.getObject("eventData").getBool("result"));
+        });
+        return p;
+    }
+
+    function exitWakeLock(cb: closure (Json)) {
+        def index: ArchInt = addEventHandler(cb);
+        _exitWakeLock(eventHandlers(index).id);
+    }
+
+    function exitWakeLock(): SrdRef[Promise[Bool]] {
+        def p: SrdRef[Promise[Bool]] = Promise[Bool].new();
+        exitWakeLock(closure (json: Json) {
+            p.resolve(json.getObject("eventData").getBool("result"));
+        });
+        return p;
+    }
 }

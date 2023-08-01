@@ -94,6 +94,8 @@
     @expname[exitPointerLock] function exitPointerLock();
     @expname[requestFullScreen] function requestFullScreen (elementName: ptr[Char]);
     @expname[exitFullScreen] function exitFullScreen();
+    @expname[requestWakeLock] function _requestWakeLock(cbId: ArchInt);
+    @expname[exitWakeLock] function _exitWakeLock(cbId: ArchInt);
     @expname[httpRedirect] function httpRedirect (address: ptr[Char]);
     @expname[getLocationHref] function getLocationHref (): ptr[Char];
     @expname[getLocationProtocol] function getLocationProtocol (): ptr[Char];

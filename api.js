@@ -10,6 +10,7 @@ let sleeping = false;
 let eventWaiting = false;
 let wasmStrPtr = null;
 let installPrompt = null;
+let wakeLock = null;
 
 const resizeObserver = new ResizeObserver(entries => {
     for (let entry of entries) {
@@ -607,6 +608,26 @@ wasmApi.exitFullScreen = () => {
     document.exitFullscreen();
 }
 
+wasmApi.requestWakeLock = (cbId) => {
+    if ("wakeLock" in navigator) {
+        navigator.wakeLock.request("screen").then((result) => {
+            onEvent(cbId, false, 'requestWakeLock', { result: true });
+        });
+    } else {
+        onEvent(cbId, false, 'requestWakeLock', { result: false });
+    }
+}
+
+wasmApi.exitWakeLock = (cbId) => {
+    if (wakeLock) {
+        wakeLock.release().then((result) => {
+            onEvent(cbId, false, 'exitWakeLock', { result: true });
+        });
+    } else {
+        onEvent(cbId, false, 'exitWakeLock', { result: false });
+    }
+}
+
 wasmApi.httpRedirect = (page) => {
     window.location.replace(toJsString(page));
 }
@@ -826,6 +847,8 @@ const eventPropMap = {
     popstate: ['state'],
     callCustomAsyncJsFn: ['result'],
     visibilitychange: [],
+    requestWakeLock: ['result'],
+    exitWakeLock: ['result'],
 };
 
 function stringifyEvent(event) {
