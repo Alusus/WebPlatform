@@ -57,6 +57,8 @@ class AudioResource {
     handler this.load(u: ptr[array[Char]]): SrdRef[Promise[Int]];
     handler this.play(loop: Bool);
     handler this.stop();
+    handler this.pause();
+    handler this.resume();
     handler this.volume = Float;
     handler this.volume:Float;
     handler this.isPlaying(): Bool;
@@ -66,9 +68,13 @@ A class used for audio resources.
 
 `id` a unique identifier to distinguish this resource from the others.
 
-`load` a method used to load the resource with the given path.
+`load` loads the resource with the given path.
 
-`play` a method used to play the resource.
+`play` starts the playback from the beginning.
+
+`pause` pauses the playback.
+
+`resume` resumes the playback from where it was paused.
 
 parameters:
 

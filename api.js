@@ -499,6 +499,17 @@ wasmApi.stopAudio = (audioId) => {
     audio.currentTime = 0;
 }
 
+wasmApi.pauseAudio = (audioId) => {
+    var audio = resources[audioId];
+    audio.pause();
+}
+
+wasmApi.resumeAudio = (audioId) => {
+    var audio = resources[audioId];
+    if (!audio.paused) return;
+    audio.play();
+}
+
 wasmApi.setAudioVolume = (audioId, volume) => {
     resources[audioId].volume = volume;
 }
