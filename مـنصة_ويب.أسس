@@ -42,6 +42,8 @@
     عرف هات_التاريخ: لقب getDate؛
     عرف ألغ_احتكار_المؤشر: لقب exitPointerLock؛
     عرف ألغ_ملء_الشاشة: لقب exitFullScreen؛
+    عرف التمس_يقظة_الشاشة: لقب requestWakeLock؛
+    عرف ألغ_يقظة_الشاشة: لقب exitWakeLock؛
 
     عرف هات_عدد_المقابض: لقب getGamepadsCount؛
     عرف هات_رمز_المقبض: لقب getGamepadId؛
@@ -614,6 +616,8 @@
         عرف حمل: لقب load؛
         عرف شغل: لقب play؛
         عرف أوقف: لقب stop؛
+        عرف ألبث: لقب pause؛
+        عرف استأنف: لقب resume؛
         عرف الجهارة: لقب volume؛
         عرف أمشتغل: لقب isPlaying؛
     }
@@ -657,6 +661,7 @@
         عرف وسم_الموقع: لقب locationHash؛
         عرف هات_متغير_استعلام: لقب getQueryParam؛
         عرف ادفع_مسارا: لقب pushLocation؛
+        عرف مرئية: لقب visible؛
         عرف حجم: لقب resize؛
         عرف المفاتيح_المكبوتة: لقب keysToSwallow؛
         عرف عند_بدء_الكبسة: لقب onKeyDown؛
@@ -666,6 +671,7 @@
         عرف عند_ربط_مقبض: لقب onGamepadConnected؛
         عرف عند_فصل_مقبض: لقب onGamepadDisconnected؛
         عرف عند_تغير_المسار: لقب onLocationChanged؛
+        عرف عند_تغير_المرئية: لقب onVisibilityChanged؛
         عرف عند_استلام_رسالة: لقب onMessage؛
         عرف أرسل_رسالة: لقب postMessage؛
         عرف ارسل_رسالة_للمالك: لقب postMessageToParent؛

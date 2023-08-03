@@ -118,6 +118,15 @@ handler this.pushLocation (url: ptr[array[Char]]);
 A function to add a path to the browser's history. This function allows changing the browser's
 address without reloading the page.
 
+#### visible
+
+```
+handler this.visible: Bool;
+```
+
+Returns true if the page is currently visible, and false if it's not (for example, the browser window
+is minimized or the browser's focus is currently on a different tab).
+
 #### postMessage
 
 ```
@@ -193,6 +202,15 @@ def onLocationChanged: DomEventSignal[Window, Int];
 
 Triggered when the browser's path changes without page reload. This event is triggered when the
 pushLocation function is called or when the user presses the browser's back or forward button.
+
+#### onVisibilityChanged
+
+```
+def onVisibilityChanged: DomEventSignal[Window, Int];
+```
+
+Triggered when the visibility state of the page is changed from visible to non-visible or
+vice versa.
 
 #### onMessage
 

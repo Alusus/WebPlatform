@@ -34,6 +34,14 @@
             stopAudio(this.id);
         }
 
+        handler this.pause() {
+            pauseAudio(this.id);
+        }
+
+        handler this.resume() {
+            resumeAudio(this.id);
+        }
+
         handler this.volume = Float {
             setAudioVolume(this.id, value);
             return value;

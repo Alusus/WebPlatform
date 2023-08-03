@@ -61,7 +61,7 @@
             if this.id == "" return;
 
             if signal == this.onChanged~ptr {
-                handleSignalConnectionChanged[onChanged, "change", {
+                handleSignalConnectionChanged[this.id, onChanged, "change", {
                     this.onChanged.emit(Int(0));
                 }];
             }
@@ -71,14 +71,14 @@
             if this.id == "" return;
 
             if signal == this.onKeyPress~ptr {
-                handleKeySignalConnectionChanged[onKeyPress, "keypress", "", {
+                handleSignalConnectionChanged[this.id, onKeyPress, "keypress", "", {
                     def outPayload: String;
                     if data.getBool("shiftKey") outPayload += "Shift+";
                     outPayload += data.getString("code");
                     this.onKeyPress.emit(outPayload);
                 }];
             } else if signal == this.onKeyUp~ptr {
-                handleKeySignalConnectionChanged[onKeyUp, "keyup", "", {
+                handleSignalConnectionChanged[this.id, onKeyUp, "keyup", "", {
                     def outPayload: String;
                     if data.getBool("shiftKey") outPayload += "Shift+";
                     outPayload += data.getString("code");

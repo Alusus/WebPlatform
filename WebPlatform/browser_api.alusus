@@ -75,6 +75,8 @@
     // Audio Operations
     @expname[playAudio] function playAudio (audioId: ArchInt, loop: Bool);
     @expname[stopAudio] function stopAudio (audioId: ArchInt);
+    @expname[pauseAudio] function pauseAudio (audioId: ArchInt);
+    @expname[resumeAudio] function resumeAudio (audioId: ArchInt);
     @expname[setAudioVolume] function setAudioVolume (audioId: ArchInt, volume: Float);
     @expname[getAudioVolume] function getAudioVolume (audioId: ArchInt): Float;
     @expname[isAudioPlaying] function isAudioPlaying (audioId: ArchInt): Bool;
@@ -92,6 +94,8 @@
     @expname[exitPointerLock] function exitPointerLock();
     @expname[requestFullScreen] function requestFullScreen (elementName: ptr[Char]);
     @expname[exitFullScreen] function exitFullScreen();
+    @expname[requestWakeLock] function _requestWakeLock(cbId: ArchInt);
+    @expname[exitWakeLock] function _exitWakeLock(cbId: ArchInt);
     @expname[httpRedirect] function httpRedirect (address: ptr[Char]);
     @expname[getLocationHref] function getLocationHref (): ptr[Char];
     @expname[getLocationProtocol] function getLocationProtocol (): ptr[Char];
@@ -105,6 +109,7 @@
     @expname[getCookie] function getCookie (cName: ptr[Char]): ptr[array[Char]];
     @expname[addVarToSession] function addVarToSession (varName: ptr[Char], varValue: ptr[Char]);
     @expname[getVarFromSession] function getVarFromSession (varName: ptr[Char]): ptr[array[Char]];
+    @expname[getVisibilityState] function getVisibilityState (): ptr[array[Char]];
     @expname[logToConsole] function logToConsole (msg: ptr[Char]);
     @expname[showAlert] function showAlert (message: ptr[Char]): Bool;
     @expname[postMessage] function postMessage (target: ptr[Char], msgType: ptr[Char], msgBody: ptr[Char]);

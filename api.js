@@ -10,6 +10,7 @@ let sleeping = false;
 let eventWaiting = false;
 let wasmStrPtr = null;
 let installPrompt = null;
+let wakeLock = null;
 
 const resizeObserver = new ResizeObserver(entries => {
     for (let entry of entries) {
@@ -122,6 +123,11 @@ wasmApi.registerElementEventHandler = (elementName, eventName, preventDefault, c
             if (preventDefault) event.preventDefault();
             onEvent(cbId, true, jsEventName, event);
         };
+    } else if (jsElementName === 'document') {
+        document[`on${jsEventName}`] = (event) => {
+            if (preventDefault) event.preventDefault();
+            onEvent(cbId, true, jsEventName, event);
+        };
     } else {
         document.getElementById(jsElementName)[`on${jsEventName}`] = (event) => {
             if (preventDefault) event.preventDefault();
@@ -139,6 +145,11 @@ wasmApi.registerElementKeyEventHandler = (elementName, eventName, keysToSwallow,
             if (toSwallow.includes(event.code)) event.preventDefault();
             onEvent(cbId, true, jsEventName, event);
         };
+    } else if (jsElementName === 'document') {
+        document[`on${jsEventName}`] = (event) => {
+            if (toSwallow.includes(event.code)) event.preventDefault();
+            onEvent(cbId, true, jsEventName, event);
+        };
     } else {
         document.getElementById(jsElementName)[`on${jsEventName}`] = (event) => {
             if (toSwallow.includes(event.code)) event.preventDefault();
@@ -152,6 +163,8 @@ wasmApi.unregisterElementEventHandler = (elementName, eventName) => {
     const jsEventName = toJsString(eventName);
     if (jsElementName === 'window') {
         window[`on${jsEventName}`] = null;
+    } else if (jsElementName === 'document') {
+        document[`on${jsEventName}`] = null;
     } else {
         const element=document.getElementById(jsElementName)
         if (!element) return;
@@ -499,6 +512,17 @@ wasmApi.stopAudio = (audioId) => {
     audio.currentTime = 0;
 }
 
+wasmApi.pauseAudio = (audioId) => {
+    var audio = resources[audioId];
+    audio.pause();
+}
+
+wasmApi.resumeAudio = (audioId) => {
+    var audio = resources[audioId];
+    if (!audio.paused) return;
+    audio.play();
+}
+
 wasmApi.setAudioVolume = (audioId, volume) => {
     resources[audioId].volume = volume;
 }
@@ -584,6 +608,26 @@ wasmApi.exitFullScreen = () => {
     document.exitFullscreen();
 }
 
+wasmApi.requestWakeLock = (cbId) => {
+    if ("wakeLock" in navigator) {
+        navigator.wakeLock.request("screen").then((result) => {
+            onEvent(cbId, false, 'requestWakeLock', { result: true });
+        });
+    } else {
+        onEvent(cbId, false, 'requestWakeLock', { result: false });
+    }
+}
+
+wasmApi.exitWakeLock = (cbId) => {
+    if (wakeLock) {
+        wakeLock.release().then((result) => {
+            onEvent(cbId, false, 'exitWakeLock', { result: true });
+        });
+    } else {
+        onEvent(cbId, false, 'exitWakeLock', { result: false });
+    }
+}
+
 wasmApi.httpRedirect = (page) => {
     window.location.replace(toJsString(page));
 }
@@ -648,6 +692,10 @@ wasmApi.addVarToSession = (varName, varValue) => {
 
 wasmApi.getVarFromSession = (varName) => {
     return sessionStorage.getItem(toJsString(varName));
+}
+
+wasmApi.getVisibilityState = () => {
+    return toWasmString(document.visibilityState);
 }
 
 wasmApi.logToConsole = (msg) => {
@@ -798,6 +846,9 @@ const eventPropMap = {
     gamepaddisconnected: ['gamepad'],
     popstate: ['state'],
     callCustomAsyncJsFn: ['result'],
+    visibilitychange: [],
+    requestWakeLock: ['result'],
+    exitWakeLock: ['result'],
 };
 
 function stringifyEvent(event) {

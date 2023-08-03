@@ -16,6 +16,7 @@
             this.onGamepadConnected.owner~no_deref = this;
             this.onGamepadDisconnected.owner~no_deref = this;
             this.onLocationChanged.owner~no_deref = this;
+            this.onVisibilityChanged.owner~no_deref = this;
             this.onMessage.owner~no_deref = this;
         }
 
@@ -36,24 +37,26 @@
         def onGamepadDisconnectedId: ArchInt = -1;
         def onLocationChanged: DomEventSignal[Window, Int];
         def onLocationChangedId: ArchInt = -1;
+        def onVisibilityChanged: DomEventSignal[Window, Int];
+        def onVisibilityChangedId: ArchInt = -1;
         def onMessage: DomEventSignal[Window, Json];
         def onMessageId: ArchInt = -1;
 
         handler this.onSignalConnectionsChanged(signal: ptr[Signal[Window, String]], connectionCount: Int) {
             if signal == this.onKeyDown~ptr {
-                handleKeySignalConnectionChanged[onKeyDown, "keydown", this.keysToSwallow, {
+                handleSignalConnectionChanged["window", onKeyDown, "keydown", this.keysToSwallow, {
                     this.onKeyDown.emit(data.getString("code"));
                 }];
             } else if signal == this.onKeyUp~ptr {
-                handleKeySignalConnectionChanged[onKeyUp, "keyup", this.keysToSwallow, {
+                handleSignalConnectionChanged["window", onKeyUp, "keyup", this.keysToSwallow, {
                     this.onKeyUp.emit(data.getString("code"));
                 }];
             } else if signal == this.onGamepadConnected~ptr {
-                handleSignalConnectionChanged[onGamepadConnected, "gamepadconnected", {
+                handleSignalConnectionChanged["window", onGamepadConnected, "gamepadconnected", {
                     this.onGamepadConnected.emit(data.getObject("gamepad").getString("id"));
                 }];
             } else if signal == this.onGamepadDisconnected~ptr {
-                handleSignalConnectionChanged[onGamepadDisconnected, "gamepaddisconnected", {
+                handleSignalConnectionChanged["window", onGamepadDisconnected, "gamepaddisconnected", {
                     this.onGamepadDisconnected.emit(data.getObject("gamepad").getString("id"));
                 }];
             }
@@ -61,11 +64,11 @@
 
         handler this.onSignalConnectionsChanged(signal: ptr[Signal[Window, Bool]], connectionCount: Int) {
             if signal == this.onPointerLockChange~ptr {
-                handleSignalConnectionChanged[onPointerLockChange, "pointerlockchange", {
+                handleSignalConnectionChanged["window", onPointerLockChange, "pointerlockchange", {
                     this.onPointerLockChange.emit(Bool().{ this = data.getBool("enabled") });
                 }];
             } else if signal == this.onFullScreenChange~ptr {
-                handleSignalConnectionChanged[onFullScreenChange, "fullscreenchange", {
+                handleSignalConnectionChanged["window", onFullScreenChange, "fullscreenchange", {
                     this.onFullScreenChange.emit(Bool().{ this = data.getBool("enabled") });
                 }];
             }
@@ -73,15 +76,19 @@
 
         handler this.onSignalConnectionsChanged(signal: ptr[Signal[Window, Int]], connectionCount: Int) {
             if signal == this.onLocationChanged~ptr {
-                handleSignalConnectionChanged[onLocationChanged, "popstate", {
+                handleSignalConnectionChanged["window", onLocationChanged, "popstate", {
                     this.onLocationChanged.emit(Int(0));
+                }];
+            } else if signal == this.onVisibilityChanged~ptr {
+                handleSignalConnectionChanged["document", onVisibilityChanged, "visibilitychange", {
+                    this.onVisibilityChanged.emit(Int(0));
                 }];
             }
         }
 
         handler this.onSignalConnectionsChanged(signal: ptr[Signal[Window, Json]], connectionCount: Int) {
             if signal == this.onMessage~ptr {
-                handleSignalConnectionChanged[onMessage, "message", {
+                handleSignalConnectionChanged["window", onMessage, "message", {
                     this.onMessage.emit(data.getObject("data"));
                 }];
             }
@@ -145,6 +152,10 @@
         handler this.pushLocation (url: ptr[array[Char]]) {
             WebPlatform.pushState(url, "{}");
             this.onLocationChanged.emit(Int(0));
+        }
+
+        handler this.visible: Bool {
+            return String.isEqual(getVisibilityState(), "visible");
         }
 
         handler this.resize(width: Int, height: Int) {

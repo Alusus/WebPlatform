@@ -326,6 +326,26 @@ Return value:
 `ptr[Char]` the result of the call as a promise because the call is async.
 
 
+### requestWakeLock
+
+```
+function requestWakeLock (): SrdRef[Promise[Bool]];
+```
+
+Requests disabling screen lock while the app is running. Returns true when successful, 0
+when unsuccessful or if the browser does not support this operation.
+
+
+### exitWakeLock
+
+```
+function exitWakeLock (): SrdRef[Promise[Bool]];
+```
+
+Exists the wake lock state. Returns true on success, false on failure or if the browser
+does not support this operation.
+
+
 ### addAssetRoute
 
 ```
