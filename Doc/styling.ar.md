@@ -750,7 +750,14 @@ module Transform {
 
 ```
 صنف خـلفية {
-    عرف حول_لنص(هذا:خـلفية): نـص؛
+    عملية هذا_الصنف(ل: سند[لـون]): سـندنا[خـلفية]؛
+    عملية هذا_الصنف(
+        ر: نـص،
+        تكرار_س: ثـنائي، تكرار_ص: ثـنائي،
+        موقع: سند[مـوقع_خلفية]،
+        حجم: سند[حـجم_خلفية]
+    ): سـندنا[خـلفية]؛
+    عملية هذا_الصنف(زاوية: صـحيح، عدد: صـحيح، معطيات: ...أيما): سـندنا[خـلفية]؛
 }
 ```
 
@@ -758,13 +765,23 @@ module Transform {
 
 ```
 class Background {
-    handler (this:Background).toString(): String;
+    handler this_type(c: ref[Color]): SrdRef[Background];
+    handler this_type(
+            u: String, repX: Bool, repY: Bool,
+            pos: ref[BackgroundPosition],
+            s: ref[BackgroundSize]
+        ): SrdRef[Background];
+    handler this_type(degree: Int, count: Int, args: ...any): SrdRef[Background];
 }
 ```
 
-صنف يحمل معلومات الخلفية.
-
-`حول_لنص` (`toString`) طريقة لتحويل معلومات الخلفية إلى ترميز نصي.
+صنف يحمل معلومات الخلفية. يحتوي على ثلاث دالات إنشاء:
+* الدالة الأولى تنشئ خلفية بلون واحد.
+* الدالة الثانية تنشئ خلفية بصورة.
+* الدالة الثالثة تنشئ خلفية بتدرج لوني. المعطى الأول يحدد زاوية التدرج بينما يحدد المعطى الثاني عدد
+  الألوان المعطاة بعدها والتي سيتم التدرج بينها. بعد المعطى الثاني يجب تمرير المعطيات اللونية على
+  شكل ثنائيات عددها يطابق المعطى الثاني. كل ثنائي يتكون من `لـون` يليه عدد صحيح يحدد النسبة التي
+  يبدأ عندها هذا اللون من المسافة الكلية.
 
 
 ### مـرونة (Flex)
@@ -813,30 +830,6 @@ class Shadow {
 
 ### مـوقع (Position)
 
-<div dir=rtl>
-
-```
-صنف مـوقع {
-    تعداد_قيمة_نصية[_ساكن_، "ساكن"]؛
-    تعداد_قيمة_نصية[_نسبي_، "نسبي"]؛
-    تعداد_قيمة_نصية[_مثبت_، "مثبت"]؛
-    تعداد_قيمة_نصية[_مطلق_، "مطلق"]؛
-    تعداد_قيمة_نصية[_لزج_، "لزج"]؛
-}
-```
-
-</div>
-
-```
-class Position {
-    enumStringValue[STATIC, "static"];
-    enumStringValue[RELATIVE, "relative"];
-    enumStringValue[FIXED, "fixed"];
-    enumStringValue[ABSOLUTE, "absolute"];
-    enumStringValue[STICKY, "sticky"];
-}
-```
-
 صنف يحمل قيم الموقع الممكنة على شكل تعدادات.
 * `_ساكن_` (`STATIC`)
 * `_نسبي_` (`RELATIVE`)
@@ -846,30 +839,6 @@ class Position {
 
 
 ### فـيض (Overflow)
-
-<div dir=rtl>
-
-```
-صنف فـيض {
-    تعداد_قيمة_نصية[_ظاهر_، "ظاهر"]؛
-    تعداد_قيمة_نصية[_مخفي_، "مخفي"]؛
-    تعداد_قيمة_نصية[_مقطوع_، "مقطوع"]؛
-    تعداد_قيمة_نصية[_تمرير_، "تمرير"]؛
-    تعداد_قيمة_نصية[_تلقائي_، "تلقائي"]؛
-}
-```
-
-</div>
-
-```
-class Overflow {
-    enumStringValue[VISIBLE, "visible"];
-    enumStringValue[HIDDEN, "hidden"];
-    enumStringValue[CLIP, "clip"];
-    enumStringValue[SCROLL, "scroll"];
-    enumStringValue[AUTO, "auto"];
-}
-```
 
 صنف يحمل قيم الفيض الممكنة على شكل تعدادات.
 * `_ظاهر_` (`VISIBLE`)
@@ -881,29 +850,6 @@ class Overflow {
 
 ### إظـهار (Display)
 
-<div dir=rtl>
-
-```
-صنف إظـهار {
-    تعداد_قيمة_نصية[_ضمني_، "inline"]؛
-    تعداد_قيمة_نصية[_كتلة_، "block"]؛
-    تعداد_قيمة_نصية[_مرن_، "flex"]؛
-    تعداد_قيمة_نصية[_شبكة_، "grid"]؛
-    تعداد_قيمة_نصية[_مخفي_، "none"]؛
-}
-```
-
-</div>
-
-```
-class Display {
-    enumStringValue[INLINE, "inline"];
-    enumStringValue[BLOCK, "block"];
-    enumStringValue[FLEX, "flex"];
-    enumStringValue[GRID, "grid"];
-    enumStringValue[NONE, "none"];
-}
-```
 صنف يحمل قيم الإظهار الممكنة على شكل تعدادات.
 * `_ضمني_` (`INLINE`)
 * `_كتلة_` (`BLOCK`)
@@ -914,28 +860,6 @@ class Display {
 
 ### نـسق (Layout)
 
-<div dir=rtl>
-
-```
-صنف نـسق {
-    تعداد_قيمة_نصية[_سطر_، "سطر"]؛
-    تعداد_قيمة_نصية[_سطر_معكوس_، "سطر_معكوس"]؛
-    تعداد_قيمة_نصية[_عمود_، "عمود"]؛
-    تعداد_قيمة_نصية[_عمود_معكوس_، "عمود_معكوس"]؛
-}
-```
-
-</div>
-
-```
-class Layout {
-    enumStringValue[ROW, "row"];
-    enumStringValue[ROW_REVERSE, "row-reverse"];
-    enumStringValue[COLUMN, "column"];
-    enumStringValue[COLUMN_REVERSE, "column-reverse"];
-}
-```
-
 صنف يحمل قيم النسق الممكنة على شكل تعدادات.
 * `_سطر_` (`ROW`)
 * `_سطر_معكوس_` (`ROW_REVERSE`)
@@ -945,28 +869,6 @@ class Layout {
 
 ### مـحاذاة (Align)
 
-<div dir=rtl>
-
-```
-صنف مـحاذاة {
-    تعداد_قيمة_نصية[_بداية_، "بداية"]؛
-    تعداد_قيمة_نصية[_وسط_، "وسط"]؛
-    تعداد_قيمة_نصية[_نهاية_، "نهاية"]؛
-    تعداد_قيمة_نصية[_تمدد_، "تمدد"]؛
-}
-```
-
-</div>
-
-```
-class Align {
-    enumStringValue[START, "start"];
-    enumStringValue[CENTER, "center"];
-    enumStringValue[END, "end"];
-    enumStringValue[STRETCH, "stretch"];
-}
-```
-
 صنف يحمل قيم المحاذاة الممكنة على شكل تعدادات.
 * `_بداية_` (`START`)
 * `_وسط_` (`CENTER`)
@@ -975,34 +877,6 @@ class Align {
 
 
 ### مـلء_سطر (Justify)
-
-<div dir=rtl>
-
-```
-صنف مـلء_سطر {
-    تعداد_قيمة_نصية[_بداية_، "بداية"]؛
-    تعداد_قيمة_نصية[_وسط_، "وسط"]؛
-    تعداد_قيمة_نصية[_نهاية_، "نهاية"]؛
-    تعداد_قيمة_نصية[_تمدد_، "تمدد"]؛
-    تعداد_قيمة_نصية[_مسافة_بينية_، "مسافة_بينية"]؛
-    تعداد_قيمة_نصية[_مسافة_محيطية_، "مسافة_محيطية"]؛
-    تعداد_قيمة_نصية[_مسافة_متساوية_، "مسافة_متساوية"]؛
-}
-```
-
-</div>
-
-```
-class Justify {
-    enumStringValue[START, "start"];
-    enumStringValue[CENTER, "center"];
-    enumStringValue[END, "end"];
-    enumStringValue[STRETCH, "stretch"];
-    enumStringValue[SPACE_BETWEEN, "space-between"];
-    enumStringValue[SPACE_AROUND, "space-around"];
-    enumStringValue[SPACE_EVENLY, "space_evenly"];
-}
-```
 
 صنف يحمل قيم ملء السطر الممكنة على شكل تعدادات.
 * `_بداية_` (`START`)
@@ -1015,56 +889,6 @@ class Justify {
 
 
 ### مـؤشر (Cursor)
-
-<div dir=rtl>
-
-```
-صنف مـؤشر {
-    تعداد_قيمة_نصية[_تلقائي_، "تلقائي"]؛
-    تعداد_قيمة_نصية[_مبدئي_، "مبدئي"]؛
-    تعداد_قيمة_نصية[_مساعدة_، "مساعدة"]؛
-    تعداد_قيمة_نصية[_سبابة_، "سبابة"]؛
-    تعداد_قيمة_نصية[_تقدم_، "تقدم"]؛
-    تعداد_قيمة_نصية[_انتظار_، "انتظار"]؛
-    تعداد_قيمة_نصية[_تقاطع_، "تقاطع"]؛
-    تعداد_قيمة_نصية[_كتابة_، "كتابة"]؛
-    تعداد_قيمة_نصية[_تحريك_، "تحريك"]؛
-    تعداد_قيمة_نصية[_ممنوع_، "ممنوع"]؛
-    تعداد_قيمة_نصية[_إمساك_، "إمساك"]؛
-    تعداد_قيمة_نصية[_ممسك_، "ممسك"]؛
-    تعداد_قيمة_نصية[_تحجيم_أفقي_، "تحجيم_أفقي"]؛
-    تعداد_قيمة_نصية[_تحجيم_عمودي_، "تحجيم_عمودي"]؛
-    تعداد_قيمة_نصية[_تحجيم_مائل_، "تحجيم_مائل"]؛
-    تعداد_قيمة_نصية[_تحجيم_مائل_معكوس_، "تحجيم_مائل_معكوس"]؛
-    تعداد_قيمة_نصية[_تكبير_، "تكبير"]؛
-    تعداد_قيمة_نصية[_تصغير_، "تصغير"]؛
-}
-```
-
-</div>
-
-```
-class Cursor {
-    enumStringValue[AUTO, "auto"];
-    enumStringValue[DEFAULT, "default"];
-    enumStringValue[HELP, "help"];
-    enumStringValue[POINTER, "pointer"];
-    enumStringValue[PROGRESS, "progress"];
-    enumStringValue[WAIT, "wait"];
-    enumStringValue[CROSSHAIR, "crosshair"];
-    enumStringValue[TEXT, "text"];
-    enumStringValue[MOVE, "move"];
-    enumStringValue[NOT_ALLOWED, "not-allowed"];
-    enumStringValue[GRAB, "grab"];
-    enumStringValue[GRABBING, "grabbing"];
-    enumStringValue[EW_RESIZE, "ew-resize"];
-    enumStringValue[NS_RESIZE, "ns-resize"];
-    enumStringValue[NESW_RESIZE, "nesw-resize"];
-    enumStringValue[NWSE_RESIZE, "nwse-resize"];
-    enumStringValue[ZOOM_IN, "zoom-in"];
-    enumStringValue[ZOOM_OUT, "zoom-out"];
-}
-```
 
 صنف يحمل قيم المؤشر الممكنة على شكل تعدادات.
 * `_تلقائي_` (`AUTO`)
@@ -1089,36 +913,6 @@ class Cursor {
 
 ### طـراز_إطار (BorderStyle)
 
-<div dir=rtl>
-
-```
-صنف طـراز_إطار {
-    تعداد_قيمة_نصية[_منقط_، "منقط"]؛
-    تعداد_قيمة_نصية[_مقطع_، "مقطع"]؛
-    تعداد_قيمة_نصية[_مستمر_، "مستمر"]؛
-    تعداد_قيمة_نصية[_مزدوج_، "مزدوج"]؛
-    تعداد_قيمة_نصية[_أخدود_، "أخدود"]؛
-    تعداد_قيمة_نصية[_حافة_، "حافة"]؛
-    تعداد_قيمة_نصية[_بلا_، "بلا"]؛
-    تعداد_قيمة_نصية[_مخفي_، "مخفي"]؛
-}
-```
-
-</div>
-
-```
-class BorderStyle {
-    enumStringValue[DOTTED, "dotted"];
-    enumStringValue[DASHED, "dashed"];
-    enumStringValue[SOLID, "solid"];
-    enumStringValue[DOUBLE, "double"];
-    enumStringValue[GROOVE, "groove"];
-    enumStringValue[RIDGE, "ridge"];
-    enumStringValue[NONE, "none"];
-    enumStringValue[HIDDEN, "hidden"];
-}
-```
-
 صنف يحمل قيم طراز الإطار الممكنة على شكل تعدادات.
 * `_منقط_` (`DOTTED`)
 * `_مقطع_` (`DASHED`)
@@ -1132,28 +926,6 @@ class BorderStyle {
 
 ### تـقطيع_كلمات (WordBreak)
 
-<div dir=rtl>
-
-```
-صنف تـقطيع_كلمات {
-    تعداد_قيمة_نصية[_عادي_، "عادي"]؛
-    تعداد_قيمة_نصية[_قطع_الكل_، "قطع_الكل"]؛
-    تعداد_قيمة_نصية[_احتفظ_بالكل_، "احتفظ_بالكل"]؛
-    تعداد_قيمة_نصية[_قطع_الكلمات_، "قطع_الكلمات"]؛
-}
-```
-
-</div>
-
-```
-class WordBreak {
-    enumStringValue[NORMAL, "normal"];
-    enumStringValue[BREAK_ALL, "break-all"];
-    enumStringValue[KEEP_ALL, "keep-all"];
-    enumStringValue[BREAK_WORD, "break-word"];
-}
-```
-
 صنف يحمل قيم تقطيع الكلمات الممكنة على شكل تعدادات.
 * `_عادي_` (`NORMAL`)
 * `_قطع_الكل_` (`BREAK_ALL`)
@@ -1163,52 +935,12 @@ class WordBreak {
 
 ### اتـجاه (Direction)
 
-<div dir=rtl>
-
-```
-صنف اتـجاه {
-    تعداد_قيمة_نصية[_من_اليسار_، "من_اليسار"]؛
-    تعداد_قيمة_نصية[_من_اليمين_، "من_اليمين"]؛
-}
-```
-
-</div>
-
-```
-class Direction {
-    enumStringValue[LTR, "ltr"];
-    enumStringValue[RTL, "rtl"];
-}
-```
-
 صنف يحمل قيم الاتجاه الممكنة على شكل تعدادات.
 * `_من_اليسار_` (`LTR`)
 * `_من_اليمين_` (`RTL`)
 
 
 ### زخـرفة_نص (TextDecoration)
-
-<div dir=rtl>
-
-```
-صنف زخـرفة_نص {
-    تعداد_قيمة_نصية[_بلا_، "بلا"]؛
-    تعداد_قيمة_نصية[_تحت_، "تحت"]؛
-    تعداد_قيمة_نصية[_فوق_، "فوق"]؛
-    تعداد_قيمة_نصية[_خلال_، "خلال"]؛
-}
-```
-
-</div>
-
-```
-class TextDecoration {
-    enumStringValue[NONE, "none"];
-    enumStringValue[UNDERLINE, "underline"];
-    enumStringValue[OVERLINE, "overline"];
-    enumStringValue[LINE_THROUGH, "line-through"];
-}
-```
 
 صنف يحمل قيم زخرفة النص الممكنة على شكل تعدادات.
 * `_بلا_` (`NONE`)
@@ -1218,30 +950,6 @@ class TextDecoration {
 
 
 ### طـراز_زخرفة_نص (TextDecorationStyle)
-
-<div dir=rtl>
-
-```
-صنف طـراز_زخرفة_نص {
-    تعداد_قيمة_نصية[_مستمر_، "مستمر"]؛
-    تعداد_قيمة_نصية[_مزدوج_، "مزدوح"]؛
-    تعداد_قيمة_نصية[_منقط_، "منقط"]؛
-    تعداد_قيمة_نصية[_مقطع_، "مقطع"]؛
-    تعداد_قيمة_نصية[_متموج_، "متموج"]؛
-}
-```
-
-</div>
-
-```
-class TextDecorationStyle {
-    enumStringValue[SOLID, "solid"];
-    enumStringValue[DOUBLE, "double"];
-    enumStringValue[DOTTED, "dotted"];
-    enumStringValue[DASHED, "dashed"];
-    enumStringValue[WAVY, "wavy"];
-}
-```
 
 صنف يحمل قيم طراز زخرفة النص الممكنة على شكل تعدادات.
 * `_مستمر_` (`SOLID`)
@@ -1253,27 +961,6 @@ class TextDecorationStyle {
 
 ### مـحاذاة_نص (TextAlign)
 
-<div dir=rtl>
-
-```
-صنف مـحاذاة_نص {
-    تعداد_قيمة_نصية[_يسار_، "يسار"]؛
-    تعداد_قيمة_نصية[_يمين_، "يمين"]؛
-    تعداد_قيمة_نصية[_وسط_، "وسط"]؛
-    تعداد_قيمة_نصية[_املأ_، "املأ"]؛
-}
-```
-
-</div>
-
-```
-class TextAlign {
-    enumStringValue[LEFT, "left"];
-    enumStringValue[RIGHT, "right"];
-    enumStringValue[CENTER, "center"];
-    enumStringValue[JUSTIFY, "justify"];
-}
-```
 صنف يحمل قيم محاذاة النص الممكنة على شكل تعدادات.
 * `_يسار_` (`LEFT`)
 * `_يمين_` (`RIGHT`)
@@ -1308,28 +995,25 @@ def FontWeight: {
 
 ### طـوفان (Floating)
 
-<div dir=rtl>
-
-```
-صنف طـوفان {
-    تعداد_قيمة_نصية[_بلا_، "بلا"]؛
-    تعداد_قيمة_نصية[_يسار_، "يسار"]؛
-    تعداد_قيمة_نصية[_يمين_، "يمين"]؛
-}
-```
-
-</div>
-
-```
-class Floating {
-    enumStringValue[NONE, "none"];
-    enumStringValue[LEFT, "left"];
-    enumStringValue[RIGHT, "right"];
-}
-```
-
 صنف يحمل قيم الطوفان الممكنة على شكل تعدادات.
 * `_بلا_` (`NONE`)
 * `_يسار_` (`LEFT`)
 * `_يمين_` (`RIGHT`)
+
+
+### مـوقع_خلفية (BackgroundPosition)
+
+تعداد للتحكم بموقع صورة الخلفية عندما لا تطابق أبعاد الصورة أبعاد العنصر الحاوي لها. القيم الممكنة:
+* `_مركز_` (`CENTER`) 
+* `_يمين_` (`RIGHT`) 
+* `_يسار_` (`LEFT`) 
+* `_فوق_` (`TOP`) 
+* `_تحت_` (`BOTTOM`) 
+
+
+### حـجم_خلفية (BackgroundSize)
+
+تعداد للتحكم بحجم صورة الخلفية عندما لا تطابق أبعاد الصورة أبعاد العنصر الحاوي لها. القيم الممكنة:
+* `_احتواء_` (`CONTAIN`): يحجم الصورة بحيث تظهر كاملة.
+* `_تغطية_` (`COVER`): يحجم الصورة بحيث تغطي كامل الخلفية. بعض أجزاء الصورة قد تكون خارج حدود الرؤية.
 

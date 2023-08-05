@@ -479,13 +479,23 @@ by specifying its three coordinates.
 
 ```
 class Background {
-    handler (this:Background).toString(): String;
+    handler this_type(c: ref[Color]): SrdRef[Background];
+    handler this_type(
+            u: String, repX: Bool, repY: Bool,
+            pos: ref[BackgroundPosition],
+            s: ref[BackgroundSize]
+        ): SrdRef[Background];
+    handler this_type(degree: Int, count: Int, args: ...any): SrdRef[Background];
 }
 ```
 
-A class that holds background information.
-
-`toString` a method to convert the class information to a string.
+Describes the properties of an element's background. It has three initializer functions:
+* The first initializer creates a background with a solid color.
+* The second initializer creates a background with an image.
+* The third initializer creates a color gradient background. The first arg to this function is the
+  angle of the gradient. The second argument is the number of color tuples that describes the
+  gradient. Each touple consists of a `Color` followed by an `Int` representing the percentage
+  of the total distance at which that color starts.
 
 
 ### Flex
@@ -516,16 +526,6 @@ A class that holds shadow information.
 
 ### Position
 
-```
-class Position {
-    enumStringValue[STATIC, "static"];
-    enumStringValue[RELATIVE, "relative"];
-    enumStringValue[FIXED, "fixed"];
-    enumStringValue[ABSOLUTE, "absolute"];
-    enumStringValue[STICKY, "sticky"];
-}
-```
-
 An enum class that holds possible values for position as enum.
 * `STATIC`
 * `RELATIVE`
@@ -535,16 +535,6 @@ An enum class that holds possible values for position as enum.
 
 
 ### Overflow
-
-```
-class Overflow {
-    enumStringValue[VISIBLE, "visible"];
-    enumStringValue[HIDDEN, "hidden"];
-    enumStringValue[CLIP, "clip"];
-    enumStringValue[SCROLL, "scroll"];
-    enumStringValue[AUTO, "auto"];
-}
-```
 
 An enum class that holds possible values for overflow as enum.
 * `VISIBLE`
@@ -556,16 +546,6 @@ An enum class that holds possible values for overflow as enum.
 
 ### Display
 
-```
-class Display {
-    enumStringValue[INLINE, "INLINE"];
-    enumStringValue[BLOCK, "block"];
-    enumStringValue[FLEX, "flex"];
-    enumStringValue[GRID, "grid"];
-    enumStringValue[NONE, "none"];
-}
-```
-
 An enum class that holds possible values for display as enum.
 * `INLINE`
 * `BLOCK`
@@ -576,15 +556,6 @@ An enum class that holds possible values for display as enum.
 
 ### Layout
 
-```
-class Layout {
-    enumStringValue[ROW, "row"];
-    enumStringValue[ROW_REVERSE, "row-reverse"];
-    enumStringValue[COLUMN, "column"];
-    enumStringValue[COLUMN_REVERSE, "column-reverse"];
-}
-```
-
 An enum class that holds possible values for layout as enum.
 * `ROW`
 * `ROW_REVERSE`
@@ -593,14 +564,7 @@ An enum class that holds possible values for layout as enum.
 
 
 ### Align
-```
-class Align {
-    enumStringValue[START, "start"];
-    enumStringValue[CENTER, "center"];
-    enumStringValue[END, "end"];
-    enumStringValue[STRETCH, "stretch"];
-}
-```
+
 An enum class that holds possible values for align as enum.
 * `START`
 * `CENTER`
@@ -609,18 +573,6 @@ An enum class that holds possible values for align as enum.
 
 
 ### Justify
-
-```
-class Justify {
-    enumStringValue[START, "start"];
-    enumStringValue[CENTER, "center"];
-    enumStringValue[END, "end"];
-    enumStringValue[STRETCH, "stretch"];
-    enumStringValue[SPACE_BETWEEN, "space-between"];
-    enumStringValue[SPACE_AROUND, "space-around"];
-    enumStringValue[SPACE_EVENLY, "space_evenly"];
-}
-```
 
 An enum class that holds possible values for justify as enum.
 * `START`
@@ -633,29 +585,6 @@ An enum class that holds possible values for justify as enum.
 
 
 ### Cursor
-
-```
-class Cursor {
-    enumStringValue[AUTO, "auto"];
-    enumStringValue[DEFAULT, "default"];
-    enumStringValue[HELP, "help"];
-    enumStringValue[POINTER, "pointer"];
-    enumStringValue[PROGRESS, "progress"];
-    enumStringValue[WAIT, "wait"];
-    enumStringValue[CROSSHAIR, "crosshair"];
-    enumStringValue[TEXT, "text"];
-    enumStringValue[MOVE, "move"];
-    enumStringValue[NOT_ALLOWED, "not-allowed"];
-    enumStringValue[GRAB, "grab"];
-    enumStringValue[GRABBING, "grabbing"];
-    enumStringValue[EW_RESIZE, "ew-resize"];
-    enumStringValue[NS_RESIZE, "ns-resize"];
-    enumStringValue[NESW_RESIZE, "nesw-resize"];
-    enumStringValue[NWSE_RESIZE, "nwse-resize"];
-    enumStringValue[ZOOM_IN, "zoom-in"];
-    enumStringValue[ZOOM_OUT, "zoom-out"];
-}
-```
 
 An enum class that holds possible values for cursor as enum.
 * `AUTO`
@@ -680,19 +609,6 @@ An enum class that holds possible values for cursor as enum.
 
 ### BorderStyle
 
-```
-class BorderStyle {
-    enumStringValue[DOTTED, "dotted"];
-    enumStringValue[DASHED, "dashed"];
-    enumStringValue[SOLID, "solid"];
-    enumStringValue[DOUBLE, "double"];
-    enumStringValue[GROOVE, "groove"];
-    enumStringValue[RIDGE, "ridge"];
-    enumStringValue[NONE, "none"];
-    enumStringValue[HIDDEN, "hidden"];
-}
-```
-
 An enum class that holds possible values for border style as enum.
 * `DOTTED`
 * `DASHED`
@@ -706,15 +622,6 @@ An enum class that holds possible values for border style as enum.
 
 ### WordBreak
 
-```
-class WordBreak {
-    enumStringValue[NORMAL, "normal"];
-    enumStringValue[BREAK_ALL, "break-all"];
-    enumStringValue[KEEP_ALL, "keep-all"];
-    enumStringValue[BREAK_WORD, "break-word"];
-}
-```
-
 An enum class that holds possible values for word break as enum.
 * `NORMAL`
 * `BREAK_ALL`
@@ -724,28 +631,12 @@ An enum class that holds possible values for word break as enum.
 
 ### Direction
 
-```
-class Direction {
-    enumStringValue[LTR, "ltr"];
-    enumStringValue[RTL, "rtl"];
-}
-```
-
 An enum class that holds possible values for direction as enum.
 * `LTR`
 * `RTL`
 
 
 ### TextDecoration
-
-```
-class TextDecoration {
-    enumStringValue[NONE, "none"];
-    enumStringValue[UNDERLINE, "underline"];
-    enumStringValue[OVERLINE, "overline"];
-    enumStringValue[LINE_THROUGH, "line-through"];
-}
-```
 
 An enum class that holds possible values for text decoration as enum.
 * `NONE`
@@ -756,16 +647,6 @@ An enum class that holds possible values for text decoration as enum.
 
 ### TextDecorationStyle
 
-```
-class TextDecorationStyle {
-    enumStringValue[SOLID, "solid"];
-    enumStringValue[DOUBLE, "double"];
-    enumStringValue[DOTTED, "dotted"];
-    enumStringValue[DASHED, "dashed"];
-    enumStringValue[WAVY, "wavy"];
-}
-```
-
 An enum class that holds possible values for text decoration style as enum.
 * `SOLID`
 * `DOUBLE`
@@ -775,15 +656,6 @@ An enum class that holds possible values for text decoration style as enum.
 
 
 ### TextAlign
-
-```
-class TextAlign {
-    enumStringValue[LEFT, "left"];
-    enumStringValue[RIGHT, "right"];
-    enumStringValue[CENTER, "center"];
-    enumStringValue[JUSTIFY, "justify"];
-}
-```
 
 An enum class that holds possible values for text align as enum.
 * `LEFT`
@@ -808,16 +680,28 @@ An enum class that holds possible values for font weight.
 
 ### Floating
 
-```
-class Floating {
-    enumStringValue[NONE, "none"];
-    enumStringValue[LEFT, "left"];
-    enumStringValue[RIGHT, "right"];
-}
-```
-
 An enum class that holds possible values for floating as enum.
 * `NONE`
 * `LEFT`
 * `RIGHT`
+
+
+### BackgroundPosition
+
+An enumeration to control the position of a background image when its dimensions do not match the
+dimension of the containing element. Possible values:
+* `CENTER` 
+* `RIGHT` 
+* `LEFT` 
+* `TOP` 
+* `BOTTOM` 
+
+
+### BackgroundSize
+
+An enumeration to control the size of a background image when its dimensions do not match the
+dimensions of the containing element. Possible values:
+* `CONTAIN`: Scales the image so that it's entirely visible.
+* `COVER`: Scales the image so that it covers the entire background. Portions of the image may
+  be outside the boundaries of the element and hence won't be visible.
 
