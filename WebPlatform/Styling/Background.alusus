@@ -7,12 +7,18 @@
             return SrdRef[BackgroundColor].construct().{ this.wkThis = this; color = c; };
         }
 
-        handler this_type(u: String, repX: Bool, repY: Bool): SrdRef[Background] {
+        handler this_type(
+            u: String, repX: Bool, repY: Bool,
+            pos: ref[BackgroundPosition],
+            s: ref[BackgroundSize]
+        ): SrdRef[Background] {
             return SrdRef[BackgroundImage].construct().{
                 this.wkThis = this;
                 url = u;
                 repeatX = repX;
                 repeatY = repY;
+                position = pos.toString();
+                size = s.toString();
             };
         }
 
@@ -43,10 +49,14 @@
         def url: String;
         def repeatX: Bool;
         def repeatY: Bool;
+        def position: String;
+        def size: String;
 
         handler (this:Background).toString(): String set_ptr {
             return String.format(
-                "%s %s url(\"%s\")",
+                "%s/%s %s %s url(\"%s\")",
+                this.position.buf,
+                this.size.buf,
                 CharsPtr()~use_in(self) { if this.repeatX self = "repeat" else self = "no-repeat" },
                 CharsPtr()~use_in(self) { if this.repeatY self = "repeat" else self = "no-repeat" },
                 this.url.buf

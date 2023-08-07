@@ -147,5 +147,20 @@
         enumStringValue[LEFT, "left"];
         enumStringValue[RIGHT, "right"];
     }
+
+    class BackgroundPosition {
+        setupStringEnum[];
+        enumStringValue[CENTER, "center"];
+        enumStringValue[LEFT, "left"];
+        enumStringValue[RIGHT, "right"];
+        enumStringValue[TOP, "top"];
+        enumStringValue[BOTTOM, "bottom"];
+    }
+
+    class BackgroundSize {
+        setupStringEnum[];
+        enumStringValue[CONTAIN, "contain"];
+        enumStringValue[COVER, "cover"];
+    }
 }
 
