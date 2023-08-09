@@ -178,8 +178,8 @@
                 handleSignalConnectionChanged[this.id, onMouseDown, "mousedown", {
                     this.onMouseDown.emit(MouseButtonPayload().{
                         button = data.getInt("button");
-                        posX = data.getInt("offsetX");
-                        posY = data.getInt("offsetY");
+                        posX = data.getFloat("offsetX");
+                        posY = data.getFloat("offsetY");
                     });
                 }];
             }
@@ -188,8 +188,8 @@
                 handleSignalConnectionChanged[this.id, onMouseUp, "mouseup", {
                     this.onMouseUp.emit(MouseButtonPayload().{
                         button = data.getInt("button");
-                        posX = data.getInt("offsetX");
-                        posY = data.getInt("offsetY");
+                        posX = data.getFloat("offsetX");
+                        posY = data.getFloat("offsetY");
                     });
                 }];
             }

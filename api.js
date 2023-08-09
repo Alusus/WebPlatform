@@ -110,9 +110,9 @@ wasmApi.scrollElementIntoView = (elementName) => {
 
 wasmApi.fetchNextEvent = () => {
     if (eventsQueue.length === 0) return 0;
-    const result = stringifyEvent(eventsQueue[0]);
+    const result = eventsQueue[0];
     eventsQueue.splice(0, 1);
-    return toWasmString(result);
+    return toWasmString(JSON.stringify(result));
 }
 
 wasmApi.registerElementEventHandler = (elementName, eventName, preventDefault, cbId) => {
@@ -835,10 +835,10 @@ const eventPropMap = {
     loadJsScript: ['success'],
     sendRequest: ['status', 'headers', 'body'],
     timer: [],
-    touchstart: (e) => stringifyTouchEventData(e),
-    touchend: (e) => stringifyTouchEventData(e),
-    touchmove: (e) => stringifyTouchEventData(e),
-    touchcancel: (e) => stringifyTouchEventData(e),
+    touchstart: pickNeededTouchEventData,
+    touchend: pickNeededTouchEventData,
+    touchmove: pickNeededTouchEventData,
+    touchcancel: pickNeededTouchEventData,
     resizeObserver: [],
     pointerlockchange: ['enabled'],
     fullscreenchange: ['enabled'],
@@ -851,19 +851,19 @@ const eventPropMap = {
     exitWakeLock: ['result'],
 };
 
-function stringifyEvent(event) {
-    const obj = { cbId: event.cbId, recurring: event.recurring, eventName: event.eventName, eventData: {} };
-    if (typeof eventPropMap[event.eventName] === 'function') {
-        obj.eventData = eventPropMap[event.eventName](event);
+function pickNeededEventData(eventName, event) {
+    if (typeof eventPropMap[eventName] === 'function') {
+        return eventPropMap[eventName](event);
     } else {
-        for (let k of eventPropMap[event.eventName]) {
-            obj.eventData[k] = event.eventData[k];
+        const eventData = {};
+        for (let k of eventPropMap[eventName]) {
+            eventData[k] = event[k];
         }
+        return eventData;
     }
-    return JSON.stringify(obj);
 }
 
-function stringifyTouchEventData(event) {
+function pickNeededTouchEventData(event) {
     const touches = [];
     for (let i = 0; i < event.eventData.touches.length; ++i) {
         const touch = event.eventData.touches.item(i);
@@ -885,7 +885,7 @@ function stringifyTouchEventData(event) {
 }
 
 function onEvent (cbId, recurring, eventName, event) {
-    eventsQueue.push({ cbId, recurring, eventName, eventData: event });
+    eventsQueue.push({ cbId, recurring, eventName, eventData: pickNeededEventData(eventName, event) });
 
     // Unblock wasm if it's waiting for events.
     if (eventWaiting) {
