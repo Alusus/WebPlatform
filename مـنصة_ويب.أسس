@@ -467,7 +467,7 @@
         عرف عند_تحريك_المؤشر: لقب onMouseMove؛
         عرف عند_بدء_اللمس: لقب onTouchStart؛
         عرف عند_انتهاء_اللمس: لقب onTouchEnd؛
-        عرف عند_تحرك_اللمس: لقب onTouchMove؛
+        عرف عند_تحريك_اللمس: لقب onTouchMove؛
         عرف عند_الضغط: لقب onClick؛
         عرف هات_الأبعاد: لقب getDimensions؛
         عرف التمس_احتكار_المؤشر: لقب requestPointerLock؛
