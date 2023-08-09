@@ -178,8 +178,8 @@
                 handleSignalConnectionChanged[this.id, onMouseDown, "mousedown", {
                     this.onMouseDown.emit(MouseButtonPayload().{
                         button = data.getInt("button");
-                        posX = data.getInt("offsetX");
-                        posY = data.getInt("offsetY");
+                        posX = data.getFloat("offsetX");
+                        posY = data.getFloat("offsetY");
                     });
                 }];
             }
@@ -188,8 +188,8 @@
                 handleSignalConnectionChanged[this.id, onMouseUp, "mouseup", {
                     this.onMouseUp.emit(MouseButtonPayload().{
                         button = data.getInt("button");
-                        posX = data.getInt("offsetX");
-                        posY = data.getInt("offsetY");
+                        posX = data.getFloat("offsetX");
+                        posY = data.getFloat("offsetY");
                     });
                 }];
             }
@@ -214,6 +214,7 @@
                         radiusY = item.getFloat("radiusY");
                         rotationAngle = item.getFloat("rotationAngle");
                         force = item.getFloat("force");
+                        changed = item.getBool("changed");
                     });
                     ++i;
                 }
@@ -249,6 +250,13 @@
             def d: Dimensions;
             getElementDimensions(this.id, d);
             return d;
+        }
+
+        handler this.getBoundingRect(): Rectangle {
+            if this.id == "" return Rectangle(0, 0, 0, 0);
+            def r: Rectangle;
+            getElementBoundingRect(this.id, r);
+            return r;
         }
 
         handler this.requestPointerLock() {

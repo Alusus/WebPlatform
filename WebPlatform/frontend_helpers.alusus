@@ -92,6 +92,7 @@
         def radiusY: Float;
         def rotationAngle: Float;
         def force: Float;
+        def changed: Bool;
 
         handler this~init() {}
         handler this~init(temp_ref[TouchPayload]) {
@@ -109,6 +110,7 @@
             this.radiusY = value.radiusY;
             this.rotationAngle = value.rotationAngle;
             this.force = value.force;
+            this.changed = value.changed;
         }
     }
 }
