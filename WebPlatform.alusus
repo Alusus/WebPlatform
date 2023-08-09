@@ -24,6 +24,7 @@ import "WebPlatform/Styling/Length4";
 import "WebPlatform/Styling/Transition";
 import "WebPlatform/Styling/Transform";
 import "WebPlatform/Styling/Dimensions";
+import "WebPlatform/Styling/Rectangle";
 import "WebPlatform/Styling/Background";
 import "WebPlatform/Styling/Flex";
 import "WebPlatform/Styling/Shadow";

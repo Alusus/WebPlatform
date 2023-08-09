@@ -252,6 +252,13 @@
             return d;
         }
 
+        handler this.getBoundingRect(): Rectangle {
+            if this.id == "" return Rectangle(0, 0, 0, 0);
+            def r: Rectangle;
+            getElementBoundingRect(this.id, r);
+            return r;
+        }
+
         handler this.requestPointerLock() {
             if this.id == "" return;
             WebPlatform.requestPointerLock(this.id);

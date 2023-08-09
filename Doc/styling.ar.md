@@ -493,8 +493,8 @@ class Animation {
 
 ```
 صنف أبـعاد {
-    عرف عرض: صـحيح = 0؛
-    عرف طول: صـحيح = 0؛
+    عرف عرض: صـحيح؛
+    عرف طول: صـحيح؛
 }
 ```
 
@@ -502,8 +502,8 @@ class Animation {
 
 ```
 class Dimensions {
-    def width: Int = 0;
-    def height: Int = 0;
+    def width: Int;
+    def height: Int;
 }
 ```
 صنف يحمل معلومات الأبعاد.
@@ -511,6 +511,32 @@ class Dimensions {
 `عرض` (`width`) العرض.
 
 `طول` (`height`) الطول.
+
+
+### مـستطيل (Rectangle)
+
+<div dir=rtl>
+
+```
+صنف مـستطيل {
+    عرف س: صـحيح؛
+    عرف ص: صـحيح؛
+    عرف عرض: صـحيح؛
+    عرف طول: صـحيح؛
+}
+```
+
+</div>
+
+```
+class Rectangle {
+    def x: Int;
+    def y: Int;
+    def width: Int;
+    def height: Int;
+}
+```
+صنف يحمل معلومات مستطيل.
 
 
 ### لـون (Color)

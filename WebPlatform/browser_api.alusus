@@ -7,6 +7,7 @@
     @expname[setElementAttribute] function setElementAttribute (name: ptr[Char], prop: ptr[Char], value: ptr[Char]);
     @expname[getElementAttribute] function getElementAttribute (name: ptr[Char], prop: ptr[Char]): ptr[array[Char]];
     @expname[getElementDimensions] function getElementDimensions (name: ptr[Char], result: ref[Dimensions]);
+    @expname[getElementBoundingRect] function getElementBoundingRect (name: ptr[Char], result: ref[Rectangle]);
     // Element Interaction
     @expname[selectItem] function selectItem (selectId: ptr[Char], selectedValue: ptr[Char]);
     @expname[getSelectedItemValue] function getSelectedItemValue (selectId: ptr[Char]): ptr[array[Char]];

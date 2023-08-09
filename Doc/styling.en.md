@@ -318,8 +318,8 @@ where keys represent the time and the value being the style corresponding to tha
 
 ```
 class Dimensions {
-    def width: Int = 0;
-    def height: Int = 0;
+    def width: Int;
+    def height: Int;
 }
 ```
 
@@ -329,14 +329,29 @@ A class that holds dimensions information.
 
 `height` the height.
 
+
+### Rectangle
+
+```
+class Rectnagle {
+    def x: Int;
+    def y: Int;
+    def width: Int;
+    def height: Int;
+}
+```
+
+A class that holds a rectangle information.
+
+
 ### Color
 
 ```
 class Color {
-    def red: Int = 0;
-    def green: Int = 0;
-    def blue: Int = 0;
-    def alpha: Int = 0;
+    def red: Int;
+    def green: Int;
+    def blue: Int;
+    def alpha: Int;
 }
 ```
 

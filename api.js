@@ -89,6 +89,16 @@ wasmApi.getElementDimensions = (elementName, pResult) => {
     resultArray[1] = element.clientHeight;
 }
 
+wasmApi.getElementBoundingRect = (elementName, pResult) => {
+    const element = document.getElementById(toJsString(elementName));
+    const resultArray = new Int32Array(wasmMemory.buffer, pResult, 4);
+    const rect = element.getBoundingClientRect();
+    resultArray[0] = rect.x;
+    resultArray[1] = rect.y;
+    resultArray[2] = rect.width;
+    resultArray[3] = rect.height;
+}
+
 // Element Interaction
 
 wasmApi.selectItem = (elementName, value) => {

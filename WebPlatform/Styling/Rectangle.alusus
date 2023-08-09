@@ -1,0 +1,26 @@
+@merge module WebPlatform {
+    class Rectangle {
+        def x: Int = 0;
+        def y: Int = 0;
+        def width: Int = 0;
+        def height: Int = 0;
+
+        handler this~init() {}
+        handler this~init(x: Int, y: Int, w: Int, h: Int) {
+            this.x = x;
+            this.y = y;
+            this.width = w;
+            this.height = h;
+        }
+        handler this~init(temp_ref[Rectangle]) {
+            this = value;
+        }
+        handler this = temp_ref[Rectangle] {
+            this.x = value.x;
+            this.y = value.y;
+            this.width = value.width;
+            this.height = value.height;
+        }
+    }
+}
+

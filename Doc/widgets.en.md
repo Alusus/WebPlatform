@@ -123,6 +123,15 @@ handler this.getDimensions(): Dimensions;
 
 A method to get the widget's dimensions.
 
+##### getBoundingRect
+
+```
+handler this.getBoundingRect(): Rectangle;
+```
+
+A method to get the widget's position and dimensions relative to the upper left corner of the
+viewport.
+
 ##### requestPointerLock
 
 ```
