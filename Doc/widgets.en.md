@@ -473,6 +473,7 @@ class TouchPayload {
     def radiusY: Float;
     def rotationAngle: Float;
     def force: Float;
+    def changed: Bool;
 }
 ```
 
@@ -509,4 +510,6 @@ rotated, clockwise, to most accurately cover the area of contact between the use
 
 `force` The amount of pressure being applied to the surface by the user, as a float between 0.0
 (no pressure) and 1.0 (maximum pressure).
+
+`changed` Specifies whether this touch has been changed or added in the current event.
 

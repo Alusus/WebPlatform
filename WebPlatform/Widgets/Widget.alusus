@@ -214,6 +214,7 @@
                         radiusY = item.getFloat("radiusY");
                         rotationAngle = item.getFloat("rotationAngle");
                         force = item.getFloat("force");
+                        changed = item.getBool("changed");
                     });
                     ++i;
                 }

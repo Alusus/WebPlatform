@@ -865,8 +865,15 @@ function pickNeededEventData(eventName, event) {
 
 function pickNeededTouchEventData(event) {
     const touches = [];
-    for (let i = 0; i < event.eventData.touches.length; ++i) {
-        const touch = event.eventData.touches.item(i);
+    for (let i = 0; i < event.touches.length; ++i) {
+        const touch = event.touches.item(i);
+        let changed = false;
+        for (let j = 0; j < event.changedTouches.length; ++j) {
+            if (event.changedTouches.item(j).identifier === touch.identifier) {
+                changed = true;
+                break;
+            }
+        }
         touches.push({
             identifier: touch.identifier,
             screenX: touch.screenX,
@@ -879,6 +886,7 @@ function pickNeededTouchEventData(event) {
             radiusY: touch.radiusY,
             rotationAngle: touch.rotationAngle,
             force: touch.force,
+            changed: Boolean(changed),
         });
     }
     return touches;
