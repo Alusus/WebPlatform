@@ -34,7 +34,7 @@
         }
 
         handler this~init(child: SrdRef[Widget]) {
-            this.innerView.addChildren({ child });
+            this.push(child);
         }
 
         handler this.setTransition(name: String, transition: StackTransition) {
@@ -138,14 +138,20 @@
     //==========================================================================
     // Default Transitions
 
-    func createSlideStackTransition (duration: Float, vertical: Bool, backward: Bool): StackTransition {
+    func createSlideStackTransition (duration: Float, vertical: Bool, exiting: Bool): StackTransition {
+        return createSlideStackTransition(duration, vertical, exiting, 0);
+    }
+
+    func createSlideStackTransition (duration: Float, vertical: Bool, exiting: Bool, reverse: Bool): StackTransition {
         def start: SrdRef[Length];
         def end: SrdRef[Length];
-        if backward {
+        if exiting {
             start = Length.pt(0);
-            end = Length.percent(100);
+            if reverse end = Length.percent(-100)
+            else end = Length.percent(100);
         } else {
-            start = Length.percent(100);
+            if reverse start = Length.percent(-100)
+            else start = Length.percent(100);
             end = Length.pt(0);
         }
         return StackTransition().{
@@ -160,10 +166,10 @@
         }
     }
 
-    func createFadeStackTransition (duration: Float, backward: Bool): StackTransition {
+    func createFadeStackTransition (duration: Float, exiting: Bool): StackTransition {
         def start: Float;
         def end: Float;
-        if backward {
+        if exiting {
             start = 1.0;
             end = 0.0;
         } else {
