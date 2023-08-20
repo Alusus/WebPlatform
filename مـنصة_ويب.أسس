@@ -491,6 +491,7 @@
         عرف فروع: لقب children؛
         عرف أضف_فروع: لقب addChildren؛
         عرف أزل_فروع: لقب removeChildren؛
+        عرف أزل_كل_الفروع: لقب removeAllChildren؛
     }
 
     عرف مـرسم: لقب Canvas؛

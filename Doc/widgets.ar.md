@@ -338,6 +338,22 @@ handler this.removeChildren (count: Int, children: ...temp_ref[SrdRef[Widget]]);
 
 * `فروع` (`children`): الفروع التي نريد إزالتها و التي هي عبارة عن ودجات.
 
+##### أزل_كل_الفروع (removeAllChildren)
+
+```
+عملية هذا.أزل_كل_الفروع()؛
+```
+
+<div dir=ltr>
+
+```
+handler this.removeAllChildren ();
+```
+
+</div>
+
+تزيل كل الفروع المضافة لهذا الصندوق.
+
 
 ### مـرسم (Canvas)
 
