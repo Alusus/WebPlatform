@@ -118,9 +118,13 @@
     @expname[callCustomAsyncJsFn] function _callCustomAsyncJsFn (fnName: ptr[Char], arg: ptr[Char], cbId: ArchInt);
     @expname[getUserLanguages] function _getUserLanguages (): ptr[Char];
     @expname[isDarkColorSchemePreferred] function isDarkColorSchemePreferred (): Bool;
-    @expname[getPwaDisplayMode] function getPwaDisplayMode(): ptr[Char];
     @expname[resizeWindow] function resizeWindow(width: Int, height: Int);
-    @expname[showInstallPrompt] function showInstallPrompt(): Bool;
+    // PWA
+    @expname[isAppUpdateAvailable] function isAppUpdateAvailable(): Bool;
+    @expname[updateApp] function updateApp();
+    @expname[getAppDisplayMode] function getAppDisplayMode(): ptr[Char];
+    @expname[isAppInstallPromptAvailable] function isAppInstallPromptAvailable(): Bool;
+    @expname[showAppInstallPrompt] function showAppInstallPrompt(): Bool;
     // String
     @expname[createRegex] function createRegex (regexStr: ptr[Char]): ArchInt;
     @expname[matchRegex] function _matchRegex (

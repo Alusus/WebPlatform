@@ -73,3 +73,17 @@ styles.
 
 At the end of the function we always execute the function `runEventLoop` that runs the event loop.
 
+### System Messages
+
+WebPlatform sends messages in some cases in response to system events. The user can subscribe to
+`onMessage` to listen to these messages. These messages have a payload (a JSON type) that contains
+a `type` property that the user can check to know the message type. The following message types
+are available:
+
+* `app_update_available`: Sent when an update is available for the web app. The user can respond
+  to this message by notifying the user of the update, and then calling `updateApp` to perform
+  the update.
+
+* `app_install_prompt`: Sent when an install prompt is available for the web app. The user can
+  respond to this message by notifying the user and then calling `showAppInstallPrompt`.
+

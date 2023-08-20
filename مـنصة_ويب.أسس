@@ -35,8 +35,12 @@
     عرف هات_لغات_المستخدم: لقب getUserLanguages؛
     عرف هات_اللغة_المفضلة: لقب getPreferredLanguage؛
     عرف هل_يفضل_نمط_الألوان_الداكن: لقب isDarkColorSchemePreferred؛
-    عرف هات_نمط_العرض_التقدمي_للتطبيق: لقب getPwaDisplayMode؛
-    عرف اعرض_واجهة_التنصيب: لقب showInstallPrompt؛
+
+    عرف أيوجد_تحديث_للتطبيق: لقب isAppUpdateAvailable؛
+    عرف حدث_التطبيق: لقب updateApp؛
+    عرف هات_نمط_عرض_التطبيق: لقب getAppDisplayMode؛
+    عرف أتوجد_واجهة_تنصيب_للتطبيق: لقب isAppInstallPromptAvailable؛
+    عرف اعرض_واجهة_تنصيب_التطبيق: لقب showAppInstallPrompt؛
 
     عرف هات_الختم_الزمني: لقب getTimestamp؛
     عرف هات_التاريخ: لقب getDate؛
