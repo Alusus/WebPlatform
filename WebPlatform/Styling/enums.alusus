@@ -29,8 +29,9 @@
 
     class Display {
         setupStringEnum[];
-        enumStringValue[INLINE, "INLINE"];
+        enumStringValue[INLINE, "inline"];
         enumStringValue[BLOCK, "block"];
+        enumStringValue[INLINE_BLOCK, "inline-block"];
         enumStringValue[FLEX, "flex"];
         enumStringValue[GRID, "grid"];
         enumStringValue[NONE, "none"];
