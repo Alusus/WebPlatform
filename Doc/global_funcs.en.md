@@ -556,3 +556,58 @@ Version 4 parameters:
 * `str` the text we want to match it with the pattern.
 * `regexId` the pattern id used for matching.
 
+
+### isAppUpdateAvailable
+
+```
+function isAppUpdateAvailable (): Bool;
+```
+
+Returns true if an update is available for the app, which is when the version number is updated in
+the args of `@webApp` modifier.
+
+
+### updateApp
+
+```
+function updateApp();
+```
+
+Updates the web app to the version that has been loaded into the browser and is awaiting activation.
+
+
+### getAppDisplayMode
+
+```
+function getAppDisplayMode(): ptr[Char];
+```
+
+Returns the current mode of the web app. The return value can be one of the following:
+* `browser`: The app is running in the browser.
+* `twa`: The app is running as a Trusted Web Activity.
+* `standalone`: The app is running as a standalone app.
+
+
+### isAppInstallPromptAvailable
+
+```
+function isAppInstallPromptAvailable (): Bool;
+```
+
+Returns 1 if the app can be installed to the device. This happens when all the followings
+conditions are met:
+* The UI endpoint has the `@webApp` modifier.
+* The site is running in HTTPS.
+* The browser supports Progressive Web Apps.
+* The app is not already installed.
+
+
+### showAppInstallPrompt
+
+```
+function showAppInstallPrompt(): Bool;
+```
+
+Triggers the system's app installation prompt. Returns 1 if successful, and 0 if no install
+prompt is available.
+

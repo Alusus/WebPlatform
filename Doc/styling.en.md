@@ -563,6 +563,7 @@ An enum class that holds possible values for overflow as enum.
 
 An enum class that holds possible values for display as enum.
 * `INLINE`
+* `INLINE_BLOCK`
 * `BLOCK`
 * `FLEX`
 * `GRID`

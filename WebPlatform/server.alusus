@@ -79,17 +79,21 @@
             def appParams: Array[String] = getModifierParams(elements(i), "webApp", "تطبيق_ويب");
             def appManifest: String;
             if appParams.getLength() > 0 appManifest = appParams(0);
+            def appVersion: String;
+            if appParams.getLength() > 1 appVersion = appParams(1) else appVersion = "v1";
 
             def preCacheFilenames: Array[String] = getModifierParams(elements(i), "preCache", "خزن_مسبق");
             def dynCacheFilenames: Array[String] = getModifierParams(elements(i), "dynCache", "خزن_تفاعلي");
 
-            addUiEndpoint(elements(i), uriParams(0), title, icon, appManifest, preCacheFilenames, dynCacheFilenames);
+            addUiEndpoint(
+                elements(i), uriParams(0), title, icon, appManifest, appVersion, preCacheFilenames, dynCacheFilenames
+            );
         }
     }
 
     func addUiEndpoint (
-        fn: ref[Core.Basic.TiObject], uri: String, title: String, iconFilename: String,
-        manifestFilename: String, preCacheFilenames: Array[String], dynCacheFilenames: Array[String]
+        fn: ref[Core.Basic.TiObject], uri: String, title: String, iconFilename: String, manifestFilename: String,
+        version: String, preCacheFilenames: Array[String], dynCacheFilenames: Array[String]
     ) {
         def fnName: String = generateWasm(fn);
         if iconFilename != "" {
@@ -107,7 +111,7 @@
                 String.format("/%s-manifest.json", fnName.buf),
             });
             if iconFilename != "" preCacheFilenames.add(String.format("/") + iconFilename);
-            generateServiceWorker(fnName, preCacheFilenames, dynCacheFilenames);
+            generateServiceWorker(fnName, preCacheFilenames, dynCacheFilenames, version);
         }
         generateHtml(fnName, title, iconFilename, manifestFilename != "");
         Spp.astMgr.insertAst(
@@ -135,10 +139,15 @@
         return fnName;
     }
 
-    func generateServiceWorker(fnName: String, preCacheFilenames: Array[String], dynCacheFilenames: Array[String]) {
+    func generateServiceWorker(
+        fnName: String, preCacheFilenames: Array[String], dynCacheFilenames: Array[String], version: String
+    ) {
         def workerTemplate: String = Fs.readFile(webPlatformPath + "service-worker.js");
         def content: String = String.format(
-            workerTemplate, createJsStringArray(preCacheFilenames).buf, createJsStringArray(dynCacheFilenames).buf
+            workerTemplate,
+            createJsStringArray(preCacheFilenames).buf,
+            createJsStringArray(dynCacheFilenames).buf,
+            (String("\"") + version.replace("\\", "\\\\").replace("\"", "\\\"") + "\"").buf
         );
         Fs.createFile(
             String.format("%s%s-service-worker.js", uiEndpointsPath.buf, fnName.buf),
@@ -166,7 +175,7 @@
         def extraScript: String;
         if webApp {
             extraHeaders += String.format("<link rel=\"manifest\" href=\"/%s-manifest.json\" />", fnName.buf);
-            extraScript += String.format("initWebApp(\"/%s-service-worker.js\", \"/\");", fnName.buf);
+            extraScript += String.format("initializeWebApp(\"/%s-service-worker.js\", \"/\");", fnName.buf);
         }
         def content: String = String.format(
             htmlTemplate, title.buf, extraHeaders.buf, extraScript.buf, String.format("/%s.wasm", fnName.buf).buf

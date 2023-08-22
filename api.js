@@ -9,8 +9,10 @@ let asyncifyDataPtr; // Where the unwind/rewind data structure will live.
 let sleeping = false;
 let eventWaiting = false;
 let wasmStrPtr = null;
-let installPrompt = null;
 let wakeLock = null;
+let appInstallPrompt = null;
+let newServiceWorker = null;
+let serviceWorkerRefreshing = false;
 
 const resizeObserver = new ResizeObserver(entries => {
     for (let entry of entries) {
@@ -749,7 +751,22 @@ wasmApi.isDarkColorSchemePreferred = () => {
     return window.matchMedia('(prefers-color-scheme: dark)').matches;
 }
 
-wasmApi.getPwaDisplayMode = () => {
+wasmApi.resizeWindow = (width, height) => {
+    window.resizeTo
+}
+
+// PWA APIs
+
+wasmApi.isAppUpdateAvailable = () => {
+    return !!newServiceWorker;
+}
+
+wasmApi.updateApp = () => {
+    if (!newServiceWorker) return;
+    newServiceWorker.postMessage({ action: 'skipWaiting' });
+}
+
+wasmApi.getAppDisplayMode = () => {
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
     if (document.referrer.startsWith('android-app://')) {
         return toWasmString('twa');
@@ -759,13 +776,13 @@ wasmApi.getPwaDisplayMode = () => {
     return toWasmString('browser');
 }
 
-wasmApi.resizeWindow = (width, height) => {
-    window.resizeTo
+wasmApi.isAppInstallPromptAvailable = () => {
+    return !!appInstallPrompt;
 }
 
-wasmApi.showInstallPrompt = () => {
-    if (installPrompt) {
-        installPrompt.prompt();
+wasmApi.showAppInstallPrompt = () => {
+    if (appInstallPrompt) {
+        appInstallPrompt.prompt();
         return true;
     } else {
         return false;
@@ -975,22 +992,41 @@ async function start(moduleName) {
     program.instance.exports.asyncify_stop_unwind();
 }
 
-function initWebApp(serviceWorkerUrl, scope) {
+function initializeWebApp(serviceWorkerUrl, scope) {
     if ('serviceWorker' in navigator) {
-        window.addEventListener('load', function() {
-            navigator.serviceWorker.register(serviceWorkerUrl, { scope })
-                .catch(function(error) {
-                    console.error('Service Worker registration failed:', error);
+        navigator.serviceWorker.register(serviceWorkerUrl, { scope })
+            .then((reg) => {
+                if (reg.waiting) {
+                    // New update was previously found and ignored.
+                    console.log('Stale update is found');
+                    newServiceWorker = reg.waiting;
+                }
+                reg.addEventListener('updatefound', () => {
+                    const installingServiceWorker = reg.installing;
+                    installingServiceWorker.addEventListener('statechange', () => {
+                        if (installingServiceWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                            // New update available.
+                            newServiceWorker = installingServiceWorker;
+                            window.postMessage({ type: 'app_update_available' }, '*');
+                        }
+                    });
                 });
+            })
+            .catch(function(error) {
+                console.error('Service Worker registration failed:', error);
+            });
+        navigator.serviceWorker.addEventListener('controllerchange', function () {
+            if (serviceWorkerRefreshing) return;
+            window.location.reload();
+            serviceWorkerRefreshing = true;
         });
     }
-
     window.addEventListener('beforeinstallprompt', (e) => {
         // Prevents the default mini-infobar or install dialog from appearing on mobile
         e.preventDefault();
         // Save the event because you'll need to trigger it later.
-        installPrompt = e;
-        window.postMessage({ type: 'pwainstallprompt' }, '*');
+        appInstallPrompt = e;
+        window.postMessage({ type: 'app_install_prompt' }, '*');
     });
 }
 

@@ -189,6 +189,14 @@ parameters:
 
 * `children` the children we want to remove, which are widgets.
 
+##### removeAllChildren
+
+```
+handler this.removeAllChildren ();
+```
+
+Removes all children of this box.
+
 
 ### Canvas
 
