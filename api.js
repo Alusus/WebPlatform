@@ -466,7 +466,7 @@ wasmApi.measureText = (canvasId, text, font, pResult) => {
     var dims = ctx.measureText(toJsString(text));
     const resultArray = new Int32Array(wasmMemory.buffer, pResult, 2);
     resultArray[0] = dims.width;
-    resultArray[1] = dims.actualBoundingBoxAscent + dims.actualBoundingBoxDescent;
+    resultArray[1] = dims.fontBoundingBoxAscent + dims.fontBoundingBoxDescent;
 }
 
 wasmApi.setFillStyle = (canvasId, c1, c2, x1, y1, x2, y2) => {
