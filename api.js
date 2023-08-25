@@ -605,8 +605,8 @@ wasmApi.exitPointerLock = () => {
 }
 
 wasmApi.requestFullScreen = (elementName) => {
-    const jsElementName = toJsString(elementName);
-    document.getElementById(jsElementName).requestFullscreen();
+    const element = document.getElementById(toJsString(elementName));
+    if (element.requestFullscreen) element.requestFullscreen();
     if (!document.onfullscreenchange) {
         document.onfullscreenchange = () => {
             if (window.onfullscreenchange) {
