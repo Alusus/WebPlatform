@@ -2,6 +2,9 @@ const STACK_SIZE = 8192;
 const wasmApi = {};
 const eventsQueue = [];
 const resources = {};
+const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+audioContext.resume();
+
 let resourceCounter = 0;
 let program;
 let wasmMemory = null;
@@ -353,24 +356,28 @@ wasmApi.registerElementAsResource = (elementName) => {
 }
 
 wasmApi.loadAudio = (url, cbId) => {
-    // We want to load the entire audio file rather than stream it, so we need to fetch the audio
-    // as data then assign the data to the audio object rather than setting the audio's src
-    // property to the URL, otherwise the audio may be streamed rather than fully loaded
-    // upfront.
     const jsUrl = toJsString(url);
     fetch(jsUrl).then((res) => {
         if (!res.ok) {
             throw new Error(`Request for ${toJsString(url)} failed with status ${res.status}`);
         }
-        return res.blob().then((blob) => {
-            const audio = document.createElement('audio');
-            audio.src = URL.createObjectURL(blob);
-            const resourceId = ++resourceCounter;
-            resources[resourceId] = audio;
-            onEvent(cbId, false, 'loadAudio', { resourceId, success: true });
+        return res.arrayBuffer().then((arrayBuf) => {
+            audioContext.decodeAudioData(
+                arrayBuf,
+                (buffer) => {
+                    audio = { volume: 1, playing: false, buffer, source: null };
+                    const resourceId = ++resourceCounter;
+                    resources[resourceId] = audio;
+                    onEvent(cbId, false, 'loadAudio', { resourceId, success: true });
+                },
+                (error) => {
+                    console.error('Failed to load audio:', error);
+                    onEvent(cbId, false, 'loadAudio', { success: false });
+                }
+            );
         });
     }).catch((err) => {
-        console.log(err);
+        console.error('Failed to load audio:', err);
         onEvent(cbId, false, 'loadAudio', { success: false });
     });
 }
@@ -508,43 +515,84 @@ wasmApi.clearCanvas = (canvasId) => {
 
 // Audio APIs
 
-wasmApi.playAudio = (audioId, loop) => {
-    var audio = resources[audioId];
-    if (!audio.paused) {
-        audio = audio.cloneNode();
+wasmApi.playAudio = (audioId, loop, stopPrevious) => {
+    try {
+      var audio = resources[audioId];
+      if (!audio) return;
+      if (audio.playing) {
+          if (stopPrevious) {
+              wasmApi.stopAudio(audioId);
+          } else {
+              // Clone the audio object so that the old instance's event doesn't
+              // end up overriding the properties of the new instance.
+              audio = {
+                  volume: audio.volume,
+                  buffer: audio.buffer,
+                  playing: false,
+                  source: null,
+              };
+              resources[audioId] = audio;
+          }
+      }
+      // Create the buffer source.
+      audio.source = audioContext.createBufferSource();
+      audio.source.buffer = audio.buffer;
+      // Connect the source to the destination through a volume node in the middle.
+      audio.gainNode = audioContext.createGain();
+      audio.gainNode.gain.value = audio.volume;
+      audio.source.connect(audio.gainNode);
+      audio.gainNode.connect(audioContext.destination);
+      // Reset the audio object when the playback is over.
+      audio.source.addEventListener('ended', () => {
+          audio.playing = false;
+          audio.source = null;
+          audio.gainNode = null;
+      });
+      // Start the playback.
+      audio.source.loop = loop;
+      audio.source.start();
+      audio.playing = true;
+    } catch (err) {
+      console.error('Failed to play audio:', err);
     }
-    audio.loop = loop;
-    audio.currentTime = 0;
-    audio.play();
 }
 
 wasmApi.stopAudio = (audioId) => {
     var audio = resources[audioId];
-    audio.pause();
-    audio.currentTime = 0;
+    if (!audio || !audio.source) return;
+    audio.source.stop();
+    audio.source = null;
+    audio.gainNode = null;
+    audio.playing = false;
 }
 
 wasmApi.pauseAudio = (audioId) => {
     var audio = resources[audioId];
-    audio.pause();
+    if (!audio || !audio.source) return;
+    audio.source.playbackRate.value = 0.0001; // Work around Firefox treating 0 as 1!
 }
 
 wasmApi.resumeAudio = (audioId) => {
     var audio = resources[audioId];
-    if (!audio.paused) return;
-    audio.play();
+    if (!audio || !audio.source) return;
+    audio.source.playbackRate.value = 1;
 }
 
 wasmApi.setAudioVolume = (audioId, volume) => {
-    resources[audioId].volume = volume;
+    const audio = resources[audioId];
+    audio.volume = volume;
+    if (!audio.gainNode) return;
+    audio.gainNode.gain.value = volume;
 }
 
 wasmApi.getAudioVolume = (audioId) => {
+    if (!resources[audioId]) return 0;
     return resources[audioId].volume;
 }
 
 wasmApi.isAudioPlaying = (audioId) => {
-    return !resources[audioId].paused;
+    if (!resources[audioId]) return false;
+    return resources[audioId].playing;
 }
 
 // Gamepad APIs

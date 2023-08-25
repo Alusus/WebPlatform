@@ -56,6 +56,7 @@ class AudioResource {
     def id: ArchInt = 0;
     handler this.load(u: ptr[array[Char]]): SrdRef[Promise[Int]];
     handler this.play(loop: Bool);
+    handler this.play(loop: Bool, stopPrevious: Bool);
     handler this.stop();
     handler this.pause();
     handler this.resume();
@@ -70,7 +71,10 @@ A class used for audio resources.
 
 `load` loads the resource with the given path.
 
-`play` starts the playback from the beginning.
+`play` starts the playback from the beginning. If called again before the previous playback
+is over the sound will be played again alongside the previous playback, which will continue
+until the end of the sound buffer. The second version of this method accepts `stopPrevious`
+which allows the user to stop the previous playback before starting the new playback.
 
 `pause` pauses the playback.
 

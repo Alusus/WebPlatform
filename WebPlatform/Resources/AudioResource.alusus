@@ -27,7 +27,11 @@
         }
 
         handler this.play(loop: Bool) {
-            playAudio(this.id, loop);
+            this.play(loop, false);
+        }
+
+        handler this.play(loop: Bool, stopPrevious: Bool) {
+            playAudio(this.id, loop, stopPrevious);
         }
 
         handler this.stop() {
