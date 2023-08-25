@@ -737,7 +737,7 @@ func main {
     // حلقة التحريك
     def x: Int = -80;
     // نبدأ مؤقت يقوم بتنفيذ ما نريد كل 8 ثواني
-    startTimer(8000, closure (
+    startTimer(8000000, closure (
         x: by_ref, img: by_ref, dynImg: by_ref, pos: by_ref, delta: by_ref, pressed: by_ref, gamepadsCount: by_ref
     ) & (json: Json) {
         // في كل مرة نقوم بمحو الرسومات للبدء من جديد
