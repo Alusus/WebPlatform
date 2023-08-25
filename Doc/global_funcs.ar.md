@@ -288,7 +288,7 @@ function startTimer (duration: Word, cb: closure (Json)): ArchInt;
 
 المعطيات:
 
-`مدة` (`duration`) المدة بين استدعاء و آخر للمغلف.
+`مدة` (`duration`) المدة بين استدعاء وآخر للمغلف، بالمايكروثانية.
 
 `م` (`cb`) المغلف المراد استدعاءه بشكل متكرر.
 
@@ -336,7 +336,7 @@ function setTimeout (duration: Word, cb: closure (Json)): ArchInt;
 
 المعطيات:
 
-`مدة` (`duration`) المدة حتى يتم استدعاء المغلف.
+`مدة` (`duration`) المدة حتى يتم استدعاء المغلفة، بالمايكروثانية.
 
 `م` (`cb`) المغلف المراد استدعاءه.
 

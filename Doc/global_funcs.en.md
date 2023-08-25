@@ -179,7 +179,7 @@ Starts a timer to call the given closure periodically.
 
 Parameters:
 
-`duration` the duration between two calls of the closure.
+`duration` the duration between two calls of the closure, in microseconds.
 
 `cb` the closure we want to call periodically.
 
@@ -211,7 +211,7 @@ Starts a timer which calls the given closure only once.
 
 Parameters:
 
-`duration` the time until executing the closure.
+`duration` the time until executing the closure, in microseconds.
 
 `cb` the closure we want to execute.
 
