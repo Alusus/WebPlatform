@@ -515,6 +515,14 @@ wasmApi.clearCanvas = (canvasId) => {
 
 // Audio APIs
 
+wasmApi.suspendAudioContext = () => {
+    audioContext.suspend();
+}
+
+wasmApi.resumeAudioContext = () => {
+    audioContext.resume();
+}
+
 wasmApi.playAudio = (audioId, loop, stopPrevious) => {
     try {
       var audio = resources[audioId];

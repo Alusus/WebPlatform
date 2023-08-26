@@ -74,6 +74,8 @@
     );
     @expname[clearCanvas] function clearCanvas (canvasId: ArchInt);
     // Audio Operations
+    @expname[suspendAudioContext] function suspendAudioContext();
+    @expname[resumeAudioContext] function resumeAudioContext();
     @expname[playAudio] function playAudio (audioId: ArchInt, loop: Bool, stopPrevious: Bool);
     @expname[stopAudio] function stopAudio (audioId: ArchInt);
     @expname[pauseAudio] function pauseAudio (audioId: ArchInt);

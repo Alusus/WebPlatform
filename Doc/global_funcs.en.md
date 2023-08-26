@@ -611,3 +611,23 @@ function showAppInstallPrompt(): Bool;
 Triggers the system's app installation prompt. Returns 1 if successful, and 0 if no install
 prompt is available.
 
+
+### suspendAudioContext
+
+```
+function suspendAudioContext();
+```
+
+Suspends the audio context which results in pausing all sounds.
+
+
+### resumeAudioContext
+
+```
+function resumeAudioContext();
+```
+
+Resumes the operation of the audio context. You need to call this function when the app's visibility
+changes from non-visible to visible because the operating system may suspend the audio context when
+the app is pushed to the background (as is the case with iOS).
+
