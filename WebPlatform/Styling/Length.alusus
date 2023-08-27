@@ -16,11 +16,13 @@
             }
         }
 
+
         defineInitializer[px, "px"];
         defineInitializer[pt, "pt"];
         defineInitializer[mm, "mm"];
         defineInitializer[vw, "vw"];
         defineInitializer[vh, "vh"];
+        defineInitializer[auto, "auto"];
         defineInitializer[vmin, "vmin"];
         defineInitializer[vmax, "vmax"];
         defineInitializer[em, "em"];
@@ -69,9 +71,13 @@
         def unit: CharsPtr;
 
         handler (this:Length).toString(): String set_ptr {
-            return String.format("%f%s", this.val, this.unit);
+            if this.unit!="auto"
+                {return String.format("%f%s", this.val, this.unit);}
+            else
+                {return String.format("%s",this.unit);}
         }
     }
+
 
     class LengthOpLength {
         @injection def length: Length;

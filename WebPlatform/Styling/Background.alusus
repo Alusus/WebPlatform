@@ -6,7 +6,10 @@
         handler this_type(c: ref[Color]): SrdRef[Background] {
             return SrdRef[BackgroundColor].construct().{ this.wkThis = this; color = c; };
         }
-
+        handler this_type(bgString: ref[String]): SrdRef[Background] {
+            logToConsole(bgString);
+            return SrdRef[BackgroundString].construct().{ this.wkThis = this; res = bgString; };
+        }
         handler this_type(
             u: String, repX: Bool, repY: Bool,
             pos: ref[BackgroundPosition],
@@ -78,6 +81,16 @@
             }
             res += ")";
             return res;
+        }
+    }
+    class BackgroundString {
+        @injection def background: Background;
+        def res : String;
+        handler (this:Background).toString(): String set_ptr {
+
+            Console.print("\ntest me %s test me\n",this.res);
+            logToConsole(this.res);
+            return this.res;
         }
     }
 }
