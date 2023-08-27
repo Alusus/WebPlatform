@@ -339,13 +339,18 @@ wasmApi.resizeCanvasResource = (canvasId, width, height) => {
     canvas.height = height;
 }
 
-wasmApi.createImageResourceFromCanvasResource = (canvasId) => {
+wasmApi.createImageResourceFromCanvasResource = (canvasId, cbId) => {
     const canvas = resources[canvasId];
-    const image = new Image();
     const resourceId = ++resourceCounter;
+    const image = new Image();
     image.src = canvas.toDataURL('image/png');
-    resources[resourceId] = image;
-    return resourceId;
+    image.decode().then(() => {
+        resources[resourceId] = image;
+        onEvent(cbId, false, 'createImageResourceFromCanvasResource', { resourceId, success: true });
+    }).catch((err) => {
+        console.error('Failed to create image from canvas:', err);
+        onEvent(cbId, false, 'createImageResourceFromCanvasResource', { success: false });
+    });
 }
 
 wasmApi.registerElementAsResource = (elementName) => {
@@ -912,6 +917,7 @@ const eventPropMap = {
     keypress: ['code', 'shiftKey', 'ctrlKey', 'altKey'],
     change: [],
     click: [],
+    createImageResourceFromCanvasResource: ['resourceId', 'success'],
     loadImage: ['resourceId', 'success'],
     loadFont: ['success'],
     loadAudio: ['resourceId', 'success'],

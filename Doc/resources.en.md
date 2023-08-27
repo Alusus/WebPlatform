@@ -12,7 +12,7 @@
 class ImageResource {
     def id: ArchInt = 0;
     handler this.load(u: ptr[array[Char]]): SrdRef[Promise[Int]];
-    handler this.initFromCanvas(canvas: ref[CanvasResource]);
+    handler this.initFromCanvas(canvas: ref[CanvasResource]): SrdRef[Promise[Int]];
     handler this.getDimensions(): Dimensions;
 }
 ```

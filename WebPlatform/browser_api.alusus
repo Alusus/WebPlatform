@@ -39,9 +39,9 @@
     @expname[getImageDimensions] function getImageDimensions (imgId: Int, result: ref[Dimensions]);
     @expname[createCanvasResource] function createCanvasResource (width: Int, height: Int): ArchInt;
     @expname[resizeCanvasResource] function resizeCanvasResource (canvasId: ArchInt, width: Int, height: Int);
-    @expname[createImageResourceFromCanvasResource] function createImageResourceFromCanvasResource (
-        canvasId: ArchInt
-    ): ArchInt;
+    @expname[createImageResourceFromCanvasResource] function _createImageResourceFromCanvasResource (
+        canvasId: ArchInt, cbId: ArchInt
+    );
     @expname[registerElementAsResource] function registerElementAsResource (id: ptr[Char]): ArchInt;
     @expname[loadAudio] function _loadAudio (url: ptr[Char], cbId: ArchInt);
     @expname[releaseResource] function releaseResource (resourceId: ArchInt);

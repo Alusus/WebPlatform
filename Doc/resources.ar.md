@@ -14,7 +14,7 @@
 صنف مـورد_صورة {
     عرف معرف: صـحيح_متكيف = 0؛
     عرف حمل(مسار: مؤشر[مصفوفة[مـحرف]]): سـندنا[مـؤجلة[صـحيح]]؛
-    عرف هيئ_من_مرسم(مرسم: سند[مـورد_مرسم])؛
+    عرف هيئ_من_مرسم(مرسم: سند[مـورد_مرسم]): سـندنا[مـؤجلة[صـحيح]]؛
     عرف هات_الأبعاد(): أبـعاد؛
 }
 ```
@@ -25,7 +25,7 @@
 class ImageResource {
     def id: ArchInt = 0;
     handler this.load(u: ptr[array[Char]]): SrdRef[Promise[Int]];
-    handler this.initFromCanvas(canvas: ref[CanvasResource]);
+    handler this.initFromCanvas(canvas: ref[CanvasResource]): SrdRef[Promise[Int]];
     handler this.getDimensions(): Dimensions;
 }
 ```

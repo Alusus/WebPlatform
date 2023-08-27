@@ -27,9 +27,21 @@
             return p;
         }
 
-        handler this.initFromCanvas(canvas: ref[CanvasResource]) {
+        handler this.initFromCanvas(canvas: ref[CanvasResource]): SrdRef[Promise[Int]] {
             if this.id != 0 releaseResource(this.id);
-            this.id = createImageResourceFromCanvasResource(canvas.id);
+            def p: SrdRef[Promise[Int]] = Promise[Int].new();
+            createImageResourceFromCanvasResource(canvas.id, closure (json: Json) {
+                def data: Json = json.getObject("eventData");
+                if this.id != 0 {
+                    releaseResource(this.id);
+                    this.id = 0;
+                }
+                if data.getBool("success") {
+                    this.id = data.getInt("resourceId");
+                    p.resolve(0);
+                } else p.reject(GenericError.new(Errors.IMAGE_LOAD, "Initialization failed"));
+            });
+            return p;
         }
 
         handler this.getDimensions(): Dimensions {
