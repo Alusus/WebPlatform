@@ -60,6 +60,9 @@
     عرف اكتب_في_الطرفية: لقب logToConsole؛
     عرف طابق_نمطا: لقب matchRegex؛
 
+    عرف علق_سياق_الصوت: لقب suspendAudioContext؛
+    عرف استأنف_سياق_الصوت: لقب resumeAudioContext؛
+
     عرف حـمولة_تحريك_المؤشر: لقب MouseMovePayload؛
     @دمج صنف حـمولة_تحريك_المؤشر {
         عرف موقع_س: لقب posX؛
