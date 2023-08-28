@@ -29,6 +29,7 @@ direction: Direction
 fontFamily: String
 overflowX: Overflow
 overflowY: Overflow
+overflow: Overflow
 display: Display
 cursor: Cursor
 animation: Animation
@@ -82,6 +83,7 @@ style type.
 * `fontFamily` Font family that the text written using a font in it.
 * `overflowX` Overflow on x axis.
 * `overflowY` Overflow on y axis.
+* `overflow` Overflow on x and y axes.
 * `display` The way the item is displayed.
 * `cursor` Cursor style.
 * `animation` Animations we want to apply on the item.
