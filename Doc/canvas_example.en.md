@@ -333,7 +333,7 @@ func main {
     // animation loop
     def x: Int = -80;
     // start a timer with 8 seconds period
-    startTimer(8000, closure (
+    startTimer(8000000, closure (
         x: by_ref, img: by_ref, dynImg: by_ref, pos: by_ref, delta: by_ref, pressed: by_ref, gamepadsCount: by_ref
     ) & (json: Json) {
         // first clear previous drawings

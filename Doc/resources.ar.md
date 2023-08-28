@@ -14,7 +14,7 @@
 صنف مـورد_صورة {
     عرف معرف: صـحيح_متكيف = 0؛
     عرف حمل(مسار: مؤشر[مصفوفة[مـحرف]]): سـندنا[مـؤجلة[صـحيح]]؛
-    عرف هيئ_من_مرسم(مرسم: سند[مـورد_مرسم])؛
+    عرف هيئ_من_مرسم(مرسم: سند[مـورد_مرسم]): سـندنا[مـؤجلة[صـحيح]]؛
     عرف هات_الأبعاد(): أبـعاد؛
 }
 ```
@@ -25,7 +25,7 @@
 class ImageResource {
     def id: ArchInt = 0;
     handler this.load(u: ptr[array[Char]]): SrdRef[Promise[Int]];
-    handler this.initFromCanvas(canvas: ref[CanvasResource]);
+    handler this.initFromCanvas(canvas: ref[CanvasResource]): SrdRef[Promise[Int]];
     handler this.getDimensions(): Dimensions;
 }
 ```
@@ -83,6 +83,7 @@ class CanvasResource {
     عرف معرف: صـحيح_متكيف = 0؛
     عملية هذا.حمل(مسار: مؤشر[مصفوفة[مـحرف]]): سـندنا[مـؤجلة[صـحيح]]؛
     عملية هذا.شغل(تكرار: ثـنائي)؛
+    عملية هذا.شغل(تكرار: ثـنائي، أوقف_السابق: ثـنائي)؛
     عملية هذا.أوقف()؛
     عملية هذا.ألبث()؛
     عملية هذا.استأنف()؛
@@ -99,6 +100,7 @@ class AudioResource {
     def id: ArchInt = 0;
     handler this.load(u: ptr[array[Char]]): SrdRef[Promise[Int]];
     handler this.play(loop: Bool);
+    handler this.play(loop: Bool, stopPrevious: Bool);
     handler this.stop();
     handler this.pause();
     handler this.resume();
@@ -113,7 +115,10 @@ class AudioResource {
 
 `حمل` (`load`) تحمل المورد من المسار المعطى.
 
-`شغل` (`play`) تبدأ تشغيل الصوت من بدايته.
+`شغل` (`play`) تبدأ تشغيل الصوت من بدايته. في حال استدعائها ثانية قبل انتهاء التشغيل السابق
+فإن الصوت سيشغل مجددا إلى جانب التشغيل السابق الذي سيستمر حتى انتهائه بشكل طبيعي. النسخة
+الثانية من هذه الدالة تستلم معطى `أوقف_السابق` (`stopPrevious`) والذي يسمح للمستخدم
+بإيقاف التشغيل السابق قبل تشغيل الصوت من جديد.
 
 `ألبث` (`pause`) توقف التشغيل عند النقطة الحالية.
 

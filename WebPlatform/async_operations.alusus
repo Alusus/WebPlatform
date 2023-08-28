@@ -55,6 +55,11 @@
         _loadImage(url, eventHandlers(index).id);
     }
 
+    function createImageResourceFromCanvasResource (canvasId: ArchInt, cb: closure (Json)) {
+        def index: ArchInt = addEventHandler(cb);
+        _createImageResourceFromCanvasResource(canvasId, eventHandlers(index).id);
+    }
+
     function loadAudio (url: ptr[Char], cb: closure (Json)) {
         def index: ArchInt = addEventHandler(cb);
         _loadAudio(url, eventHandlers(index).id);
