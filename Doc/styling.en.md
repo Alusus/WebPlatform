@@ -378,24 +378,9 @@ A class that holds color information.
 
 ### Length
 
-```
-class Length {
-    defineInitializer[px, "px"];
-    defineInitializer[pt, "pt"];
-    defineInitializer[mm, "mm"];
-    defineInitializer[vw, "vw"];
-    defineInitializer[vh, "vh"];
-    defineInitializer[vmin, "vmin"];
-    defineInitializer[vmax, "vmax"];
-    defineInitializer[em, "em"];
-    defineInitializer[percent, "%"];
-    handler (this:Length).toString(): String;
-}
-```
-
 A class that holds distance information.
 
-This class defines many measuring units which are:
+This class defines the following measuring units:
 
 `px` number of pixels.
 
@@ -415,28 +400,64 @@ This class defines many measuring units which are:
 
 `percent` a percentage of the container component.
 
+`auto` the auto value from CSS.
+
+Each of these units is a function that creates an instance of type `Length` and gives it the
+value that was passed as an arg to the function. The return value is of type `SrdRef[Length]`.
+For example:
+
+```
+Length.pt(50); // Creates an object with value of 50 points.
+```
+
 Also, it contains the following method:
 
 `toString` a method to convery class information into a string.
 
+
 ### Length4
 
+Similar to `Length` but with 4 values, one for each direction.
+This class defines the following measuring units:
+
+`px` number of pixels.
+
+`pt` number of points.
+
+`mm` distance in millimeters.
+
+`vw` a relative distance, proportional to 1% of the browser window width.
+
+`vh` a relative distance, proportional to 1% of the browser window height.
+
+`vmin` a relative distance, proportional to 1% of the browser window minimum side length.
+
+`vmax` a relative distance, proportional to 1% of the browser window maximum side length.
+
+`em` a relative distance, proportional to text font size.
+
+`percent` a percentage of the container component.
+
+Each of these units is a function that creates an instance of type `Length4` and gives it the
+values that were passed as args to the function. The return value is of type `SrdRef[Length4]`.
+For example:
+
 ```
-class Length4 {
-    defineInitializer[px, "px"];
-    defineInitializer[pt, "pt"];
-    defineInitializer[mm, "mm"];
-    defineInitializer[vw, "vw"];
-    defineInitializer[vh, "vh"];
-    defineInitializer[vmin, "vmin"];
-    defineInitializer[vmax, "vmax"];
-    defineInitializer[em, "em"];
-    defineInitializer[percent, "%"];
-    handler (this:Length).toString(): String set_ptr;
-}
+Length4.pt(50); // Creates an object with value of 50 points for each of the 4 values.
+Length4.pt(50, 30); // Creates an object with value of 50 points for vertical values (top and bottom)
+                   // and 30 points for horizontal values (left and right).
+Length4.pt(10, 20, 30, 40); // Creates an object with value top = 50 points, right = 20 points,
+                           // bottom = 30 points, and left = 40 points.
 ```
 
-Similar to `Length` but with 4 values, one for each direction.
+You can also create the object and pass `Length` values to it instead of using the unit functions
+mentioned above:
+
+```
+// Create Length4 and give it 50 points for vertical values (top and bottom)
+// and 30 pixels for horizontal values (left and right).
+SrdRef[Length4]().{ alloc()~init(Length.pt(50), Length.px(30)) }
+```
 
 
 ### Transition

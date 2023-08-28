@@ -22,11 +22,14 @@
         defineInitializer[mm, "mm"];
         defineInitializer[vw, "vw"];
         defineInitializer[vh, "vh"];
-        defineInitializer[auto, "auto"];
         defineInitializer[vmin, "vmin"];
         defineInitializer[vmax, "vmax"];
         defineInitializer[em, "em"];
         defineInitializer[percent, "%"];
+
+        func auto(): SrdRef[LengthConst] {
+            return SrdRef[LengthConst].construct().{ this.wkThis = this; unit = "auto" };
+        }
 
         handler this + SrdRef[Length]: SrdRef[LengthOpLength] {
             return SrdRef[LengthOpLength].construct()~use_in(self) {
@@ -71,10 +74,11 @@
         def unit: CharsPtr;
 
         handler (this:Length).toString(): String set_ptr {
-            if this.unit!="auto"
-                {return String.format("%f%s", this.val, this.unit);}
-            else
-                {return String.format("%s",this.unit);}
+            if String.isEqual(this.unit, "auto") {
+                return String("auto");
+            } else {
+                return String.format("%f%s", this.val, this.unit);
+            }
         }
     }
 
