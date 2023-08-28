@@ -16,7 +16,6 @@
             }
         }
 
-
         defineInitializer[px, "px"];
         defineInitializer[pt, "pt"];
         defineInitializer[mm, "mm"];
@@ -81,7 +80,6 @@
             }
         }
     }
-
 
     class LengthOpLength {
         @injection def length: Length;
