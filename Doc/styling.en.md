@@ -123,6 +123,14 @@ style type.
   `position` property).
 * `background` Item background.
 
+#### setRawStyle
+
+```
+handler [styleProp: ast] this.setRawStyle(val: String);
+```
+
+Allows setting raw CSS value for any of the properties of the Style object.
+
 
 ### StyleSet
 
