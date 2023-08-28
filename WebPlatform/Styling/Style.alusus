@@ -50,6 +50,7 @@
         generateStringStyleProp[transform, "transform"];
         generateTypedStyleProp[overflowX, "overflow-x", Overflow];
         generateTypedStyleProp[overflowY, "overflow-y", Overflow];
+        generateTypedStyleProp[overflow, "overflow", Overflow];
         generateTypedStyleProp[boxShadow, "box-shadow", Shadow];
         generateTypedStyleProp[display, "display", Display];
         generateTypedStyleProp[cursor, "cursor", Cursor];

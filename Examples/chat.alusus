@@ -195,7 +195,7 @@ class TextEntry {
                     style.{
                         height = Length.percent(100);
                         width = Length.pt(50);
-                        background = Background(Color(200, 200, 200));
+                        setRawStyle[background](String("lightblue"));
                         fontSize = Length.pt(16.0);
                         justify = Justify.CENTER;
                     };
