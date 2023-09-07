@@ -51,7 +51,8 @@
         generateTypedStyleProp[overflowX, "overflow-x", Overflow];
         generateTypedStyleProp[overflowY, "overflow-y", Overflow];
         generateTypedStyleProp[overflow, "overflow", Overflow];
-        generateTypedStyleProp[boxShadow, "box-shadow", Shadow];
+        generateTypedStyleProp[boxShadow, "box-shadow", BoxShadow];
+        generateTypedStyleProp[textShadow, "text-shadow", TextShadow];
         generateTypedStyleProp[display, "display", Display];
         generateTypedStyleProp[cursor, "cursor", Cursor];
         generateTypedStyleProp[top, "top", Length];

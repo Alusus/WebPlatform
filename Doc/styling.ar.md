@@ -58,7 +58,8 @@
 ارتفاع_الكتابة: مـسافة
 الشفافية: صـحيح
 التحول: تـحول
-ظل_الصندوق: ظـل
+ظل_الصندوق: ظـل_صندوق
+ظل_النص: ظـل_نص
 فوق: مـسافة
 يسار: مـسافة
 يمين: مـسافة
@@ -111,7 +112,8 @@ fontWeight: Length
 lineHeight: Length
 opacity: Int
 transform: Transform
-boxShadow: Shadow
+boxShadow: BoxShadow
+textShadow: TextShadow
 top: Length
 left: Length
 right: Length
@@ -166,6 +168,7 @@ background: Background
 * `الشفافية` (`opacity`) شفافية العنصر.
 * `التحول` (`transform`) التحويلات المطبقة على العنصر.
 * `ظل_الصندوق` (`boxShadow`) الظل الخاص بالصندوق الذي يحوي العنصر.
+* `ظل_النص` (`textShadow`) ظل الكتابة التي في العنصر.
 * `فوق` (`top`) بعد العنصر عن أعلى العنصر الحاوي له أو الشاشة (تبعاً للخاصية `موقع`).
 * `يسار` (`left`) بعد العنصر عن يسار العنصر الحاوي له أو الشاشة (تبعاً للخاصية `موقع`).
 * `يمين` (`right`) بعد العنصر عن يمين العنصر الحاوي له أو الشاشة (تبعاً للخاصية `موقع`).
@@ -862,12 +865,29 @@ class Flex {
 `حول_لنص` (`toString`) طريقة لتحويل معلومات المرونة إلى ترميز نصي.
 
 
-### ظـل (Shadow)
+### ظـل_صندوق (BoxShadow)
 
 <div dir=rtl>
 
 ```
-صنف ظـل {
+صنف ظـل_صندوق {
+    عملية هذا~هيئ()؛
+    عملية هذا~هيئ(إزاحة_س: سـندنا[مـسافة]، إزاحة_ص: سـندنا[مـسافة]، لون: لـون)؛
+    عملية هذا~هيئ(
+        إزاحة_س: سـندنا[مـسافة]،
+        إزاحة_ص: سـندنا[مـسافة]،
+        نصف_قطر_الغباشة: سـندنا[مـسافة]،
+        نصف_قطر_الانتشار: سـندنا[مـسافة]،
+        لون: لـون
+    )؛
+    عملية هذا~هيئ(
+        للداخل: ثـنائي،
+        إزاحة_س: سـندنا[مـسافة]،
+        إزاحة_ص: سـندنا[مـسافة]،
+        نصف_قطر_الغباشة: سـندنا[مـسافة]،
+        نصف_قطر_الانتشار: سـندنا[مـسافة]،
+        لون: لـون
+    )؛
     عرف حول_لنص(): نـص؛
 }
 ```
@@ -875,11 +895,66 @@ class Flex {
 </div>
 
 ```
-class Shadow {
+class BoxShadow {
+    handler this~init();
+    handler this~init(offsetX: SrdRef[Length], offsetY: SrdRef[Length], color: Color);
+    handler this~init(
+        offsetX: SrdRef[Length],
+        offsetY: SrdRef[Length],
+        blurRadius: SrdRef[Length],
+        spreadRadius: SrdRef[Length],
+        color: Color
+    );
+    handler this~init(
+        inset: Bool,
+        offsetX: SrdRef[Length],
+        offsetY: SrdRef[Length],
+        blurRadius: SrdRef[Length],
+        spreadRadius: SrdRef[Length],
+        color: Color
+    );
     handler this.toString(): String;
 }
 ```
-صنف يحمل معلومات الظل.
+صنف يحمل معلومات الظل لصندوق.
+
+`حول_لنص` (`toString`) طريقة لتحويل معلومات الظل إلى ترميز نصي.
+
+
+### ظـل_نص (TextShadow)
+
+<div dir=rtl>
+
+```
+صنف ظـل_نص {
+    عملية هذا~هيئ()؛
+    عملية هذا~هيئ(إزاحة_س: سـندنا[مـسافة]، إزاحة_ص: سـندنا[مـسافة]، لون: لـون)؛
+    عملية هذا~هيئ(
+        إزاحة_س: سـندنا[مـسافة]،
+        إزاحة_ص: سـندنا[مـسافة]،
+        نصف_قطر_الغباشة: سـندنا[مـسافة]،
+        لون: لـون
+    )؛
+    عرف حول_لنص(): نـص؛
+}
+```
+
+</div>
+
+```
+class TextShadow {
+    handler this~init();
+    handler this~init(offsetX: SrdRef[Length], offsetY: SrdRef[Length], color: Color);
+    handler this~init(
+        offsetX: SrdRef[Length],
+        offsetY: SrdRef[Length],
+        blurRadius: SrdRef[Length],
+        color: Color
+    );
+    handler this.toString(): String;
+}
+```
+صنف يحمل معلومات الظل لنص.
 
 `حول_لنص` (`toString`) طريقة لتحويل معلومات الظل إلى ترميز نصي.
 
