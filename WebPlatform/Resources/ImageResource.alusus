@@ -14,13 +14,13 @@
             def p: SrdRef[Promise[Int]] = Promise[Int].new();
             this.url = u;
             loadImage(u, closure (json: Json) {
-                def data: Json = json.getObject("eventData");
+                def data: Json = json("eventData");
                 if this.id != 0 {
                     releaseResource(this.id);
                     this.id = 0;
                 }
-                if data.getBool("success") {
-                    this.id = data.getInt("resourceId");
+                if data("success") {
+                    this.id = data("resourceId");
                     p.resolve(0);
                 } else p.reject(GenericError.new(Errors.IMAGE_LOAD, "Loading failed"));
             });
@@ -31,13 +31,13 @@
             if this.id != 0 releaseResource(this.id);
             def p: SrdRef[Promise[Int]] = Promise[Int].new();
             createImageResourceFromCanvasResource(canvas.id, closure (json: Json) {
-                def data: Json = json.getObject("eventData");
+                def data: Json = json("eventData");
                 if this.id != 0 {
                     releaseResource(this.id);
                     this.id = 0;
                 }
-                if data.getBool("success") {
-                    this.id = data.getInt("resourceId");
+                if data("success") {
+                    this.id = data("resourceId");
                     p.resolve(0);
                 } else p.reject(GenericError.new(Errors.IMAGE_LOAD, "Initialization failed"));
             });

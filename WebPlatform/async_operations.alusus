@@ -73,8 +73,8 @@
     function loadFont (fontName: ptr[Char], url: ptr[Char]): SrdRef[Promise[Int]] {
         def p: SrdRef[Promise[Int]] = Promise[Int].new();
         loadFont(fontName, url, closure (json: Json) {
-            def data: Json = json.getObject("eventData");
-            if data.getBool("success") p.resolve(0)
+            def data: Json = json("eventData");
+            if data("success") p.resolve(0)
             else p.reject(GenericError.new(Errors.FONT_LOAD, "Loading failed"));
         });
         return p;
@@ -88,8 +88,8 @@
     function loadJsScript (url: ptr[Char]): SrdRef[Promise[Int]] {
         def p: SrdRef[Promise[Int]] = Promise[Int].new();
         loadJsScript(url, closure (json: Json) {
-            def data: Json = json.getObject("eventData");
-            if data.getBool("success") p.resolve(0)
+            def data: Json = json("eventData");
+            if data("success") p.resolve(0)
             else p.reject(GenericError.new(Errors.JS_SCRIPT_LOAD, "Loading failed"));
         });
         return p;
@@ -103,7 +103,7 @@
     function callCustomAsyncJsFn (fnName: ptr[Char], arg: ptr[Char]): SrdRef[Promise[String]] {
         def p: SrdRef[Promise[String]] = Promise[String].new();
         callCustomAsyncJsFn(fnName, arg, closure (json: Json) {
-            p.resolve(json.getObject("eventData").getString("result"));
+            p.resolve(json("eventData")("result"));
         });
         return p;
     }
@@ -116,7 +116,7 @@
     function requestWakeLock(): SrdRef[Promise[Bool]] {
         def p: SrdRef[Promise[Bool]] = Promise[Bool].new();
         requestWakeLock(closure (json: Json) {
-            p.resolve(json.getObject("eventData").getBool("result"));
+            p.resolve(json("eventData")("result"));
         });
         return p;
     }
@@ -129,7 +129,7 @@
     function exitWakeLock(): SrdRef[Promise[Bool]] {
         def p: SrdRef[Promise[Bool]] = Promise[Bool].new();
         exitWakeLock(closure (json: Json) {
-            p.resolve(json.getObject("eventData").getBool("result"));
+            p.resolve(json("eventData")("result"));
         });
         return p;
     }

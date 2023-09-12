@@ -269,9 +269,9 @@ func main {
                             fontSize = Length.pt(20.0);
                         };
                         onFetch = closure (json: Json) {
-                            def status: Int = json.getObject("eventData").getInt("status");
+                            def status: Int[64] = json("eventData")("status");
                             if status >= 200 and status < 300 {
-                                def data: String = json.getObject("eventData").getString("body");
+                                def data: String = json("eventData")("body");
                                 if this.getText() != data {
                                     this.setText(data);
                                 }

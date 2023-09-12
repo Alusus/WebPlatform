@@ -820,10 +820,10 @@ func main {
                         // نقوم بتغريف مغلف سيتم تتنفيذه عند جلب البيانات من الخادم
                         onFetch = closure (json: Json) {
                             // في البداية نتحقق من أنه قد تم جلب البيانات بدون حدوث أخطاء
-                            def status: Int = json.getObject("eventData").getInt("status");
+                            def status: Int = json("eventData")("status");
                             if status >= 200 and status < 300 {
                                 // نستخرج البيانات
-                                def data: String = json.getObject("eventData").getString("body");
+                                def data: String = json("eventData")("body");
                                 // نقوم بتحديث النص
                                 if this.getText() != data {
                                     this.setText(data);
