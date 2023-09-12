@@ -1,5 +1,5 @@
 @merge module WebPlatform {
-    class Shadow {
+    class BoxShadow {
         def inset: Bool = false;
         def offsetX: SrdRef[Length];
         def offsetY: SrdRef[Length];
@@ -31,11 +31,11 @@
             this.color = c;
         }
 
-        handler this~init(temp_ref[Shadow]) {
+        handler this~init(temp_ref[BoxShadow]) {
             this = value;
         }
 
-        handler this = temp_ref[Shadow] {
+        handler this = temp_ref[BoxShadow] {
             this.inset = value.inset;
             this.offsetX = value.offsetX;
             this.offsetY = value.offsetY;

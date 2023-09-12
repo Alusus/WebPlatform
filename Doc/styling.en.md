@@ -58,7 +58,8 @@ fontWeight: Length
 lineHeight: Length
 opacity: Int
 transform: Transform
-boxShadow: Shadow
+boxShadow: BoxShadow
+textShadow: TextShadow
 top: Length
 left: Length
 right: Length
@@ -113,6 +114,7 @@ style type.
 * `opacity` Item opacity.
 * `transform` Transformations applied on the item.
 * `boxShadow` The shadow of the box containing the item.
+* `textShadow` The shadow of the text in the item.
 * `top` The distance of the item from the top of its container or the screen (depending on
   `position` property).
 * `left` The distance of the item from the left of its container or the screen (depending on
@@ -557,15 +559,53 @@ A class that holds flex information.
 `toString` a method to convert the class information to a string.
 
 
-### Shadow
+### BoxShadow
 
 ```
-class Shadow {
+class BoxShadow {
+    handler this~init();
+    handler this~init(offsetX: SrdRef[Length], offsetY: SrdRef[Length], color: Color);
+    handler this~init(
+        offsetX: SrdRef[Length],
+        offsetY: SrdRef[Length],
+        blurRadius: SrdRef[Length],
+        spreadRadius: SrdRef[Length],
+        color: Color
+    );
+    handler this~init(
+        inset: Bool,
+        offsetX: SrdRef[Length],
+        offsetY: SrdRef[Length],
+        blurRadius: SrdRef[Length],
+        spreadRadius: SrdRef[Length],
+        color: Color
+    );
     handler this.toString(): String;
 }
 ```
 
-A class that holds shadow information.
+A class that holds shadow information for a box.
+
+`toString` a method to convert the class information to a string.
+
+
+### TextShadow
+
+```
+class TextShadow {
+    handler this~init();
+    handler this~init(offsetX: SrdRef[Length], offsetY: SrdRef[Length], color: Color);
+    handler this~init(
+        offsetX: SrdRef[Length],
+        offsetY: SrdRef[Length],
+        blurRadius: SrdRef[Length],
+        color: Color
+    );
+    handler this.toString(): String;
+}
+```
+
+A class that holds shadow information for a text.
 
 `toString` a method to convert the class information to a string.
 
