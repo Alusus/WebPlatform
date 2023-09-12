@@ -53,8 +53,8 @@
                 for i=0,i<this.sourceArray.getLength() , i+=1{
                     htmlVal += String.format(
                         "<source srcset=\"%s\" media=\"(max-width:%s)\">",
-                        this.sourceArray(i).src.buf,
-                        this.sourceArray(i).maxWidth.buf
+                        this.sourceArray(i).src.replace("\"", "\\\"").buf,
+                        this.sourceArray(i).maxWidth.replace("\"", "\\\"").buf
                     );
                 }
 

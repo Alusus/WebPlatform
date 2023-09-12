@@ -46,7 +46,7 @@
         handler (this:Widget).update() set_ptr {
             if this.id.getLength() > 0 {
                 this.updateCommon();
-                setElementAttribute(this.id, "innerHTML", this.text);
+                setElementAttribute(this.id, "innerText", this.text);
                 if this.ariaHidden == true {
                    setElementAttribute(this.id, String("aria-hidden"), String("true"));
                 }

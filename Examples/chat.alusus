@@ -1,5 +1,6 @@
 import "Build";
 import "Apm";
+Apm.importFile("Alusus/Threading");
 Apm.importFile("Alusus/WebPlatform");
 use Srl;
 use WebPlatform;
@@ -9,19 +10,25 @@ use WebPlatform;
 
 def MAX_MESSAGES: 12;
 def messages: Array[String];
+def mutex: Threading.Mutex;
+Threading.initMutex(mutex~ptr, 0);
 
 @beEndpoint["POST", "/messages"]
 func postMessages (conn: ptr[Http.Connection]) {
     def postData: array[Char, 1024];
     def postDataSize: Int = Http.read(conn, postData~ptr, postData~size);
+    Threading.lockMutex(mutex~ptr);
     if messages.getLength() >= MAX_MESSAGES messages.remove(0);
     messages.add(String(postData~ptr, postDataSize));
+    Threading.unlockMutex(mutex~ptr);
     Http.print(conn, "HTTP/1.1 200 Ok\r\n\r\n");
 }
 
 @beEndpoint["GET", "/messages"]
 func getMessages (conn: ptr[Http.Connection]) {
-    def response: String = String.merge(messages, "<br>");
+    Threading.lockMutex(mutex~ptr);
+    def response: String = String.merge(messages, "\n");
+    Threading.unlockMutex(mutex~ptr);
     Http.print(conn, "HTTP/1.1 200 Ok\r\n");
     Http.print(conn, "Content-Type: text/plain\r\n");
     Http.print(conn, "Cache-Control: no-cache\r\n");
@@ -185,7 +192,7 @@ class TextEntry {
                     };
                     onKeyUp.connect(closure (widget: ref[TextInput], payload: ref[String]) {
                         if payload == "Shift+Enter" {
-                            def newData: String = String("- ") + encodeHtml(widget.getText()).trim();
+                            def newData: String = String("- ") + widget.getText().trim();
                             widget.setText(String());
                             if not self.onNewEntry.isNull() self.onNewEntry(newData);
                         }
@@ -200,7 +207,7 @@ class TextEntry {
                         justify = Justify.CENTER;
                     };
                     onClick.connect(closure (widget: ref[Widget], payload: ref[Int]) {
-                        def newData: String = String("- ") + encodeHtml(self.textInput.getText()).trim();
+                        def newData: String = String("- ") + self.textInput.getText().trim();
                         self.textInput.setText(String());
                         if not self.onNewEntry.isNull() self.onNewEntry(newData);
                     });
@@ -212,13 +219,6 @@ class TextEntry {
     handler this_type(): SrdRef[TextEntry] {
         return SrdRef[TextEntry].construct();
     }
-}
-
-func encodeHtml(str: String): String {
-    return str
-        .replace("\n", "<br>")
-        .replace(",", "&comma;")
-        .replace("\"", "&quot;");
 }
 
 //==============================================================================

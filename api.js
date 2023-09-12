@@ -67,12 +67,12 @@ wasmApi.removeStyleRule = (elementName, styleSelector) => {
     }
 }
 
+const nonAttributeProps = ['innerHTML', 'value', 'innerText', 'textContent'];
+
 wasmApi.setElementAttribute = (elementName, propName, value) => {
     const prop = toJsString(propName);
-    if (prop === 'innerHTML') {
-        document.getElementById(toJsString(elementName)).innerHTML = toJsString(value);
-    } else if (prop === 'value') {
-        document.getElementById(toJsString(elementName)).value = toJsString(value);
+    if (nonAttributeProps.includes(prop)) {
+        document.getElementById(toJsString(elementName))[prop] = toJsString(value);
     } else {
         document.getElementById(toJsString(elementName)).setAttribute(prop, toJsString(value));
     }
@@ -81,8 +81,7 @@ wasmApi.setElementAttribute = (elementName, propName, value) => {
 wasmApi.getElementAttribute = (elementName, propName) => {
     const prop = toJsString(propName);
     let result;
-    if (prop === 'innerHTML') result = document.getElementById(toJsString(elementName)).innerHTML;
-    else if (prop === 'value') result = document.getElementById(toJsString(elementName)).value;
+    if (nonAttributeProps.includes(prop)) result = document.getElementById(toJsString(elementName))[prop];
     else result = document.getElementById(toJsString(elementName)).getAttribute(prop);
     return toWasmString(result);
 }
