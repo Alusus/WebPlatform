@@ -4,10 +4,9 @@
             def jsonStr: ptr[array[Char]] = fetchNextEvent();
             if jsonStr == 0 break;
             def json: Json(jsonStr);
-            // TODO: Use (and implement) json.getArchInt("cbId").
-            def index: ArchInt = findEventHandlerIndex(json.getInt("cbId"));
+            def index: ArchInt = findEventHandlerIndex(json("cbId"));
             if index != -1 {
-                if json.getBool("recurring") {
+                if json("recurring") {
                     eventHandlers(index).cb(json);
                 } else {
                     def cb: closure (Json) = eventHandlers(index).cb;

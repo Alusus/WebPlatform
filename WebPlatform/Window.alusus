@@ -45,19 +45,19 @@
         handler this.onSignalConnectionsChanged(signal: ptr[Signal[Window, String]], connectionCount: Int) {
             if signal == this.onKeyDown~ptr {
                 handleSignalConnectionChanged["window", onKeyDown, "keydown", this.keysToSwallow, {
-                    this.onKeyDown.emit(data.getString("code"));
+                    this.onKeyDown.emit(data("code"));
                 }];
             } else if signal == this.onKeyUp~ptr {
                 handleSignalConnectionChanged["window", onKeyUp, "keyup", this.keysToSwallow, {
-                    this.onKeyUp.emit(data.getString("code"));
+                    this.onKeyUp.emit(data("code"));
                 }];
             } else if signal == this.onGamepadConnected~ptr {
                 handleSignalConnectionChanged["window", onGamepadConnected, "gamepadconnected", {
-                    this.onGamepadConnected.emit(data.getObject("gamepad").getString("id"));
+                    this.onGamepadConnected.emit(data("gamepad")("id"));
                 }];
             } else if signal == this.onGamepadDisconnected~ptr {
                 handleSignalConnectionChanged["window", onGamepadDisconnected, "gamepaddisconnected", {
-                    this.onGamepadDisconnected.emit(data.getObject("gamepad").getString("id"));
+                    this.onGamepadDisconnected.emit(data("gamepad")("id"));
                 }];
             }
         }
@@ -65,11 +65,11 @@
         handler this.onSignalConnectionsChanged(signal: ptr[Signal[Window, Bool]], connectionCount: Int) {
             if signal == this.onPointerLockChange~ptr {
                 handleSignalConnectionChanged["window", onPointerLockChange, "pointerlockchange", {
-                    this.onPointerLockChange.emit(Bool().{ this = data.getBool("enabled") });
+                    this.onPointerLockChange.emit(Bool().{ this = data("enabled") });
                 }];
             } else if signal == this.onFullScreenChange~ptr {
                 handleSignalConnectionChanged["window", onFullScreenChange, "fullscreenchange", {
-                    this.onFullScreenChange.emit(Bool().{ this = data.getBool("enabled") });
+                    this.onFullScreenChange.emit(Bool().{ this = data("enabled") });
                 }];
             }
         }
@@ -89,7 +89,7 @@
         handler this.onSignalConnectionsChanged(signal: ptr[Signal[Window, Json]], connectionCount: Int) {
             if signal == this.onMessage~ptr {
                 handleSignalConnectionChanged["window", onMessage, "message", {
-                    this.onMessage.emit(data.getObject("data"));
+                    this.onMessage.emit(data("data"));
                 }];
             }
         }

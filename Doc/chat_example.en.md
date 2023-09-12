@@ -338,10 +338,10 @@ func main {
                         // define a closure that will be called when fetching the data from the server
                         onFetch = closure (json: Json) {
                             // at first, check that data is fetched without errors
-                            def status: Int = json.getObject("eventData").getInt("status");
+                            def status: Int = json("eventData")("status");
                             if status >= 200 and status < 300 {
                                 // extract the data
-                                def data: String = json.getObject("eventData").getString("body");
+                                def data: String = json("eventData")("body");
                                 // update the text
                                 if this.getText() != data {
                                     this.setText(data);

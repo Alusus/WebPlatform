@@ -63,7 +63,8 @@
                 def htmlVal: String;
                 for i = 0, i < this.items.getLength(), ++i {
                     htmlVal += String("<option value= \"") +
-                        this.items.keyAt(i) + "\">" + this.items.valAt(i) + "</option>";
+                        this.items.keyAt(i).replace("\"", "\\\"") + "\">" +
+                        this.items.valAt(i).replace("<", "&lt;").replace(">", "&gt;") + "</option>";
                 }
                 setElementAttribute(this.id, "innerHTML", htmlVal);
                 if this.ariaHidden == true{

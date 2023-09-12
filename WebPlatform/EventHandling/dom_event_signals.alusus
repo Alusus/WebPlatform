@@ -17,7 +17,7 @@
                 eventHtmlIentifier,
                 this.signalName.defaultPrevented,
                 closure (json: Json) {
-                    def data: Json = json.getObject("eventData");
+                    def data: Json = json("eventData");
                     emitSignal;
                 }
             );
@@ -37,7 +37,7 @@
                 eventHtmlIentifier,
                 keysToSwallow,
                 closure (json: Json) {
-                    def data: Json = json.getObject("eventData");
+                    def data: Json = json("eventData");
                     emitSignal;
                 }
             );

@@ -162,10 +162,10 @@
             if signal == this.onMouseMove~ptr {
                 handleSignalConnectionChanged[this.id, onMouseMove, "mousemove", {
                     this.onMouseMove.emit(MouseMovePayload().{
-                        posX = data.getInt("offsetX");
-                        posY = data.getInt("offsetY");
-                        deltaX = data.getInt("movementX");
-                        deltaY = data.getInt("movementY");
+                        posX = data("offsetX");
+                        posY = data("offsetY");
+                        deltaX = data("movementX");
+                        deltaY = data("movementY");
                     });
                 }];
             }
@@ -177,9 +177,9 @@
             if signal == this.onMouseDown~ptr {
                 handleSignalConnectionChanged[this.id, onMouseDown, "mousedown", {
                     this.onMouseDown.emit(MouseButtonPayload().{
-                        button = data.getInt("button");
-                        posX = data.getFloat("offsetX");
-                        posY = data.getFloat("offsetY");
+                        button = data("button");
+                        posX = data("offsetX");
+                        posY = data("offsetY");
                     });
                 }];
             }
@@ -187,9 +187,9 @@
             if signal == this.onMouseUp~ptr {
                 handleSignalConnectionChanged[this.id, onMouseUp, "mouseup", {
                     this.onMouseUp.emit(MouseButtonPayload().{
-                        button = data.getInt("button");
-                        posX = data.getFloat("offsetX");
-                        posY = data.getFloat("offsetY");
+                        button = data("button");
+                        posX = data("offsetX");
+                        posY = data("offsetY");
                     });
                 }];
             }
@@ -199,24 +199,22 @@
             if this.id == "" return;
             macro convertJsonToPayload {
                 def i: Int = 0;
-                while 1 {
-                    def item: Json = data.getObject(i);
-                    if item.jsonString == "" break;
+                for i = 0, i < data.getLength(), ++i {
+                    def item: Json = data(i);
                     payload.add(TouchPayload().{
-                        identifier = item.getString("identifier");
-                        screenX = item.getFloat("screenX");
-                        screenY = item.getFloat("screenY");
-                        clientX = item.getFloat("clientX");
-                        clientY = item.getFloat("clientY");
-                        pageX = item.getFloat("pageX");
-                        pageY = item.getFloat("pageY");
-                        radiusX = item.getFloat("radiusX");
-                        radiusY = item.getFloat("radiusY");
-                        rotationAngle = item.getFloat("rotationAngle");
-                        force = item.getFloat("force");
-                        changed = item.getBool("changed");
+                        identifier = item("identifier");
+                        screenX = item("screenX");
+                        screenY = item("screenY");
+                        clientX = item("clientX");
+                        clientY = item("clientY");
+                        pageX = item("pageX");
+                        pageY = item("pageY");
+                        radiusX = item("radiusX");
+                        radiusY = item("radiusY");
+                        rotationAngle = item("rotationAngle");
+                        force = item("force");
+                        changed = item("changed");
                     });
-                    ++i;
                 }
             }
 
