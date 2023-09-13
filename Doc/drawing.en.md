@@ -118,6 +118,12 @@ Sets the stroke width used for drawing.
 handler this.drawImage(img: ref[ImageResource], x: Int, y: Int, w: Int, h: Int, alpha: Float);
 ```
 
+```
+handler this.drawImage(
+    img: ref[ImageResource], x: Int, y: Int, w: Int, h: Int, alpha: Float, smoothing: Bool
+);
+```
+
 Draws the given image, stretching it to fit the provided position and dimension. Applies the given
 alpha to the image. If the image has an alpha channel it will be blended with the provided alpha
 value. 
@@ -129,6 +135,10 @@ parameters:
 * `x`، `y`، `w`، `h` rectangle coordinates of the rectangle we want to draw the image inside, its width and height.
 
 * `alpha` image transparency.
+
+* `smoothing` specifies the scaling algorithm. A value of 1 means the scaling will be done using interpolation
+between near pixels whereas a value of 0 specifies nearst pixel scaling algorithm. The version version of this
+function assumes a value of 1 for this param.
 
 #### clear
 

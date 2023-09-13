@@ -70,7 +70,7 @@
     @expname[setStrokeStyle] function setStrokeStyle (canvasId: ArchInt, ss: ptr[Char]);
     @expname[setLineWidth] function setLineWidth (canvasId: ArchInt, lw: Int);
     @expname[drawImage] function drawImage (
-        canvasId: ArchInt, imgId: Int, x: Int, y: Int, w: Int, h: Int, alpha: Float
+        canvasId: ArchInt, imgId: Int, x: Int, y: Int, w: Int, h: Int, alpha: Float, smoothing: Bool
     );
     @expname[clearCanvas] function clearCanvas (canvasId: ArchInt);
     // Audio Operations

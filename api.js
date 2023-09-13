@@ -501,11 +501,12 @@ wasmApi.setLineWidth = (canvasId, lw) => {
     ctx.lineWidth = lw;
 }
 
-wasmApi.drawImage = (canvasId, imgId, x, y, w, h, a) => {
+wasmApi.drawImage = (canvasId, imgId, x, y, w, h, a, s) => {
     var canvas = resources[canvasId];
     var ctx = canvas.getContext("2d");
     ctx.save();
     ctx.globalAlpha = a;
+    ctx.imageSmoothingEnabled = s;
     if (w === -1) ctx.drawImage(resources[imgId], x, y);
     else ctx.drawImage(resources[imgId], x, y, w, h);
     ctx.restore();
