@@ -163,5 +163,14 @@
         enumStringValue[CONTAIN, "contain"];
         enumStringValue[COVER, "cover"];
     }
+
+    class ScalingAlgorithm {
+        setupStringEnum[];
+        enumStringValue[AUTO, "auto"];
+        enumStringValue[SMOOTH, "smooth"];
+        enumStringValue[HIGH_QUALITY, "high-quality"];
+        enumStringValue[PIXELATED, "pixelated"];
+        enumStringValue[CRISP_EDGES, "crisp-edges"];
+    }
 }
 
