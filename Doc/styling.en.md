@@ -65,6 +65,7 @@ left: Length
 right: Length
 bottom: Length
 background: Background
+scalingAlgorithm: ScalingAlgorithm
 ```
 
 Following is the description of each style prop. For possible values refer to the documentaiton of each
@@ -124,6 +125,7 @@ style type.
 * `bottom` The distance of the item from the bottom of its container or the screen (depending on
   `position` property).
 * `background` Item background.
+* `scalingAlgorithm` Specifies the scaling algorithm used for images and canvases.
 
 #### setRawStyle
 
@@ -791,4 +793,13 @@ dimensions of the containing element. Possible values:
 * `CONTAIN`: Scales the image so that it's entirely visible.
 * `COVER`: Scales the image so that it covers the entire background. Portions of the image may
   be outside the boundaries of the element and hence won't be visible.
+
+### ScalingAlgorithm
+
+An enumeration for possible scaling algorithms. Possible values:
+* `AUTO`
+* `SMOOTH`
+* `HIGH_QUALITY`
+* `PIXELATED`
+* `CRISP_EDGES`
 

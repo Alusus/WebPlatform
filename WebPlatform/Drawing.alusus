@@ -53,7 +53,11 @@
         }
 
         handler this.drawImage(img: ref[ImageResource], x: Int, y: Int, w: Int, h: Int, alpha: Float) {
-            WebPlatform.drawImage(this.getResourceId(), img.id, x, y, w, h, alpha);
+            WebPlatform.drawImage(this.getResourceId(), img.id, x, y, w, h, alpha, true);
+        }
+
+        handler this.drawImage(img: ref[ImageResource], x: Int, y: Int, w: Int, h: Int, alpha: Float, smoothing: Bool) {
+            WebPlatform.drawImage(this.getResourceId(), img.id, x, y, w, h, alpha, smoothing);
         }
 
         handler this.clear() {

@@ -61,6 +61,7 @@
         generateTypedStyleProp[bottom, "bottom", Length];
         generateTypedStyleProp[background, "background", Background];
         generateTypedStyleProp[wordBreak, "word-break", WordBreak];
+        generateTypedStyleProp[scalingAlgorithm, "image-rendering", ScalingAlgorithm];
 
         def vanimation: SrdRef[Animation];
         handler this.animation = (val: SrdRef[Animation]) {
