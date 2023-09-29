@@ -272,9 +272,6 @@
             for i = 0, i < endpointsModules.getLength(), ++i addUiEndpoints(endpointsModules(i));
         };
         preprocess { addAssetRoutes(parent~ast) };
-        if uiEndpoints.getLength() == 0 {
-            System.fail(1, "No UI endpoints found\n");
-        }
 
         options.add(0);
 
