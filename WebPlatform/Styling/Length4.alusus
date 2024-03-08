@@ -29,7 +29,6 @@
         handler this~init(that: ref[this_type]) {
             this = that;
         }
-
         handler this = temp_ref[Length4] {
             this.top = value.top;
             this.right = value.right;
@@ -41,7 +40,9 @@
             func name(v: Float): Length4 {
                 return Length4(Length(v, u));
             }
-
+            func name(v: bool): Length4 {
+                return Length4(Length.auto());
+            }
             func name(v: Float, h: Float): Length4 {
                 return Length4(Length(v, u), Length(h, u));
             }
@@ -60,6 +61,7 @@
         defineInitializer[vmax, "vmax"];
         defineInitializer[em, "em"];
         defineInitializer[percent, "%"];
+        defineInitializer[auto, ""];
 
         handler this.toString(): String {
             return String.format(
