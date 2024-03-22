@@ -6,6 +6,10 @@
         handler this_type(c: ref[Color]): SrdRef[Background] {
             return SrdRef[BackgroundColor].construct().{ this.wkThis = this; color = c; };
         }
+        
+        handler this_type(v : String): SrdRef[Background] {
+            return SrdRef[BackgroundString].construct().{ this.wkThis = this; stringValue = v; };
+        }
 
         handler this_type(
             u: String, repX: Bool, repY: Bool,
@@ -60,6 +64,18 @@
                 CharsPtr()~use_in(self) { if this.repeatX self = "repeat" else self = "no-repeat" },
                 CharsPtr()~use_in(self) { if this.repeatY self = "repeat" else self = "no-repeat" },
                 this.url.buf
+            );
+        }
+    }
+    
+    class BackgroundString {
+        @injection def background: Background;
+        def stringValue: String;
+
+        handler (this:Background).toString(): String set_ptr {
+            return String.format(
+                "%s",
+                this.stringValue.buf,
             );
         }
     }
