@@ -40,9 +40,6 @@
             func name(v: Float): Length4 {
                 return Length4(Length(v, u));
             }
-            func name(v: bool): Length4 {
-                return Length4(Length.auto());
-            }
             func name(v: Float, h: Float): Length4 {
                 return Length4(Length(v, u), Length(h, u));
             }
@@ -61,7 +58,9 @@
         defineInitializer[vmax, "vmax"];
         defineInitializer[em, "em"];
         defineInitializer[percent, "%"];
-        defineInitializer[auto, ""];
+        func auto(): Length4 {
+            return Length4(Length.auto())
+        }
 
         handler this.toString(): String {
             return String.format(

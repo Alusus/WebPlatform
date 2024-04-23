@@ -71,12 +71,8 @@
     class BackgroundString {
         @injection def background: Background;
         def stringValue: String;
-
         handler (this:Background).toString(): String set_ptr {
-            return String.format(
-                "%s",
-                this.stringValue.buf,
-            );
+            return this.stringValue;
         }
     }
 
