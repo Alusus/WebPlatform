@@ -13,6 +13,8 @@
 
     عرف أنشئ_عنصر: لقب createElement؛
     عرف حدد_ميزة_عنصر: لقب setElementAttribute؛
+    عرف هات_ميزة_عنصر: لقب getElementAttribute؛
+    عرف أزل_ميزة_عنصر: لقب removeElementAttribute؛
     عرف حدد_متن_طراز: لقب setStyleRule؛
 
     عرف نفذ_حلقة_معالجة_الأحداث: لقب runEventLoop؛
@@ -27,6 +29,7 @@
     عرف ابدأ_المؤقت: لقب setTimeout؛
     عرف ألغ_المؤقت: لقب cancelTimeout؛
     عرف أرسل_نداء: لقب sendRequest؛
+    عرف ألغ_نداء: لقب cancelRequest؛
     عرف حمل_خط: لقب loadFont؛
     عرف حمل_بريمج_جافاسكريبت: لقب loadJsScript؛
     عرف استدع_دالة_جافاسكريبت: لقب callCustomJsFn؛
@@ -555,6 +558,7 @@
         عرب_خصلة[النص، _النص، text، Text]؛
         عرب_خصلة[صنف_الإدخال، _صنف_الإدخال، inputType، InputType]؛
         عرب_خصلة[قيمة_وصفية، _قيمة_وصفية، placeholder، Placeholder]؛
+        عرب_خصلة[معطل، _معطل، disabled، Disabled]؛
         عرف عند_الغيير: لقب onChanged؛
         عرف عند_كبس_مفتاح: لقب onKeyPress؛
         عرف عند_انتهاء_الكبسة: لقب onKeyUp؛

@@ -294,6 +294,8 @@ A user input field.
 
 * `inputType`: `String`. The type of input values.
 
+* `disabled`: `Bool`. Whether the input box is disabled.
+
 * `placeholder`: `String`. A value that appears before the user enters anything, to clarify what
   to enter.
 

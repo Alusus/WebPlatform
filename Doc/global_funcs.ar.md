@@ -122,6 +122,52 @@ function setElementAttribute (name: ptr[Char], prop: ptr[Char], value: ptr[Char]
 `قيمة` (`value`) قيمة الميزة التي نريد تحديدها.
 
 
+### هات_ميزة_عنصر (getElementAttribute)
+
+<div dir=rtl>
+
+```
+عرف هات_ميزة_عنصر(اسم: مؤشر[مـحرف]، خاصية: مؤشر[مـحرف]): مـؤشر_محارف؛
+```
+
+</div>
+
+```
+function getElementAttribute (name: ptr[Char], prop: ptr[Char]): CharsPtr;
+```
+
+ترجع قيمة ميزة لعنصر من عناصر DOM.
+
+المعطيات:
+
+`اسم` (`name`) اسم العنصر.
+
+`خاصية` (`prop`) اسم الخاصية المراد جلب قيمتها.
+
+
+### أزل_ميزة_عنصر (removeElementAttribute)
+
+<div dir=rtl>
+
+```
+عرف أزل_ميزة_عنصر(اسم: مؤشر[مـحرف]، خاصية: مؤشر[مـحرف])؛
+```
+
+</div>
+
+```
+function removeElementAttribute (name: ptr[Char], prop: ptr[Char]);
+```
+
+تزيل ميزة لعنصر من عناصر DOM.
+
+المعطيات:
+
+`اسم` (`name`) اسم العنصر.
+
+`خاصية` (`prop`) اسم الخاصية المراد إزالتها.
+
+
 ### حدد_متن_طراز (setStyleRule)
 
 <div dir=rtl>
@@ -374,7 +420,7 @@ function cancelTimeout (id: ArchInt);
 عرف أرسل_نداء(
     طريقة: مؤشر[مـحرف]، عنوان: مؤشر[مـحرف]، ترويسات: مؤشر[مـحرف]، متن: مؤشر[مـحرف]،
     الصلاحية_بالميلي_ثانية: صـحيح، منادى: مغلفة(جـيسون)
-)؛
+): صـحيح_متكيف؛
 عرف أرسل_نداء(
     طريقة: مؤشر[مـحرف]، عنوان: مؤشر[مـحرف]، ترويسات: مؤشر[مـحرف]، متن: مؤشر[مـحرف]،
     الصلاحية_بالميلي_ثانية: صـحيح
@@ -387,7 +433,7 @@ function cancelTimeout (id: ArchInt);
 function sendRequest (
     method: ptr[Char], uri: ptr[Char], headers: ptr[Char], body: ptr[Char], timeoutInMs: Int,
     cb: closure (Json)
-);
+): ArchInt;
 function sendRequest (
     method: ptr[Char], uri: ptr[Char], headers: ptr[Char], body: ptr[Char], timeoutInMs: Int
 ): SrdRef[Promise[Json]];
@@ -405,6 +451,25 @@ function sendRequest (
     }
 }
 ```
+
+الصيغة الأولى ترجع رمزًا يمكن استخدامه لاحقًا لإلغاء الطلب باستخدام دالة ألغ_نداء.
+
+
+### ألغ_نداء (cancelRequest)
+
+<div dir=rtl>
+
+```
+دالة ألغ_نداء (رمز_النداء: صـحيح_متكيف)؛
+```
+
+</div>
+
+```
+function cancelRequest (requestId: ArchInt);
+```
+
+تلغي نداءا ارسل باستخدام `أرسل_نداء`. الرمز المطلوب في المعطى هو الرمز المرجع من دالة `أرسل_نداء`.
 
 
 ### حمل_خط (loadFont)

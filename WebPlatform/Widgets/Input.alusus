@@ -10,6 +10,7 @@
         generateProperty[inputType, InputType, String];
         generateProperty[placeholder, Placeholder, String];
         generateProperty[ariaHidden, AriaHidden, bool];
+        generateProperty[disabled, Disabled, bool];
 
         def _text: String;
         handler this.setText (t: String) {
@@ -25,7 +26,7 @@
             this.setText(val);
             return this._text;
         }
-        handler this.text: ref[String] {
+        handler this.text: String {
             return this.getText();
         }
 
@@ -45,6 +46,7 @@
             this.onKeyUp.owner~no_deref = this;
             this.inputType = String("text");
             this.ariaHidden = false;
+            this.disabled = false;
         }
         handler this~init(inputType : String) {
             this.onChanged.owner~no_deref = this;
@@ -52,6 +54,7 @@
             this.onKeyUp.owner~no_deref = this;
             this.inputType=inputType;
             this.ariaHidden = false;
+            this.disabled = false;
         }
 
         //-----------------
@@ -125,6 +128,13 @@
                 setElementAttribute(this.id, "placeholder", this.placeholder);
                 if this.ariaHidden == true {
                     setElementAttribute(this.id, String("aria-hidden"), String("true"));
+                } else {
+                    removeElementAttribute(this.id, String("aria-hidden"));
+                }
+                if this.disabled == true {
+                    setElementAttribute(this.id, String("disabled"), String("true"));
+                } else {
+                    removeElementAttribute(this.id, String("disabled"));
                 }
             }
         }
