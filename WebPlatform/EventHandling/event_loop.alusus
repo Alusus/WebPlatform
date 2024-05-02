@@ -6,7 +6,9 @@
             def json: Json(jsonStr);
             def index: ArchInt = findEventHandlerIndex(json("cbId"));
             if index != -1 {
-                if json("recurring") {
+                if json("eventName")~cast[String] == "_abort_" {
+                    eventHandlers.remove(index);
+                } else if json("recurring") {
                     eventHandlers(index).cb(json);
                 } else {
                     def cb: closure (Json) = eventHandlers(index).cb;

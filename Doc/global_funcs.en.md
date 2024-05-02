@@ -80,6 +80,36 @@ Parameters:
 `value` the value of the attribute we want to set
 
 
+### getElementAttribute
+
+```
+function getElementAttribute (name: ptr[Char], prop: ptr[Char]): CharsPtr;
+```
+
+Gets an attribute for a given DOM element.
+
+Parameters:
+
+`name` component's name.
+
+`prop` the name of the attribute we want to retrieve.
+
+
+### removeElementAttribute
+
+```
+function removeElementAttribute (name: ptr[Char], prop: ptr[Char]);
+```
+
+Removes an attribute from a given DOM element.
+
+Parameters:
+
+`name` component's name.
+
+`prop` the name of the attribute we want to remove.
+
+
 ### setStyleRule
 
 ```
@@ -239,7 +269,7 @@ Parameters:
 function sendRequest (
     method: ptr[Char], uri: ptr[Char], headers: ptr[Char], body: ptr[Char], timeoutInMs: Int,
     cb: closure (Json)
-);
+): ArchInt;
 function sendRequest (
     method: ptr[Char], uri: ptr[Char], headers: ptr[Char], body: ptr[Char], timeoutInMs: Int
 ): SrdRef[Promise[Json]];
@@ -258,6 +288,18 @@ The response data is formatted as JSON and has the following structure:
     }
 }
 ```
+
+The callback form of this function returns an ID that can later be used to cancel the request using
+cancelRequest.
+
+
+### cancelRequest
+
+```
+function cancelRequest (requestId: ArchInt);
+```
+
+Cancels an ongoing request. The provided ID is the ID obtained from sendRequest.
 
 
 ### loadFont

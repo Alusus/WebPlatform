@@ -1,9 +1,9 @@
 @merge module WebPlatform {
     function sendRequest (
         method: ptr[Char], uri: ptr[Char], headers: ptr[Char], body: ptr[Char], timeoutInMs: Int, cb: closure (Json)
-    ) {
+    ): ArchInt {
         def index: ArchInt = addEventHandler(cb);
-        _sendRequest(method, uri, headers, body, timeoutInMs, eventHandlers(index).id);
+        return _sendRequest(method, uri, headers, body, timeoutInMs, eventHandlers(index).id);
     }
 
     function sendRequest (

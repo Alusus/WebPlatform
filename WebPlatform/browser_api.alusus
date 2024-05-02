@@ -6,6 +6,7 @@
     @expname[removeStyleRule] function removeStyleRule (name: ptr[Char], selector: ptr[Char]);
     @expname[setElementAttribute] function setElementAttribute (name: ptr[Char], prop: ptr[Char], value: ptr[Char]);
     @expname[getElementAttribute] function getElementAttribute (name: ptr[Char], prop: ptr[Char]): ptr[array[Char]];
+    @expname[removeElementAttribute] function removeElementAttribute (name: ptr[Char], prop: ptr[Char]);
     @expname[getElementDimensions] function getElementDimensions (name: ptr[Char], result: ref[Dimensions]);
     @expname[getElementBoundingRect] function getElementBoundingRect (name: ptr[Char], result: ref[Rectangle]);
     // Element Interaction
@@ -29,7 +30,8 @@
     // Async Operations
     @expname[sendRequest] function _sendRequest (
         method: ptr[Char], uri: ptr[Char], headers: ptr[Char], body: ptr[Char], timeoutInMs: Int, cbId: ArchInt
-    );
+    ): ArchInt;
+    @expname[cancelRequest] function cancelRequest (requestId: ArchInt);
     @expname[startTimer] function _startTimer (duration: Word, cbId: ArchInt): Word;
     @expname[stopTimer] function _stopTimer (id: Word);
     @expname[setTimeout] function _setTimeout (duration: Word, cbId: ArchInt): Word;

@@ -2,10 +2,12 @@ const STACK_SIZE = 8192;
 const wasmApi = {};
 const eventsQueue = [];
 const resources = {};
+const requestControllers = {};
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 audioContext.resume();
 
 let resourceCounter = 0;
+let requestControllerCounter = 0;
 let program;
 let wasmMemory = null;
 let asyncifyDataPtr; // Where the unwind/rewind data structure will live.
@@ -84,6 +86,10 @@ wasmApi.getElementAttribute = (elementName, propName) => {
     if (nonAttributeProps.includes(prop)) result = document.getElementById(toJsString(elementName))[prop];
     else result = document.getElementById(toJsString(elementName)).getAttribute(prop);
     return toWasmString(result);
+}
+
+wasmApi.removeElementAttribute = (elementName, propName) => {
+    document.getElementById(toJsString(elementName)).removeAttribute(toJsString(propName));
 }
 
 wasmApi.getElementDimensions = (elementName, pResult) => {
@@ -242,10 +248,14 @@ wasmApi.usleep = (ms) => {
 // Async Operations APIs
 
 wasmApi.sendRequest = (method, uri, headers, body, timeoutInMs, cbId) => {
+    const controllerId = ++requestControllerCounter;
     const controller = new AbortController();
+    controller.cbId = cbId;
+    requestControllers[controllerId] = controller;
     const signal = controller.signal;
     const timeoutId = setTimeout(() => {
         controller.abort();
+        delete requestControllers[controllerId];
         onEvent(cbId, false, 'sendRequest', {
             status: 0,
             body: "Connection timeout"
@@ -264,6 +274,7 @@ wasmApi.sendRequest = (method, uri, headers, body, timeoutInMs, cbId) => {
         body: toJsString(body),
         signal
     }).then(response => {
+        delete requestControllers[controllerId];
         return response.text().then(bodyText => {
             clearTimeout(timeoutId);
             onEvent(cbId, false, 'sendRequest', {
@@ -273,12 +284,23 @@ wasmApi.sendRequest = (method, uri, headers, body, timeoutInMs, cbId) => {
             });
         });
     }).catch(err => {
+        delete requestControllers[controllerId];
         clearTimeout(timeoutId);
         onEvent(cbId, false, 'sendRequest', {
             status: 0,
             body: err.message
         });
     });
+    return controllerId;
+}
+
+wasmApi.cancelRequest = (requestId) => {
+    const controller = requestControllers[requestId];
+    if (controller) {
+        controller.abort();
+        onEvent(controller.cbId, false, '_abort_', {});
+        delete requestControllers[requestId];
+    }
 }
 
 wasmApi.startTimer = (duration, cbId) => {
@@ -938,6 +960,7 @@ const eventPropMap = {
     visibilitychange: [],
     requestWakeLock: ['result'],
     exitWakeLock: ['result'],
+    _abort_: [],
 };
 
 function pickNeededEventData(eventName, event) {
