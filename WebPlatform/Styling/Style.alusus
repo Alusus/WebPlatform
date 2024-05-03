@@ -15,7 +15,6 @@
         generateTypedStyleProp[width, "width", Length];
         generateTypedStyleProp[height, "height", Length];
         generateTypedStyleProp[minWidth, "min-width", Length];
-        generateTypedStyleProp[letterSpacing, "letter-spacing", Length];
         generateTypedStyleProp[minHeight, "min-height", Length];
         generateTypedStyleProp[maxWidth, "max-width", Length];
         generateTypedStyleProp[maxHeight, "max-height", Length];
@@ -43,6 +42,7 @@
         generateTypedStyleProp[textDecorationThickness, "text-decoration-thickness", Length];
         generateTypedStyleProp[direction, "direction", Direction];
         generateTypedStyleProp[fontSize, "font-size", Length];
+        generateTypedStyleProp[letterSpacing, "letter-spacing", Length];
         generateTypedStyleProp[lineHeight, "line-height", Length];
         generateTypedStyleProp[fontColor, "color", Color];
         generateStringStyleProp[fontFamily, "font-family"];

@@ -55,6 +55,7 @@ padding: Length4
 fontSize: Length
 color: Color
 fontWeight: Length
+letterSpacing: Length
 lineHeight: Length
 opacity: Int
 transform: Transform
@@ -111,6 +112,7 @@ style type.
 * `fontSize` Font size.
 * `fontColor` Font color.
 * `fontWeight` Font weight.
+* `letterSpacing` To control the distance between letters.
 * `lineHeight` Line height. Useful in increasing or decreasing the space between lines.
 * `opacity` Item opacity.
 * `transform` Transformations applied on the item.
@@ -442,7 +444,7 @@ This class defines the following measuring units:
 
 `percent` a percentage of the container component.
 
-`auto` the auto value from CSS.
+`auto` the "auto" value from CSS.
 
 Each of these units is a function that creates an instance of type `Length4` and gives it the
 values that were passed as args to the function. The return value is of type `SrdRef[Length4]`.
@@ -549,7 +551,7 @@ Describes the properties of an element's background. It has three initializer fu
   angle of the gradient. The second argument is the number of color tuples that describes the
   gradient. Each touple consists of a `Color` followed by an `Int` representing the percentage
   of the total distance at which that color starts.
-* The fourth initializer creates a background with a string like 'none'.
+* The fourth initializer creates a background that is initialized with a string value.
 
 
 ### Flex
