@@ -442,6 +442,8 @@ This class defines the following measuring units:
 
 `percent` a percentage of the container component.
 
+`auto` the auto value from CSS.
+
 Each of these units is a function that creates an instance of type `Length4` and gives it the
 values that were passed as args to the function. The return value is of type `SrdRef[Length4]`.
 For example:
@@ -536,6 +538,7 @@ class Background {
             s: ref[BackgroundSize]
         ): SrdRef[Background];
     handler this_type(degree: Int, count: Int, args: ...any): SrdRef[Background];
+    handler this_type(v : String): SrdRef[Background];
 }
 ```
 
@@ -546,6 +549,7 @@ Describes the properties of an element's background. It has three initializer fu
   angle of the gradient. The second argument is the number of color tuples that describes the
   gradient. Each touple consists of a `Color` followed by an `Int` representing the percentage
   of the total distance at which that color starts.
+* The fourth initializer creates a background with a string like 'none'.
 
 
 ### Flex
