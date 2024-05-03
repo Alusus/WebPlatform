@@ -60,6 +60,9 @@
         defineInitializer[vmax, "vmax"];
         defineInitializer[em, "em"];
         defineInitializer[percent, "%"];
+        func auto(): Length4 {
+            return Length4(Length.auto())
+        }
 
         handler this.toString(): String {
             return String.format(

@@ -42,6 +42,7 @@
         generateTypedStyleProp[textDecorationThickness, "text-decoration-thickness", Length];
         generateTypedStyleProp[direction, "direction", Direction];
         generateTypedStyleProp[fontSize, "font-size", Length];
+        generateTypedStyleProp[letterSpacing, "letter-spacing", Length];
         generateTypedStyleProp[lineHeight, "line-height", Length];
         generateTypedStyleProp[fontColor, "color", Color];
         generateStringStyleProp[fontFamily, "font-family"];

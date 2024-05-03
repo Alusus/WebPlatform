@@ -171,6 +171,7 @@
                 حجم_الخط: fontSize؛
                 لون_الخط: fontColor؛
                 سمك_الخط: fontWeight؛
+                تباعد_الحروف: letterSpacing؛
                 ارتفاع_الكتابة: lineHeight؛
                 الشفافية: opacity؛
                 التحول: transform؛
