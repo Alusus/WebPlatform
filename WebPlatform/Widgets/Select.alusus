@@ -68,7 +68,7 @@
                 }
                 setElementAttribute(this.id, "innerHTML", htmlVal);
                 if this.ariaHidden == true{
-                    setElementAttribute(this.id, String("aria-hidden"),String("true"));
+                    setElementAttribute(this.id, "aria-hidden", "true");
                 }
             }
         }

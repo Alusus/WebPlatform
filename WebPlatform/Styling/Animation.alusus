@@ -53,12 +53,18 @@
         handler this.update() {
             if this.buildCounter == 0 return;
 
-            def cssString: String = String("@keyframes ") + this.name + String(" {");
+            def cssString: StringBuilder;
+            cssString += "@keyframes ";
+            cssString += this.name;
+            cssString += " {";
             def i: Int;
             for i = 0, i < this.styles.getLength(), ++i {
-                cssString = cssString + this.styles.keyAt(i) + "% {" + this.styles(i).getCssString() + "}";
+                cssString += this.styles.keyAt(i);
+                cssString += "% {";
+                cssString += this.styles(i).getCssString();
+                cssString += "}";
             }
-            cssString += String("}");
+            cssString += "}";
             setElementAttribute(this.name, "innerHTML", cssString);
         }
 

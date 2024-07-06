@@ -127,14 +127,14 @@
                 setElementAttribute(this.id, "type", this.inputType);
                 setElementAttribute(this.id, "placeholder", this.placeholder);
                 if this.ariaHidden == true {
-                    setElementAttribute(this.id, String("aria-hidden"), String("true"));
+                    setElementAttribute(this.id, "aria-hidden", "true");
                 } else {
-                    removeElementAttribute(this.id, String("aria-hidden"));
+                    removeElementAttribute(this.id, "aria-hidden");
                 }
                 if this.disabled == true {
-                    setElementAttribute(this.id, String("disabled"), String("true"));
+                    setElementAttribute(this.id, "disabled", "true");
                 } else {
-                    removeElementAttribute(this.id, String("disabled"));
+                    removeElementAttribute(this.id, "disabled");
                 }
             }
         }

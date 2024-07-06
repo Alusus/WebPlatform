@@ -48,10 +48,10 @@
                 this.updateCommon();
                 setElementAttribute(this.id, "innerText", this.text);
                 if this.ariaHidden == true {
-                   setElementAttribute(this.id, String("aria-hidden"), String("true"));
+                   setElementAttribute(this.id, "aria-hidden", "true");
                 }
                 if this.targetId != "" {
-                   setElementAttribute(this.id, String("for"), this.targetId);
+                   setElementAttribute(this.id, "for", this.targetId);
                 }
             }
         }
