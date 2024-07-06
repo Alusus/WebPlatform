@@ -1067,8 +1067,10 @@ async function start(moduleName) {
 
     asyncifyDataPtr = program.instance.exports.malloc(STACK_SIZE + 8);
 
-    // Call global constructors.
-    const programConstructors=Object.keys(program.instance.exports).filter(name => name.match(/^__constructor__/));
+    // Call global constructors in reverse order to run subdependencies first.
+    const programConstructors = Object.keys(program.instance.exports)
+      .filter(name => name.match(/^__constructor__/))
+      .reverse();
     programConstructors.forEach(name => {
         program.instance.exports[name]()
     });
