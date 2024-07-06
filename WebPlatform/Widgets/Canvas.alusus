@@ -24,9 +24,9 @@
         //-------------------
         // Function Overrides
 
-        handler (this:Widget).build (ownerId: String) set_ptr {
+        handler (this:Widget).build (ownerId: String, nextSiblingId: String) set_ptr {
             this.id = getNewId();
-            createElement("canvas", this.id, ownerId);
+            createElement("canvas", this.id, ownerId, nextSiblingId);
             this.resourceId = registerElementAsResource(this.id);
             this.buildCommon();
             this.update();

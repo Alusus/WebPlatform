@@ -29,9 +29,9 @@
         //-------------------
         // Function Overrides
 
-        handler (this:Widget).build (ownerId: String) set_ptr {
+        handler (this:Widget).build (ownerId: String, nextSiblingId: String) set_ptr {
             this.id = getNewId();
-            createElement("iframe", this.id, ownerId);
+            createElement("iframe", this.id, ownerId, nextSiblingId);
             this.buildCommon();
             this.update();
         }

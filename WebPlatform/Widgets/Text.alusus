@@ -28,9 +28,9 @@
         //-------------------
         // Function Overrides
 
-        handler (this:Widget).build (ownerId: String) set_ptr {
+        handler (this:Widget).build (ownerId: String, nextSiblingId: String) set_ptr {
             this.id = getNewId();
-            createElement(this.tag, this.id, ownerId);
+            createElement(this.tag, this.id, ownerId, nextSiblingId);
             this.buildCommon();
             this.update();
         }

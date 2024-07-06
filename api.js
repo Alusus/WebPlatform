@@ -29,10 +29,15 @@ const resizeObserver = new ResizeObserver(entries => {
 
 // Element Management APIs
 
-wasmApi.createElement = (elementType, elementName, parentName) => {
+wasmApi.createElement = (elementType, elementName, parentName, nextSiblingName) => {
     const parent = document.getElementById(toJsString(parentName));
     const element = document.createElement(toJsString(elementType));
-    parent.appendChild(element);
+    if (nextSiblingName === 0) {
+      parent.appendChild(element);
+    } else {
+      const nextSibling = document.getElementById(toJsString(nextSiblingName));
+      parent.insertBefore(element, nextSibling);
+    }
     element.setAttribute('id', toJsString(elementName));
 }
 

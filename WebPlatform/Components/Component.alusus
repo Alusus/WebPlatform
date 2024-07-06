@@ -5,6 +5,7 @@
         @injection def widget: Widget;
         def _view: SrdRef[Widget];
         def ownerId: String;
+        def nextSiblingId: String;
 
         //---------
         // Handlers
@@ -14,7 +15,7 @@
         handler this.view = SrdRef[Widget] {
             if this.id != "" this.unbuild();
             this._view = value;
-            if this.ownerId != "" this.build(this.ownerId);
+            if this.ownerId != "" this.build(this.ownerId, this.nextSiblingId);
             return this._view;
         }
 
@@ -33,11 +34,12 @@
         //-------------------
         // Function Overrides
 
-        handler (this:Widget).build (ownerId: String) set_ptr {
+        handler (this:Widget).build (ownerId: String, nextSiblingId: String) set_ptr {
             this.beforeBuild();
-            if this._view.obj~ptr != 0 this._view.build(ownerId);
+            if this._view.obj~ptr != 0 this._view.build(ownerId, nextSiblingId);
             this.id = this._view.id;
             this.ownerId = ownerId;
+            this.nextSiblingId = nextSiblingId;
             this.afterBuild();
         }
 

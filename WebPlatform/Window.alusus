@@ -112,7 +112,7 @@
         handler this.setView(v: SrdRef[Widget]) {
             this.unsetView();
             this.view = v;
-            this.view.build(String("body"));
+            this.view.build(String("body"), String());
         }
 
         handler this.unsetView() {

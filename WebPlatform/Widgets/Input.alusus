@@ -95,9 +95,9 @@
         //-------------------
         // Function Overrides
 
-        handler (this:Widget).build (ownerId: String) set_ptr {
+        handler (this:Widget).build (ownerId: String, nextSiblingId: String) set_ptr {
             this.id = getNewId();
-            createElement("input", this.id, ownerId);
+            createElement("input", this.id, ownerId, nextSiblingId);
             this.buildCommon();
             this.update();
             this.onSignalConnectionsChanged(this.onChanged~ptr, this.onChanged.getConnectionCount());
