@@ -96,7 +96,8 @@
         }
 
         handler this.getCssString(): String {
-            def styleRep: String;
+            def memSize: ArchInt = 100*(this.props.getLength() + this.transitions.getLength());
+            def styleRep: StringBuilder(memSize, memSize);
             def i: Int;
             for i = 0, i < this.props.getLength(), ++i {
                 styleRep += this.props.keyAt(i) + ":" + this.props.valAt(i) + ";";
@@ -110,8 +111,8 @@
                 styleRep += ";";
             }
             if !this.vanimation.isNull() {
-                styleRep += String.format("animation-name:%s;", this.vanimation.name.buf);
-                styleRep += String.format("animation-duration:%fs;", this.vanimation.totalDuration);
+                styleRep.format("animation-name:%s;", this.vanimation.name.buf);
+                styleRep.format("animation-duration:%fs;", this.vanimation.totalDuration);
             }
             return styleRep;
         }

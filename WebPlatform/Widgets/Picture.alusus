@@ -22,16 +22,16 @@
         handler this.setChild (child: temp_ref[SrdRef[Image]]) {
             if this.child.obj~ptr != 0 this.child.unbuild();
             this.child = child;
-            if this.child.obj~ptr != 0 && this.id.getLength() > 0 this.child.build(this.id);
+            if this.child.obj~ptr != 0 && this.id.getLength() > 0 this.child.build(this.id, String());
         }
 
-        handler (this:Widget).build (ownerId: String) set_ptr {
+        handler (this:Widget).build (ownerId: String, nextSiblingId: String) set_ptr {
             this.id = getNewId();
-            createElement("picture", this.id, ownerId);
+            createElement("picture", this.id, ownerId, nextSiblingId);
             this.buildCommon();
             this.update();
 
-            if this.child.obj~ptr != 0 this.child.build(this.id);
+            if this.child.obj~ptr != 0 this.child.build(this.id, String());
         }
 
         handler (this:Widget).unbuild() set_ptr {

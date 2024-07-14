@@ -518,7 +518,10 @@
     @دمج صنف صـندوق {
         عرف فروع: لقب children؛
         عرف أضف_فروع: لقب addChildren؛
+        عرف أضف_فروعا: لقب addChildren؛
+        عرف احشر_فرعا: لقب insertChild؛
         عرف أزل_فروع: لقب removeChildren؛
+        عرف أزل_فروعا: لقب removeChildren؛
         عرف أزل_كل_الفروع: لقب removeAllChildren؛
     }
 

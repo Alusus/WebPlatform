@@ -48,7 +48,7 @@
         //-------------------
         // Abstract Functions
 
-        handler this.build(ownerId: String) as_ptr;
+        handler this.build(ownerId: String, nextSiblingId: String) as_ptr;
         handler this.unbuild() as_ptr;
         handler this.update() as_ptr;
 

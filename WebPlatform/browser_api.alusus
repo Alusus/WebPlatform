@@ -1,6 +1,17 @@
 @merge module WebPlatform {
     // Element Management
-    @expname[createElement] function createElement (type: ptr[Char], name: ptr[Char], parent: ptr[Char]);
+    @expname[createElement] function _createElement (
+        elementType: ptr[Char], name: ptr[Char], parent: ptr[Char], nextSibling: ptr[Char]
+    );
+    function createElement (
+        elementType: ptr[Char], name: ptr[Char], parent: ptr[Char], nextSibling: ptr[Char]
+    ) {
+        if nextSibling~cnt == 0 nextSibling = 0;
+        _createElement(elementType, name, parent, nextSibling);
+    }
+    function createElement (elementType: ptr[Char], name: ptr[Char], parent: ptr[Char]) {
+        _createElement(elementType, name, parent, 0);
+    }
     @expname[deleteElement] function deleteElement (name: ptr[Char]);
     @expname[setStyleRule] function setStyleRule (name: ptr[Char], selector: ptr[Char], css: ptr[Char]);
     @expname[removeStyleRule] function removeStyleRule (name: ptr[Char], selector: ptr[Char]);

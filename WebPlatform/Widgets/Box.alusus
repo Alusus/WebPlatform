@@ -16,8 +16,18 @@
             while count-- > 0 {
                 def child: ref[SrdRef[Widget]](children~next_arg[ref[SrdRef[Widget]]]);
                 this.children.add(child);
-                if this.id.getLength() > 0 child.build(this.id);
+                if this.id != "" child.build(this.id, String());
             }
+        }
+
+        handler this.insertChild (index: Int, child: SrdRef[Widget]) {
+            if index < 0 index = 0
+            else if index >= this.children.getLength() {
+                this.addChildren({ child });
+                return;
+            }
+            this.children.insert(index, child);
+            if this.id != "" child.build(this.id, this.children(index + 1).id);
         }
 
         handler this.removeChildren (count: Int, children: ...temp_ref[SrdRef[Widget]]) {
@@ -45,14 +55,14 @@
         //-------------------
         // Function Overrides
 
-        handler (this:Widget).build (ownerId: String) set_ptr {
+        handler (this:Widget).build (ownerId: String, nextSiblingId: String) set_ptr {
             this.id = getNewId();
-            createElement("div", this.id, ownerId);
+            createElement("div", this.id, ownerId, nextSiblingId);
             this.buildCommon();
             this.update();
             def i: Int;
             for i = 0, i < this.children.getLength(), ++i {
-                this.children(i).build(this.id);
+                this.children(i).build(this.id, String());
             }
         }
 

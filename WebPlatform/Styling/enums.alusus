@@ -1,7 +1,7 @@
 @merge module WebPlatform {
     macro setupStringEnum {
         def val: String;
-        handler this~init(v: CharsPtr) { this.val = v; }
+        handler this~init(v: CharsPtr) { this.val = String(1, v); }
         handler this.toString(): String { return this.val; }
     }
 

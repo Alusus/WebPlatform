@@ -1,5 +1,6 @@
 import "Srl/Console";
 import "Srl/String";
+import "Srl/StringBuilder";
 import "Srl/Array";
 import "Srl/System";
 import "Srl/Fs";

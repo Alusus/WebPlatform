@@ -28,9 +28,9 @@
         //-------------------
         // Function Overrides
 
-        handler (this:Widget).build (ownerId: String) set_ptr {
+        handler (this:Widget).build (ownerId: String, nextSiblingId: String) set_ptr {
             this.id = getNewId();
-            createElement(this.tag, this.id, ownerId);
+            createElement(this.tag, this.id, ownerId, nextSiblingId);
             this.buildCommon();
             this.update();
         }
@@ -48,10 +48,10 @@
                 this.updateCommon();
                 setElementAttribute(this.id, "innerText", this.text);
                 if this.ariaHidden == true {
-                   setElementAttribute(this.id, String("aria-hidden"), String("true"));
+                   setElementAttribute(this.id, "aria-hidden", "true");
                 }
                 if this.targetId != "" {
-                   setElementAttribute(this.id, String("for"), this.targetId);
+                   setElementAttribute(this.id, "for", this.targetId);
                 }
             }
         }

@@ -171,6 +171,10 @@ This class represents a rectangle area that contains other widgets.
 
 ##### addChildren
 
+```
+handler this.addChildren (count: Int, children: ...temp_ref[SrdRef[Widget]]);
+```
+
 A method to add a new child or more to this box.
 
 parameters:
@@ -179,7 +183,25 @@ parameters:
 
 * `children` the children we want to add, which are widgets.
 
+##### insertChild
+
+```
+handler this.insertChild (index: Int, child: SrdRef[Widget]);
+```
+
+Inserts a child at the spefcified index.
+
+parameters:
+
+* `index` The index at which to insert the widget.
+
+* `child` the widget to be inserted.
+
 ##### removeChildren
+
+```
+handler this.removeChildren (count: Int, children: ...temp_ref[SrdRef[Widget]]);
+```
 
 A method to remove children from this box.
 

@@ -26,7 +26,7 @@
         handler this.setChild (child: temp_ref[SrdRef[Widget]]) {
             if this.child.obj~ptr != 0 this.child.unbuild();
             this.child = child;
-            if this.child.obj~ptr != 0 && this.id.getLength() > 0 this.child.build(this.id);
+            if this.child.obj~ptr != 0 && this.id.getLength() > 0 this.child.build(this.id, String());
         }
 
         handler this.onPropUpdated() this.update();
@@ -34,13 +34,13 @@
         //-------------------
         // Function Overrides
 
-        handler (this:Widget).build (ownerId: String) set_ptr {
+        handler (this:Widget).build (ownerId: String, nextSiblingId: String) set_ptr {
             this.id = getNewId();
-            createElement("a", this.id, ownerId);
+            createElement("a", this.id, ownerId, nextSiblingId);
             this.buildCommon();
             this.update();
 
-            if this.child.obj~ptr != 0 this.child.build(this.id);
+            if this.child.obj~ptr != 0 this.child.build(this.id, String());
         }
 
         handler (this:Widget).unbuild() set_ptr {
