@@ -23,6 +23,12 @@
             this.text = t;
         }
 
+        handler this~init(tag: String, text: String) {
+            this.tag = tag;
+            this.ariaHidden = false;
+            this.text = text;
+        }
+
         handler this.onPropUpdated() this.update();
 
         //-------------------
@@ -66,6 +72,12 @@
         handler this_type(t: String): SrdRef[Text] {
             def r: SrdRef[Text];
             r.alloc()~init(t);
+            return r;
+        }
+
+        handler this_type(tag: String, text: String): SrdRef[Text] {
+            def r: SrdRef[Text];
+            r.alloc()~init(tag, text);
             return r;
         }
     }

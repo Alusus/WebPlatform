@@ -253,6 +253,18 @@ A class that represents an image.
 
 A class for displaying static text.
 
+#### Initialization
+
+```
+Text();
+Text(text: String);
+Text(tag: String, text: String);
+```
+
+The third version of the initialization function allows the user to specify the HTML tag to use
+to render the text. By default this widget uses `span`, but with the third init function the user
+can specify a different tag, like `h1` for example.
+
 #### Properties
 
 * `text`: `String`. The text of this component.
