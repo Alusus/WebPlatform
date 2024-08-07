@@ -1,0 +1,130 @@
+@merge module WebPlatform {
+    //==========================================================================
+    // Video
+    class Video {
+        @injection def widget: Widget;
+
+        //-----------
+        // Properties
+        generateProperty[sourceArray, SourceArray, Array[VideoSource]];
+        generateProperty[trackArray, TrackArray, Array[VideoTrack]];
+        generateProperty[controls, Controls, bool];
+        generateProperty[autoplay, Autoplay, bool];
+
+
+        //---------
+        // Handlers
+
+        handler this~init() {
+        }
+        handler this.onPropUpdated() this.update();
+
+        //-------------------
+        // Function Overrides
+
+        handler (this:Widget).build (ownerId: String, nextSiblingId: String) set_ptr {
+            this.id = getNewId();
+            createElement("video", this.id, ownerId, nextSiblingId);
+            this.buildCommon();
+            this.update();
+
+
+        }
+
+        handler (this:Widget).unbuild() set_ptr {
+            if this.id.getLength() > 0 {
+                deleteElement(this.id);
+                this.unbuildCommon();
+                this.id = String();
+            }
+        }
+
+        handler (this:Widget).update() set_ptr {
+            if this.id.getLength() > 0 {
+                this.updateCommon();
+                if this.controls == true setElementAttribute(this.id, "controls", "controls");
+                if this.autoplay == true { setElementAttribute(this.id, "autoplay", "autoplay"); setElementAttribute(this.id, "muted", "muted"); }
+                def i: Int = 0;
+                def htmlVal: String="";
+                for i=0,i<this.sourceArray.getLength() , i+=1{
+                    htmlVal += String.format(
+                        "<source src=\"%s\" type=\"video/%s\">",
+                        this.sourceArray(i).src.replace("\"", "\\\"").buf,
+                        this.sourceArray(i).videoType.replace("\"", "\\\"").buf
+                    );
+                }
+                for i=0,i<this.trackArray.getLength() , i+=1{
+                    htmlVal += String.format(
+                        "<track src=\"%s\" kind=\"%s\" srclang=\"%s\" label=\"%s\">",
+                        this.trackArray(i).src.replace("\"", "\\\"").buf,
+                        this.trackArray(i).kind.buf,
+                        this.trackArray(i).srclang.buf,
+                        this.trackArray(i).label.buf,
+                    );
+                }
+
+                setElementAttribute(this.id, "innerHTML", htmlVal);
+            }
+        }
+
+        //-----------------
+        // Shared Functions
+
+        handler this_type(): SrdRef[Video] {
+            def r: SrdRef[Video];
+            r.alloc()~init();
+            return r;
+        }
+    }
+
+    //==========================================================================
+    // VideoSource
+    // Video source used by the Video wiedget.
+    class VideoSource {
+        def src: String = "";
+        def videoType: String = "";
+
+        handler this~init() {}
+        handler this~init(src : String , videoType : String) {
+            this.src = src;
+            this.videoType = videoType;
+        }
+        handler this~init(temp_ref[VideoSource]) {
+            this = value;
+        }
+        handler this = temp_ref[VideoSource] {
+            this.src = value.src;
+            this.videoType = value.videoType;
+        }
+        handler this == ref[VideoSource] : bool {
+            if (this.src==value.src )
+                return true;
+            return false;
+        }
+        handler this != ref[VideoSource] : bool {
+            return !(this == value);
+        }
+    }
+
+    class VideoTrack {
+        def src: String = "";
+        def kind: String = "";
+        def srclang: String = "";
+        def label: String = "";
+
+
+        handler this~init() {}
+        handler this~init(src : String , videoType : String) {
+            this.src = src;
+            this.videoType = videoType;
+        }
+        handler this~init(temp_ref[VideoTrack]) {
+            this = value;
+        }
+        handler this = temp_ref[VideoTrack] {
+            this.src = value.src;
+            this.videoType = value.videoType;
+        }
+    }
+}
+
