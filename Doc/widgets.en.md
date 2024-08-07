@@ -249,6 +249,39 @@ A class that represents an image.
 * `url`: `String`. The URL of the image's source.
 
 
+### Video
+
+A class that represents a video.
+
+#### Properties
+
+* `sourceArray`: ` Array[VideoSource]`. The sources and types  of the video.
+* `trackArray`: ` Array[VideoTrack]`. The tracks and subtitles of the video.
+* `controls`: ` bool`. The video have controls button or not.
+* `autoplay`: ` bool`. The video will be auto played or not.
+
+
+### VideoSource
+
+A class that represents a video source.
+
+#### Properties
+
+* `src`: ` String`. The source of the video.
+* `videoType`: ` String`. The type of the video.
+
+
+### VideoTrack
+
+A class that represents a video track like subtitle.
+
+#### Properties
+
+* `src`: ` String`. The source of the track.
+* `kind`: ` String`. The kind of the track.
+* `srclang`: ` String`. The language of the track.
+* `label`: ` String`. The label of the track.
+
 ### Text
 
 A class for displaying static text.
