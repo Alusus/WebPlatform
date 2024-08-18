@@ -428,6 +428,16 @@ parameters:
 
 A class used to show an HTML or Markdown document.
 
+#### Initialization
+
+```
+DocView();
+DocView(html: String);
+```
+
+The second version of the initialization function creates a new DocView and initializes it with
+the provided HTML text.
+
 #### Operations
 
 ##### setHtml
