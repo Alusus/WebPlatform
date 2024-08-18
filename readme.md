@@ -30,6 +30,7 @@ Apm.importFile("Alusus/WebPlatform");
 * [[Resources]](Doc/resources.en.md)
 * [[Drawing]](Doc/drawing.en.md)
 * [[RegExp]](Doc/regexp.en.md)
+* [[Javascript Functions and Variables]](Doc/js_funcs.en.md)
 * Examples
   * [[Chat Application]](Doc/chat_example.en.md)
   * [[Dealing with the Canvas]](Doc/canvas_example.en.md)
