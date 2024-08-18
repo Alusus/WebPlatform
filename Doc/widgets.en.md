@@ -282,6 +282,39 @@ A class that represents a video track like subtitle.
 * `srclang`: ` String`. The language of the track.
 * `label`: ` String`. The label of the track.
 
+### Picture
+
+A class that represents a Picture.
+
+#### Properties
+
+* `sourceArray`: ` Array[ImageSource]`. The sources and max width  of the Picture.
+
+#### Operations
+
+##### setChild
+
+```
+handler this.setChild (child: temp_ref[SrdRef[Image]]);
+```
+
+Sets the child component of this Picture.
+
+parameters:
+
+* `child` the Image we want displayed inside the Picture.
+
+
+### ImageSource
+
+A class that represents a Picture source.
+
+#### Properties
+
+* `src`: ` String`. The source of the Image.
+* `maxWidth`: ` String`. The max width of the Image.
+
+
 ### Text
 
 A class for displaying static text.
