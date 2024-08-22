@@ -65,5 +65,9 @@
         handler this_type(): SrdRef[DocView] {
             return SrdRef[DocView].construct();
         }
+
+        handler this_type(t: String): SrdRef[DocView] {
+            return SrdRef[DocView]().{ alloc()~init(t) };
+        }
     }
 }

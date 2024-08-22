@@ -1058,6 +1058,11 @@ function toWasmStringArray(strs) {
     return wasmStrPtr;
 }
 
+function pushLocation(url) {
+    window.history.pushState({}, null, url);
+    window["onpopstate"]({ preventDefault: () => {}, state: {} });
+}
+
 // Main Functions
 
 async function loadWasm(filename, importTable) {

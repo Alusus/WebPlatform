@@ -37,6 +37,7 @@ Apm.importFile("Alusus/WebPlatform");
 * [[الموارد (Resources)]](Doc/resources.ar.md)
 * [[رسـم (Drawing)]](Doc/drawing.ar.md)
 * [[تـعبير_نمطي (RegExp)]](Doc/regexp.ar.md)
+* [[دالات والمتغيرات جافاسكريبت]](Doc/js_funcs.ar.md)
 * أمثلة
   * [[تطبيق دردشة]](Doc/chat_example.ar.md)
   * [[التعامل مع المرسم]](Doc/canvas_example.ar.md)
