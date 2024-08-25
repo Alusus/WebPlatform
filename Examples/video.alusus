@@ -11,75 +11,43 @@ func video {
         padding = Length4.pt(0);
         margin = Length4.pt(0);
     };
-    Window.instance.setView(Box({}).{
+    Window.instance.setView(Box({ }).{
         style.{
             display = Display.FLEX;
             layout = Layout.COLUMN;
         };
         addChildren({
-            Text(String("video Example")).{ style.{
-                fontColor = Color(0, 0, 0);
-                fontSize = Length.pt(30.0);
-            } },
-            Video().{
-
-                    style.{
-                        width = Length.percent(100);
-                        height = Length.percent(100);
-                        background = Background(Color("fff"));
-                        fontSize = Length.pt(12.0);
-                    };
-                    def src : Array[VideoSource];
-                    def vs : VideoSource(String("https://static.vecteezy.com/system/resources/previews/001/622/851/mp4/mobile-and-website-designer-designing-a-mobile-application-free-video.mp4"),String("mp4"));
-                    src.add(vs);
-                    sourceArray = src;
-                    controls = true;
-
+            Text(String("video Example")).{
+                style.{
+                    fontColor = Color(0, 0, 0);
+                    fontSize = Length.pt(30.0);
                 }
+            },
+            Video().{
+                style.{
+                    width = Length.percent(100);
+                    height = Length.percent(100);
+                    background = Background(Color("fff"));
+                    fontSize = Length.pt(12.0);
+                };
+                def src: Array[VideoSource];
+                def vs: VideoSource(String("https://static.vecteezy.com/system/resources/previews/001/622/851/mp4/mobile-and-website-designer-designing-a-mobile-application-free-video.mp4"), String("mp4"));
+                src.add(vs);
+                sourceArray = src;
+                controls = true;
+            }
         })
     });
 
     runEventLoop();
 }
+
 mainAssetsPath = "Build/Assets/"؛
 uiEndpointsPath = "Build/UiEndpoints/"؛
 
-func startChatServer {
+func startServer {
     Console.print("Starting server on port 8010...\nURL: http://localhost:8010/\n");
     runServer({ "listening_ports", "8010", "static_file_max_age", "0" });
 }
 
-@expname[main]
-func start (argCount: Int، args: ptr[array[CharsPtr]]): Int {
-    mainAssetsPath = "Assets/"؛
-    uiEndpointsPath = "UiEndpoints/"؛
-
-    startChatServer()؛
-    return 0؛
-}
-
-func buildChat {
-    System.exec("cp -r Assets Build/")؛
-    def exe: Build.Exe(start~ast، "Build/chat")؛
-    exe.addDependencies(WebPlatform.getBuildDependencies())؛
-    if exe.generate() {
-        Console.print("Build complete.\n")؛
-    } else {
-        System.fail(1، "Build failed.")؛
-    }
-}
-
-if Process.argCount == 3 {
-    def arg: CharsPtr = Process.args~cnt(Process.argCount - 1)؛
-    if String.isEqual(arg، "build") {
-        buildChat()؛
-    } else {
-        Console.print(
-            "Error: Invalid argument\n"
-            "Usage:\n"
-            "  alusus chat.alusus [build]\n"
-        );
-    }
-} else {
-    startChatServer()؛
-}
+startServer()؛

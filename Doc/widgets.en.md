@@ -284,7 +284,7 @@ A class that represents a video track like subtitle.
 
 ### Picture
 
-A class that represents a Picture.
+A class that represents a picture HTML element.
 
 #### Properties
 
