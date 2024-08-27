@@ -29,7 +29,7 @@
             النسق = نـسق._عمود_؛
         }؛
         أضف_فروع({
-            كـتابة(نـص("مثال الدردشة")).{
+            كـتابة(نـص("مثال فيديو")).{
                 الطراز.{
                     لون_الخط = لـون(0، 0، 0)؛
                     حجم_الخط = مـسافة.نقاط(30.0)؛
@@ -41,12 +41,15 @@
                     الطول = مـسافة.مئوي(100)؛
                 };
                 عرف مصادر: مـصفوفة[مـصدر_فيديو];
-                عرف مصدر_فيديو: مـصدر_فيديو(نـص("https://static.vecteezy.com/system/resources/previews/001/622/851/mp4/mobile-and-website-designer-designing-a-mobile-application-free-video.mp4"), نـص("mp4"));
+                عرف مصدر_فيديو: مـصدر_فيديو(نـص(
+    ‏                "https://static.vecteezy.com/system/resources/previews/001/622/851/mp4/"
+                    ‏"mobile-and-website-designer-designing-a-mobile-application-free-video.mp4"
+                ), نـص("mp4"));
                 مصادر.أضف(مصدر_فيديو);
                 مصفوفة_مصدر = مصادر;
                 التحكمات = 1;
             }
-        })
+        })؛
     })؛
 
     نفذ_حلقة_معالجة_الأحداث()؛
@@ -63,4 +66,4 @@
     شغل_الخادم({ "listening_ports"، "8010"، "static_file_max_age"، "0" })؛
 }
 
-ابدأ_خادم()
+ابدأ_خادم()؛
