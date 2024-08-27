@@ -249,6 +249,72 @@ A class that represents an image.
 * `url`: `String`. The URL of the image's source.
 
 
+### Video
+
+A class that represents a video.
+
+#### Properties
+
+* `sourceArray`: ` Array[VideoSource]`. The sources and types  of the video.
+* `trackArray`: ` Array[VideoTrack]`. The tracks and subtitles of the video.
+* `controls`: ` bool`. The video have controls button or not.
+* `autoplay`: ` bool`. The video will be auto played or not.
+
+
+### VideoSource
+
+A class that represents a video source.
+
+#### Properties
+
+* `src`: ` String`. The source of the video.
+* `videoType`: ` String`. The type of the video.
+
+
+### VideoTrack
+
+A class that represents a video track like subtitle.
+
+#### Properties
+
+* `src`: ` String`. The source of the track.
+* `kind`: ` String`. The kind of the track.
+* `srclang`: ` String`. The language of the track.
+* `label`: ` String`. The label of the track.
+
+### Picture
+
+A class that represents a picture HTML element.
+
+#### Properties
+
+* `sourceArray`: ` Array[ImageSource]`. The sources and max width  of the Picture.
+
+#### Operations
+
+##### setChild
+
+```
+handler this.setChild (child: temp_ref[SrdRef[Image]]);
+```
+
+Sets the child component of this Picture.
+
+parameters:
+
+* `child` the Image we want displayed inside the Picture.
+
+
+### ImageSource
+
+A class that represents a Picture source.
+
+#### Properties
+
+* `src`: ` String`. The source of the Image.
+* `maxWidth`: ` String`. The max width of the Image.
+
+
 ### Text
 
 A class for displaying static text.
