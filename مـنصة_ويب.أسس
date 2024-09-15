@@ -676,6 +676,7 @@
 
     عرف أنشئ_انتقال_انزلاق_مكداس: لقب createSlideStackTransition؛
     عرف أنشئ_انتقال_تلاشي_مكداس: لقب createFadeStackTransition؛
+    عرف أنشئ_انتقال_تلاشي_مع_تحجيم_مكداس: لقب createFadeWithScaleStackTransition؛
 
     عرف مـكداس_توجيه: لقب RoutingStack؛
     @دمج صنف مـكداس_توجيه {

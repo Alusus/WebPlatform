@@ -167,28 +167,37 @@
     }
 
     func createFadeStackTransition (duration: Float, exiting: Bool): StackTransition {
-        def start: Float;
-        def end: Float;
+        return createFadeWithScaleStackTransition(duration, 1.0, exiting);
+    }
+
+    func createFadeWithScaleStackTransition (duration: Float, minScale: Float, exiting: Bool): StackTransition {
+        def startOpacity: Float;
+        def startScale: Float;
+        def endOpacity: Float;
+        def endScale: Float;
         if exiting {
-            start = 1.0;
-            end = 0.0;
+            startOpacity = 1.0;
+            endOpacity = 0.0;
+            startScale = 1.0;
+            endScale = minScale;
         } else {
-            start = 0.0;
-            end = 1.0;
+            startOpacity = 0.0;
+            endOpacity = 1.0;
+            startScale = minScale;
+            endScale = 1.0;
         }
         return StackTransition().{
             totalDuration = duration * 1000000;
             topViewStyle.{
-                left = "0";
-                opacity = end;
+                opacity = endOpacity;
+                transform = Transform.scale(endScale, endScale);
                 animation = Animation(duration, Array[Style]({
-                    Style().{ opacity = start },
-                    Style().{ opacity = end }
+                    Style().{ opacity = startOpacity; transform = Transform.scale(startScale, startScale) },
+                    Style().{ opacity = endOpacity; transform = Transform.scale(endScale, endScale) }
                 }));
-            };
+            }
         }
     }
 
     // TODO: Add more transitions.
 }
-
