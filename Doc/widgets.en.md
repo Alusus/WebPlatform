@@ -356,6 +356,9 @@ A text entry box.
 
 * `text`: `String`. The entered text.
 
+* `placeholder`: `String`. A value that appears before the user enters anything, to clarify what
+  to enter.
+
 #### Events
 
 ##### onChanged
