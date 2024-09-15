@@ -242,7 +242,7 @@ func main {
     canvasRes.drawLine(100, 0, 0, 100);
     def points: Array [Int]({ 25, 25, 75, 25, 75, 75, 25, 75 });
     canvasRes.drawPolygon(4, points.buf, false);
-    dynImg.initFromCanvas(canvasRes);
+    await(dynImg.initFromCanvas(canvasRes));
 
     // Animation loop.
     def x: Int = -80;
