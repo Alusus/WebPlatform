@@ -8,6 +8,8 @@
         //-----------------------
         // Properties and Signals
 
+        generateProperty[placeholder, Placeholder, String];
+
         def _text: String;
         handler this.setText (t: String) {
             this._text = t;
@@ -107,6 +109,7 @@
             if this.id.getLength() > 0 {
                 this.updateCommon();
                 setElementAttribute(this.id, "value", this._text);
+                setElementAttribute(this.id, "placeholder", this.placeholder);
             }
         }
 

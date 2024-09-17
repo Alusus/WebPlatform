@@ -585,6 +585,7 @@
     عرف مـدخل_نص: لقب TextInput؛
     @دمج صنف مـدخل_نص {
         عرب_خصلة[النص، _النص، text، Text]؛
+        عرب_خصلة[قيمة_وصفية، _قيمة_وصفية، placeholder، Placeholder]؛
         عرف عند_الغيير: لقب onChanged؛
         عرف عند_كبس_مفتاح: لقب onKeyPress؛
         عرف عند_انتهاء_الكبسة: لقب onKeyUp؛
@@ -676,6 +677,7 @@
 
     عرف أنشئ_انتقال_انزلاق_مكداس: لقب createSlideStackTransition؛
     عرف أنشئ_انتقال_تلاشي_مكداس: لقب createFadeStackTransition؛
+    عرف أنشئ_انتقال_تلاشي_مع_تحجيم_مكداس: لقب createFadeWithScaleStackTransition؛
 
     عرف مـكداس_توجيه: لقب RoutingStack؛
     @دمج صنف مـكداس_توجيه {
