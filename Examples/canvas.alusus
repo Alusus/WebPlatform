@@ -281,6 +281,14 @@ func main {
     runEventLoop();
 }
 
+mainAssetsPath = "Build/Assets/"؛
+uiEndpointsPath = "Build/UiEndpoints/"؛
 
-Console.print("Starting server on port 8010...\nURL: http://localhost:8010/\n");
-runServer({ "listening_ports", "8010", "static_file_max_age", "0" });
+function startMyServer() {
+    Console.print("Starting server on port 8010...\nURL: http://localhost:8010/\n");
+    WebPlatform.startServer({ "listening_ports", "8010", "static_file_max_age", "0" });
+    Console.print("Server is running.\n");
+    while 1 System.sleep(1000000);
+}
+
+startMyServer();
