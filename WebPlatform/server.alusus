@@ -260,7 +260,6 @@
     func prepareMainAssets {
         if mainAssetsPath == webPlatformPath return;
         System.exec(String.format("mkdir -p \"%s\"", mainAssetsPath.buf));
-        System.exec(String.format("cp %s/wasm.html \"%s/wasm.html\"", webPlatformPath.buf, mainAssetsPath.buf));
         System.exec(String.format("cp %s/api.js \"%s/api.js\"", webPlatformPath.buf, mainAssetsPath.buf));
     }
 
