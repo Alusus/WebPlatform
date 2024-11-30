@@ -1,0 +1,18 @@
+@merge module WebPlatform {
+    class SafeTimeout {
+        def timeoutHandler: ArchInt(0);
+
+        handler this~terminate() {
+            this.stop();
+        }
+
+        handler this.set(duration: Word, cb: closure (Json)) {
+            this.stop();
+            this.timeoutHandler = setTimeout(duration, cb);
+        }
+
+        handler this.cancel() {
+            if this.timeoutHandler != 0 cancelTimeout(this.timeoutHandler);
+        }
+    }
+}
