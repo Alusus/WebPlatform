@@ -21,6 +21,7 @@
 
     function addEventHandler (cb: closure (Json)): ArchInt {
         ++eventIdCounter;
+        if eventIdCounter == 0 eventIdCounter = 1;
         eventHandlers.add(EventHandler(cb, eventIdCounter));
         return eventHandlers.getLength() - 1;
     }
