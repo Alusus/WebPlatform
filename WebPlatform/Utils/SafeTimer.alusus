@@ -1,0 +1,18 @@
+@merge module WebPlatform {
+    class SafeTimer {
+        def timerHandler: ArchInt(0);
+
+        handler this~terminate() {
+            this.stop();
+        }
+
+        handler this.start(duration: Word, cb: closure (Json)) {
+            this.stop();
+            this.timerHandler = startTimer(duration, cb);
+        }
+
+        handler this.stop() {
+            if this.timerHandler != 0 stopTimer(this.timerHandler);
+        }
+    }
+}

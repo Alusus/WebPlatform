@@ -1,0 +1,28 @@
+@merge module WebPlatform {
+    class SafeRequest {
+        def requestId: ArchInt(0);
+
+        handler this~terminate() {
+            this.cancel();
+        }
+
+        handler this.send (
+            method: ptr[Char], uri: ptr[Char], headers: ptr[Char], body: ptr[Char], timeoutInMs: Int, cb: closure (Json)
+        ): Bool {
+            if this.requestId != 0 return false;
+            this.requestId = sendRequest(method, uri, headers, body, timeoutInMs, closure (json: Json) {
+                this.requestId = 0;
+                cb(json);
+            });
+            return true;
+        }
+
+        handler this.cancel() {
+            if this.requestId != 0 cancelRequest(this.requestId);
+        }
+
+        handler this.inProgress: Bool {
+            return this.requestId != 0;
+        }
+    }
+}

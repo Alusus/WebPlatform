@@ -37,6 +37,9 @@ Apm.importFile("Alusus/WebPlatform");
 * [[الموارد (Resources)]](Doc/resources.ar.md)
 * [[رسـم (Drawing)]](Doc/drawing.ar.md)
 * [[تـعبير_نمطي (RegExp)]](Doc/regexp.ar.md)
+* [[نـداء_آمن (SafeRequest)]](Doc/saferequest.ar.md)
+* [[مـؤقت_متكرر_آمن (SafeTimer)]](Doc/safetimer.ar.md)
+* [[مـؤقت_آمن (SafeTimeout)]](Doc/safetimeout.ar.md)
 * [[دالات والمتغيرات جافاسكريبت]](Doc/js_funcs.ar.md)
 * أمثلة
   * [[تطبيق دردشة]](Doc/chat_example.ar.md)
