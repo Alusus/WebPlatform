@@ -402,7 +402,7 @@
 
 طـرفية.اطبع("تشغيل الخادم على المنفذ 8010...\nURL: http://localhost:8010/\n")؛
 // نبدأ تشغيل السيرفر على المنفذ 8010
-شغل_الخادم ({ "listening_ports"، "8010"، "static_file_max_age"، "0" })؛
+ابن_وشغل_الخادم(مـصفوفة[مـؤشر_محارف]({ "listening_ports"، "8010"، "static_file_max_age"، "0" }))؛
 ```
 
 </div>
@@ -780,6 +780,6 @@ func main {
 
 Console.print("Starting server on port 8010...\nURL: http://localhost:8010/\n");
 // نبدأ تشغيل السيرفر على المنفذ 8010
-runServer({ "listening_ports", "8010", "static_file_max_age", "0" });
+buildAndRunServer(Array[CharsPtr]({ "listening_ports", "8010", "static_file_max_age", "0" }));
 ```
 

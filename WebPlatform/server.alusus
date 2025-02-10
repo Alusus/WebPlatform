@@ -1,61 +1,36 @@
 @merge module WebPlatform {
-    class Route {
+    // Types
+
+    class StaticRoute {
         def uri: String;
         def path: String;
         handler this~init() {}
         handler this~init(uri: String, path: String) this.set(uri, path);
-        handler this~init(ref[Route]) this.set(value.uri, value.path);
-        handler this=ref[Route] this.set(value.uri, value.path);
+        handler this~init(ref[StaticRoute]) this.set(value.uri, value.path);
+        handler this=ref[StaticRoute] this.set(value.uri, value.path);
         handler this.set (uri: String, path: String) {
             this.uri = uri;
             this.path = path;
         }
     }
-    def assetRoutes: Array[Route];
-    def uiEndpoints: Array[Route];
 
-    def endpointsModules: Array[ref[Core.Basic.TiObject]];
-    func _registerEndpointsModule(m: ref[Core.Basic.TiObject]) {
-        endpointsModules.add(m);
+    class CallbackContext {
+        def mainAssetsPath: String;
+        def assetRoutes: Array[StaticRoute];
+        def uiEndpoints: Array[StaticRoute];
+        def uiEndpointsPath: String;
     }
-    macro registerEndpointsModule[m] _registerEndpointsModule(m~ast);
+
+    class ServerSession {
+        def callbackContext: SrdRef[CallbackContext];
+        def httpContext: ptr[Http.Context];
+    }
 
     def AstTemplateMap: alias Map[String, ref[Core.Basic.TiObject]];
 
-    func getElementName (obj: ref[Core.Basic.TiObject]): String {
-        def node: ref[Core.Data.Node](castRef[obj, Core.Data.Node]);
-        def d: ref[Core.Data.Ast.Definition](castRef[node.owner, Core.Data.Ast.Definition]);
-        def binding: ref[Core.Basic.Binding](Core.Basic.getInterface[d, Core.Basic.Binding]);
-        def name: ref[Core.Basic.TiStr](castRef[binding.getMember("name"), Core.Basic.TiStr]);
-        return name.value;
-    }
+    // Build Functions
 
-    func constructElementFullReference (element: ref[Core.Basic.TiObject]): SrdRef[Core.Basic.TiObject] {
-        def node: ref[Core.Data.Node](castRef[element, Core.Data.Node]);
-        if node.owner~ptr == 0 return SrdRef[Core.Basic.TiObject]();
-        def name: String = getElementName(node);
-        def identifier: SrdRef[Core.Data.Ast.Identifier] = Core.Basic.newSrdObj[Core.Data.Ast.Identifier].{
-            value.value = name;
-        };
-        def ownerRef: SrdRef[Core.Basic.TiObject] = constructElementFullReference(node.owner.owner);
-        if ownerRef.isNull() return identifier
-        else return Core.Basic.newSrdObj[Core.Data.Ast.LinkOperator].{
-            Core.Basic.MapContainerOf[this].{
-                setElement("first", ownerRef);
-                setElement("second", identifier);
-            };
-        };
-    }
-
-    func getModifierParams (element: ref[Core.Basic.TiObject], enKwd: CharsPtr, arKwd: CharsPtr): Array[String] {
-        def modifier: ref[Core.Basic.TiObject](Spp.astMgr.findModifierForElement(element, enKwd));
-        if modifier~ptr == 0 modifier~no_deref = Spp.astMgr.findModifierForElement(element, arKwd);
-        def endpointParams: Array[String];
-        Spp.astMgr.getModifierStringParams(modifier, endpointParams);
-        return endpointParams;
-    }
-
-    func addUiEndpoints (parent: ref[Core.Basic.TiObject]) {
+    func generateUiEndpointsFiles (parent: ref[Core.Basic.TiObject], uiEndpointsPath: String) {
         def elements: Array[ref[Core.Basic.TiObject]] = Spp.astMgr.findElements(
             ast { modifier == "uiEndpoint" || modifier == "منفذ_مرئي" },
             parent,
@@ -85,17 +60,18 @@
             def preCacheFilenames: Array[String] = getModifierParams(elements(i), "preCache", "خزن_مسبق");
             def dynCacheFilenames: Array[String] = getModifierParams(elements(i), "dynCache", "خزن_تفاعلي");
 
-            addUiEndpoint(
-                elements(i), uriParams(0), title, icon, appManifest, appVersion, preCacheFilenames, dynCacheFilenames
+            generateUiEndpointFiles(
+                elements(i), uriParams(0), title, icon, appManifest, appVersion, preCacheFilenames, dynCacheFilenames,
+                uiEndpointsPath
             );
         }
     }
 
-    func addUiEndpoint (
+    func generateUiEndpointFiles (
         fn: ref[Core.Basic.TiObject], uri: String, title: String, iconFilename: String, manifestFilename: String,
-        version: String, preCacheFilenames: Array[String], dynCacheFilenames: Array[String]
+        version: String, preCacheFilenames: Array[String], dynCacheFilenames: Array[String], uiEndpointsPath: String
     ) {
-        def fnName: String = generateWasm(fn);
+        def fnName: String = generateWasm(fn, uiEndpointsPath);
         if iconFilename != "" {
             def icon: String;
             iconFilename.split("/").{ icon = this(this.getLength() - 1) };
@@ -103,7 +79,12 @@
             iconFilename = icon;
         }
         if manifestFilename != "" {
-            System.exec(String.format("cp %s \"%s%s-manifest.json\"", manifestFilename.buf, uiEndpointsPath.buf, fnName.buf));
+            System.exec(String.format(
+                "cp %s \"%s%s-manifest.json\"",
+                manifestFilename.buf,
+                uiEndpointsPath.buf,
+                fnName.buf
+            ));
             preCacheFilenames.add({
                 uri,
                 String("/api.js"),
@@ -111,25 +92,19 @@
                 String.format("/%s-manifest.json", fnName.buf),
             });
             if iconFilename != "" preCacheFilenames.add(String.format("/") + iconFilename);
-            generateServiceWorker(fnName, preCacheFilenames, dynCacheFilenames, version);
+            generateServiceWorker(fnName, preCacheFilenames, dynCacheFilenames, version, uiEndpointsPath);
         }
-        generateHtml(fnName, title, iconFilename, manifestFilename != "");
-        Spp.astMgr.insertAst(
-            (ast uiEndpoints.add(Route(String(uri), String(path)))),
-            AstTemplateMap()
-                .set(String("uri"), Core.Data.Ast.StringLiteral(uri))
-                .set(String("path"), Core.Data.Ast.StringLiteral(fnName + ".html"))
-        );
+        generateHtml(fnName, title, iconFilename, manifestFilename != "", uiEndpointsPath);
     }
 
-    func generateWasm(fn: ref[Core.Basic.TiObject]): String {
+    func generateWasm(fn: ref[Core.Basic.TiObject], uiEndpointsPath: String): String {
         def binding: ref[Core.Basic.Binding](Core.Basic.getInterface[fn, Core.Basic.Binding]);
         binding.setMember("name", Core.Basic.TiStr("wasmStart"));
         def wasm: Build.Wasm(fn, uiEndpointsPath + "_intermediate.wasm");
         wasm.addDependency(webPlatformPath + String("stdlib-min.wasm"));
         wasm.addFlags({ String("--export=malloc"), String("--export=realloc") });
         wasm.generate();
-        def fnName: String = getElementName(fn);
+        def fnName: String = Spp.astMgr.getDefinitionName(fn);
         if System.exec(
             webPlatformPath + "Tools/bin/wasm-opt -O --asyncify " + uiEndpointsPath + "_intermediate.wasm -o " +
             uiEndpointsPath + fnName + ".wasm"
@@ -140,7 +115,8 @@
     }
 
     func generateServiceWorker(
-        fnName: String, preCacheFilenames: Array[String], dynCacheFilenames: Array[String], version: String
+        fnName: String, preCacheFilenames: Array[String], dynCacheFilenames: Array[String], version: String,
+        uiEndpointsPath: String
     ) {
         def workerTemplate: String = Fs.readFile(webPlatformPath + "service-worker.js");
         def content: String = String.format(
@@ -168,7 +144,7 @@
         return result;
     }
 
-    func generateHtml(fnName: String, title: String, icon: String, webApp: Bool) {
+    func generateHtml(fnName: String, title: String, icon: String, webApp: Bool, uiEndpointsPath: String) {
         def htmlTemplate: String = Fs.readFile(webPlatformPath + "wasm.html");
         def extraHeaders: String;
         if icon != "" extraHeaders += String.format("<link rel=\"icon\" href=\"/%s\" />", icon.buf);
@@ -183,7 +159,47 @@
         Fs.createFile(uiEndpointsPath + fnName + ".html", content.buf, content.getLength());
     }
 
-    func addBeEndpoints (parent: ref[Core.Basic.TiObject]) {
+    func prepareMainAssets (mainAssetsPath: String) {
+        if mainAssetsPath == webPlatformPath return;
+        System.exec(String.format("mkdir -p \"%s\"", mainAssetsPath.buf));
+        System.exec(String.format("cp %s/api.js \"%s/api.js\"", webPlatformPath.buf, mainAssetsPath.buf));
+    }
+
+    func buildUiEndpoints(modulesRef: ref[Core.Basic.TiObject], mainAssetsPath: String, uiEndpointsPath: String) {
+        prepareMainAssets(mainAssetsPath);
+        def modules: Array[ref[Core.Basic.TiObject]] = getAllModules(modulesRef);
+        if modules.getLength() == 0 {
+            System.fail(1, "Invalid module argument for buildUiEndpoints.");
+        }
+        def i: Int;
+        for i = 0, i < modules.getLength(), ++i generateUiEndpointsFiles(modules(i), uiEndpointsPath);
+    }
+
+    // Code Generation
+
+    func generateUiEndpointsInitialization (parent: ref[Core.Basic.TiObject]) {
+        def elements: Array[ref[Core.Basic.TiObject]] = Spp.astMgr.findElements(
+            ast { modifier == "uiEndpoint" || modifier == "منفذ_مرئي" },
+            parent,
+            Spp.SeekerFlags.SKIP_OWNERS | Spp.SeekerFlags.SKIP_USES | Spp.SeekerFlags.SKIP_CHILDREN
+        );
+        def i: Int;
+        for i = 0, i < elements.getLength(), ++i {
+            def uriParams: Array[String] = getModifierParams(elements(i), "uiEndpoint", "منفذ_مرئي");
+            if uriParams.getLength() < 1 {
+                System.fail(1, "Invalid @uiEndpoint params");
+            }
+            def fnName: String = Spp.astMgr.getDefinitionName(elements(i));
+            Spp.astMgr.insertAst(
+                (ast callbackContext.uiEndpoints.add(StaticRoute(String(uri), String(path)))),
+                AstTemplateMap()
+                    .set(String("uri"), Core.Data.Ast.StringLiteral(uriParams(0)))
+                    .set(String("path"), Core.Data.Ast.StringLiteral(fnName + ".html"))
+            );
+        }
+    }
+
+    func generateBeEndpointsCalls (parent: ref[Core.Basic.TiObject]) {
         def elements: Array[ref[Core.Basic.TiObject]] = Spp.astMgr.findElements(
             ast { modifier == "beEndpoint" || modifier == "منفذ_بياني" },
             parent,
@@ -213,7 +229,7 @@
         }
     }
 
-    func addAssetRoutes (parent: ref[Core.Basic.TiObject]) {
+    func generateAssetRoutesInitialization (parent: ref[Core.Basic.TiObject]) {
         def elements: Array[ref[Core.Basic.TiObject]] = Spp.astMgr.findElements(
             ast { modifier == "assetsRoute" || modifier == "مسار_موارد" },
             parent,
@@ -221,7 +237,6 @@
         );
         def i: Int;
         for i = 0, i < elements.getLength(), ++i {
-            def endpointParams: Array[String];
             if !Core.Basic.isDerivedFrom[elements(i), Core.Data.Ast.StringLiteral] {
                 System.fail(1, "Invalid asset route");
             }
@@ -229,17 +244,209 @@
             if path(0) == '/' || path(0) == '.' {
                 System.fail(1, String("Invalid asset route element; path should not start with / or .: ") + path);
             }
+
+            def modifier: ref[Core.Basic.TiObject](Spp.astMgr.findModifierForElement(elements(i), "assetsRoute"));
+            if modifier~ptr == 0 modifier~no_deref = Spp.astMgr.findModifierForElement(elements(i), "مسار_موارد");
+            def uri: String;
+            def params: Array[String];
+            if Spp.astMgr.getModifierStringParams(modifier, params) && params.getLength() == 1 {
+                uri = params(0);
+            } else {
+                uri = String("/") + path;
+            }
+
+            validateAssetRoute(uri, path);
+
             Spp.astMgr.insertAst(
-                (ast addAssetRoute(String("/") + path, String(path))),
+                (ast callbackContext.assetRoutes.add(StaticRoute(String(uri), String(path)))),
                 Map[String, ref[Core.Basic.TiObject]]()
+                    .set(String("uri"), Core.Data.Ast.StringLiteral(uri))
                     .set(String("path"), Core.Data.Ast.StringLiteral(path))
             );
         }
     }
 
-    func addAssetRoute (uri: String, path: String) {
-        validateAssetRoute(uri, path);
-        assetRoutes.add(Route(uri, path));
+    // Server Functions
+
+    func startServer [modulesRef: ast_ref = Root] (
+        mainAssetsPath: String, uiEndpointsPath: String, options: Array[CharsPtr]
+    ): ptr[ServerSession] {
+        // Http library requires that the last options argument is a zero, to denote
+        // the end of options.
+        options.add(0);
+
+        // Prepare the context.
+        def callbackContext: SrdRef[CallbackContext];
+        callbackContext.construct();
+        callbackContext.mainAssetsPath = mainAssetsPath;
+        callbackContext.uiEndpointsPath = uiEndpointsPath;
+        preprocess {
+            // Dummy statement just to prevent circular code generation.
+            Core.Data.Ast.StringLiteral();
+
+            def modules: Array[ref[Core.Basic.TiObject]] = getAllModules(modulesRef~ast);
+            if modules.getLength() == 0 {
+                Spp.buildMgr.raiseBuildNotice("SPPA1002", 1, modulesRef~ast);
+            }
+            def i: Int;
+            for i = 0, i < modules.getLength(), ++i {
+                generateUiEndpointsInitialization(modules(i));
+                generateAssetRoutesInitialization(modules(i));
+            }
+        };
+
+        // Start the HTTP server.
+        def httpContext: ptr[Http.Context] = Http.startServer(
+            callbackRequest[modulesRef]~ptr, callbackContext.obj~ptr, options
+        );
+        if httpContext == 0 return 0;
+
+        def session: ptr[ServerSession] = Memory.alloc(ServerSession~size)~cast[ptr[ServerSession]];
+        session~cnt~init();
+        session~cnt.callbackContext = callbackContext;
+        session~cnt.httpContext = httpContext;
+        return session;
+    }
+
+    func stopServer(session: ptr[ServerSession]) {
+        if session == 0 return;
+        Http.stopServer(session~cnt.httpContext);
+        session~cnt~terminate();
+        Memory.free(session);
+    }
+
+    func runServer [modulesRef: ast_ref = Root] (
+        mainAssetsPath: String, uiEndpointsPath: String, options: Array[CharsPtr]
+    ) {
+        def session: ptr[ServerSession] = startServer[modulesRef](mainAssetsPath, uiEndpointsPath, options);
+        if session == 0 {
+            System.fail(1, "Failed to start HTTP server.");
+        }
+        Console.print("Server started.\nPress Ctrl+C to exit.\n");
+        while 1 System.sleep(100000);
+    }
+
+    func buildAndStartServer [modulesRef: ast_ref = Root] (options: Array[CharsPtr]): ptr[ServerSession] {
+        buildUiEndpoints(modulesRef~ast, webPlatformPath, String(TEMP_UI_ENDPOINTS_PATH));
+        return startServer[modulesRef](webPlatformPath, String(TEMP_UI_ENDPOINTS_PATH), options);
+    }
+
+    func buildAndRunServer [modulesRef: ast_ref = Root] (options: Array[CharsPtr]) {
+        buildUiEndpoints(modulesRef~ast, webPlatformPath, String(TEMP_UI_ENDPOINTS_PATH));
+        runServer[modulesRef](webPlatformPath, String(TEMP_UI_ENDPOINTS_PATH), options);
+    }
+
+    func callbackRequest [modulesRef: ast_ref = Root] (connection: ptr[Http.Connection]): Int {
+        def requestInfo: ptr[Http.RequestInfo] = Http.getRequestInfo(connection);
+        def context: ref[CallbackContext];
+        context~ptr = requestInfo~cnt.userData~cast[ptr[CallbackContext]];
+        def uri: ptr[array[Char]] = requestInfo~cnt.requestUri;
+        def method: ptr[array[Char]] = requestInfo~cnt.requestMethod;
+
+        preprocess {
+            def modules: Array[ref[Core.Basic.TiObject]] = getAllModules(modulesRef~ast);
+            if modules.getLength() == 0 {
+                Spp.buildMgr.raiseBuildNotice("SPPA1002", 1, modulesRef~ast);
+            }
+            def i: Int;
+            for i = 0, i < modules.getLength(), ++i generateBeEndpointsCalls(modules(i));
+        };
+
+        if String.isEqual(method, "GET") {
+            if String.isEqual(uri, "/api.js") {
+                Http.sendFile(connection, context.mainAssetsPath + "api.js");
+                return 1;
+            }
+
+            if !String.isEqual(uri, "/") {
+                def fileName: String = context.uiEndpointsPath + uri;
+                if Fs.exists(fileName) {
+                    Http.sendFile(connection, fileName);
+                    return 1;
+                }
+            }
+
+            def i: Int;
+            for i = 0, i < context.assetRoutes.getLength(), ++i {
+                if String.find(uri, context.assetRoutes(i).uri) == uri and context.assetRoutes(i).uri != uri {
+                    def fileName: String = context.assetRoutes(i).path + (uri + context.assetRoutes(i).uri.getLength());
+                    if Fs.exists(fileName) {
+                        Http.sendFile(connection, fileName);
+                        return 1;
+                    }
+                }
+            }
+
+            for i = 0, i < context.uiEndpoints.getLength(), ++i {
+                def len: ArchInt = context.uiEndpoints(i).uri.getLength();
+                if context.uiEndpoints(i).uri == uri or (
+                    len > 0 and context.uiEndpoints(i).uri(len - 1) == '*' and
+                    String.compare(context.uiEndpoints(i).uri, uri, len - 1) == 0
+                ) {
+                    Http.sendFile(connection, context.uiEndpointsPath + context.uiEndpoints(i).path);
+                    return 1;
+                }
+            }
+        }
+
+        def content: array[Char, 1024];
+        String.assign(content~ptr, "<h1>404 - Not Found</h1><p> you are in \"%.512s\"", requestInfo~cnt.localUri);
+        Http.print(connection, "HTTP/1.1 404 Not Found\r\n");
+        Http.print(connection, "Content-Type: text/html\r\n");
+        Http.print(connection, "Content-Length: %d\r\n\r\n", String.getLength(content~ptr));
+        Http.print(connection, content~ptr);
+
+        return 1;
+    }
+
+    // Helpers
+
+    func constructElementFullReference (element: ref[Core.Basic.TiObject]): SrdRef[Core.Basic.TiObject] {
+        def node: ref[Core.Data.Node](castRef[element, Core.Data.Node]);
+        if node.owner~ptr == 0 return SrdRef[Core.Basic.TiObject]();
+        def name: String = Spp.astMgr.getDefinitionName(node);
+        def identifier: SrdRef[Core.Data.Ast.Identifier] = Core.Basic.newSrdObj[Core.Data.Ast.Identifier].{
+            value.value = name;
+        };
+        def ownerRef: SrdRef[Core.Basic.TiObject] = constructElementFullReference(node.owner.owner);
+        if ownerRef.isNull() return identifier
+        else return Core.Basic.newSrdObj[Core.Data.Ast.LinkOperator].{
+            Core.Basic.MapContainerOf[this].{
+                setElement("first", ownerRef);
+                setElement("second", identifier);
+            };
+        };
+    }
+
+    func getModifierParams (element: ref[Core.Basic.TiObject], enKwd: CharsPtr, arKwd: CharsPtr): Array[String] {
+        def modifier: ref[Core.Basic.TiObject](Spp.astMgr.findModifierForElement(element, enKwd));
+        if modifier~ptr == 0 modifier~no_deref = Spp.astMgr.findModifierForElement(element, arKwd);
+        def endpointParams: Array[String];
+        Spp.astMgr.getModifierStringParams(modifier, endpointParams);
+        return endpointParams;
+    }
+
+    func getAllModules (astRef: ref[Core.Basic.TiObject]): Array[ref[Core.Basic.TiObject]] {
+        def result: Array[ref[Core.Basic.TiObject]];
+        if astRef~ptr == Root~ast~ptr or Core.Basic.isDerivedFrom[astRef, Spp.Ast.Module] {
+            result.add(astRef);
+        } else if Core.Basic.isDerivedFrom[astRef, Core.Data.Ast.List] {
+            def container: Core.Basic.ContainerOf[astRef];
+            def i: Word;
+            for i = 0, i < container.getElementCount(), ++i {
+                result.add(getAllModules(container.getElement(i)));
+            }
+        } else {
+            def node: ref[Core.Data.Node](castRef[astRef, Core.Data.Node]);
+            def elements: Array[ref[Core.Basic.TiObject]] = Spp.astMgr.findElements(
+                node, node.owner, Spp.SeekerFlags.SKIP_CHILDREN
+            );
+            def j: Int;
+            for j = 0, j < elements.getLength(), ++j {
+                result.add(getAllModules(elements(j)));
+            }
+        }
+        return result;
     }
 
     func validateAssetRoute(uri: String, path: String) {
@@ -255,99 +462,5 @@
         if path(path.getLength() - 1) != '/' {
             System.fail(1, String("Invalid asset route; path should end with /: ") + path);
         }
-    }
-
-    func prepareMainAssets {
-        if mainAssetsPath == webPlatformPath return;
-        System.exec(String.format("mkdir -p \"%s\"", mainAssetsPath.buf));
-        System.exec(String.format("cp %s/api.js \"%s/api.js\"", webPlatformPath.buf, mainAssetsPath.buf));
-    }
-
-    func startServer [parent: ast_ref = Root] (options: ref[Array[CharsPtr]]): ptr[Http.Context] {
-        preprocess { prepareMainAssets() };
-        preprocess {
-            addUiEndpoints(parent~ast);
-            def i: Int;
-            for i = 0, i < endpointsModules.getLength(), ++i addUiEndpoints(endpointsModules(i));
-        };
-        preprocess { addAssetRoutes(parent~ast) };
-
-        options.add(0);
-
-        return Http.startServer(callbackRequest[parent]~ptr, options);
-    }
-
-    func startServer [parent: ast_ref = Root] (optsCount: Int, opts: ...CharsPtr): ptr[Http.Context] {
-        def options: Array[CharsPtr];
-        while optsCount-- > 0 options.add(opts~next_arg[CharsPtr]);
-        return startServer[parent](options);
-    }
-
-    func runServer [parent: ast_ref = Root] (optsCount: Int, opts: ...CharsPtr) {
-        def options: Array[CharsPtr];
-        while optsCount-- > 0 options.add(opts~next_arg[CharsPtr]);
-
-        def context: ptr[Http.Context] = startServer[parent](options);
-        Console.print("Server started.\npress enter to close server: ");
-        Console.getChar(); // stop proccess here waiting user to press enter
-        Http.stopServer(context); // stop the server
-    }
-
-    func callbackRequest [parent: ast_ref = Root] (connection: ptr[Http.Connection]): Int {
-        def requestInfo: ptr[Http.RequestInfo] = Http.getRequestInfo(connection);
-        def uri: ptr[array[Char]] = requestInfo~cnt.requestUri;
-        def method: ptr[array[Char]] = requestInfo~cnt.requestMethod;
-
-        preprocess {
-            addBeEndpoints(parent~ast);
-            def i: Int;
-            for i = 0, i < endpointsModules.getLength(), ++i addBeEndpoints(endpointsModules(i));
-        };
-
-        if String.isEqual(method, "GET") {
-            if String.isEqual(uri, "/api.js") {
-                Http.sendFile(connection, mainAssetsPath + "api.js");
-                return 1;
-            }
-
-            if !String.isEqual(uri, "/") {
-                def fileName: String = uiEndpointsPath + uri;
-                if Fs.exists(fileName) {
-                    Http.sendFile(connection, fileName);
-                    return 1;
-                }
-            }
-
-            def i: Int;
-            for i = 0, i < assetRoutes.getLength(), ++i {
-                if String.find(uri, assetRoutes(i).uri) == uri and assetRoutes(i).uri != uri {
-                    def fileName: String = assetRoutes(i).path + (uri + assetRoutes(i).uri.getLength());
-                    if Fs.exists(fileName) {
-                        Http.sendFile(connection, fileName);
-                        return 1;
-                    }
-                }
-            }
-
-            for i = 0, i < uiEndpoints.getLength(), ++i {
-                def len: ArchInt = uiEndpoints(i).uri.getLength();
-                if uiEndpoints(i).uri == uri or (
-                    len > 0 and uiEndpoints(i).uri(len - 1) == '*' and
-                    String.compare(uiEndpoints(i).uri, uri, len - 1) == 0
-                ) {
-                    Http.sendFile(connection, uiEndpointsPath + uiEndpoints(i).path);
-                    return 1;
-                }
-            }
-        }
-
-        def content: array[Char, 1024];
-        String.assign(content~ptr, "<h1>404 - Not Found</h1><p> you are in \"%.512s\"", requestInfo~cnt.localUri);
-        Http.print(connection, "HTTP/1.1 404 Not Found\r\n");
-        Http.print(connection, "Content-Type: text/html\r\n");
-        Http.print(connection, "Content-Length: %d\r\n\r\n", String.getLength(content~ptr));
-        Http.print(connection, content~ptr);
-
-        return 1;
     }
 }

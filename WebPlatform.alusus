@@ -8,6 +8,7 @@ import "Srl/refs";
 import "Srl/errors";
 import "Core/Data";
 import "Spp";
+import "Spp/Ast";
 import "Build";
 import "Apm";
 import "closure";
@@ -77,9 +78,8 @@ import "WebPlatform/i18n";
     use Srl;
     use Promises;
 
+    def TEMP_UI_ENDPOINTS_PATH: "/tmp/WebPlatform/";
     def webPlatformPath: String = getThisSourceDirectory[];
-    def mainAssetsPath: String = webPlatformPath;
-    def uiEndpointsPath: String = "/tmp/WebPlatform/";
 
     func getBuildDependencies(): Array[String] {
         return Http.getBuildDependencies();

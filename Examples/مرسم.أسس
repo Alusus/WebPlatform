@@ -295,5 +295,4 @@
 
 
 طـرفية.اطبع("تشغيل الخادم على المنفذ 8010...\nURL: http://localhost:8010/\n")؛
-شغل_الخادم ({ "listening_ports"، "8010"، "static_file_max_age"، "0" })؛
-
+ابن_وشغل_الخادم(مـصفوفة[مـؤشر_محارف]({ "listening_ports"، "8010"، "static_file_max_age"، "0" }))؛
