@@ -288,7 +288,6 @@ func encodeHtml(str: String): String {
 //==============================================================================
 // User Interface Pages
 
-
 // a UI endpoint for main page
 @uiEndpoint["/", "WebPlatform Example - Chat"]
 func main {
@@ -414,5 +413,16 @@ func about {
 
     runEventLoop();
 }
+
+
+//==============================================================================
+// Program Entry
+
+func startChatServer {
+    Console.print("Starting server on port 8010...\nURL: http://localhost:8010/\n");
+    buildAndRunServer[serverModules](Array[CharsPtr]({ "listening_ports", "8010", "static_file_max_age", "0" }));
+}
+
+startChatServer();
 ```
 

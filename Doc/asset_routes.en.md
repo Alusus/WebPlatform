@@ -15,6 +15,13 @@ Asset routes can be created by placing the following definition anywhere in the 
 The server path in this case will be `/Assets/` while the directory path in the file system will
 be `./Assets/`.
 
-Routes can also be added using the function `addAssetRoute`, which allows adding routes from
-outside of the current folder.
+You can also specify a different server path from the file system path by specifying the server
+path as an argument of the `@assetsRoute` modifier:
+
+```
+@assetsRoute["/images/"] def assetsRoute: "Assets/Images/";
+```
+
+In the upper example using the path `/images/` in the browser will give you access to the files
+under `Assets/Images/`.
 

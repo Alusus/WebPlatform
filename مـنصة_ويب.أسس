@@ -7,8 +7,6 @@
 عرف مـنصة_ويب: لقب WebPlatform؛
 @دمج وحدة مـنصة_ويب {
     عرف مسار_منصة_ويب: لقب webPlatformPath؛
-    عرف مسار_الموارد_الرئيسية: لقب mainAssetsPath؛
-    عرف مسار_المنافذ_المرئية: لقب uiEndpointsPath؛
     عرف هات_اعتماديات_البناء: لقب getBuildDependencies؛
 
     عرف أنشئ_عنصر: لقب createElement؛
@@ -21,9 +19,12 @@
     عرف عالج_الأحداث: لقب dispatchEvents؛
     عرف انتظر_حدثا: لقب waitForEvent؛
     عرف انتظر: لقب await؛
-    عرف أضف_وحدة_منافذ: لقب registerEndpointsModule؛
-    عرف شغل_الخادم: لقب runServer؛
     عرف ابدأ_الخادم: لقب startServer؛
+    عرف أوقف_الخادم: لقب stopServer؛
+    عرف شغل_الخادم: لقب runServer؛
+    عرف ابن_وابدأ_الخادم: لقب buildAndStartServer؛
+    عرف ابن_وشغل_الخادم: لقب buildAndRunServer؛
+    عرف ابن_المنافذ_المرئية: لقب buildUiEndpoints؛
     عرف ابدأ_المؤقت_المتكرر: لقب startTimer؛
     عرف أوقف_المؤقت_المتكرر: لقب stopTimer؛
     عرف ابدأ_المؤقت: لقب setTimeout؛
@@ -34,7 +35,6 @@
     عرف حمل_بريمج_جافاسكريبت: لقب loadJsScript؛
     عرف استدع_دالة_جافاسكريبت: لقب callCustomJsFn؛
     عرف استدع_دالة_جافاسكريبت_لامتزامنة: لقب callCustomAsyncJsFn؛
-    عرف أضف_مسار_موارد: لقب addAssetRoute؛
     عرف هات_لغات_المستخدم: لقب getUserLanguages؛
     عرف هات_اللغة_المفضلة: لقب getPreferredLanguage؛
     عرف هل_يفضل_نمط_الألوان_الداكن: لقب isDarkColorSchemePreferred؛
@@ -65,6 +65,11 @@
 
     عرف علق_سياق_الصوت: لقب suspendAudioContext؛
     عرف استأنف_سياق_الصوت: لقب resumeAudioContext؛
+
+    عرف جـلسة_خادم: لقب ServerSession؛
+    @دمج صنف جـلسة_خادم {
+        عرف سياق_بننف: لقب httpContext؛
+    }
 
     عرف حـمولة_تحريك_المؤشر: لقب MouseMovePayload؛
     @دمج صنف حـمولة_تحريك_المؤشر {

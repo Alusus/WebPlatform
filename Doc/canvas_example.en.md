@@ -375,7 +375,6 @@ func main {
 
 
 Console.print("Starting server on port 8010...\nURL: http://localhost:8010/\n");
-// run the server on port 8010
-runServer({ "listening_ports", "8010", "static_file_max_age", "0" });
+buildAndRunServer(Array[CharsPtr]({ "listening_ports", "8010", "static_file_max_age", "0" }));
 ```
 
