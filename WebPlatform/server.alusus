@@ -410,9 +410,11 @@
             def i: Int;
             for i = 0, i < context.assetRoutes.getLength(), ++i {
                 if String.find(uri, context.assetRoutes(i).uri) == uri and context.assetRoutes(i).uri != uri {
-                    def assetsPath: String;
-                    if context.useSrcAssetsPath assetsPath = context.assetRoutes(i).srcPath
-                    else assetsPath = context.assetRoutes(i).buildPath;
+                    // We'll avoid String assignment here because it's not thread safe, so we'll just capture
+                    // a reference to it instead.
+                    def assetsPath: ref[String];
+                    if context.useSrcAssetsPath assetsPath~no_deref = context.assetRoutes(i).srcPath
+                    else assetsPath~no_deref = context.assetRoutes(i).buildPath;
                     def fileName: String = assetsPath + (uri + context.assetRoutes(i).uri.getLength());
                     if Fs.exists(fileName) {
                         Http.sendFile(connection, fileName);
