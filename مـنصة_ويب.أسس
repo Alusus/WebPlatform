@@ -24,6 +24,7 @@
     عرف شغل_الخادم: لقب runServer؛
     عرف ابن_وابدأ_الخادم: لقب buildAndStartServer؛
     عرف ابن_وشغل_الخادم: لقب buildAndRunServer؛
+    عرف هات_مسارات_الموارد_لوحدات: لقب getAssetsRoutesFromModules؛
     عرف ابن_المنافذ_المرئية: لقب buildUiEndpoints؛
     عرف ابدأ_المؤقت_المتكرر: لقب startTimer؛
     عرف أوقف_المؤقت_المتكرر: لقب stopTimer؛
@@ -69,6 +70,13 @@
     عرف جـلسة_خادم: لقب ServerSession؛
     @دمج صنف جـلسة_خادم {
         عرف سياق_بننف: لقب httpContext؛
+    }
+
+    عرف مـسار_سواكن: لقب StaticRoute؛
+    @دمج صنف مـسار_سواكن {
+        عرف مسار_الخادم: لقب uri؛
+        عرف مسار_المصدر: لقب srcPath؛
+        عرف مسار_البناء: لقب buildPath؛
     }
 
     عرف حـمولة_تحريك_المؤشر: لقب MouseMovePayload؛

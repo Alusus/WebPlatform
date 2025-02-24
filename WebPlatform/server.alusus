@@ -3,14 +3,17 @@
 
     class StaticRoute {
         def uri: String;
-        def path: String;
+        def srcPath: String;
+        def buildPath: String;
         handler this~init() {}
-        handler this~init(uri: String, path: String) this.set(uri, path);
-        handler this~init(ref[StaticRoute]) this.set(value.uri, value.path);
-        handler this=ref[StaticRoute] this.set(value.uri, value.path);
-        handler this.set (uri: String, path: String) {
+        handler this~init(uri: String, path: String) this.set(uri, path, path);
+        handler this~init(uri: String, srcPath: String, buildPath: String) this.set(uri, srcPath, buildPath);
+        handler this~init(ref[StaticRoute]) this.set(value.uri, value.srcPath, value.buildPath);
+        handler this=ref[StaticRoute] this.set(value.uri, value.srcPath, value.buildPath);
+        handler this.set (uri: String, srcPath: String, buildPath: String) {
             this.uri = uri;
-            this.path = path;
+            this.srcPath = srcPath;
+            this.buildPath = buildPath;
         }
     }
 
@@ -19,6 +22,7 @@
         def assetRoutes: Array[StaticRoute];
         def uiEndpoints: Array[StaticRoute];
         def uiEndpointsPath: String;
+        def useSrcAssetsPath: Bool;
     }
 
     class ServerSession {
@@ -177,25 +181,32 @@
 
     // Code Generation
 
-    func generateUiEndpointsInitialization (parent: ref[Core.Basic.TiObject]) {
-        def elements: Array[ref[Core.Basic.TiObject]] = Spp.astMgr.findElements(
-            ast { modifier == "uiEndpoint" || modifier == "منفذ_مرئي" },
-            parent,
-            Spp.SeekerFlags.SKIP_OWNERS | Spp.SeekerFlags.SKIP_USES | Spp.SeekerFlags.SKIP_CHILDREN
-        );
-        def i: Int;
-        for i = 0, i < elements.getLength(), ++i {
-            def uriParams: Array[String] = getModifierParams(elements(i), "uiEndpoint", "منفذ_مرئي");
-            if uriParams.getLength() < 1 {
-                System.fail(1, "Invalid @uiEndpoint params");
-            }
-            def fnName: String = Spp.astMgr.getDefinitionName(elements(i));
-            Spp.astMgr.insertAst(
-                (ast callbackContext.uiEndpoints.add(StaticRoute(String(uri), String(path)))),
-                AstTemplateMap()
-                    .set(String("uri"), Core.Data.Ast.StringLiteral(uriParams(0)))
-                    .set(String("path"), Core.Data.Ast.StringLiteral(fnName + ".html"))
+    func generateUiEndpointsInitialization (modulesRef: ref[Core.Basic.TiObject]) {
+        def modules: Array[ref[Core.Basic.TiObject]] = getAllModules(modulesRef);
+        if modules.getLength() == 0 {
+            Spp.buildMgr.raiseBuildNotice("SPPA1002", 1, modulesRef);
+        }
+        def j: Int;
+        for j = 0, j < modules.getLength(), ++j {
+            def elements: Array[ref[Core.Basic.TiObject]] = Spp.astMgr.findElements(
+                ast { modifier == "uiEndpoint" || modifier == "منفذ_مرئي" },
+                modules(j),
+                Spp.SeekerFlags.SKIP_OWNERS | Spp.SeekerFlags.SKIP_USES | Spp.SeekerFlags.SKIP_CHILDREN
             );
+            def i: Int;
+            for i = 0, i < elements.getLength(), ++i {
+                def uriParams: Array[String] = getModifierParams(elements(i), "uiEndpoint", "منفذ_مرئي");
+                if uriParams.getLength() < 1 {
+                    System.fail(1, "Invalid @uiEndpoint params");
+                }
+                def fnName: String = Spp.astMgr.getDefinitionName(elements(i));
+                Spp.astMgr.insertAst(
+                    (ast callbackContext.uiEndpoints.add(StaticRoute(String(uri), String(path)))),
+                    AstTemplateMap()
+                        .set(String("uri"), Core.Data.Ast.StringLiteral(uriParams(0)))
+                        .set(String("path"), Core.Data.Ast.StringLiteral(fnName + ".html"))
+                );
+            }
         }
     }
 
@@ -229,47 +240,69 @@
         }
     }
 
-    func generateAssetRoutesInitialization (parent: ref[Core.Basic.TiObject]) {
-        def elements: Array[ref[Core.Basic.TiObject]] = Spp.astMgr.findElements(
-            ast { modifier == "assetsRoute" || modifier == "مسار_موارد" },
-            parent,
-            Spp.SeekerFlags.SKIP_OWNERS | Spp.SeekerFlags.SKIP_USES | Spp.SeekerFlags.SKIP_CHILDREN
-        );
+    func generateAssetRoutesInitialization (modulesRef: ref[Core.Basic.TiObject]) {
+        def assetRoutes: Array[StaticRoute] = getAssetsRoutesFromModules(modulesRef);
         def i: Int;
-        for i = 0, i < elements.getLength(), ++i {
-            if !Core.Basic.isDerivedFrom[elements(i), Core.Data.Ast.StringLiteral] {
-                System.fail(1, "Invalid asset route");
-            }
-            def path: String = Core.Basic.dynCastRef[elements(i), Core.Data.Ast.StringLiteral].value.value;
-            if path(0) == '/' || path(0) == '.' {
-                System.fail(1, String("Invalid asset route element; path should not start with / or .: ") + path);
-            }
-
-            def modifier: ref[Core.Basic.TiObject](Spp.astMgr.findModifierForElement(elements(i), "assetsRoute"));
-            if modifier~ptr == 0 modifier~no_deref = Spp.astMgr.findModifierForElement(elements(i), "مسار_موارد");
-            def uri: String;
-            def params: Array[String];
-            if Spp.astMgr.getModifierStringParams(modifier, params) && params.getLength() == 1 {
-                uri = params(0);
-            } else {
-                uri = String("/") + path;
-            }
-
-            validateAssetRoute(uri, path);
-
+        for i = 0, i < assetRoutes.getLength(), ++i {
             Spp.astMgr.insertAst(
-                (ast callbackContext.assetRoutes.add(StaticRoute(String(uri), String(path)))),
+                (ast callbackContext.assetRoutes.add(StaticRoute(String(uri), String(srcPath), String(buildPath)))),
                 Map[String, ref[Core.Basic.TiObject]]()
-                    .set(String("uri"), Core.Data.Ast.StringLiteral(uri))
-                    .set(String("path"), Core.Data.Ast.StringLiteral(path))
+                    .set(String("uri"), Core.Data.Ast.StringLiteral(assetRoutes(i).uri))
+                    .set(String("srcPath"), Core.Data.Ast.StringLiteral(assetRoutes(i).srcPath))
+                    .set(String("buildPath"), Core.Data.Ast.StringLiteral(assetRoutes(i).buildPath))
             );
         }
+    }
+
+    // Querying Functions
+
+    func getAssetsRoutesFromModules (modulesRef: ref[Core.Basic.TiObject]): Array[StaticRoute] {
+        def result: Array[StaticRoute];
+        def modules: Array[ref[Core.Basic.TiObject]] = getAllModules(modulesRef);
+        if modules.getLength() == 0 {
+            Spp.buildMgr.raiseBuildNotice("SPPA1002", 1, modulesRef);
+        }
+        def j: Int;
+        for j = 0, j < modules.getLength(), ++j {
+            def elements: Array[ref[Core.Basic.TiObject]] = Spp.astMgr.findElements(
+                ast { modifier == "assetsRoute" || modifier == "مسار_موارد" },
+                modules(j),
+                Spp.SeekerFlags.SKIP_OWNERS | Spp.SeekerFlags.SKIP_USES | Spp.SeekerFlags.SKIP_CHILDREN
+            );
+            def i: Int;
+            for i = 0, i < elements.getLength(), ++i {
+                def srcPath: String;
+                def buildPath: String;
+                extractAssetRoutePaths(elements(i), srcPath, buildPath);
+                if srcPath == "" continue;
+
+                def modifier: ref[Core.Basic.TiObject](Spp.astMgr.findModifierForElement(elements(i), "assetsRoute"));
+                if modifier~ptr == 0 modifier~no_deref = Spp.astMgr.findModifierForElement(elements(i), "مسار_موارد");
+                def uri: String;
+                def params: Array[String];
+                if Spp.astMgr.getModifierStringParams(modifier, params) && params.getLength() == 1 {
+                    uri = params(0);
+                } else {
+                    if buildPath(0) == '/' or buildPath(0) == '.' {
+                        System.fail(
+                            1, String("Invalid asset route element; path should not start with / or .: ") + buildPath
+                        );
+                    }
+                    uri = String("/") + buildPath;
+                }
+
+                validateAssetRoute(uri, srcPath, buildPath);
+
+                result.add(StaticRoute(uri, srcPath, buildPath));
+            }
+        }
+        return result;
     }
 
     // Server Functions
 
     func startServer [modulesRef: ast_ref = Root] (
-        mainAssetsPath: String, uiEndpointsPath: String, options: Array[CharsPtr]
+        mainAssetsPath: String, uiEndpointsPath: String, options: Array[CharsPtr], useSrcAssetsPath: Bool
     ): ptr[ServerSession] {
         // Http library requires that the last options argument is a zero, to denote
         // the end of options.
@@ -280,19 +313,13 @@
         callbackContext.construct();
         callbackContext.mainAssetsPath = mainAssetsPath;
         callbackContext.uiEndpointsPath = uiEndpointsPath;
+        callbackContext.useSrcAssetsPath = useSrcAssetsPath;
         preprocess {
             // Dummy statement just to prevent circular code generation.
             Core.Data.Ast.StringLiteral();
 
-            def modules: Array[ref[Core.Basic.TiObject]] = getAllModules(modulesRef~ast);
-            if modules.getLength() == 0 {
-                Spp.buildMgr.raiseBuildNotice("SPPA1002", 1, modulesRef~ast);
-            }
-            def i: Int;
-            for i = 0, i < modules.getLength(), ++i {
-                generateUiEndpointsInitialization(modules(i));
-                generateAssetRoutesInitialization(modules(i));
-            }
+            generateUiEndpointsInitialization(modulesRef~ast);
+            generateAssetRoutesInitialization(modulesRef~ast);
         };
 
         // Start the HTTP server.
@@ -308,6 +335,12 @@
         return session;
     }
 
+    func startServer [modulesRef: ast_ref = Root] (
+        mainAssetsPath: String, uiEndpointsPath: String, options: Array[CharsPtr]
+    ): ptr[ServerSession] {
+        return startServer[modulesRef](mainAssetsPath, uiEndpointsPath, options, false);
+    }
+
     func stopServer(session: ptr[ServerSession]) {
         if session == 0 return;
         Http.stopServer(session~cnt.httpContext);
@@ -316,9 +349,11 @@
     }
 
     func runServer [modulesRef: ast_ref = Root] (
-        mainAssetsPath: String, uiEndpointsPath: String, options: Array[CharsPtr]
+        mainAssetsPath: String, uiEndpointsPath: String, options: Array[CharsPtr], useSrcAssetsPath: Bool
     ) {
-        def session: ptr[ServerSession] = startServer[modulesRef](mainAssetsPath, uiEndpointsPath, options);
+        def session: ptr[ServerSession] = startServer[modulesRef](
+            mainAssetsPath, uiEndpointsPath, options, useSrcAssetsPath
+        );
         if session == 0 {
             System.fail(1, "Failed to start HTTP server.");
         }
@@ -326,14 +361,20 @@
         while 1 System.sleep(100000);
     }
 
+    func runServer [modulesRef: ast_ref = Root] (
+        mainAssetsPath: String, uiEndpointsPath: String, options: Array[CharsPtr]
+    ) {
+        runServer[modulesRef](mainAssetsPath, uiEndpointsPath, options, false);
+    }
+
     func buildAndStartServer [modulesRef: ast_ref = Root] (options: Array[CharsPtr]): ptr[ServerSession] {
         buildUiEndpoints(modulesRef~ast, webPlatformPath, String(TEMP_UI_ENDPOINTS_PATH));
-        return startServer[modulesRef](webPlatformPath, String(TEMP_UI_ENDPOINTS_PATH), options);
+        return startServer[modulesRef](webPlatformPath, String(TEMP_UI_ENDPOINTS_PATH), options, true);
     }
 
     func buildAndRunServer [modulesRef: ast_ref = Root] (options: Array[CharsPtr]) {
         buildUiEndpoints(modulesRef~ast, webPlatformPath, String(TEMP_UI_ENDPOINTS_PATH));
-        runServer[modulesRef](webPlatformPath, String(TEMP_UI_ENDPOINTS_PATH), options);
+        runServer[modulesRef](webPlatformPath, String(TEMP_UI_ENDPOINTS_PATH), options, true);
     }
 
     func callbackRequest [modulesRef: ast_ref = Root] (connection: ptr[Http.Connection]): Int {
@@ -369,7 +410,10 @@
             def i: Int;
             for i = 0, i < context.assetRoutes.getLength(), ++i {
                 if String.find(uri, context.assetRoutes(i).uri) == uri and context.assetRoutes(i).uri != uri {
-                    def fileName: String = context.assetRoutes(i).path + (uri + context.assetRoutes(i).uri.getLength());
+                    def assetsPath: String;
+                    if context.useSrcAssetsPath assetsPath = context.assetRoutes(i).srcPath
+                    else assetsPath = context.assetRoutes(i).buildPath;
+                    def fileName: String = assetsPath + (uri + context.assetRoutes(i).uri.getLength());
                     if Fs.exists(fileName) {
                         Http.sendFile(connection, fileName);
                         return 1;
@@ -383,7 +427,7 @@
                     len > 0 and context.uiEndpoints(i).uri(len - 1) == '*' and
                     String.compare(context.uiEndpoints(i).uri, uri, len - 1) == 0
                 ) {
-                    Http.sendFile(connection, context.uiEndpointsPath + context.uiEndpoints(i).path);
+                    Http.sendFile(connection, context.uiEndpointsPath + context.uiEndpoints(i).buildPath);
                     return 1;
                 }
             }
@@ -449,9 +493,46 @@
         return result;
     }
 
-    func validateAssetRoute(uri: String, path: String) {
+    func extractAssetRoutePaths (element: ref[Core.Basic.TiObject], srcPath: ref[String], buildPath: ref[String]) {
+        use Core.Basic;
+        use Core.Data.Ast;
+        def strLiteral: ref[StringLiteral](Core.Basic.dynCastRef[element, StringLiteral]);
+        if strLiteral~ptr != 0 {
+            srcPath = buildPath = strLiteral.value.value;
+            return;
+        }
+        if isDerivedFrom[element, Bracket] {
+            def list: ContainerOf[ContainerOf[element].getElement(0)];
+            if list~ptr != 0 {
+                if list.getElementCount() == 1u {
+                    def strLiteral: ref[StringLiteral](Core.Basic.dynCastRef[list.getElement(0), StringLiteral]);
+                    if strLiteral~ptr != 0 {
+                        srcPath = buildPath = strLiteral.value.value;
+                        return;
+                    }
+                } else if list.getElementCount() == 2u {
+                    def strLiteral1: ref[StringLiteral](Core.Basic.dynCastRef[list.getElement(0), StringLiteral]);
+                    def strLiteral2: ref[StringLiteral](Core.Basic.dynCastRef[list.getElement(1), StringLiteral]);
+                    if strLiteral1~ptr != 0 and strLiteral2~ptr != 0 {
+                        srcPath = strLiteral1.value.value;
+                        if srcPath(0) == '$' {
+                            // If the path starts with $ we'll replace the $ with the path of the source file
+                            // instead of having the path absolute or relative to the current working dir.
+                            def sourceFilePath: String = Spp.astMgr.getSourceDirectoryForElement(element);
+                            srcPath = sourceFilePath + (srcPath.buf + 1);
+                        }
+                        buildPath = strLiteral2.value.value;
+                        return;
+                    }
+                }
+            }
+        }
+        Spp.buildMgr.raiseBuildNotice("CD1003", 1, element);
+    }
+
+    func validateAssetRoute(uri: String, srcPath: String, buildPath: String) {
         if uri.getLength() == 0 {
-            System.fail(1, "Invalid asset route; path is empty");
+            System.fail(1, "Invalid asset route; uri is empty");
         }
         if uri(0) != '/' {
             System.fail(1, String("Invalid asset route; uri should start with /: ") + uri);
@@ -459,8 +540,11 @@
         if uri(uri.getLength() - 1) != '/' {
             System.fail(1, String("Invalid asset route; uri should end with /: ") + uri);
         }
-        if path(path.getLength() - 1) != '/' {
-            System.fail(1, String("Invalid asset route; path should end with /: ") + path);
+        if srcPath(srcPath.getLength() - 1) != '/' {
+            System.fail(1, String("Invalid asset route; path should end with /: ") + srcPath);
+        }
+        if buildPath(buildPath.getLength() - 1) != '/' {
+            System.fail(1, String("Invalid asset route; path should end with /: ") + buildPath);
         }
     }
 }
