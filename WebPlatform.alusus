@@ -59,6 +59,7 @@ import "WebPlatform/Resources/CanvasResource";
 import "WebPlatform/Resources/AudioResource";
 import "WebPlatform/Utils/Signal";
 import "WebPlatform/Utils/string_operations";
+import "WebPlatform/Utils/file_operations";
 import "WebPlatform/Utils/RegExp";
 import "WebPlatform/Utils/SafeRequest";
 import "WebPlatform/Utils/SafeTimer";

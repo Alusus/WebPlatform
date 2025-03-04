@@ -381,8 +381,13 @@
         def requestInfo: ptr[Http.RequestInfo] = Http.getRequestInfo(connection);
         def context: ref[CallbackContext];
         context~ptr = requestInfo~cnt.userData~cast[ptr[CallbackContext]];
-        def uri: ptr[array[Char]] = requestInfo~cnt.requestUri;
+        def uri: ptr[array[Char]] = requestInfo~cnt.localUri;
         def method: ptr[array[Char]] = requestInfo~cnt.requestMethod;
+
+        // `uri` should not contain unsafe parts like .. because requestInfo.localUri is cleaned
+        // internally by the Http library. If we don't have uri we'll just return 0 and let
+        // Http library handle the request instead.
+        if uri == 0 return 0;
 
         preprocess {
             def modules: Array[ref[Core.Basic.TiObject]] = getAllModules(modulesRef~ast);
@@ -409,14 +414,17 @@
 
             def i: Int;
             for i = 0, i < context.assetRoutes.getLength(), ++i {
-                if String.find(uri, context.assetRoutes(i).uri) == uri and context.assetRoutes(i).uri != uri {
+                if String.find(uri, context.assetRoutes(i).uri) == uri {
                     // We'll avoid String assignment here because it's not thread safe, so we'll just capture
                     // a reference to it instead.
                     def assetsPath: ref[String];
                     if context.useSrcAssetsPath assetsPath~no_deref = context.assetRoutes(i).srcPath
                     else assetsPath~no_deref = context.assetRoutes(i).buildPath;
                     def fileName: String = assetsPath + (uri + context.assetRoutes(i).uri.getLength());
-                    if Fs.exists(fileName) {
+                    if isDir(fileName) {
+                        return404(connection, uri);
+                        return 1;
+                    } else if Fs.exists(fileName) {
                         Http.sendFile(connection, fileName);
                         return 1;
                     }
@@ -435,14 +443,17 @@
             }
         }
 
+        return404(connection, uri);
+        return 1;
+    }
+
+    func return404(connection: ptr[Http.Connection], uri: CharsPtr) {
         def content: array[Char, 1024];
-        String.assign(content~ptr, "<h1>404 - Not Found</h1><p> you are in \"%.512s\"", requestInfo~cnt.localUri);
+        String.assign(content~ptr, "<h1>404 - Not Found</h1><p> you are in \"%.512s\"", uri);
         Http.print(connection, "HTTP/1.1 404 Not Found\r\n");
         Http.print(connection, "Content-Type: text/html\r\n");
         Http.print(connection, "Content-Length: %d\r\n\r\n", String.getLength(content~ptr));
         Http.print(connection, content~ptr);
-
-        return 1;
     }
 
     // Helpers
