@@ -17,7 +17,7 @@
         }
     }
 
-    class CallbackContext {
+    class RequestCallbackContext {
         def mainAssetsPath: String;
         def assetRoutes: Array[StaticRoute];
         def uiEndpoints: Array[StaticRoute];
@@ -26,7 +26,7 @@
     }
 
     class ServerSession {
-        def callbackContext: SrdRef[CallbackContext];
+        def requestCallbackContext: SrdRef[RequestCallbackContext];
         def httpContext: ptr[Http.Context];
     }
 
@@ -201,7 +201,7 @@
                 }
                 def fnName: String = Spp.astMgr.getDefinitionName(elements(i));
                 Spp.astMgr.insertAst(
-                    (ast callbackContext.uiEndpoints.add(StaticRoute(String(uri), String(path)))),
+                    (ast requestCallbackContext.uiEndpoints.add(StaticRoute(String(uri), String(path)))),
                     AstTemplateMap()
                         .set(String("uri"), Core.Data.Ast.StringLiteral(uriParams(0)))
                         .set(String("path"), Core.Data.Ast.StringLiteral(fnName + ".html"))
@@ -245,7 +245,9 @@
         def i: Int;
         for i = 0, i < assetRoutes.getLength(), ++i {
             Spp.astMgr.insertAst(
-                (ast callbackContext.assetRoutes.add(StaticRoute(String(uri), String(srcPath), String(buildPath)))),
+                (ast requestCallbackContext.assetRoutes.add(
+                    StaticRoute(String(uri), String(srcPath), String(buildPath))
+                )),
                 Map[String, ref[Core.Basic.TiObject]]()
                     .set(String("uri"), Core.Data.Ast.StringLiteral(assetRoutes(i).uri))
                     .set(String("srcPath"), Core.Data.Ast.StringLiteral(assetRoutes(i).srcPath))
@@ -309,11 +311,11 @@
         options.add(0);
 
         // Prepare the context.
-        def callbackContext: SrdRef[CallbackContext];
-        callbackContext.construct();
-        callbackContext.mainAssetsPath = mainAssetsPath;
-        callbackContext.uiEndpointsPath = uiEndpointsPath;
-        callbackContext.useSrcAssetsPath = useSrcAssetsPath;
+        def requestCallbackContext: SrdRef[RequestCallbackContext];
+        requestCallbackContext.construct();
+        requestCallbackContext.mainAssetsPath = mainAssetsPath;
+        requestCallbackContext.uiEndpointsPath = uiEndpointsPath;
+        requestCallbackContext.useSrcAssetsPath = useSrcAssetsPath;
         preprocess {
             // Dummy statement just to prevent circular code generation.
             Core.Data.Ast.StringLiteral();
@@ -324,13 +326,13 @@
 
         // Start the HTTP server.
         def httpContext: ptr[Http.Context] = Http.startServer(
-            callbackRequest[modulesRef]~ptr, callbackContext.obj~ptr, options
+            requestCallback[modulesRef]~ptr, requestCallbackContext.obj~ptr, options
         );
         if httpContext == 0 return 0;
 
         def session: ptr[ServerSession] = Memory.alloc(ServerSession~size)~cast[ptr[ServerSession]];
         session~cnt~init();
-        session~cnt.callbackContext = callbackContext;
+        session~cnt.requestCallbackContext = requestCallbackContext;
         session~cnt.httpContext = httpContext;
         return session;
     }
@@ -377,10 +379,10 @@
         runServer[modulesRef](webPlatformPath, String(TEMP_UI_ENDPOINTS_PATH), options, true);
     }
 
-    func callbackRequest [modulesRef: ast_ref = Root] (connection: ptr[Http.Connection]): Int {
+    func requestCallback [modulesRef: ast_ref = Root] (connection: ptr[Http.Connection]): Int {
         def requestInfo: ptr[Http.RequestInfo] = Http.getRequestInfo(connection);
-        def context: ref[CallbackContext];
-        context~ptr = requestInfo~cnt.userData~cast[ptr[CallbackContext]];
+        def context: ref[RequestCallbackContext];
+        context~ptr = requestInfo~cnt.userData~cast[ptr[RequestCallbackContext]];
         def uri: ptr[array[Char]] = requestInfo~cnt.localUri;
         def method: ptr[array[Char]] = requestInfo~cnt.requestMethod;
 
@@ -421,10 +423,7 @@
                     if context.useSrcAssetsPath assetsPath~no_deref = context.assetRoutes(i).srcPath
                     else assetsPath~no_deref = context.assetRoutes(i).buildPath;
                     def fileName: String = assetsPath + (uri + context.assetRoutes(i).uri.getLength());
-                    if isDir(fileName) {
-                        return404(connection, uri);
-                        return 1;
-                    } else if Fs.exists(fileName) {
+                    if Fs.exists(fileName) and not isDir(fileName)  {
                         Http.sendFile(connection, fileName);
                         return 1;
                     }
