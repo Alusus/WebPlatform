@@ -1,0 +1,9 @@
+@merge module WebPlatform {
+    func isDir(path: ptr[array[Char]]): Bool {
+        def d: ptr[Fs.Dir];
+        d = Fs.openDir(path);
+        if d == 0 return false;
+        Fs.closeDir(d);
+        return true;
+    }
+}
