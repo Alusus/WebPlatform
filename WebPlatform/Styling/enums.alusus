@@ -27,6 +27,12 @@
         enumStringValue[AUTO, "auto"];
     }
 
+    class TextOverflow {
+        setupStringEnum[];
+        enumStringValue[CLIP, "clip"];
+        enumStringValue[ELLIPSIS, "ellipsis"];
+    }
+
     class Display {
         setupStringEnum[];
         enumStringValue[INLINE, "inline"];
@@ -104,6 +110,14 @@
         enumStringValue[BREAK_ALL, "break-all"];
         enumStringValue[KEEP_ALL, "keep-all"];
         enumStringValue[BREAK_WORD, "break-word"];
+    }
+
+    class WhiteSpace {
+        setupStringEnum[];
+        enumStringValue[NORMAL, "normal"];
+        enumStringValue[PRE, "pre"];
+        enumStringValue[PRE_WRAP, "pre-wrap"];
+        enumStringValue[PRE_LINE, "pre-line"];
     }
 
     class Direction {

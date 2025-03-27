@@ -9,6 +9,7 @@
 
         // Properties
         generateProperty[className, ClassName, String];
+        generateProperty[title, Title, String];
 
         // Events
         def onResize: DomEventSignal[Widget, Int];
@@ -120,6 +121,7 @@
             if this.id != "" {
                 if this._style.isNull() setElementAttribute(this.id, "class", this.className)
                 else setElementAttribute(this.id, "class", this.className + " " + this._style.id);
+                setElementAttribute(this.id, "title", this.title);
             }
         }
 

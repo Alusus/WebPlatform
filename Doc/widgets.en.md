@@ -17,6 +17,7 @@ The base class for all widgets.
 #### Properties
 
 * `className`: `String`. Class name of the widget, used for applying styles by class name.
+* `title`: `String`. A string to be displayed as a tooltip when the cursor hovers over the element.
 
 #### Events
 

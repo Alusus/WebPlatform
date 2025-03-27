@@ -30,6 +30,10 @@
             return SrdRef[LengthConst].construct().{ this.wkThis = this; unit = "auto" };
         }
 
+        func inherit(): SrdRef[LengthConst] {
+            return SrdRef[LengthConst].construct().{ this.wkThis = this; unit = "inherit" };
+        }
+
         handler this + SrdRef[Length]: SrdRef[LengthOpLength] {
             return SrdRef[LengthOpLength].construct()~use_in(self) {
                 self.wkThis = self;
