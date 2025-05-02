@@ -15,7 +15,10 @@ other async operations.
 class Signal [ownerType: type, payloadType: type] {
     handler this.connect(slot: closure (ref[ownerType], payload: ref[payloadType]));
     handler this.disconnect(slot: closure (ref[ownerType], payload: ref[payloadType]));
+    handler this.disconnect(id: ArchInt);
     handler this.getConnectionCount (): Int;
+    handler this.emit(owner: ref[ownerType], payload: ref[payloadType]);
+    def onConnectionsChanged: closure (connectionCount: Int);
 }
 ```
 
@@ -46,6 +49,11 @@ called and payload passed to it.
 `disconnect` a method used to disconnect a closure connected by the previous method from the signal.
 
 `getConnectionCount` a method that retrieve the number of connections with the signal.
+
+`emit` emits the signal through all current connections.
+
+`onConnectionsChanged` a closure to be called when connections change, whether by adding a new connection or removing
+an existing one.
 
 
 ### DomEventSignal

@@ -2,14 +2,14 @@
     //==========================================================================
     // Hyperlink
     class Hyperlink {
-        @injection def widget: Widget;
+        @injection def basicWidget: BasicWidget;
         def child: SrdRef[Widget];
 
         //-----------
         // Properties
 
-        generateProperty[url, Url, String];
-        generateProperty[newTab, NewTab, Bool];
+        defineProperty[url, Url, String];
+        defineProperty[newTab, NewTab, Bool];
 
         //---------
         // Handlers

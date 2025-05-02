@@ -2,14 +2,14 @@
     //==========================================================================
     // Video
     class Video {
-        @injection def widget: Widget;
+        @injection def basicWidget: BasicWidget;
 
         //-----------
         // Properties
-        generateProperty[sourceArray, SourceArray, Array[VideoSource]];
-        generateProperty[trackArray, TrackArray, Array[VideoTrack]];
-        generateProperty[controls, Controls, bool];
-        generateProperty[autoplay, Autoplay, bool];
+        defineProperty[sourceArray, SourceArray, Array[VideoSource]];
+        defineProperty[trackArray, TrackArray, Array[VideoTrack]];
+        defineProperty[controls, Controls, bool];
+        defineProperty[autoplay, Autoplay, bool];
 
 
         //---------

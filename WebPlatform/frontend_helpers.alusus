@@ -7,7 +7,7 @@
         return String("id") + (++counter);
     }
 
-    macro generateProperty [propName, upperCasePropName, propType] {
+    macro defineProperty [propName, upperCasePropName, propType] {
         def v__propName__: propType;
         handler this.set__upperCasePropName__ (val: temp_ref[propType]) {
             this.v__propName__ = val;
@@ -22,6 +22,32 @@
             return this.v__propName__;
         }
         handler this.propName: ref[propType] {
+            return this.v__propName__;
+        }
+    }
+
+    macro defineAbstractProperty [propName, upperCasePropName, propType] {
+        handler this.set__upperCasePropName__ (val: temp_ref[propType]) as_ptr;
+        handler this.get__upperCasePropName__ (): ref[propType] as_ptr;
+        handler this.propName = (val: temp_ref[propType]) as_ptr;
+        handler this.propName: ref[propType] as_ptr;
+    }
+
+    macro implementAbstractProperty [parentClass, propName, upperCasePropName, propType] {
+        def v__propName__: propType;
+        handler (this:parentClass).set__upperCasePropName__ (val: temp_ref[propType]) set_ptr {
+            this.v__propName__ = val;
+            this.onPropUpdated();
+        }
+        handler (this:parentClass).get__upperCasePropName__ (): ref[propType] set_ptr {
+            return this.v__propName__;
+        }
+        handler (this:parentClass).propName = (val: temp_ref[propType]) set_ptr {
+            this.v__propName__ = val;
+            this.onPropUpdated();
+            return this.v__propName__;
+        }
+        handler (this:parentClass).propName: ref[propType] set_ptr {
             return this.v__propName__;
         }
     }

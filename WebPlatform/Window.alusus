@@ -1,6 +1,14 @@
 @merge module WebPlatform {
     class Window {
-        @shared def instance: Window(0~cast[ptr]);
+        @shared def _instance: ref[Window];
+        @operation[""] func instance (): ref[Window] {
+            if _instance~ptr == 0 {
+                _instance~ptr = Memory.alloc(Window~size)~cast[ptr[Window]];
+                _instance~init(0~cast[ptr]);
+            }
+            return _instance;
+        }
+
         def _style: SrdRef[StyleSet];
         def id: ptr[array[Char]] = "window";
         def view: SrdRef[Widget];
@@ -9,15 +17,59 @@
         def localStorage: Storage(1);
 
         handler this~init(dummy: ptr) {
-            this.onKeyDown.owner~no_deref = this;
-            this.onKeyUp.owner~no_deref = this;
-            this.onPointerLockChange.owner~no_deref = this;
-            this.onFullScreenChange.owner~no_deref = this;
-            this.onGamepadConnected.owner~no_deref = this;
-            this.onGamepadDisconnected.owner~no_deref = this;
-            this.onLocationChanged.owner~no_deref = this;
-            this.onVisibilityChanged.owner~no_deref = this;
-            this.onMessage.owner~no_deref = this;
+            this.onKeyDown.onConnectionsChanged = closure (connectionCount: Int) {
+                handleSignalConnectionChanged["window", onKeyDown, "keydown", this.keysToSwallow, {
+                    this.onKeyDown.emit(this, data("code"));
+                }];
+            };
+
+            this.onKeyUp.onConnectionsChanged = closure (connectionCount: Int) {
+                handleSignalConnectionChanged["window", onKeyUp, "keyup", this.keysToSwallow, {
+                    this.onKeyUp.emit(this, data("code"));
+                }];
+            };
+
+            this.onPointerLockChange.onConnectionsChanged = closure (connectionCount: Int) {
+                handleSignalConnectionChanged["window", onPointerLockChange, "pointerlockchange", {
+                    this.onPointerLockChange.emit(this, Bool().{ this = data("enabled") });
+                }];
+            };
+
+            this.onFullScreenChange.onConnectionsChanged = closure (connectionCount: Int) {
+                handleSignalConnectionChanged["window", onFullScreenChange, "fullscreenchange", {
+                    this.onFullScreenChange.emit(this, Bool().{ this = data("enabled") });
+                }];
+            };
+
+            this.onGamepadConnected.onConnectionsChanged = closure (connectionCount: Int) {
+                handleSignalConnectionChanged["window", onGamepadConnected, "gamepadconnected", {
+                    this.onGamepadConnected.emit(this, data("gamepad")("id"));
+                }];
+            };
+
+            this.onGamepadDisconnected.onConnectionsChanged = closure (connectionCount: Int) {
+                handleSignalConnectionChanged["window", onGamepadDisconnected, "gamepaddisconnected", {
+                    this.onGamepadDisconnected.emit(this, data("gamepad")("id"));
+                }];
+            };
+
+            this.onLocationChanged.onConnectionsChanged = closure (connectionCount: Int) {
+                handleSignalConnectionChanged["window", onLocationChanged, "popstate", {
+                    this.onLocationChanged.emit(this, Int(0));
+                }];
+            };
+
+            this.onVisibilityChanged.onConnectionsChanged = closure (connectionCount: Int) {
+                handleSignalConnectionChanged["document", onVisibilityChanged, "visibilitychange", {
+                    this.onVisibilityChanged.emit(this, Int(0));
+                }];
+            };
+
+            this.onMessage.onConnectionsChanged = closure (connectionCount: Int) {
+                handleSignalConnectionChanged["window", onMessage, "message", {
+                    this.onMessage.emit(this, data("data"));
+                }];
+            };
         }
 
         //-------
@@ -41,58 +93,6 @@
         def onVisibilityChangedId: ArchInt = -1;
         def onMessage: DomEventSignal[Window, Json];
         def onMessageId: ArchInt = -1;
-
-        handler this.onSignalConnectionsChanged(signal: ptr[Signal[Window, String]], connectionCount: Int) {
-            if signal == this.onKeyDown~ptr {
-                handleSignalConnectionChanged["window", onKeyDown, "keydown", this.keysToSwallow, {
-                    this.onKeyDown.emit(data("code"));
-                }];
-            } else if signal == this.onKeyUp~ptr {
-                handleSignalConnectionChanged["window", onKeyUp, "keyup", this.keysToSwallow, {
-                    this.onKeyUp.emit(data("code"));
-                }];
-            } else if signal == this.onGamepadConnected~ptr {
-                handleSignalConnectionChanged["window", onGamepadConnected, "gamepadconnected", {
-                    this.onGamepadConnected.emit(data("gamepad")("id"));
-                }];
-            } else if signal == this.onGamepadDisconnected~ptr {
-                handleSignalConnectionChanged["window", onGamepadDisconnected, "gamepaddisconnected", {
-                    this.onGamepadDisconnected.emit(data("gamepad")("id"));
-                }];
-            }
-        }
-
-        handler this.onSignalConnectionsChanged(signal: ptr[Signal[Window, Bool]], connectionCount: Int) {
-            if signal == this.onPointerLockChange~ptr {
-                handleSignalConnectionChanged["window", onPointerLockChange, "pointerlockchange", {
-                    this.onPointerLockChange.emit(Bool().{ this = data("enabled") });
-                }];
-            } else if signal == this.onFullScreenChange~ptr {
-                handleSignalConnectionChanged["window", onFullScreenChange, "fullscreenchange", {
-                    this.onFullScreenChange.emit(Bool().{ this = data("enabled") });
-                }];
-            }
-        }
-
-        handler this.onSignalConnectionsChanged(signal: ptr[Signal[Window, Int]], connectionCount: Int) {
-            if signal == this.onLocationChanged~ptr {
-                handleSignalConnectionChanged["window", onLocationChanged, "popstate", {
-                    this.onLocationChanged.emit(Int(0));
-                }];
-            } else if signal == this.onVisibilityChanged~ptr {
-                handleSignalConnectionChanged["document", onVisibilityChanged, "visibilitychange", {
-                    this.onVisibilityChanged.emit(Int(0));
-                }];
-            }
-        }
-
-        handler this.onSignalConnectionsChanged(signal: ptr[Signal[Window, Json]], connectionCount: Int) {
-            if signal == this.onMessage~ptr {
-                handleSignalConnectionChanged["window", onMessage, "message", {
-                    this.onMessage.emit(data("data"));
-                }];
-            }
-        }
 
         //---------
         // Handlers
@@ -151,7 +151,7 @@
 
         handler this.pushLocation (url: ptr[array[Char]]) {
             WebPlatform.pushState(url, "{}");
-            this.onLocationChanged.emit(Int(0));
+            this.onLocationChanged.emit(this, Int(0));
         }
 
         handler this.visible: Bool {
@@ -171,4 +171,3 @@
         }
     }
 }
-

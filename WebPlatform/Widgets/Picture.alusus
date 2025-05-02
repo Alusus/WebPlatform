@@ -2,11 +2,11 @@
     //==========================================================================
     // Picture
     class Picture {
-        @injection def widget: Widget;
+        @injection def basicWidget: BasicWidget;
 
         //-----------
         // Properties
-        generateProperty[sourceArray, SourceArray, Array[ImageSource]];
+        defineProperty[sourceArray, SourceArray, Array[ImageSource]];
         def child: SrdRef[Image];
 
         //---------

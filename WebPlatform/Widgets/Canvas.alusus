@@ -3,15 +3,15 @@
     // Canvas
     // A free form drawing area.
     class Canvas {
-        @injection def widget: Widget;
+        @injection def basicWidget: BasicWidget;
         @injection def drawing: Drawing;
         def resourceId: ArchInt;
 
         //-----------
         // Properties
 
-        generateProperty[bitmapWidth, BitmapWidth, SrdRef[Length]];
-        generateProperty[bitmapHeight, BitmapHeight, SrdRef[Length]];
+        defineProperty[bitmapWidth, BitmapWidth, SrdRef[Length]];
+        defineProperty[bitmapHeight, BitmapHeight, SrdRef[Length]];
 
         //---------
         // Handlers

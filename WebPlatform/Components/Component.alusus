@@ -23,6 +23,78 @@
             return this._view;
         }
 
+        //--------------------
+        // Abstract Properties
+
+        handler (this: Widget).id: String set_ptr {
+            if this._view.isNull() return String()
+            else return this._view.id;
+        }
+
+        handler (this: Widget).style: SrdRef[StyleSet] set_ptr {
+            return this._view.style;
+        }
+        handler (this: Widget).style = SrdRef[StyleSet] set_ptr {
+            return this._view.style;
+        }
+
+        handler (this:Widget).setClassName (val: temp_ref[String]) set_ptr {
+            this._view.setClassName(val);
+        }
+        handler (this:Widget).getClassName (): ref[String] set_ptr {
+            return this._view.getClassName();
+        }
+        handler (this:Widget).className = (val: temp_ref[String]) set_ptr {
+            this._view.className = val;
+            return this._view.className;
+        }
+        handler (this:Widget).className: ref[String] set_ptr {
+            return this._view.className;
+        }
+
+        //--------------------
+        // Abstract Events
+
+        handler (this:Widget).onResize: ref[DomEventSignal[Widget, Int]] set_ptr {
+            return this._view.onResize;
+        }
+
+        handler (this:Widget).onMouseEnter: ref[DomEventSignal[Widget, Int]] set_ptr {
+            return this._view.onMouseEnter;
+        }
+
+        handler (this:Widget).onMouseOut: ref[DomEventSignal[Widget, Int]] set_ptr {
+            return this._view.onMouseOut;
+        }
+
+        handler (this:Widget).onMouseDown: ref[DomEventSignal[Widget, MouseButtonPayload]] set_ptr {
+            return this._view.onMouseDown;
+        }
+
+        handler (this:Widget).onMouseUp: ref[DomEventSignal[Widget, MouseButtonPayload]] set_ptr {
+            return this._view.onMouseUp;
+        }
+
+        handler (this:Widget).onMouseMove: ref[DomEventSignal[Widget, MouseMovePayload]] set_ptr {
+            return this._view.onMouseMove;
+        }
+
+        handler (this:Widget).onTouchStart: ref[DomEventSignal[Widget, Array[TouchPayload]]] set_ptr {
+            return this._view.onTouchStart;
+        }
+
+        handler (this:Widget).onTouchEnd: ref[DomEventSignal[Widget, Array[TouchPayload]]] set_ptr {
+            return this._view.onTouchEnd;
+        }
+
+        handler (this:Widget).onTouchMove: ref[DomEventSignal[Widget, Array[TouchPayload]]] set_ptr {
+            return this._view.onTouchMove;
+        }
+
+        handler (this:Widget).onClick: ref[DomEventSignal[Widget, Int]] set_ptr {
+            return this._view.onClick;
+        }
+
         //-------------------
         // Abstract Functions
 
@@ -37,7 +109,6 @@
         handler (this:Widget).build (ownerId: String, nextSiblingId: String) set_ptr {
             this.beforeBuild();
             if this._view.obj~ptr != 0 this._view.build(ownerId, nextSiblingId);
-            this.id = this._view.id;
             this.ownerId = ownerId;
             this.nextSiblingId = nextSiblingId;
             this.afterBuild();
@@ -45,7 +116,6 @@
 
         handler (this:Widget).unbuild() set_ptr {
             this.beforeUnbuild();
-            this.id = String();
             if this._view.obj~ptr != 0 this._view.unbuild();
             this.afterUnbuild();
         }

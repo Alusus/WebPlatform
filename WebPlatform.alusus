@@ -36,6 +36,7 @@ import "WebPlatform/Styling/StyleSet";
 import "WebPlatform/Styling/Animation";
 import "WebPlatform/Styling/enums";
 import "WebPlatform/Widgets/Widget";
+import "WebPlatform/Widgets/BasicWidget";
 import "WebPlatform/Widgets/Box";
 import "WebPlatform/Widgets/Text";
 import "WebPlatform/Widgets/Hyperlink";

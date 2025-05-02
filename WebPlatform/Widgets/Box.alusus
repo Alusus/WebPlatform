@@ -3,7 +3,7 @@
     // Box
     // A rectangular area that contains other widgets.
     class Box {
-        @injection def widget: Widget;
+        @injection def basicWidget: BasicWidget;
         def children: Array[SrdRef[Widget]];
 
         //---------

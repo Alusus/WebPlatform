@@ -3,12 +3,12 @@
     // Browser
     // An area for viewing another web page, i.e. an IFrame.
     class Browser {
-        @injection def widget: Widget;
+        @injection def basicWidget: BasicWidget;
 
         //-----------
         // Properties
 
-        generateProperty[url, Url, String];
+        defineProperty[url, Url, String];
 
         //---------
         // Handlers

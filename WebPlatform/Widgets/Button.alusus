@@ -2,12 +2,12 @@
     //==========================================================================
     // Button
     class Button {
-        @injection def widget: Widget;
+        @injection def basicWidget: BasicWidget;
 
         //-----------------------
         // Properties and Signals
 
-        generateProperty[text, Text, String];
+        defineProperty[text, Text, String];
 
         //---------
         // Handlers
