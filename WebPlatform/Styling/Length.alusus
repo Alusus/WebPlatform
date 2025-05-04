@@ -79,6 +79,8 @@
         handler (this:Length).toString(): String set_ptr {
             if String.isEqual(this.unit, "auto") {
                 return String("auto");
+            } else if String.isEqual(this.unit, "inherit") {
+                return String("inherit");
             } else {
                 return String.format("%f%s", this.val, this.unit);
             }
