@@ -12,6 +12,7 @@
         def transitionIn: Bool;
         def transitionDurations: Map[String, Int];
 
+        this.view = Box();
         this.style.{
             display = Display.FLEX;
             layout = Layout.ROW;
@@ -25,9 +26,6 @@
             position = Position.ABSOLUTE;
             left = Length.pt(0);
             flex = Flex(0, 0);
-        };
-        this.view = Box({})~use_in(self) {
-            style = this.style;
         };
 
         handler this~init() {

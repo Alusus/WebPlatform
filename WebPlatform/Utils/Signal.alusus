@@ -4,13 +4,13 @@
     // A signal that can be subscribed to for handling events. It can have
     // multiple subscriptions.
     class Signal [ownerType: type, payloadType: type] {
-        def owner: ref[ownerType];
         def slots: Array[closure (ref[ownerType], payload: ref[payloadType])];
+        def onConnectionsChanged: closure (connectionCount: Int);
 
-        handler this.emit(payload: ref[payloadType]) {
+        handler this.emit(owner: ref[ownerType], payload: ref[payloadType]) {
             def i: Int;
             for i = 0, i < this.slots.getLength(), ++i {
-                this.slots(i)(this.owner, payload);
+                this.slots(i)(owner, payload);
             }
         }
 
@@ -20,7 +20,7 @@
                 if this.slots(i) == slot return slot.data.obj~ptr~cast[ArchInt];
             }
             this.slots.add(slot);
-            this.owner.onSignalConnectionsChanged(this~ptr, this.slots.getLength());
+            if not this.onConnectionsChanged.isNull() this.onConnectionsChanged(this.slots.getLength());
             return slot.data.obj~ptr~cast[ArchInt];
         }
 
@@ -29,7 +29,7 @@
             for i = 0, i < this.slots.getLength(), ++i {
                 if this.slots(i) == slot {
                     this.slots.remove(i);
-                    this.owner.onSignalConnectionsChanged(this~ptr, this.slots.getLength());
+                    if not this.onConnectionsChanged.isNull() this.onConnectionsChanged(this.slots.getLength());
                     return;
                 }
             }
@@ -40,7 +40,7 @@
             for i = 0, i < this.slots.getLength(), ++i {
                 if this.slots(i).data.obj~ptr~cast[ArchInt] == id {
                     this.slots.remove(i);
-                    this.owner.onSignalConnectionsChanged(this~ptr, this.slots.getLength());
+                    if not this.onConnectionsChanged.isNull() this.onConnectionsChanged(this.slots.getLength());
                     return;
                 }
             }

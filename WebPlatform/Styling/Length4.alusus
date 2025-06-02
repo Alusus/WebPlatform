@@ -60,18 +60,29 @@
         defineInitializer[vmax, "vmax"];
         defineInitializer[em, "em"];
         defineInitializer[percent, "%"];
+
         func auto(): Length4 {
             return Length4(Length.auto())
         }
 
+        func inherit(): Length4 {
+            return Length4(Length.inherit())
+        }
+
         handler this.toString(): String {
-            return String.format(
-                "%s %s %s %s",
-                this.top.toString().buf,
-                this.right.toString().buf,
-                this.bottom.toString().buf,
-                this.left.toString().buf
-            );
+            if this.top.obj~ptr == this.right.obj~ptr
+            and this.top.obj~ptr == this.bottom.obj~ptr
+            and this.top.obj~ptr == this.left.obj~ptr {
+                return this.top.toString();
+            } else {
+                return String.format(
+                    "%s %s %s %s",
+                    this.top.toString().buf,
+                    this.right.toString().buf,
+                    this.bottom.toString().buf,
+                    this.left.toString().buf
+                );
+            }
         }
     }
 }

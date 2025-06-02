@@ -191,7 +191,7 @@ wasmApi.unregisterElementEventHandler = (elementName, eventName) => {
     } else if (jsElementName === 'document') {
         document[`on${jsEventName}`] = null;
     } else {
-        const element=document.getElementById(jsElementName)
+        const element = document.getElementById(jsElementName)
         if (!element) return;
         element[`on${jsEventName}`] = null;
     }
@@ -205,6 +205,7 @@ wasmApi.observeResize = (elementName, cbId) => {
 
 wasmApi.unobserveResize = (elementName) => {
     const element = document.getElementById(toJsString(elementName))
+    if (!element) return;
     element.dataset.resizeObserverCbId = null;
     resizeObserver.unobserve(element);
 }

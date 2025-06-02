@@ -14,9 +14,12 @@
 
 ```
 صنف إشـارة [صنف_المالك: صنف، صنف_الحمولة: صنف] {
-    عرف اربط(خانة: مغلف(سند[نمط_المالك]، حمولة: سند[نمط_الحمولة]))؛
-    عرف افصل(خانة: مغلف(سند[نمط_المالك]، حمولة: سند[نمط_الحمولة]))؛
-    عرف هات_عدد_الروابط(): صـحيح؛
+    عرف هذا.اربط(خانة: مغلف(سند[صنف_المالك]، حمولة: سند[صنف_الحمولة]))؛
+    عرف هذا.افصل(خانة: مغلف(سند[صنف_المالك]، حمولة: سند[صنف_الحمولة]))؛
+    عرف هذا.افصل(معرف: صـحيح)؛
+    عرف هذا.هات_عدد_الروابط(): صـحيح؛
+    عرف هذا.أرسل(المالك: سند[صنف_المالك]، الحمولة: سند[صنف_الحمولة])؛
+    عرف هذا.عند_تغير_الارتباطات: مغلفة (عدد_الارتباطات: صـحيح)؛
 }
 ```
 
@@ -26,7 +29,10 @@
 class Signal [ownerType: type, payloadType: type] {
     handler this.connect(slot: closure (ref[ownerType], payload: ref[payloadType]));
     handler this.disconnect(slot: closure (ref[ownerType], payload: ref[payloadType]));
-    handler this.getConnectionCount (): Int;
+    handler this.disconnect(id: ArchInt);
+    handler this.getConnectionCount(): Int;
+    handler this.emit(owner: ref[ownerType], payload: ref[payloadType]);
+    def onConnectionsChanged: closure (connectionCount: Int);
 }
 ```
 
@@ -63,6 +69,11 @@ closure (ref[Widget], ref[String]) { ... }
 `افصل` (`disconnect`) طريقة لفصل مغلفة تم ربطها بواسطة التابع السابق عن الإشارة.
 
 `هات_عدد_الروابط` (`getConnectionCount`) طريقة تعيد عدد الروابط للإشارة.
+
+`أرسل` (`emit`) لإرسال إشارة عبر جميع الارتباطات الحالية لهذه الإشارة.
+
+`عند_تغير_الارتباطات` (`onConnectionsChanged`) دالة مغلفة تُستدعى عند تغير الارتباطات الحالية سواء بفصل أحد الارتباطات
+أو بإنشاء ارتباط جديد.
 
 
 ### إشـارة_حدث_دوم (DomEventSignal)

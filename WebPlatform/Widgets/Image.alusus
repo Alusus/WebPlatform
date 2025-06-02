@@ -2,12 +2,12 @@
     //==========================================================================
     // Image
     class Image {
-        @injection def widget: Widget;
+        @injection def basicWidget: BasicWidget;
 
         //-----------
         // Properties
 
-        generateProperty[url, Url, String];
+        defineProperty[url, Url, String];
 
         //---------
         // Handlers

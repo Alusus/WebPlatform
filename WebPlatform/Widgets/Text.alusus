@@ -2,14 +2,14 @@
     //==========================================================================
     // Text
     class Text {
-        @injection def widget: Widget;
+        @injection def basicWidget: BasicWidget;
         def tag: String("span");
 
         //-----------
         // Properties
-        generateProperty[text, Text, String];
-        generateProperty[ariaHidden, AriaHidden, bool];
-        generateProperty[targetId, TargetId, String];
+        defineProperty[text, Text, String];
+        defineProperty[ariaHidden, AriaHidden, bool];
+        defineProperty[targetId, TargetId, String];
 
         //----------
         // Handlers

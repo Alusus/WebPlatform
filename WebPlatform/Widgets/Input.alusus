@@ -2,15 +2,15 @@
     //==========================================================================
     // Input
     class Input {
-        @injection def widget: Widget;
+        @injection def basicWidget: BasicWidget;
 
         //-----------------------
         // Properties and Signals
 
-        generateProperty[inputType, InputType, String];
-        generateProperty[placeholder, Placeholder, String];
-        generateProperty[ariaHidden, AriaHidden, bool];
-        generateProperty[disabled, Disabled, bool];
+        defineProperty[inputType, InputType, String];
+        defineProperty[placeholder, Placeholder, String];
+        defineProperty[ariaHidden, AriaHidden, bool];
+        defineProperty[disabled, Disabled, bool];
 
         def _text: String;
         handler this.setText (t: String) {
@@ -41,54 +41,46 @@
         // Handlers
 
         handler this~init() {
-            this.onChanged.owner~no_deref = this;
-            this.onKeyPress.owner~no_deref = this;
-            this.onKeyUp.owner~no_deref = this;
+            this.initSignals();
             this.inputType = String("text");
             this.ariaHidden = false;
             this.disabled = false;
         }
         handler this~init(inputType : String) {
-            this.onChanged.owner~no_deref = this;
-            this.onKeyPress.owner~no_deref = this;
-            this.onKeyUp.owner~no_deref = this;
-            this.inputType=inputType;
+            this.initSignals();
+            this.inputType = inputType;
             this.ariaHidden = false;
             this.disabled = false;
         }
 
-        //-----------------
-        // Member Functions
-
-        handler this.onSignalConnectionsChanged(signal: ptr[Signal[Input, Int]], connectionCount: Int) {
-            if this.id == "" return;
-
-            if signal == this.onChanged~ptr {
+        handler this.initSignals() {
+            this.onChanged.onConnectionsChanged = closure (connectionCount: Int) {
                 handleSignalConnectionChanged[this.id, onChanged, "change", {
-                    this.onChanged.emit(Int(0));
+                    this.onChanged.emit(this, Int(0));
                 }];
-            }
-        }
+            };
 
-        handler this.onSignalConnectionsChanged(signal: ptr[Signal[Input, String]], connectionCount: Int) {
-            if this.id == "" return;
-
-            if signal == this.onKeyPress~ptr {
+            this.onKeyPress.onConnectionsChanged = closure (connectionCount: Int) {
                 handleSignalConnectionChanged[this.id, onKeyPress, "keypress", "", {
                     def outPayload: String;
                     if data("shiftKey") outPayload += "Shift+";
                     outPayload += data("code")~cast[String];
-                    this.onKeyPress.emit(outPayload);
+                    this.onKeyPress.emit(this, outPayload);
                 }];
-            } else if signal == this.onKeyUp~ptr {
+            };
+
+            this.onKeyUp.onConnectionsChanged = closure (connectionCount: Int) {
                 handleSignalConnectionChanged[this.id, onKeyUp, "keyup", "", {
                     def outPayload: String;
                     if data("shiftKey") outPayload += "Shift+";
                     outPayload += data("code")~cast[String];
-                    this.onKeyUp.emit(outPayload);
+                    this.onKeyUp.emit(this, outPayload);
                 }];
-            }
+            };
         }
+
+        //-----------------
+        // Member Functions
 
         handler this.onPropUpdated() this.update();
 
@@ -100,9 +92,9 @@
             createElement("input", this.id, ownerId, nextSiblingId);
             this.buildCommon();
             this.update();
-            this.onSignalConnectionsChanged(this.onChanged~ptr, this.onChanged.getConnectionCount());
-            this.onSignalConnectionsChanged(this.onKeyPress~ptr, this.onKeyPress.getConnectionCount());
-            this.onSignalConnectionsChanged(this.onKeyUp~ptr, this.onKeyUp.getConnectionCount());
+            this.onChanged.onConnectionsChanged(this.onChanged.getConnectionCount());
+            this.onKeyPress.onConnectionsChanged(this.onKeyPress.getConnectionCount());
+            this.onKeyUp.onConnectionsChanged(this.onKeyUp.getConnectionCount());
         }
 
         handler (this:Widget).unbuild() set_ptr {
@@ -154,4 +146,3 @@
         }
     }
 }
-

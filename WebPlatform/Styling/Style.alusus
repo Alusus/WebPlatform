@@ -52,6 +52,7 @@
         generateTypedStyleProp[overflowX, "overflow-x", Overflow];
         generateTypedStyleProp[overflowY, "overflow-y", Overflow];
         generateTypedStyleProp[overflow, "overflow", Overflow];
+        generateTypedStyleProp[textOverflow, "text-overflow", TextOverflow];
         generateTypedStyleProp[boxShadow, "box-shadow", BoxShadow];
         generateTypedStyleProp[textShadow, "text-shadow", TextShadow];
         generateTypedStyleProp[display, "display", Display];
@@ -62,6 +63,7 @@
         generateTypedStyleProp[bottom, "bottom", Length];
         generateTypedStyleProp[background, "background", Background];
         generateTypedStyleProp[wordBreak, "word-break", WordBreak];
+        generateTypedStyleProp[whiteSpace, "white-space", WhiteSpace];
         generateTypedStyleProp[scalingAlgorithm, "image-rendering", ScalingAlgorithm];
 
         def vanimation: SrdRef[Animation];

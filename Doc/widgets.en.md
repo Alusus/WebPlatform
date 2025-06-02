@@ -10,20 +10,34 @@
 
 The base class for all widgets.
 
-#### Variables
+#### Abstract Properties
+
+The following are the abstract properties declared in this class that must be implemented in child classes.
+
+```
+handler this.id: String as_ptr;
+
+handler this.className: ref[String] as_ptr;
+handler this.className = temp_ref[String] as ptr;
+
+handler this.style: SrdRef[StyleSet] as_ptr;
+handler this.style = SrdRef[StyleSet] as_ptr;
+```
 
 * `id` a unique identifier to distinguish each widget from the other.
+* `className`: Class name of the widget, used for applying styles by class name.
+* `style`: This property allows updating the style of the widget. You can assign a StyleSet object to it, which
+  will be useful in sharing styles between multiple instances of a widget. If you try to update the styles
+  without setting a StyleSet upfront it will create a new StyleSet object for this widget and return it.
 
-#### Properties
+#### Abstract Events
 
-* `className`: `String`. Class name of the widget, used for applying styles by class name.
-
-#### Events
+The following are abstract events delcared in this class and must be implemented in child classes.
 
 ##### onResize
 
 ```
-def onResize: DomEventSignal[Widget, Int];
+def onResize: ref[DomEventSignal[Widget, Int]] as_ptr;
 ```
 
 Signals that the widget's dimensions changed.
@@ -31,7 +45,7 @@ Signals that the widget's dimensions changed.
 ##### onMouseEnter
 
 ```
-def onMouseEnter: DomEventSignal[Widget, Int];
+def onMouseEnter: ref[DomEventSignal[Widget, Int]] as_ptr;
 ```
 
 Signals that the cursor entered the widget's region.
@@ -39,7 +53,7 @@ Signals that the cursor entered the widget's region.
 ##### onMouseOut
 
 ```
-def onMouseOut: DomEventSignal[Widget, Int];
+def onMouseOut: ref[DomEventSignal[Widget, Int]] as_ptr;
 ```
 
 Signals that the cursor exited the widget's region.
@@ -47,7 +61,7 @@ Signals that the cursor exited the widget's region.
 ##### onMouseDown
 
 ```
-def onMouseDown: DomEventSignal[Widget, MouseButtonPayload];
+def onMouseDown: ref[DomEventSignal[Widget, MouseButtonPayload]] as_ptr;
 ```
 
 Signals that the mouse button has been pressed.
@@ -55,7 +69,7 @@ Signals that the mouse button has been pressed.
 ##### onMouseUp
 
 ```
-def onMouseUp: DomEventSignal[Widget, MouseButtonPayload];
+def onMouseUp: ref[DomEventSignal[Widget, MouseButtonPayload]] as_ptr;
 ```
 
 Signals that the mouse button has been released.
@@ -63,7 +77,7 @@ Signals that the mouse button has been released.
 ##### onMouseMove
 
 ```
-def onMouseMove: DomEventSignal[Widget, MouseMovePayload];
+def onMouseMove: ref[DomEventSignal[Widget, MouseMovePayload]] as_ptr;
 ```
 
 Signals that the cursor moved over the widget.
@@ -71,7 +85,7 @@ Signals that the cursor moved over the widget.
 ##### onTouchStart
 
 ```
-def onTouchStart: DomEventSignal[Widget, Array[TouchPayload]];
+def onTouchStart: ref[DomEventSignal[Widget, Array[TouchPayload]]] as_ptr;
 ```
 
 Signals the start of a touch on devices with touch screens.
@@ -79,7 +93,7 @@ Signals the start of a touch on devices with touch screens.
 ##### onTouchEnd
 
 ```
-def onTouchEnd: DomEventSignal[Widget, Array[TouchPayload]];
+def onTouchEnd: ref[DomEventSignal[Widget, Array[TouchPayload]]] as_ptr;
 ```
 
 Signals the end of a touch on devices with touch screens.
@@ -87,7 +101,7 @@ Signals the end of a touch on devices with touch screens.
 ##### onTouchMove
 
 ```
-def onTouchMove: DomEventSignal[Widget, Array[TouchPayload]];
+def onTouchMove: ref[DomEventSignal[Widget, Array[TouchPayload]]] as_ptr;
 ```
 
 Signals the change of touch positions on devices with touch screens.
@@ -95,25 +109,12 @@ Signals the change of touch positions on devices with touch screens.
 ##### onClick
 
 ```
-def onClick: DomEventSignal[Widget, Int];
+def onClick: ref[DomEventSignal[Widget, Int]] as_ptr;
 ```
 
 Signals that a mouse click occurred.
 
-
-#### Operations
-
-##### style
-
-```
-handler this.style: SrdRef[StyleSet];
-handler this.style = SrdRef[StyleSet];
-```
-
-This property allows updating the style of the widget. You can assign a StyleSet object to it, which
-will be useful in sharing styles between multiple instances of a widget. If you try to update the
-styles without setting a StyleSet upfront it will create a new StyleSet object for this widget and
-return it.
+#### Methods
 
 ##### getDimensions
 
@@ -157,6 +158,16 @@ handler this.scrollIntoView();
 ```
 
 Requets the browser to be scrolled to the element on which the method is called.
+
+
+### BasicWidget
+
+The base class of all basic widgets. It implements the operations that are shared between all basic widgets.
+
+It also adds the following definitions:
+
+* `hint`: `String`. A property for setting a string to be displayed as a tooltip when the cursor hovers over
+  the element.
 
 
 ### Box

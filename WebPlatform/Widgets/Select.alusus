@@ -2,13 +2,13 @@
     //==========================================================================
     // Select
     class Select {
-        @injection def widget: Widget;
+        @injection def basicWidget: BasicWidget;
 
         //-----------------------
         // Properties and Signals
 
-        generateProperty[items, Items, Map[String,String]];
-        generateProperty[ariaHidden, AriaHidden, bool];
+        defineProperty[items, Items, Map[String,String]];
+        defineProperty[ariaHidden, AriaHidden, bool];
 
         def onChanged: DomEventSignal[Select, Int];
         def onChangedId: ArchInt = -1;
@@ -17,22 +17,16 @@
         // Handlers
 
         handler this~init() {
-            this.onChanged.owner~no_deref = this;
+            this.onChanged.onConnectionsChanged = closure (connectionCount: Int) {
+                handleSignalConnectionChanged[this.id, onChanged, "change", {
+                    this.onChanged.emit(this, Int(0));
+                }];
+            };
             this.ariaHidden = false;
         }
 
         //-----------------
         // Member Functions
-
-        handler this.onSignalConnectionsChanged(signal: ptr[Signal[Select, Int]], connectionCount: Int) {
-            if this.id == "" return;
-
-            if signal == this.onChanged~ptr {
-                handleSignalConnectionChanged[this.id, onChanged, "change", {
-                    this.onChanged.emit(Int(0));
-                }];
-            }
-        }
 
         handler this.onPropUpdated() this.update();
 
@@ -44,7 +38,7 @@
             createElement("select", this.id, ownerId, nextSiblingId);
             this.buildCommon();
             this.update();
-            this.onSignalConnectionsChanged(this.onChanged~ptr, this.onChanged.getConnectionCount());
+            this.onChanged.onConnectionsChanged(this.onChanged.getConnectionCount());
         }
 
         handler (this:Widget).unbuild() set_ptr {
@@ -93,4 +87,3 @@
         }
     }
 }
-

@@ -30,10 +30,12 @@ fontFamily: String
 overflowX: Overflow
 overflowY: Overflow
 overflow: Overflow
+textOverflow: TextOverflow
 display: Display
 cursor: Cursor
 animation: Animation
 wordBreak: WordBreak
+whiteSpace: WhiteSpace
 width: Length
 height: Length
 minWidth: Length
@@ -87,10 +89,12 @@ style type.
 * `overflowX` Overflow on x axis.
 * `overflowY` Overflow on y axis.
 * `overflow` Overflow on x and y axes.
+* `textOverflow` Specifies how to display text that expands beyond the container's borders.
 * `display` The way the item is displayed.
 * `cursor` Cursor style.
 * `animation` Animations we want to apply on the item.
 * `wordBreak` How we should break the words on line end.
+* `whiteSpace` Specifies how to deal with white spaces.
 * `width` Item width.
 * `height` Item height.
 * `minWidth` The minimum width of the item.
@@ -408,6 +412,8 @@ This class defines the following measuring units:
 
 `auto` the auto value from CSS.
 
+`inherit` the inherit value from CSS.
+
 Each of these units is a function that creates an instance of type `Length` and gives it the
 value that was passed as an arg to the function. The return value is of type `SrdRef[Length]`.
 For example:
@@ -445,6 +451,8 @@ This class defines the following measuring units:
 `percent` a percentage of the container component.
 
 `auto` the "auto" value from CSS.
+
+`inherit` the inherit value from CSS.
 
 Each of these units is a function that creates an instance of type `Length4` and gives it the
 values that were passed as args to the function. The return value is of type `SrdRef[Length4]`.
@@ -630,12 +638,19 @@ An enum class that holds possible values for position as enum.
 
 ### Overflow
 
-An enum class that holds possible values for overflow as enum.
+An enum class that holds possible values for overflow properties.
 * `VISIBLE`
 * `HIDDEN`
 * `CLIP`
 * `SCROLL`
 * `AUTO`
+
+
+### TextOverflow
+
+An enum class that holds possible values for the textOverflow property.
+* `CLIP`
+* `ELLIPSIS`
 
 
 ### Display
@@ -722,6 +737,15 @@ An enum class that holds possible values for word break as enum.
 * `BREAK_ALL`
 * `KEEP_ALL`
 * `BREAK_WORD`
+
+
+### WhiteSpace
+
+An enum class that holds possible values for the whiteSpace property.
+* `NORMAL`
+* `PRE`
+* `PRE_WRAP`
+* `PRE_LINE`
 
 
 ### Direction

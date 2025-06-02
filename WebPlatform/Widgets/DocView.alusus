@@ -2,11 +2,11 @@
     //==========================================================================
     // DocView
     class DocView {
-        @injection def widget: Widget;
+        @injection def basicWidget: BasicWidget;
 
         //-----------
         // Properties
-        generateProperty[html, Text, String];
+        defineProperty[html, Text, String];
 
         //----------
         // Handlers

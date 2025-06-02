@@ -9,9 +9,9 @@
 
     //==========================================================================
     // handleSignalConnectionChanged
-    // A helper macro for handling an event in onSignalConnectionsChanged.
+    // A helper macro for handling signal connection changes in widgets.
     macro handleSignalConnectionChanged [elementId, signalName, eventHtmlIentifier, emitSignal] {
-        if connectionCount > 0 and this.__signalName__Id == -1 {
+        if connectionCount > 0 and this.__signalName__Id == -1 and not String.isEqual(elementId, "") {
             this.__signalName__Id = registerElementEventHandler(
                 elementId,
                 eventHtmlIentifier,
@@ -23,15 +23,17 @@
             );
         } else if connectionCount == 0 and this.__signalName__Id != -1 {
             unregisterElementEventHandler(this.__signalName__Id);
+            this.__signalName__Id = -1;
         }
     }
 
 
     //==========================================================================
     // handleSignalConnectionChanged
-    // A helper macro for handling a key event in onSignalConnectionsChanged.
+    // A helper macro for handling key events signal connection changes in
+    // widgets.
     macro handleSignalConnectionChanged [elementId, signalName, eventHtmlIentifier, keysToSwallow, emitSignal] {
-        if connectionCount > 0 and this.__signalName__Id == -1 {
+        if connectionCount > 0 and this.__signalName__Id == -1 and not String.isEqual(elementId, "") {
             this.__signalName__Id = registerElementKeyEventHandler(
                 elementId,
                 eventHtmlIentifier,
@@ -43,6 +45,7 @@
             );
         } else if connectionCount == 0 and this.__signalName__Id != -1 {
             unregisterElementEventHandler(this.__signalName__Id);
+            this.__signalName__Id = -1;
         }
     }
 }

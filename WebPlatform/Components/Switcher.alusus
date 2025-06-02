@@ -13,6 +13,15 @@
         def transitionDurations: Map[String, Int];
         def shouldPreserveChild: closure (child: ref[Widget]): Bool;
 
+        this.view = Box({})~use_in(self) {
+            addChildren({
+                Box({})~use_in(self) {
+                    className = String("switcherview");
+                    addChildren({ Box() });
+                    this.innerView = self;
+                }
+            });
+        };
         this.style.{
             display = Display.FLEX;
             layout = Layout.ROW;
@@ -28,16 +37,6 @@
         };
         this.style(">hiddenview").{
             display = Display.NONE;
-        };
-        this.view = Box({})~use_in(self) {
-            style = this.style;
-            addChildren({
-                Box({})~use_in(self) {
-                    className = String("switcherview");
-                    addChildren({ Box() });
-                    this.innerView = self;
-                }
-            });
         };
 
         handler this~init() {

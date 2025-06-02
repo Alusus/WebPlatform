@@ -12,26 +12,56 @@
 
 الصنف الأساسي (الجذر) لكل الودجات.
 
-#### المتغيرات
+#### الخصال المجردة
 
-* `معرف` (`id`): `نـص`. معرف عنصر DOM المقابل لهذه الودجة.
-
-#### الخصال
-
-* `اسم_الفئة` (`className`): `نـص`. اسم الفئة للودجة، وتستعمل لتطبيق طراز تابع لفئة معينة.
-
-#### الأحداث
-
-##### عند_تغير_الأبعاد (onResize)
+هذه قائمة الخصال المجردة (abstract properties) التي تعرفها هذه الودجة وتُلزم الأصناف المشتقة بتحقيقها.
 
 ```
-عرف عند_تغير_الأبعاد: إشـارة_حدث_دوم[ودجـة، صـحيح]؛
+عملية هذا.معرف: نـص: كمؤشر؛
+
+عملية هذا.اسم_الفئة: سند[نـص] كمؤشر؛
+عملية هذا.اسم_الفئة = سند_مؤقت[نـص] كمؤشر؛
+
+عملية هذا.الطراز: سـندنا[طـقم_طرز] كمؤشر؛
+عملية هذا.الطراز = سـندنا[طـقم_طرز] كمؤشر؛
 ```
 
 <div dir=ltr>
 
 ```
-def onResize: DomEventSignal[Widget, Int];
+handler this.id: String as_ptr;
+
+handler this.className: ref[String] as_ptr;
+handler this.className = temp_ref[String] as ptr;
+
+handler this.style: SrdRef[StyleSet] as_ptr;
+handler this.style = SrdRef[StyleSet] as_ptr;
+```
+
+</div>
+
+* `معرف` (`id`): معرف عنصر DOM المقابل لهذه الودجة.
+
+* `اسم_الفئة` (`className`): اسم الفئة للودجة، وتستعمل لتطبيق طراز تابع لفئة معينة.
+
+* `الطراز` (`style`): تستخدم لتعديل طقم الطرز المخصص لهذه الودجة. يمكن تعيين طقم طرز مشترك مع ودجات
+  أخرى. في حال محاولة تغيير طقم الطرز الخاص بالودجة قبل تعيين طقم طرز لها سيُنشأ طقم طرز تلقائيًا لهذه
+  الودجة.
+
+#### الأحداث المجردة
+
+هذه قائمة بالأحداث المجردة (abstract events) التي يعرفها هذا الصنف ويُلزم الأصناف المشتقة بتحقيقها.
+
+##### عند_تغير_الأبعاد (onResize)
+
+```
+عرف عند_تغير_الأبعاد: سند[إشـارة_حدث_دوم[ودجـة، صـحيح]] كمؤشر؛
+```
+
+<div dir=ltr>
+
+```
+def onResize: ref[DomEventSignal[Widget, Int]] as_ptr;
 ```
 
 </div>
@@ -41,13 +71,13 @@ def onResize: DomEventSignal[Widget, Int];
 ##### عند_دخول_المؤشر (onMouseEnter)
 
 ```
-عرف عند_دخول_المؤشر: إشـارة_حدث_دوم[ودجـة، صـحيح]؛
+عرف عند_دخول_المؤشر: سند[إشـارة_حدث_دوم[ودجـة، صـحيح]] كمؤشر؛
 ```
 
 <div dir=ltr>
 
 ```
-def onMouseEnter: DomEventSignal[Widget, Int];
+def onMouseEnter: ref[DomEventSignal[Widget, Int]] as_ptr;
 ```
 
 </div>
@@ -57,13 +87,13 @@ def onMouseEnter: DomEventSignal[Widget, Int];
 ##### عند_خروج_المؤشر (onMouseOut)
 
 ```
-عرف عند_خروج_المؤشر: إشـارة_حدث_دوم[ودجـة، صـحيح]؛
+عرف عند_خروج_المؤشر: سند[إشـارة_حدث_دوم[ودجـة، صـحيح]] كمؤشر؛
 ```
 
 <div dir=ltr>
 
 ```
-def onMouseOut: DomEventSignal[Widget, Int];
+def onMouseOut: ref[DomEventSignal[Widget, Int]] as_ptr;
 ```
 
 </div>
@@ -73,13 +103,13 @@ def onMouseOut: DomEventSignal[Widget, Int];
 ##### عند_بدء_النقرة (onMouseDown)
 
 ```
-عرف عند_بدء_النقرة: إشـارة_حدث_دوم[ودجـة، حـمولة_زر_المؤشر]؛
+عرف عند_بدء_النقرة: سند[إشـارة_حدث_دوم[ودجـة، حـمولة_زر_المؤشر]] كمؤشر؛
 ```
 
 <div dir=ltr>
 
 ```
-def onMouseDown: DomEventSignal[Widget, MouseButtonPayload];
+def onMouseDown: ref[DomEventSignal[Widget, MouseButtonPayload]] as_ptr;
 ```
 
 </div>
@@ -89,13 +119,13 @@ def onMouseDown: DomEventSignal[Widget, MouseButtonPayload];
 ##### عند_انتهاء_النقرة (onMouseUp)
 
 ```
-عرف عند_انتهاء_النقرة: إشـارة_حدث_دوم[ودجـة، حـمولة_زر_المؤشر]؛
+عرف عند_انتهاء_النقرة: سند[إشـارة_حدث_دوم[ودجـة، حـمولة_زر_المؤشر]] كمؤشر؛
 ```
 
 <div dir=ltr>
 
 ```
-def onMouseUp: DomEventSignal[Widget, MouseButtonPayload];
+def onMouseUp: ref[DomEventSignal[Widget, MouseButtonPayload]] as_ptr;
 ```
 
 </div>
@@ -105,13 +135,13 @@ def onMouseUp: DomEventSignal[Widget, MouseButtonPayload];
 ##### عند_تحريك_المؤشر (onMouseMove)
 
 ```
-عرف عند_تحريك_المؤشر: إشـارة_حدث_دوم[ودجـة، حـمولة_تحريك_المؤشر]؛
+عرف عند_تحريك_المؤشر: سند[إشـارة_حدث_دوم[ودجـة، حـمولة_تحريك_المؤشر]] كمؤشر؛
 ```
 
 <div dir=ltr>
 
 ```
-def onMouseMove: DomEventSignal[Widget, MouseMovePayload];
+def onMouseMove: ref[DomEventSignal[Widget, MouseMovePayload]] as_ptr
 ```
 
 </div>
@@ -121,13 +151,13 @@ def onMouseMove: DomEventSignal[Widget, MouseMovePayload];
 ##### عند_بدء_اللمس (onTouchStart)
 
 ```
-عرف عند_بدء_اللمس: إشـارة_حدث_دوم[ودجـة، مـصفوفة[حـمولة_لمس]]؛
+عرف عند_بدء_اللمس: سند[إشـارة_حدث_دوم[ودجـة، مـصفوفة[حـمولة_لمس]]] كمؤشر؛
 ```
 
 <div dir=ltr>
 
 ```
-def onTouchStart: DomEventSignal[Widget, Array[TouchPayload]];
+def onTouchStart: ref[DomEventSignal[Widget, Array[TouchPayload]]] as_ptr;
 ```
 
 </div>
@@ -137,13 +167,13 @@ def onTouchStart: DomEventSignal[Widget, Array[TouchPayload]];
 ##### عند_انتهاء_اللمس (onTouchEnd)
 
 ```
-عرف عند_انتهاء_اللمس: إشـارة_حدث_دوم[ودجـة، مـصفوفة[حـمولة_لمس]]؛
+عرف عند_انتهاء_اللمس: سند[إشـارة_حدث_دوم[ودجـة، مـصفوفة[حـمولة_لمس]]] كمؤشر؛
 ```
 
 <div dir=ltr>
 
 ```
-def onTouchEnd: DomEventSignal[Widget, Array[TouchPayload]];
+def onTouchEnd: ref[DomEventSignal[Widget, Array[TouchPayload]]] as_ptr;
 ```
 
 </div>
@@ -153,13 +183,13 @@ def onTouchEnd: DomEventSignal[Widget, Array[TouchPayload]];
 ##### عند_تحريك_اللمس (onTouchMove)
 
 ```
-عرف عند_تحريك_اللمس: إشـارة_حدث_دوم[ودجـة، مـصفوفة[حـمولة_لمس]]؛
+عرف عند_تحريك_اللمس: سند[إشـارة_حدث_دوم[ودجـة، مـصفوفة[حـمولة_لمس]]] كمؤشر؛
 ```
 
 <div dir=ltr>
 
 ```
-def onTouchMove: DomEventSignal[Widget, Array[TouchPayload]];
+def onTouchMove: ref[DomEventSignal[Widget, Array[TouchPayload]]] as_ptr;
 ```
 
 </div>
@@ -169,39 +199,20 @@ def onTouchMove: DomEventSignal[Widget, Array[TouchPayload]];
 ##### عند_الضغط (onClick)
 
 ```
-عرف عند_الضغط: إشـارة_حدث_دوم[ودجـة، صـحيح]؛
+عرف عند_الضغط: سند[إشـارة_حدث_دوم[ودجـة، صـحيح]] كمؤشر؛
 ```
 
 <div dir=ltr>
 
 ```
-def onClick: DomEventSignal[Widget, Int];
+def onClick: ref[DomEventSignal[Widget, Int]] as_ptr;
 ```
 
 </div>
 
 إشارة بأن ضغطة بزر الفأرة قد حدثت. الحمولة مهملة في هذا الحدث.
 
-#### العمليات
-
-##### الطراز (style)
-
-```
-عملية هذا.الطراز: سـندنا[طـقم_طرز]؛
-عملية هذا.الطراز = سـندنا[طـقم_طرز]؛
-```
-
-<div dir=ltr>
-
-```
-handler this.style: SrdRef[StyleSet];
-handler this.style = SrdRef[StyleSet];
-```
-
-</div>
-
-تستخدم لتعديل طقم الطرز المخصص لهذه الودجة. يمكن تعيين طقم طرز مشترك مع ودجات أخرى. في حال محاولة
-تغيير طقم الطرز الخاص بالودجة قبل تعيين طقم طرز لها سيُنشأ طقم طرز تلقائيًا لهذه الودجة.
+#### الوظائف
 
 ##### هات_الأبعاد (getDimensions)
 
@@ -282,6 +293,16 @@ handler this.scrollIntoView();
 </div>
 
 طريقة تسمح بالنزول في الصفحة الحاوية لمجموعة عناصر إلى العنصر الذي استدعى هذه الطريقة ليصبح مرئياً.
+
+
+### ودجـة_أساسية (BasicWidget)
+
+هذا الصنف يشتق من `ودجـة` (`Widget`) وهو الصنف الأصل لكل الودجات الأساسية ويُحقق الخصال والأحداث المشتركة بين كل الودجات
+الأساسية.
+
+بالإضافة لتحقيق العمليات المجردة، يضيف هذا الصنف التعريفات التالية:
+
+* `التلميح` (`hint`): `نـص`. خصلة لتحديد نص يُعرض على شكل تلميح عند وقوف مؤشر الفأرة على العنصر.
 
 
 ### صـندوق (Box)
