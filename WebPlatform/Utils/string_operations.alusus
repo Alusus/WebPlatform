@@ -28,4 +28,9 @@
         }
         return result;
     }
+
+    macro stringLiteralFromFile [filename] preprocess {
+        def str: String = Fs.readFile(filename);
+        Spp.astMgr.insertAst(Core.Data.Ast.StringLiteral(str));
+    }
 }

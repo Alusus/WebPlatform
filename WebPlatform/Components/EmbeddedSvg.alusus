@@ -1,0 +1,18 @@
+@merge module WebPlatform {
+    //==========================================================================
+    // EmbeddedSvg
+    // Used to embed an SVG within the compiled code.
+    class EmbeddedSvg [filename: string] {
+        @injection def component: Component;
+
+        handler this~init() {
+            this.view = DocView().{
+                setHtml(String(1, stringLiteralFromFile[filename]));
+            }
+        }
+
+        handler this_type(): SrdRef[this_type] {
+            return SrdRef[this_type]().{ alloc()~init() };
+        }
+    }
+}
