@@ -448,5 +448,41 @@ handler this.setTransition(pushing: StackTransition, popping: StackTransition);
 
 تستعمل هذه الطريقة لتحديد الانتقال لحالتي الإضافة والإزالة.
 
+
+### إسـفيجي_ضمنية (EmbeddedSvg)
+
+تستخدم لتضمين صورة SVG ضمن البرنامج التنفيذي بدل تحميلها بعد بدء البرنامج. هذا الصنف قالب يستلم
+معطى واحد وهو المسار إلى ملف SVG.
+
+```
+صـنف إسـفيجي_ضمنية [مسار_إسفيجي: نص]
+```
+
+<div dir=ltr>
+
+```
+class EmbeddedSvg [filename: string]
+```
+
+</div>
+
+المثال التالي يوضح طريقة الاستخدام:
+
+```
+    صـندوق().{
+        أضف_فروع({ إسـفيجي_ضمنية["المارد/أيقونة.svg"]() })؛
+    }
+```
+
+<div dir=ltr>
+
+```
+Box().{
+    addChildren({ EmbeddedSvg["resources/icon.svg"] });
+}
+```
+
+</div>
+
 </div>
 

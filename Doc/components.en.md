@@ -287,3 +287,21 @@ handler this.setTransition(pushing: StackTransition, popping: StackTransition);
 
 This method is used to specify the transition for pushing and popping operations.
 
+
+### EmbeddedSvg
+
+Used to embed an SVG image within the executalbe rather than being fetched after the program is
+started. This template class takes one argument, which is a path to an SVG file.
+
+```
+class EmbeddedSvg [filename: string]
+```
+
+The following example shows how to use this component:
+
+```
+Box().{
+    addChildren({ EmbeddedSvg["resources/icon.svg"] });
+}
+```
+
