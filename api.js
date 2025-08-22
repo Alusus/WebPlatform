@@ -74,7 +74,7 @@ wasmApi.removeStyleRule = (elementName, styleSelector) => {
     }
 }
 
-const nonAttributeProps = ['innerHTML', 'value', 'innerText', 'textContent'];
+const nonAttributeProps = ['innerHTML', 'value', 'innerText', 'textContent', 'checked'];
 
 wasmApi.setElementAttribute = (elementName, propName, value) => {
     const prop = toJsString(propName);

@@ -15,16 +15,13 @@
         handler this.setChecked (c: Bool) {
             this._checked = c;
             if this.id.getLength() > 0 {
-                if c {
-                    setElementAttribute(this.id, "checked", "true");
-                } else {
-                    removeElementAttribute(this.id, "checked");
-                }
+                if c setElementAttribute(this.id, "checked", "true")
+                else setElementAttribute(this.id, "checked", "false");
             }
         }
         handler this.getChecked (): Bool {
             if this.id.getLength() == 0 return this._checked
-            else return getElementAttribute(this.id, "checked") != "";
+            else return String.isEqual(getElementAttribute(this.id, "checked"), "true");
         }
         handler this.checked = (val: Bool) {
             this.setChecked(val);
