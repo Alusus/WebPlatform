@@ -45,6 +45,7 @@ import "WebPlatform/Widgets/Picture";
 import "WebPlatform/Widgets/Button";
 import "WebPlatform/Widgets/Input";
 import "WebPlatform/Widgets/TextInput";
+import "WebPlatform/Widgets/RadioButton";
 import "WebPlatform/Widgets/Select";
 import "WebPlatform/Widgets/Video";
 import "WebPlatform/Widgets/Canvas";

@@ -1,0 +1,207 @@
+import "Srl/Console";
+import "Apm";
+Apm.importFile("Alusus/WebPlatform");
+use Srl;
+use WebPlatform;
+
+//==============================================================================
+// Backend
+
+@assetsRoute def assetsRoute: "Assets/";
+
+//==============================================================================
+// Frontend
+
+@uiEndpoint["/"]
+@title["WebPlatform Example - Radio Buttons"]
+func main {
+    def selectedColorText: SrdRef[Text];
+    def selectedSportText: SrdRef[Text];
+
+    // Build the view
+    Window.instance.style.{
+        padding = Length4.pt(20);
+        margin = Length4.pt(0);
+    };
+    Window.instance.setView(Box({}).{
+        style.{
+            display = Display.FLEX;
+            layout = Layout.COLUMN;
+            gap = Length.pt(10);
+        };
+        addChildren({
+            Text(String("Radio Button Test")).{
+                style.{
+                    fontSize = Length.pt(24.0);
+                    fontWeight = 700;
+                    margin = Length4.pt(0, 0, 20, 0);
+                };
+            },
+
+            Text(String("Choose your favorite color:")).{
+                style.{
+                    fontSize = Length.pt(18.0);
+                    margin = Length4.pt(0, 0, 10, 0);
+                };
+            },
+
+            // Radio button group
+            Box({}).{
+                style.{
+                    display = Display.FLEX;
+                    layout = Layout.COLUMN;
+                    gap = Length.pt(8);
+                    margin = Length4.pt(0, 0, 0, 20);
+                };
+                addChildren({
+                    Box({}).{
+                        style.{
+                            display = Display.FLEX;
+                            layout = Layout.ROW;
+                            gap = Length.pt(8);
+                            align = Align.CENTER;
+                        };
+                        addChildren({
+                            RadioButton(String("color"), String("red"), true).{
+                                onChanged.connect(closure (selectedColorText: by_ref)&(widget: ref[RadioButton], payload: ref[Int]) {
+                                    selectedColorText.setText(String("Selected Color: Red"));
+                                });
+                            },
+                            Text(String("Red"));
+                        });
+                    },
+
+                    Box({}).{
+                        style.{
+                            display = Display.FLEX;
+                            layout = Layout.ROW;
+                            gap = Length.pt(8);
+                            align = Align.CENTER;
+                        };
+                        addChildren({
+                            RadioButton(String("color"), String("green")).{
+                                onChanged.connect(closure (selectedColorText: by_ref)&(widget: ref[RadioButton], payload: ref[Int]) {
+                                    selectedColorText.setText(String("Selected Color: Green"));
+                                });
+                            },
+                            Text(String("Green"));
+                        });
+                    },
+
+                    Box({}).{
+                        style.{
+                            display = Display.FLEX;
+                            layout = Layout.ROW;
+                            gap = Length.pt(8);
+                            align = Align.CENTER;
+                        };
+                        addChildren({
+                            RadioButton(String("color"), String("blue")).{
+                                onChanged.connect(closure (selectedColorText: by_ref)&(widget: ref[RadioButton], payload: ref[Int]) {
+                                    selectedColorText.setText(String("Selected Color: Blue"));
+                                });
+                            },
+                            Text(String("Blue"));
+                        });
+                    }
+                });
+            },
+
+            Text(String("Selected Color: Red")).{
+                selectedColorText = this~cast[SrdRef[Text]];
+                style.{
+                    fontSize = Length.pt(16.0);
+                    margin = Length4.pt(20, 0, 0, 0);
+                    fontWeight = FontWeight.BOLD;
+                };
+            },
+
+            Text(String("Choose your favorite sport:")).{
+                style.{
+                    fontSize = Length.pt(18.0);
+                    margin = Length4.pt(0, 0, 10, 0);
+                };
+            },
+
+            // Radio button group
+            Box({}).{
+                style.{
+                    display = Display.FLEX;
+                    layout = Layout.COLUMN;
+                    gap = Length.pt(8);
+                    margin = Length4.pt(0, 0, 0, 20);
+                };
+                addChildren({
+                    Box({}).{
+                        style.{
+                            display = Display.FLEX;
+                            layout = Layout.ROW;
+                            gap = Length.pt(8);
+                            align = Align.CENTER;
+                        };
+                        addChildren({
+                            RadioButton(String("sport"), String("football"), true).{
+                                onChanged.connect(closure (selectedSportText: by_ref)&(widget: ref[RadioButton], payload: ref[Int]) {
+                                    selectedSportText.setText(String("Selected Sport: Football"));
+                                });
+                            },
+                            Text(String("Football"));
+                        });
+                    },
+
+                    Box({}).{
+                        style.{
+                            display = Display.FLEX;
+                            layout = Layout.ROW;
+                            gap = Length.pt(8);
+                            align = Align.CENTER;
+                        };
+                        addChildren({
+                            RadioButton(String("sport"), String("ping pong")).{
+                                onChanged.connect(closure (selectedSportText: by_ref)&(widget: ref[RadioButton], payload: ref[Int]) {
+                                    selectedSportText.setText(String("Selected Sport: Ping Pong"));
+                                });
+                            },
+                            Text(String("Ping Pong"));
+                        });
+                    },
+
+                    Box({}).{
+                        style.{
+                            display = Display.FLEX;
+                            layout = Layout.ROW;
+                            gap = Length.pt(8);
+                            align = Align.CENTER;
+                        };
+                        addChildren({
+                            RadioButton(String("sport"), String("tennis")).{
+                                onChanged.connect(closure (selectedSportText: by_ref)&(widget: ref[RadioButton], payload: ref[Int]) {
+                                    selectedSportText.setText(String("Selected Sport: Tennis"));
+                                });
+                            },
+                            Text(String("Tennis"));
+                        });
+                    }
+                });
+            },
+
+            Text(String("Selected Sport: Football")).{
+                selectedSportText = this~cast[SrdRef[Text]];
+                style.{
+                    fontSize = Length.pt(16.0);
+                    margin = Length4.pt(20, 0, 0, 0);
+                    fontWeight = FontWeight.BOLD;
+                };
+            }
+        });
+    });
+
+    runEventLoop();
+}
+
+function startMyServer() {
+    Console.print("Starting server on port 8010...\nURL: http://localhost:8010/\n");
+    buildAndRunServer(Array[CharsPtr]({ "listening_ports", "8010", "static_file_max_age", "0" }));
+}
+
+startMyServer();

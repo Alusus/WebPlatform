@@ -32,6 +32,7 @@
         generateTypedStyleProp[flex, "flex", Flex];
         generateTypedStyleProp[layout, "flex-direction", Layout];
         generateTypedStyleProp[justify, "justify-content", Justify];
+        generateTypedStyleProp[gap, "gap", Length];
         generateTypedStyleProp[margin, "margin", Length4];
         generateTypedStyleProp[padding, "padding", Length4];
         generateTypedStyleProp[align, "align-items", Align];

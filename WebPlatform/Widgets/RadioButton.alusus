@@ -1,0 +1,138 @@
+@merge module WebPlatform {
+    //==========================================================================
+    // RadioButton
+    class RadioButton {
+        @injection def basicWidget: BasicWidget;
+
+        //-----------------------
+        // Properties and Signals
+
+        defineProperty[value, Value, String];
+        defineProperty[name, Name, String];
+        defineProperty[disabled, Disabled, bool];
+
+        def _checked: Bool;
+        handler this.setChecked (c: Bool) {
+            this._checked = c;
+            if this.id.getLength() > 0 {
+                if c {
+                    setElementAttribute(this.id, "checked", "true");
+                } else {
+                    removeElementAttribute(this.id, "checked");
+                }
+            }
+        }
+        handler this.getChecked (): Bool {
+            if this.id.getLength() == 0 return this._checked
+            else return getElementAttribute(this.id, "checked") != "";
+        }
+        handler this.checked = (val: Bool) {
+            this.setChecked(val);
+            return this._checked;
+        }
+        handler this.checked: Bool {
+            return this.getChecked();
+        }
+
+        def onChanged: DomEventSignal[RadioButton, Int];
+        def onChangedId: ArchInt = -1;
+
+        //---------
+        // Handlers
+
+        handler this~init() {
+            this.initSignals();
+            this.disabled = false;
+            this._checked = false;
+        }
+
+        handler this~init(n: String, v: String) {
+            this.initSignals();
+            this.name = n;
+            this.value = v;
+            this.disabled = false;
+            this._checked = false;
+        }
+
+        handler this~init(n: String, v: String, c: Bool) {
+            this.initSignals();
+            this.name = n;
+            this.value = v;
+            this.disabled = false;
+            this._checked = c;
+        }
+
+        handler this.initSignals() {
+            this.onChanged.onConnectionsChanged = closure (connectionCount: Int) {
+                handleSignalConnectionChanged[this.id, onChanged, "change", {
+                    this.onChanged.emit(this, Int(0));
+                }];
+            };
+        }
+
+        //-----------------
+        // Member Functions
+
+        handler this.onPropUpdated() this.update();
+
+        //-------------------
+        // Function Overrides
+
+        handler (this:Widget).build (ownerId: String, nextSiblingId: String) set_ptr {
+            this.id = getNewId();
+            createElement("input", this.id, ownerId, nextSiblingId);
+            this.buildCommon();
+            this.update();
+            this.onChanged.onConnectionsChanged(this.onChanged.getConnectionCount());
+        }
+
+        handler (this:Widget).unbuild() set_ptr {
+            if this.onChangedId != -1 unregisterElementEventHandler(this.onChangedId);
+            this.onChangedId = -1;
+
+            deleteElement(this.id);
+            this.unbuildCommon();
+            this.id = String();
+        }
+
+        handler (this:Widget).update() set_ptr {
+            if this.id.getLength() > 0 {
+                this.updateCommon();
+                setElementAttribute(this.id, "type", "radio");
+                setElementAttribute(this.id, "value", this.value);
+                setElementAttribute(this.id, "name", this.name);
+                if this._checked {
+                    setElementAttribute(this.id, "checked", "true");
+                } else {
+                    removeElementAttribute(this.id, "checked");
+                }
+                if this.disabled == true {
+                    setElementAttribute(this.id, "disabled", "true");
+                } else {
+                    removeElementAttribute(this.id, "disabled");
+                }
+            }
+        }
+
+        //-----------------
+        // Shared Functions
+
+        handler this_type(): SrdRef[RadioButton] {
+            def r: SrdRef[RadioButton];
+            r.alloc()~init();
+            return r;
+        }
+
+        handler this_type(n: String, v: String): SrdRef[RadioButton] {
+            def r: SrdRef[RadioButton];
+            r.alloc()~init(n, v);
+            return r;
+        }
+
+        handler this_type(n: String, v: String, c: Bool): SrdRef[RadioButton] {
+            def r: SrdRef[RadioButton];
+            r.alloc()~init(n, v, c);
+            return r;
+        }
+    }
+}

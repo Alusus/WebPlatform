@@ -50,6 +50,7 @@ outlineOffset: Length4
 outlineColor: Color
 zIndex: Int
 flex: Flex
+gap: Length
 margin: Length4
 textDecorationColor: Color
 textDecorationThickness: Length
@@ -109,6 +110,7 @@ style type.
 * `outlineColor` The color of outline.
 * `zIndex` This used to order items when they are on top of each other.
 * `flex` The flex style, determine a layout for items placement.
+* `gap` Sets the space between flex items or grid items, providing consistent spacing without the need for margins.
 * `margin` Margin around the item.
 * `textDecorationColor` Text decoration color.
 * `textDecorationThickness` Text decoration thickness.
