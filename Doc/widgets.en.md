@@ -394,6 +394,39 @@ def onChanged: DomEventSignal[RadioButton, Int];
 Gets fired when the radio button is selected or deselected. The event is triggered when the user clicks on the radio button or when the selection changes programmatically.
 
 
+### CheckBox
+
+Displays a checkbox for multiple-choice selections.
+
+#### Initialization
+
+```
+CheckBox();
+CheckBox(value: String);
+CheckBox(value: String, checked: Bool);
+```
+
+* The first form creates an empty checkbox.
+* The second form creates a checkbox with the specified value.
+* The third form allows setting the initial checked state.
+
+#### Properties
+
+* `value`: `String`. The value of this checkbox.
+* `checked`: `Bool`. Whether this checkbox is currently checked.
+* `disabled`: `Bool`. Whether this checkbox is disabled.
+
+#### Events
+
+##### onChanged
+
+```
+def onChanged: DomEventSignal[CheckBox, Int];
+```
+
+Gets fired when the checkbox is checked or unchecked. The event is triggered when the user clicks on the checkbox or when the state changes programmatically.
+
+
 ### TextInput
 
 A text entry box.
