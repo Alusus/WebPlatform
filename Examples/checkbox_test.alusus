@@ -1,0 +1,140 @@
+import "Srl/Console";
+import "Apm";
+Apm.importFile("Alusus/WebPlatform");
+use Srl;
+use WebPlatform;
+
+//==============================================================================
+// Backend
+
+@assetsRoute def assetsRoute: "Assets/";
+
+//==============================================================================
+// Frontend
+
+@uiEndpoint["/"]
+@title["WebPlatform Example - CheckBox"]
+func main {
+    def statusText: SrdRef[Text];
+
+    // Build the view
+    Window.instance.style.{
+        padding = Length4.pt(20);
+        margin = Length4.pt(0);
+    };
+    Window.instance.setView(Box({}).{
+        style.{
+            display = Display.FLEX;
+            layout = Layout.COLUMN;
+            gap = Length.pt(10);
+        };
+        addChildren({
+            Text(String("CheckBox Test")).{
+                style.{
+                    fontSize = Length.pt(24.0);
+                    fontWeight = 700;
+                    margin = Length4.pt(0, 0, 20, 0);
+                };
+            },
+
+            Text(String("Select your preferences:")).{
+                style.{
+                    fontSize = Length.pt(18.0);
+                    margin = Length4.pt(0, 0, 10, 0);
+                };
+            },
+
+            // CheckBox options
+            Box({}).{
+                style.{
+                    display = Display.FLEX;
+                    layout = Layout.COLUMN;
+                    gap = Length.pt(8);
+                    margin = Length4.pt(0, 0, 0, 20);
+                };
+                addChildren({
+                    Box({}).{
+                        style.{
+                            display = Display.FLEX;
+                            layout = Layout.ROW;
+                            gap = Length.pt(8);
+                            align = Align.CENTER;
+                        };
+                        addChildren({
+                            CheckBox(String("newsletter"), true).{
+                                onChanged.connect(closure (statusText: by_ref)&(widget: ref[CheckBox], payload: ref[Int]) {
+                                    if widget.checked {
+                                        statusText.setText(String("Newsletter: Subscribed"));
+                                    } else {
+                                        statusText.setText(String("Newsletter: Unsubscribed"));
+                                    }
+                                });
+                            },
+                            Text(String("Subscribe to newsletter"));
+                        });
+                    },
+
+                    Box({}).{
+                        style.{
+                            display = Display.FLEX;
+                            layout = Layout.ROW;
+                            gap = Length.pt(8);
+                            align = Align.CENTER;
+                        };
+                        addChildren({
+                            CheckBox(String("updates")).{
+                                onChanged.connect(closure (statusText: by_ref)&(widget: ref[CheckBox], payload: ref[Int]) {
+                                    if widget.checked {
+                                        statusText.setText(String("Updates: Enabled"));
+                                    } else {
+                                        statusText.setText(String("Updates: Disabled"));
+                                    }
+                                });
+                            },
+                            Text(String("Receive updates"));
+                        });
+                    },
+
+                    Box({}).{
+                        style.{
+                            display = Display.FLEX;
+                            layout = Layout.ROW;
+                            gap = Length.pt(8);
+                            align = Align.CENTER;
+                        };
+                        addChildren({
+                            CheckBox(String("notifications")).{
+                                onChanged.connect(closure (statusText: by_ref)&(widget: ref[CheckBox], payload: ref[Int]) {
+                                    if widget.checked {
+                                        statusText.setText(String("Notifications: Enabled"));
+                                    } else {
+                                        statusText.setText(String("Notifications: Disabled"));
+                                    }
+                                });
+                            },
+                            Text(String("Enable notifications"));
+                        });
+                    }
+                });
+            },
+
+            Text(String("Newsletter: Subscribed")).{
+                statusText = this;
+                style.{
+                    fontSize = Length.pt(16.0);
+                    margin = Length4.pt(20, 0, 0, 0);
+                    fontWeight = FontWeight.BOLD;
+                };
+            }
+        });
+    });
+
+    runEventLoop();
+}
+
+function startMyServer() {
+    Console.print("Starting server on port 8010...\nURL: http://localhost:8010/\n");
+    buildAndRunServer(Array[CharsPtr]({ "listening_ports", "8010", "static_file_max_age", "0" }));
+}
+
+startMyServer();

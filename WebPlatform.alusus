@@ -45,6 +45,8 @@ import "WebPlatform/Widgets/Picture";
 import "WebPlatform/Widgets/Button";
 import "WebPlatform/Widgets/Input";
 import "WebPlatform/Widgets/TextInput";
+import "WebPlatform/Widgets/RadioButton";
+import "WebPlatform/Widgets/CheckBox";
 import "WebPlatform/Widgets/Select";
 import "WebPlatform/Widgets/Video";
 import "WebPlatform/Widgets/Canvas";
@@ -95,4 +97,3 @@ import "WebPlatform/i18n";
         def JS_SCRIPT_LOAD: "webplatform_js_script_load";
     }
 }
-

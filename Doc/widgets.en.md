@@ -359,6 +359,74 @@ Displays a button.
 * `text`: `String`. The text we want to show on the button.
 
 
+### RadioButton
+
+Displays a radio button for single-choice selections within a group.
+
+#### Initialization
+
+```
+RadioButton(name: String, value: String);
+RadioButton(name: String, value: String, checked: Bool);
+```
+
+* The first form creates a radio button with the specified name and value.
+* The second form allows setting the initial checked state.
+
+#### Properties
+
+* `name`: `String`. The name attribute that groups radio buttons together. Only one radio button with the same name can be selected at a time.
+
+* `value`: `String`. The value of this radio button when selected.
+
+* `checked`: `Bool`. Whether this radio button is currently selected.
+
+* `disabled`: `Bool`. Whether this radio button is disabled.
+
+#### Events
+
+##### onChanged
+
+```
+def onChanged: DomEventSignal[RadioButton, Int];
+```
+
+Gets fired when the radio button is selected or deselected. The event is triggered when the user clicks on the radio button or when the selection changes programmatically.
+
+
+### CheckBox
+
+Displays a checkbox for multiple-choice selections.
+
+#### Initialization
+
+```
+CheckBox();
+CheckBox(value: String);
+CheckBox(value: String, checked: Bool);
+```
+
+* The first form creates an empty checkbox.
+* The second form creates a checkbox with the specified value.
+* The third form allows setting the initial checked state.
+
+#### Properties
+
+* `value`: `String`. The value of this checkbox.
+* `checked`: `Bool`. Whether this checkbox is currently checked.
+* `disabled`: `Bool`. Whether this checkbox is disabled.
+
+#### Events
+
+##### onChanged
+
+```
+def onChanged: DomEventSignal[CheckBox, Int];
+```
+
+Gets fired when the checkbox is checked or unchecked. The event is triggered when the user clicks on the checkbox or when the state changes programmatically.
+
+
 ### TextInput
 
 A text entry box.
