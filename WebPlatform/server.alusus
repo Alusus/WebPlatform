@@ -317,9 +317,6 @@
         requestCallbackContext.uiEndpointsPath = uiEndpointsPath;
         requestCallbackContext.useSrcAssetsPath = useSrcAssetsPath;
         preprocess {
-            // Dummy statement just to prevent circular code generation.
-            Core.Data.Ast.StringLiteral();
-
             generateUiEndpointsInitialization(modulesRef~ast);
             generateAssetRoutesInitialization(modulesRef~ast);
         };

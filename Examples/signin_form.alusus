@@ -1,0 +1,219 @@
+import "Srl/Console";
+import "Apm";
+Apm.importFile("Alusus/WebPlatform");
+use Srl;
+use WebPlatform;
+
+//==============================================================================
+// Backend
+
+@assetsRoute def assetsRoute: "Assets/";
+
+//==============================================================================
+// Frontend
+
+@uiEndpoint["/"]
+@title["WebPlatform Example - Sign In Form"]
+func main {
+    def emailInput: SrdRef[Input];
+    def passwordInput: SrdRef[Input];
+    def passwordInputEye: SrdRef[Text];
+    def showPassword: Bool(false);
+
+    // Build the view
+    Window.instance.style.{
+        padding = Length4.pt(0);
+        margin = Length4.pt(0);
+        background = Background(Color(192, 175, 232)); // Light purple background
+    };
+
+    Window.instance.setView(Box({}).{
+        style.{
+            display = Display.FLEX;
+            layout = Layout.COLUMN;
+            align = Align.CENTER;
+            justify = Justify.CENTER;
+            width = Length.percent(100);
+            height = Length.vh(100);
+            background = Background(Color(192, 175, 232)); // Light purple background
+        };
+        addChildren({
+            // Main form container
+            Box({}).{
+                style.{
+                    width = Length.pt(400);
+                    background = Background(Color(255, 255, 255)); // White background
+                    borderRadius = Length4.pt(24);
+                    padding = Length4.pt(40);
+                    display = Display.FLEX;
+                    layout = Layout.COLUMN;
+                    gap = Length.pt(24);
+                    boxShadow = BoxShadow(Length.pt(0), Length.pt(8), Length.pt(32), Length.pt(0), Color(0, 0, 0, 20));
+                };
+                addChildren({
+                    // Title
+                    Text(String("Sign in")).{
+                        style.{
+                            fontSize = Length.pt(32);
+                            fontWeight = 600;
+                            textAlign = TextAlign.CENTER;
+                            fontColor = Color(41, 41, 41);
+                            margin = Length4.pt(0, 0, 16, 0);
+                        };
+                    },
+
+                    // Email field container
+                    Box({}).{
+                        style.{
+                            display = Display.FLEX;
+                            layout = Layout.COLUMN;
+                            gap = Length.pt(8);
+                        };
+                        addChildren({
+                            Text(String("Email")).{
+                                style.{
+                                    fontSize = Length.pt(16);
+                                    fontWeight = 500;
+                                    fontColor = Color(41, 41, 41);
+                                };
+                            },
+                            Input().{
+                                emailInput = this;
+                                placeholder = String("name@example.com");
+                                style.{
+                                    width = Length.percent(100);
+                                    height = Length.pt(48);
+                                    borderRadius = Length4.pt(24);
+                                    borderWidth = Length4.pt(1);
+                                    borderStyle = BorderStyle.SOLID;
+                                    borderColor = Color(209, 213, 219);
+                                    padding = Length4.pt(0, 20);
+                                    fontSize = Length.pt(16);
+                                    background = Background(Color(255, 255, 255));
+                                };
+                                style({ StateSelector.FOCUS }).{
+                                    borderColor = Color(139, 92, 246);
+                                    // outline = String("none");
+                                };
+                            }
+                        });
+                    },
+
+                    // Password field container
+                    Box({}).{
+                        style.{
+                            display = Display.FLEX;
+                            layout = Layout.COLUMN;
+                            gap = Length.pt(8);
+                        };
+                        addChildren({
+                            Text(String("Password")).{
+                                style.{
+                                    fontSize = Length.pt(16);
+                                    fontWeight = 500;
+                                    fontColor = Color(41, 41, 41);
+                                };
+                            },
+                            Box({}).{
+                                style.{
+                                    position = Position.RELATIVE;
+                                };
+                                addChildren({
+                                    Input().{
+                                        passwordInput = this;
+                                        inputType = String("password");
+                                        style.{
+                                            width = Length.percent(100);
+                                            height = Length.pt(48);
+                                            borderRadius = Length4.pt(24);
+                                            borderWidth = Length4.pt(1);
+                                            borderStyle = BorderStyle.SOLID;
+                                            borderColor = Color(209, 213, 219);
+                                            padding = Length4.pt(0, 50, 0, 20);
+                                            fontSize = Length.pt(16);
+                                            background = Background(Color(255, 255, 255));
+                                        };
+                                        style({ StateSelector.FOCUS }).{
+                                            borderColor = Color(139, 92, 246);
+                                            // outline = String("none");
+                                        };
+                                    },
+                                    // Eye icon for show/hide password
+                                    Box({}).{
+                                        style.{
+                                            position = Position.ABSOLUTE;
+                                            top = Length.percent(50);
+                                            right = Length.pt(16);
+                                            transform = "translateY(-50%)";
+                                            cursor = Cursor.POINTER;
+                                            width = Length.pt(20);
+                                            height = Length.pt(20);
+                                            display = Display.FLEX;
+                                            align = Align.CENTER;
+                                            justify = Justify.CENTER;
+                                        };
+                                        onClick.connect(closure (passwordInputEye: by_ref)&(widget: ref[Widget], payload: ref[Int]) {
+                                            showPassword = !showPassword;
+                                            if showPassword {
+                                                passwordInput.inputType = String("text");
+                                                passwordInputEye.text = String("👁️");
+                                            } else {
+                                                passwordInput.inputType = String("password");
+                                                passwordInputEye.text = String("🔒");
+                                            }
+                                        });
+                                        addChildren({
+                                            Text(String("🔒")).{
+                                                passwordInputEye = this;
+                                                style.{
+                                                    fontSize = Length.pt(18);
+                                                    fontColor = Color(107, 114, 128);
+                                                };
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+                        });
+                    },
+
+                    // Sign in button
+                    Button(String("Sign in")).{
+                        style.{
+                            width = Length.percent(100);
+                            height = Length.pt(48);
+                            borderRadius = Length4.pt(24);
+                            background = Background(Color(139, 92, 246)); // Purple button
+                            borderWidth = Length4.pt(0);
+                            fontSize = Length.pt(16);
+                            fontWeight = 600;
+                            fontColor = Color(255, 255, 255);
+                            cursor = Cursor.POINTER;
+                            margin = Length4.pt(16, 0, 0, 0);
+                        };
+                        style({ StateSelector.HOVER }).{
+                            background = Background(Color(124, 58, 237)); // Darker purple on hover
+                        };
+                        style({ StateSelector.ACTIVE }).{
+                            background = Background(Color(109, 40, 217)); // Even darker on click
+                        };
+                        onClick.connect(closure (widget: ref[Widget], payload: ref[Int]) {
+                            logToConsole("Sign in clicked!\n");
+                            logToConsole(String("Email: ") + emailInput.text + "\n");
+                            logToConsole(String("Password: ") + passwordInput.text + "\n");
+                        });
+                    }
+                });
+            }
+        });
+    });
+
+    runEventLoop();
+}
+
+function startMyServer() {
+    Console.print("Starting server on port 8010...\nURL: http://localhost:8010/\n");
+    buildAndRunServer(Array[CharsPtr]({ "listening_ports", "8010", "static_file_max_age", "0" }));
+}
+
+startMyServer();
