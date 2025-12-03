@@ -1,0 +1,463 @@
+import "Srl/Console";
+import "Apm";
+Apm.importFile("Alusus/WebPlatform");
+use Srl;
+use WebPlatform;
+
+//==============================================================================
+// Backend
+
+@assetsRoute def assetsRoute: "Assets/";
+
+//==============================================================================
+// Frontend
+
+@uiEndpoint["/"]
+@title["WebPlatform Example - FlexWrap Property Demo"]
+func main {
+    // Build the view
+    Window.instance.style.{
+        padding = Length4.pt(20);
+        margin = Length4.pt(0);
+    };
+    Window.instance.setView(Box({}).{
+        style.{
+            display = Display.FLEX;
+            layout = Layout.COLUMN;
+            gap = Length.pt(25);
+        };
+        addChildren({
+            Text(String("CSS FlexWrap Property Demo")).{
+                style.{
+                    fontSize = Length.pt(28.0);
+                    fontWeight = FontWeight.BOLD;
+                    textAlign = TextAlign.CENTER;
+                };
+            },
+
+            Text(String("FlexWrap: NOWRAP (Default)")).{
+                style.{
+                    fontSize = Length.pt(18.0);
+                    fontWeight = FontWeight.BOLD;
+                };
+            },
+
+            Text(String("Items stay in a single line and may overflow the container")).{
+                style.{
+                    fontSize = Length.pt(14.0);
+                    fontColor = Color("666");
+                };
+            },
+
+            // NOWRAP example
+            Box({}).{
+                style.{
+                    display = Display.FLEX;
+                    layout = Layout.ROW;
+                    flexWrap = FlexWrap.NOWRAP;
+                    padding = Length4.pt(15);
+                    background = Background(Color("e8f4f8"));
+                    maxWidth = Length.pt(500);
+                    borderWidth = Length4.pt(2);
+                    borderStyle = BorderStyle.SOLID;
+                    borderColor = Color("3498db");
+                };
+                addChildren({
+                    Box({}).{
+                        style.{
+                            width = Length.pt(120);
+                            height = Length.pt(60);
+                            background = Background(Color("ff6b6b"));
+                            display = Display.FLEX;
+                            align = Align.CENTER;
+                            justify = Justify.CENTER;
+                        };
+                        addChildren({
+                            Text(String("Box 1")).{
+                                style.{
+                                    fontColor = Color("fff");
+                                    fontWeight = FontWeight.BOLD;
+                                };
+                            }
+                        });
+                    },
+                    Box({}).{
+                        style.{
+                            width = Length.pt(120);
+                            height = Length.pt(60);
+                            background = Background(Color("4ecdc4"));
+                            display = Display.FLEX;
+                            align = Align.CENTER;
+                            justify = Justify.CENTER;
+                        };
+                        addChildren({
+                            Text(String("Box 2")).{
+                                style.{
+                                    fontColor = Color("fff");
+                                    fontWeight = FontWeight.BOLD;
+                                };
+                            }
+                        });
+                    },
+                    Box({}).{
+                        style.{
+                            width = Length.pt(120);
+                            height = Length.pt(60);
+                            background = Background(Color("45b7d1"));
+                            display = Display.FLEX;
+                            align = Align.CENTER;
+                            justify = Justify.CENTER;
+                        };
+                        addChildren({
+                            Text(String("Box 3")).{
+                                style.{
+                                    fontColor = Color("fff");
+                                    fontWeight = FontWeight.BOLD;
+                                };
+                            }
+                        });
+                    },
+                    Box({}).{
+                        style.{
+                            width = Length.pt(120);
+                            height = Length.pt(60);
+                            background = Background(Color("f7dc6f"));
+                            display = Display.FLEX;
+                            align = Align.CENTER;
+                            justify = Justify.CENTER;
+                        };
+                        addChildren({
+                            Text(String("Box 4")).{
+                                style.{
+                                    fontColor = Color("333");
+                                    fontWeight = FontWeight.BOLD;
+                                };
+                            }
+                        });
+                    },
+                    Box({}).{
+                        style.{
+                            width = Length.pt(120);
+                            height = Length.pt(60);
+                            background = Background(Color("a569bd"));
+                            display = Display.FLEX;
+                            align = Align.CENTER;
+                            justify = Justify.CENTER;
+                        };
+                        addChildren({
+                            Text(String("Box 5")).{
+                                style.{
+                                    fontColor = Color("fff");
+                                    fontWeight = FontWeight.BOLD;
+                                };
+                            }
+                        });
+                    }
+                });
+            },
+
+            Text(String("FlexWrap: WRAP")).{
+                style.{
+                    fontSize = Length.pt(18.0);
+                    fontWeight = FontWeight.BOLD;
+                };
+            },
+
+            Text(String("Items wrap to new lines when needed, from top to bottom")).{
+                style.{
+                    fontSize = Length.pt(14.0);
+                    fontColor = Color("666");
+                };
+            },
+
+            // WRAP example
+            Box({}).{
+                style.{
+                    display = Display.FLEX;
+                    layout = Layout.ROW;
+                    flexWrap = FlexWrap.WRAP;
+                    gap = Length.pt(10);
+                    padding = Length4.pt(15);
+                    background = Background(Color("f0f8e8"));
+                    maxWidth = Length.pt(500);
+                    borderWidth = Length4.pt(2);
+                    borderStyle = BorderStyle.SOLID;
+                    borderColor = Color("58d68d");
+                };
+                addChildren({
+                    Box({}).{
+                        style.{
+                            width = Length.pt(120);
+                            height = Length.pt(60);
+                            background = Background(Color("e74c3c"));
+                            display = Display.FLEX;
+                            align = Align.CENTER;
+                            justify = Justify.CENTER;
+                        };
+                        addChildren({
+                            Text(String("Box 1")).{
+                                style.{
+                                    fontColor = Color("fff");
+                                    fontWeight = FontWeight.BOLD;
+                                };
+                            }
+                        });
+                    },
+                    Box({}).{
+                        style.{
+                            width = Length.pt(120);
+                            height = Length.pt(60);
+                            background = Background(Color("3498db"));
+                            display = Display.FLEX;
+                            align = Align.CENTER;
+                            justify = Justify.CENTER;
+                        };
+                        addChildren({
+                            Text(String("Box 2")).{
+                                style.{
+                                    fontColor = Color("fff");
+                                    fontWeight = FontWeight.BOLD;
+                                };
+                            }
+                        });
+                    },
+                    Box({}).{
+                        style.{
+                            width = Length.pt(120);
+                            height = Length.pt(60);
+                            background = Background(Color("f39c12"));
+                            display = Display.FLEX;
+                            align = Align.CENTER;
+                            justify = Justify.CENTER;
+                        };
+                        addChildren({
+                            Text(String("Box 3")).{
+                                style.{
+                                    fontColor = Color("fff");
+                                    fontWeight = FontWeight.BOLD;
+                                };
+                            }
+                        });
+                    },
+                    Box({}).{
+                        style.{
+                            width = Length.pt(120);
+                            height = Length.pt(60);
+                            background = Background(Color("16a085"));
+                            display = Display.FLEX;
+                            align = Align.CENTER;
+                            justify = Justify.CENTER;
+                        };
+                        addChildren({
+                            Text(String("Box 4")).{
+                                style.{
+                                    fontColor = Color("fff");
+                                    fontWeight = FontWeight.BOLD;
+                                };
+                            }
+                        });
+                    },
+                    Box({}).{
+                        style.{
+                            width = Length.pt(120);
+                            height = Length.pt(60);
+                            background = Background(Color("8e44ad"));
+                            display = Display.FLEX;
+                            align = Align.CENTER;
+                            justify = Justify.CENTER;
+                        };
+                        addChildren({
+                            Text(String("Box 5")).{
+                                style.{
+                                    fontColor = Color("fff");
+                                    fontWeight = FontWeight.BOLD;
+                                };
+                            }
+                        });
+                    },
+                    Box({}).{
+                        style.{
+                            width = Length.pt(120);
+                            height = Length.pt(60);
+                            background = Background(Color("c0392b"));
+                            display = Display.FLEX;
+                            align = Align.CENTER;
+                            justify = Justify.CENTER;
+                        };
+                        addChildren({
+                            Text(String("Box 6")).{
+                                style.{
+                                    fontColor = Color("fff");
+                                    fontWeight = FontWeight.BOLD;
+                                };
+                            }
+                        });
+                    }
+                });
+            },
+
+            Text(String("FlexWrap: WRAP_REVERSE")).{
+                style.{
+                    fontSize = Length.pt(18.0);
+                    fontWeight = FontWeight.BOLD;
+                };
+            },
+
+            Text(String("Items wrap to new lines in reverse order, from bottom to top")).{
+                style.{
+                    fontSize = Length.pt(14.0);
+                    fontColor = Color("666");
+                };
+            },
+
+            // WRAP_REVERSE example
+            Box({}).{
+                style.{
+                    display = Display.FLEX;
+                    layout = Layout.ROW;
+                    flexWrap = FlexWrap.WRAP_REVERSE;
+                    gap = Length.pt(10);
+                    padding = Length4.pt(15);
+                    background = Background(Color("fdf2e9"));
+                    maxWidth = Length.pt(500);
+                    borderWidth = Length4.pt(2);
+                    borderStyle = BorderStyle.SOLID;
+                    borderColor = Color("e67e22");
+                };
+                addChildren({
+                    Box({}).{
+                        style.{
+                            width = Length.pt(120);
+                            height = Length.pt(60);
+                            background = Background(Color("1abc9c"));
+                            display = Display.FLEX;
+                            align = Align.CENTER;
+                            justify = Justify.CENTER;
+                        };
+                        addChildren({
+                            Text(String("Box 1")).{
+                                style.{
+                                    fontColor = Color("fff");
+                                    fontWeight = FontWeight.BOLD;
+                                };
+                            }
+                        });
+                    },
+                    Box({}).{
+                        style.{
+                            width = Length.pt(120);
+                            height = Length.pt(60);
+                            background = Background(Color("2ecc71"));
+                            display = Display.FLEX;
+                            align = Align.CENTER;
+                            justify = Justify.CENTER;
+                        };
+                        addChildren({
+                            Text(String("Box 2")).{
+                                style.{
+                                    fontColor = Color("fff");
+                                    fontWeight = FontWeight.BOLD;
+                                };
+                            }
+                        });
+                    },
+                    Box({}).{
+                        style.{
+                            width = Length.pt(120);
+                            height = Length.pt(60);
+                            background = Background(Color("9b59b6"));
+                            display = Display.FLEX;
+                            align = Align.CENTER;
+                            justify = Justify.CENTER;
+                        };
+                        addChildren({
+                            Text(String("Box 3")).{
+                                style.{
+                                    fontColor = Color("fff");
+                                    fontWeight = FontWeight.BOLD;
+                                };
+                            }
+                        });
+                    },
+                    Box({}).{
+                        style.{
+                            width = Length.pt(120);
+                            height = Length.pt(60);
+                            background = Background(Color("34495e"));
+                            display = Display.FLEX;
+                            align = Align.CENTER;
+                            justify = Justify.CENTER;
+                        };
+                        addChildren({
+                            Text(String("Box 4")).{
+                                style.{
+                                    fontColor = Color("fff");
+                                    fontWeight = FontWeight.BOLD;
+                                };
+                            }
+                        });
+                    },
+                    Box({}).{
+                        style.{
+                            width = Length.pt(120);
+                            height = Length.pt(60);
+                            background = Background(Color("e67e22"));
+                            display = Display.FLEX;
+                            align = Align.CENTER;
+                            justify = Justify.CENTER;
+                        };
+                        addChildren({
+                            Text(String("Box 5")).{
+                                style.{
+                                    fontColor = Color("fff");
+                                    fontWeight = FontWeight.BOLD;
+                                };
+                            }
+                        });
+                    },
+                    Box({}).{
+                        style.{
+                            width = Length.pt(120);
+                            height = Length.pt(60);
+                            background = Background(Color("95a5a6"));
+                            display = Display.FLEX;
+                            align = Align.CENTER;
+                            justify = Justify.CENTER;
+                        };
+                        addChildren({
+                            Text(String("Box 6")).{
+                                style.{
+                                    fontColor = Color("fff");
+                                    fontWeight = FontWeight.BOLD;
+                                };
+                            }
+                        });
+                    }
+                });
+            },
+
+            Text(String(
+                "The flexWrap property controls whether flex items wrap onto multiple lines when they exceed the "
+                "container width. NOWRAP keeps items in a single line, WRAP wraps from top to bottom, and "
+                "WRAP_REVERSE wraps from bottom to top."
+            )).{
+                style.{
+                    fontSize = Length.pt(14.0);
+                    textAlign = TextAlign.CENTER;
+                    background = Background(Color("eef2f7"));
+                    padding = Length4.pt(15);
+                    lineHeight = Length.pt(22.0);
+                };
+            }
+        });
+    });
+
+    runEventLoop();
+}
+
+function startMyServer() {
+    Console.print("Starting server on port 8010...\nURL: http://localhost:8010/\n");
+    buildAndRunServer(Array[CharsPtr]({ "listening_ports", "8010", "static_file_max_age", "0" }));
+}
+
+startMyServer();

@@ -20,6 +20,7 @@ outlineStyle: BorderStyle
 float: Floating
 position: Position
 flexDirection: Layout
+flexWrap: FlexWrap
 justifyContent: Justify
 alignItems: Align
 textAlign: TextAlign
@@ -80,6 +81,7 @@ style type.
 * `floating` Determines whether/how elements float in the containing box (div).
 * `position` Item's position style.
 * `layout` Determine the layout of the item when using `FLEX` display mode.
+* `flexWrap` Determines whether flex items wrap onto multiple lines.
 * `justify` The style used to specify how items are placed in a row.
 * `align` The style related to aligning an item inside its container.
 * `textAlign` The style related to aligning a text inside its container. 
@@ -673,6 +675,14 @@ An enum class that holds possible values for layout as enum.
 * `ROW_REVERSE`
 * `COLUMN`
 * `COLUMN_REVERSE`
+
+
+### FlexWrap
+
+An enum class that holds possible values for flex-wrap as enum.
+* `NOWRAP`
+* `WRAP`
+* `WRAP_REVERSE`
 
 
 ### Align
