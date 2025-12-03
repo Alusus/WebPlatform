@@ -51,6 +51,13 @@
         enumStringValue[COLUMN_REVERSE, "column-reverse"];
     }
 
+    class FlexWrap {
+        setupStringEnum[];
+        enumStringValue[NOWRAP, "nowrap"];
+        enumStringValue[WRAP, "wrap"];
+        enumStringValue[WRAP_REVERSE, "wrap-reverse"];
+    }
+
     class Align {
         setupStringEnum[];
         enumStringValue[START, "start"];
