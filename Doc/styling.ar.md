@@ -193,21 +193,37 @@ scalingAlgorithm: ScalingAlgorithm
 * `الخلفية` (`background`) خلفية العنصر.
 * `خوارزمية_التحجيم` (`scalingAlorithm`) تحديد الخوارزمية المستخدمة لتحجيم الصور والمراسم.
 
-#### حدد_طرازا_خاما (setRawStyle)
+#### حدد_خامة (setRaw)
 
 <div dir=rtl>
 
 ```
-عملية [اسم_الخصلة: شبم] هذا.حدد_طرازا_خاما(القيمة: نـص)؛
+عملية [اسم_الخصلة: شبم] هذا.حدد_خامة(القيمة: نـص)؛
 ```
 
 </div>
 
 ```
-handler [styleProp: ast] this.setRawStyle(val: String);
+handler [styleProp: ast] this.setRaw(val: String);
 ```
 
 دالة تمكن المستخدم من كتابة قيمة CSS يدويا لأي من خصال الطراز.
+
+#### أزل (remove)
+
+<div dir=rtl>
+
+```
+عملية [اسم_الخصلة: شبم] هذا.أزل()؛
+```
+
+</div>
+
+```
+handler [styleProp: ast] this.remove();
+```
+
+تزيل طرازا محددا لتعيده إلى وضعه المبدئي.
 
 
 ### طـقم_طرز (StyleSet)
