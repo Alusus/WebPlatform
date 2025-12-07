@@ -1,0 +1,247 @@
+@merge module WebPlatform {
+    //==========================================================================
+    // SlidingPanelPosition
+    // Enum for sliding panel position (which side it slides from)
+    class SlidingPanelPosition {
+        setupStringEnum[];
+        enumStringValue[LEFT, "left"];
+        enumStringValue[RIGHT, "right"];
+        enumStringValue[TOP, "top"];
+        enumStringValue[BOTTOM, "bottom"];
+    }
+
+    //==========================================================================
+    // SlidingPanel
+    // A panel that slides in from the edge of the screen, overlaying content.
+    // Typically used for navigation menus, settings panels, or additional content.
+    class SlidingPanel {
+        @injection def component: Component;
+
+        def _isOpen: Bool = false;
+        def _position: SlidingPanelPosition = SlidingPanelPosition.LEFT;
+        def _panelSize: SrdRef[Length];
+        def _animationDuration: Float = 0.3;
+        def closeOnBackdropClick: Bool = true;
+
+        def backdropBox: SrdRef[Box];
+        def panelBox: SrdRef[Box];
+        def contentBox: SrdRef[Box];
+        def timeout: SafeTimeout;
+
+        handler this~init() {
+            this.setup();
+        }
+
+        handler this~init(child: SrdRef[Widget]) {
+            this.setup();
+            this.setContent(child);
+        }
+
+        handler this.setup() {
+            def self: ref[this_type](this);
+
+            this.view = Box().{
+                addChildren({
+                    // Create backdrop (overlay)
+                    Box().{
+                        self.backdropBox = this;
+                        style.{
+                            position = Position.FIXED;
+                            left = Length.pt(0);
+                            top = Length.pt(0);
+                            width = Length.percent(100);
+                            height = Length.percent(100);
+                            zIndex = 999;
+                            display = Display.NONE;
+                            background = Background(Color(0, 0, 0, 0.5 * 255));
+                            opacity = 0.0;
+                            opacityTransition = Transition(self._animationDuration);
+                        };
+                        onClick.connect(closure (ref[Widget], ref[Int]) {
+                            if self.closeOnBackdropClick self.close();
+                        });
+                    },
+                    // Create sliding panel
+                    Box().{
+                        self.panelBox = this;
+                        style.{
+                            position = Position.FIXED;
+                            background = Background(Color(255, 255, 255));
+                            zIndex = 1000;
+                            overflowX = Overflow.AUTO;
+                            overflowY = Overflow.AUTO;
+                            boxShadow = BoxShadow(Length.pt(0), Length.pt(0), Length.pt(10), Length.pt(10), Color(0, 0, 0, 0));
+                            boxShadowTransition = Transition(self._animationDuration);
+                            transformTransition = Transition(self._animationDuration);
+                        };
+                        addChildren({
+                            // Create content container inside panel
+                            Box().{
+                                self.contentBox = this;
+                                style.{
+                                    width = Length.percent(100);
+                                    height = Length.percent(100);
+                                };
+                            }
+                        });
+                    },
+                });
+            };
+
+            this.updatePanelPosition();
+        }
+
+        handler this.updatePanelPosition() {
+            if this._position.toString() == "left" {
+                this.panelBox.style~use_in(self) {
+                    left = Length.pt(0);
+                    top = Length.pt(0);
+                    remove[right]();
+                    remove[bottom]();
+                    if this._panelSize.isNull() width = Length.pt(300) else width = this._panelSize;
+                    height = Length.percent(100);
+                    if this._isOpen transform = "translateX(0pt)"
+                    else transform = "translateX(-100%)";
+                };
+            } else if this._position.toString() == "right" {
+                this.panelBox.style~use_in(self) {
+                    right = Length.pt(0);
+                    top = Length.pt(0);
+                    remove[left]();
+                    remove[bottom]();
+                    if this._panelSize.isNull() width = Length.pt(300) else width = this._panelSize;
+                    height = Length.percent(100);
+                    if this._isOpen transform = "translateX(0pt)"
+                    else transform = "translateX(100%)";
+                };
+            } else if this._position.toString() == "top" {
+                this.panelBox.style~use_in(self) {
+                    left = Length.pt(0);
+                    top = Length.pt(0);
+                    remove[right]();
+                    remove[bottom]();
+                    width = Length.percent(100);
+                    if this._panelSize.isNull() height = Length.pt(300) else height = this._panelSize;
+                    if this._isOpen transform = "translateY(0pt)"
+                    else transform = "translateY(-100%)";
+                };
+            } else if this._position.toString() == "bottom" {
+                this.panelBox.style~use_in(self) {
+                    left = Length.pt(0);
+                    bottom = Length.pt(0);
+                    remove[right]();
+                    remove[top]();
+                    width = Length.percent(100);
+                    if this._panelSize.isNull() height = Length.pt(300) else height = this._panelSize;
+                    if this._isOpen transform = "translateY(0pt)"
+                    else transform = "translateY(100%)";
+                };
+            }
+            // Only show the shadow if the panel is open.
+            if this._isOpen {
+                this.panelBox.style.boxShadow = BoxShadow(
+                    Length.pt(0), Length.pt(0), Length.pt(10), Length.pt(10), Color(0, 0, 0, 0.3 * 255)
+                );
+            } else {
+                this.panelBox.style.boxShadow = BoxShadow(
+                    Length.pt(0), Length.pt(0), Length.pt(10), Length.pt(10), Color(0, 0, 0, 0)
+                );
+            }
+        }
+
+        //---------
+        // Properties
+
+        handler this.isOpen = Bool {
+            this._isOpen = value;
+            if value this.open() else this.close();
+            return this._isOpen;
+        }
+        handler this.isOpen: Bool {
+            return this._isOpen;
+        }
+
+        handler this.position = SlidingPanelPosition {
+            this._position = value;
+            this.updatePanelPosition();
+            return this._position;
+        }
+        handler this.position: SlidingPanelPosition {
+            return this._position;
+        }
+
+        handler this.panelSize = SrdRef[Length] {
+            this._panelSize = value;
+            this.updatePanelPosition();
+            return this._panelSize;
+        }
+        handler this.panelSize: SrdRef[Length] {
+            return this._panelSize;
+        }
+
+        handler this.animationDuration = Float {
+            this._animationDuration = value;
+            this.backdropBox.style.opacityTransition = Transition(self._animationDuration);
+            this.panelBox.style.boxShadowTransition = Transition(self._animationDuration);
+            this.panelBox.style.transformTransition = Transition(self._animationDuration);
+            return this._animationDuration;
+        }
+        handler this.animationDuration: Float {
+            return this._animationDuration;
+        }
+
+        //---------
+        // Methods
+
+        handler this.setContent(child: SrdRef[Widget]) {
+            this.contentBox.removeAllChildren();
+            this.contentBox.addChildren({ child });
+        }
+
+        handler this.open() {
+            if this._isOpen return;
+            this._isOpen = true;
+
+            // Show backdrop
+            this.backdropBox.style.display = Display.BLOCK;
+
+            // Trigger reflow to ensure transition works
+            this.timeout.set(0, closure (json: Json) {
+                this.backdropBox.style.opacity = 1.0;
+                this.updatePanelPosition();
+            });
+        }
+
+        handler this.close() {
+            if !this._isOpen return;
+            this._isOpen = false;
+
+            // Hide panel
+            this.updatePanelPosition();
+            this.backdropBox.style.opacity = 0.0;
+
+            // Hide backdrop after animation
+            this.timeout.set(
+                this.animationDuration * 1000000,
+                closure (json: Json) {
+                    this.backdropBox.style.display = Display.NONE;
+                }
+            );
+        }
+
+        handler this.toggle() {
+            if this._isOpen this.close() else this.open();
+        }
+
+        //-----------------
+        // Shared Functions
+
+        handler this_type(): SrdRef[SlidingPanel] {
+            return SrdRef[SlidingPanel].construct();
+        }
+
+        handler this_type(child: temp_ref[SrdRef[Widget]]): SrdRef[SlidingPanel] {
+            return SrdRef[SlidingPanel]().{ alloc()~init(child) };
+        }
+    }
+}

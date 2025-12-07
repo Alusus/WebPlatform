@@ -121,43 +121,49 @@
             return styleRep;
         }
 
-        handler [styleProp: ast] this.setRawStyle(val: String) {
-            def styleName: String = preprocess {
-                use Core.Basic;
-                use Core.Data.Ast;
-                def elements: Array[ref[Core.Basic.TiObject]] = Spp.astMgr.findElements(
-                    styleProp~ast,
-                    this_type~ast,
-                    Spp.SeekerFlags.SKIP_OWNERS | Spp.SeekerFlags.SKIP_USES | Spp.SeekerFlags.SKIP_CHILDREN
-                );
-                if elements.getLength() == 0 {
-                    Spp.buildMgr.raiseBuildNotice("SPPA1007", 1, styleProp~ast);
-                    return;
-                }
-                def i: Int;
-                for i = 0, i < elements.getLength(), ++i {
-                    def mod: ref[TiObject](Spp.astMgr.findModifierForElement(elements(i), "style"));
-                    if mod~ptr == 0 continue;
-                    def params: Array[String];
-                    Spp.astMgr.getModifierStringParams(mod, params);
-                    if params.getLength() == 0 continue;
-                    Spp.astMgr.insertAst(
-                        (ast strLiteral),
-                        Srl.Map[String, ref[TiObject]]().set(String("strLiteral"), StringLiteral(params(0)))
-                    );
-                    break;
-                }
-                if i == elements.getLength() {
-                    Spp.buildMgr.raiseBuildNotice("SPPA1002", 1, styleProp~ast);
-                }
-            };
-            this.props(styleName) = val;
+        handler [styleProp: ast] this.setRaw(val: String) {
+            this.props(String(1, preprocess { generatePropNameLiteral(styleProp~ast) })) = val;
             this.onPropUpdated();
         }
 
-        handler this.setRawStyle(styleName: String, styleVal: String) {
+        handler this.setRaw(styleName: String, styleVal: String) {
             this.props(styleName) = styleVal;
             this.onPropUpdated();
+        }
+
+        handler [styleProp: ast] this.remove() {
+            this.props.remove(String(1, preprocess { generatePropNameLiteral(styleProp~ast) }));
+            this.onPropUpdated();
+        }
+
+        func generatePropNameLiteral(prop: ref[Core.Basic.TiObject]) {
+            use Core.Basic;
+            use Core.Data.Ast;
+            def elements: Array[ref[Core.Basic.TiObject]] = Spp.astMgr.findElements(
+                prop,
+                this_type~ast,
+                Spp.SeekerFlags.SKIP_OWNERS | Spp.SeekerFlags.SKIP_USES | Spp.SeekerFlags.SKIP_CHILDREN
+            );
+            if elements.getLength() == 0 {
+                Spp.buildMgr.raiseBuildNotice("SPPA1007", 1, prop);
+                return;
+            }
+            def i: Int;
+            for i = 0, i < elements.getLength(), ++i {
+                def mod: ref[TiObject](Spp.astMgr.findModifierForElement(elements(i), "style"));
+                if mod~ptr == 0 continue;
+                def params: Array[String];
+                Spp.astMgr.getModifierStringParams(mod, params);
+                if params.getLength() == 0 continue;
+                Spp.astMgr.insertAst(
+                    (ast strLiteral),
+                    Srl.Map[String, ref[TiObject]]().set(String("strLiteral"), StringLiteral(params(0)))
+                );
+                break;
+            }
+            if i == elements.getLength() {
+                Spp.buildMgr.raiseBuildNotice("SPPA1002", 1, prop);
+            }
         }
     }
 

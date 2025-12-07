@@ -57,6 +57,7 @@ import "WebPlatform/Components/Switcher";
 import "WebPlatform/Components/RoutingSwitcher";
 import "WebPlatform/Components/Stack";
 import "WebPlatform/Components/RoutingStack";
+import "WebPlatform/Components/SlidingPanel";
 import "WebPlatform/Components/EmbeddedSvg";
 import "WebPlatform/Resources/ImageResource";
 import "WebPlatform/Resources/CanvasResource";

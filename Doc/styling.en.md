@@ -137,13 +137,21 @@ style type.
 * `background` Item background.
 * `scalingAlgorithm` Specifies the scaling algorithm used for images and canvases.
 
-#### setRawStyle
+#### setRaw
 
 ```
-handler [styleProp: ast] this.setRawStyle(val: String);
+handler [styleProp: ast] this.setRaw(val: String);
 ```
 
 Allows setting raw CSS value for any of the properties of the Style object.
+
+#### remove
+
+```
+handler [styleProp: ast] this.remove();
+```
+
+Removes (unsets) a previously set style.
 
 
 ### StyleSet

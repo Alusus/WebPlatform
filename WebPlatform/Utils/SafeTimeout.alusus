@@ -3,11 +3,11 @@
         def timeoutHandler: ArchInt(0);
 
         handler this~terminate() {
-            this.stop();
+            this.cancel();
         }
 
         handler this.set(duration: Word, cb: closure (Json)) {
-            this.stop();
+            this.cancel();
             this.timeoutHandler = setTimeout(duration, cb);
         }
 

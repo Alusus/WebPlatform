@@ -205,7 +205,7 @@ module Frontend {
                         style.{
                             height = Length.percent(100);
                             width = Length.pt(50);
-                            setRawStyle[background](String("lightblue"));
+                            setRaw[background](String("lightblue"));
                             fontSize = Length.pt(16.0);
                             justify = Justify.CENTER;
                         };

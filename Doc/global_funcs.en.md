@@ -466,7 +466,7 @@ function getDate(type: CharsPtr, timestamp: Int[64]): CharsPtr;
 
 Returns the date as a string.
 
-`type`: The requested format for the returned string. It can be `iso`, `locale`, or an empty string.
+`type`: The requested format for the returned string. It can be `iso`, `local_iso`, `locale`, or an empty string.
 
 `timestamp`: The timestamp for which we want the date string. If this is -1 the current timestamp
 will be used.

@@ -673,6 +673,7 @@ wasmApi.getDate = (type, timestamp) => {
     switch (toJsString(type)) {
         case 'iso': return toWasmString(date.toISOString());
         case 'locale': return toWasmString(date.toLocaleString());
+        case 'local_iso': return toWasmString(toLocalISOString(date));
         default: return toWasmString(date.toString());
     }
 }
@@ -1062,6 +1063,21 @@ function toWasmStringArray(strs) {
 function pushLocation(url) {
     window.history.pushState({}, null, url);
     window["onpopstate"]({ preventDefault: () => {}, state: {} });
+}
+
+function toLocalISOString(date) {
+  const pad = (n) => n.toString().padStart(2, '0');
+  const padMs = (n) => n.toString().padStart(3, '0');
+
+  const year = date.getFullYear();
+  const month = pad(date.getMonth() + 1);
+  const day = pad(date.getDate());
+  const hours = pad(date.getHours());
+  const minutes = pad(date.getMinutes());
+  const seconds = pad(date.getSeconds());
+  const milliseconds = padMs(date.getMilliseconds());
+
+  return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}.${milliseconds}`;
 }
 
 // Main Functions
