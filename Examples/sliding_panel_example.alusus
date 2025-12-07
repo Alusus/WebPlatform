@@ -1,0 +1,398 @@
+import "Srl/Console";
+import "Apm";
+Apm.importFile("Alusus/WebPlatform");
+use Srl;
+use WebPlatform;
+
+//==============================================================================
+// Backend
+
+@assetsRoute def assetsRoute: "Assets/";
+
+//==============================================================================
+// Frontend
+
+@uiEndpoint["/"]
+@title["WebPlatform Example - SlidingPanel"]
+func main {
+    def panelLeft: SrdRef[SlidingPanel];
+    def panelRight: SrdRef[SlidingPanel];
+    def panelTop: SrdRef[SlidingPanel];
+    def panelBottom: SrdRef[SlidingPanel];
+
+    // Build the main view
+    Window.instance.style.{
+        padding = Length4.pt(0);
+        margin = Length4.pt(0);
+        height = Length.percent(100);
+    };
+
+    Window.instance.setView(Box({}).{
+        style.{
+            display = Display.FLEX;
+            layout = Layout.COLUMN;
+            gap = Length.pt(20);
+            padding = Length4.pt(20);
+            height = Length.percent(100) - Length.pt(20 * 2);
+            background = Background(Color(245, 245, 245));
+        };
+        addChildren({
+            Text(String("SlidingPanel Component Examples")).{
+                style.{
+                    fontSize = Length.pt(32.0);
+                    fontWeight = FontWeight.BOLD;
+                    margin = Length4.pt(0, 0, 10, 0);
+                    fontColor = Color(30, 30, 30);
+                };
+            },
+
+            Text(String("Click the buttons below to open sliding panels from different directions")).{
+                style.{
+                    fontSize = Length.pt(16.0);
+                    margin = Length4.pt(0, 0, 20, 0);
+                    fontColor = Color(80, 80, 80);
+                };
+            },
+
+            // Buttons container
+            Box({}).{
+                style.{
+                    display = Display.FLEX;
+                    layout = Layout.ROW;
+                    gap = Length.pt(10);
+                    flexWrap = FlexWrap.WRAP;
+                };
+                addChildren({
+                    Button(String("Open Left Panel")).{
+                        style.{
+                            padding = Length4.pt(12, 24, 12, 24);
+                            fontSize = Length.pt(16.0);
+                            background = Background(Color(59, 130, 246));
+                            fontColor = Color(255, 255, 255);
+                            borderRadius = Length4.pt(6);
+                            borderWidth = Length4.pt(0);
+                            cursor = Cursor.POINTER;
+                        };
+                        style({ StateSelector.HOVER }).{
+                            background = Background(Color(37, 99, 235));
+                        };
+                        onClick.connect(closure (panelLeft: by_ref)&(widget: ref[Widget], payload: ref[Int]) {
+                            panelLeft.open();
+                        });
+                    },
+
+                    Button(String("Open Right Panel")).{
+                        style.{
+                            padding = Length4.pt(12, 24, 12, 24);
+                            fontSize = Length.pt(16.0);
+                            background = Background(Color(16, 185, 129));
+                            fontColor = Color(255, 255, 255);
+                            borderRadius = Length4.pt(6);
+                            borderWidth = Length4.pt(0);
+                            cursor = Cursor.POINTER;
+                        };
+                        style({ StateSelector.HOVER }).{
+                            background = Background(Color(5, 150, 105));
+                        };
+                        onClick.connect(closure (panelRight: by_ref)&(widget: ref[Widget], payload: ref[Int]) {
+                            panelRight.open();
+                        });
+                    },
+
+                    Button(String("Open Top Panel")).{
+                        style.{
+                            padding = Length4.pt(12, 24, 12, 24);
+                            fontSize = Length.pt(16.0);
+                            background = Background(Color(245, 158, 11));
+                            fontColor = Color(255, 255, 255);
+                            borderRadius = Length4.pt(6);
+                            borderWidth = Length4.pt(0);
+                            cursor = Cursor.POINTER;
+                        };
+                        style({ StateSelector.HOVER }).{
+                            background = Background(Color(217, 119, 6));
+                        };
+                        onClick.connect(closure (panelTop: by_ref)&(widget: ref[Widget], payload: ref[Int]) {
+                            panelTop.open();
+                        });
+                    },
+
+                    Button(String("Open Bottom Panel")).{
+                        style.{
+                            padding = Length4.pt(12, 24, 12, 24);
+                            fontSize = Length.pt(16.0);
+                            background = Background(Color(239, 68, 68));
+                            fontColor = Color(255, 255, 255);
+                            borderRadius = Length4.pt(6);
+                            borderWidth = Length4.pt(0);
+                            cursor = Cursor.POINTER;
+                        };
+                        style({ StateSelector.HOVER }).{
+                            background = Background(Color(220, 38, 38));
+                        };
+                        onClick.connect(closure (panelBottom: by_ref)&(widget: ref[Widget], payload: ref[Int]) {
+                            panelBottom.open();
+                        });
+                    }
+                });
+            },
+
+            // Info box
+            Box({}).{
+                style.{
+                    background = Background(Color(219, 234, 254));
+                    padding = Length4.pt(16);
+                    borderRadius = Length4.pt(8);
+                    margin = Length4.pt(20, 0, 0, 0);
+                };
+                addChildren({
+                    Text(String(
+                        "Features:\n"
+                        "• Click the backdrop to close the panel\n"
+                        "• Smooth slide animations\n"
+                        "• Customizable position (left, right, top, bottom)\n"
+                        "• Configurable size and styling"
+                    )).{
+                        style.{
+                            fontSize = Length.pt(14.0);
+                            lineHeight = Length.pt(1.6 * 14);
+                            fontColor = Color(30, 64, 175);
+                            whiteSpace = WhiteSpace.PRE_WRAP;
+                        };
+                    }
+                });
+            },
+
+            // Left SlidingPanel
+            SlidingPanel().{
+                panelLeft = this;
+                position = SlidingPanelPosition.LEFT;
+                panelSize = Length.pt(320);
+                setContent(
+                    Box({}).{
+                        style.{
+                            padding = Length4.pt(20);
+                            display = Display.FLEX;
+                            layout = Layout.COLUMN;
+                            gap = Length.pt(20);
+                        };
+                        addChildren({
+                            Text(String("Left Navigation")).{
+                                style.{
+                                    fontSize = Length.pt(24.0);
+                                    fontWeight = FontWeight.BOLD;
+                                    fontColor = Color(30, 30, 30);
+                                };
+                            },
+
+                            Text(String("This panel slides in from the left side. Perfect for navigation menus!")).{
+                                style.{
+                                    fontSize = Length.pt(14.0);
+                                    lineHeight = Length.pt(1.5 * 14);
+                                    fontColor = Color(100, 100, 100);
+                                };
+                            },
+
+                            Box({}).{
+                                style.{
+                                    display = Display.FLEX;
+                                    layout = Layout.COLUMN;
+                                    gap = Length.pt(8);
+                                };
+                                addChildren({
+                                    Text(String("• Home")),
+                                    Text(String("• About")),
+                                    Text(String("• Services")),
+                                    Text(String("• Contact"))
+                                });
+                            },
+
+                            Button(String("Close")).{
+                                style.{
+                                    padding = Length4.pt(10, 20, 10, 20);
+                                    background = Background(Color(220, 38, 38));
+                                    fontColor = Color(255, 255, 255);
+                                    borderRadius = Length4.pt(6);
+                                    borderWidth = Length4.pt(0);
+                                    cursor = Cursor.POINTER;
+                                    margin = Length4.pt(20, 0, 0, 0);
+                                };
+                                onClick.connect(closure (panelLeft: by_ref)&(widget: ref[Widget], payload: ref[Int]) {
+                                    panelLeft.close();
+                                });
+                            }
+                        });
+                    }
+                );
+            },
+
+            // Right SlidingPanel
+            SlidingPanel().{
+                panelRight = this;
+                position = SlidingPanelPosition.RIGHT;
+                panelSize = Length.pt(400);
+                setContent(
+                    Box({}).{
+                        style.{
+                            padding = Length4.pt(20);
+                            display = Display.FLEX;
+                            layout = Layout.COLUMN;
+                            gap = Length.pt(20);
+                        };
+                        addChildren({
+                            Text(String("Settings Panel")).{
+                                style.{
+                                    fontSize = Length.pt(24.0);
+                                    fontWeight = FontWeight.BOLD;
+                                    fontColor = Color(30, 30, 30);
+                                };
+                            },
+
+                            Text(String("This panel slides in from the right side. Great for settings or filters!")).{
+                                style.{
+                                    fontSize = Length.pt(14.0);
+                                    lineHeight = Length.pt(1.5 * 14);
+                                    fontColor = Color(100, 100, 100);
+                                };
+                            },
+
+                            Text(String("Settings options would go here...")).{
+                                style.{
+                                    fontSize = Length.pt(14.0);
+                                    fontColor = Color(150, 150, 150);
+                                };
+                            },
+
+                            Button(String("Close")).{
+                                style.{
+                                    padding = Length4.pt(10, 20, 10, 20);
+                                    background = Background(Color(220, 38, 38));
+                                    fontColor = Color(255, 255, 255);
+                                    borderRadius = Length4.pt(6);
+                                    borderWidth = Length4.pt(0);
+                                    cursor = Cursor.POINTER;
+                                    margin = Length4.pt(20, 0, 0, 0);
+                                };
+                                onClick.connect(closure (panelRight: by_ref)&(widget: ref[Widget], payload: ref[Int]) {
+                                    panelRight.close();
+                                });
+                            }
+                        });
+                    }
+                );
+            },
+
+            // Top SlidingPanel
+            SlidingPanel().{
+                panelTop = this;
+                position = SlidingPanelPosition.TOP;
+                panelSize = Length.pt(250);
+                setContent(
+                    Box({}).{
+                        style.{
+                            padding = Length4.pt(20);
+                            display = Display.FLEX;
+                            layout = Layout.COLUMN;
+                            gap = Length.pt(15);
+                        };
+                        addChildren({
+                            Text(String("Top Notification")).{
+                                style.{
+                                    fontSize = Length.pt(24.0);
+                                    fontWeight = FontWeight.BOLD;
+                                    fontColor = Color(30, 30, 30);
+                                };
+                            },
+
+                            Text(String("This panel slides down from the top. Useful for notifications or announcements!")).{
+                                style.{
+                                    fontSize = Length.pt(14.0);
+                                    lineHeight = Length.pt(1.5 * 14);
+                                    fontColor = Color(100, 100, 100);
+                                };
+                            },
+
+                            Button(String("Close")).{
+                                style.{
+                                    padding = Length4.pt(10, 20, 10, 20);
+                                    background = Background(Color(220, 38, 38));
+                                    fontColor = Color(255, 255, 255);
+                                    borderRadius = Length4.pt(6);
+                                    borderWidth = Length4.pt(0);
+                                    cursor = Cursor.POINTER;
+                                };
+                                onClick.connect(closure (panelTop: by_ref)&(widget: ref[Widget], payload: ref[Int]) {
+                                    panelTop.close();
+                                });
+                            }
+                        });
+                    }
+                );
+            },
+
+            // Bottom SlidingPanel
+            SlidingPanel().{
+                panelBottom = this;
+                position = SlidingPanelPosition.BOTTOM;
+                panelSize = Length.pt(300);
+                setContent(
+                    Box({}).{
+                        style.{
+                            padding = Length4.pt(20);
+                            display = Display.FLEX;
+                            layout = Layout.COLUMN;
+                            gap = Length.pt(15);
+                        };
+                        addChildren({
+                            Text(String("Bottom Sheet")).{
+                                style.{
+                                    fontSize = Length.pt(24.0);
+                                    fontWeight = FontWeight.BOLD;
+                                    fontColor = Color(30, 30, 30);
+                                };
+                            },
+
+                            Text(String("This panel slides up from the bottom. Popular in mobile interfaces!")).{
+                                style.{
+                                    fontSize = Length.pt(14.0);
+                                    lineHeight = Length.pt(1.5 * 14);
+                                    fontColor = Color(100, 100, 100);
+                                };
+                            },
+
+                            Text(String("Bottom sheets are commonly used for action menus, sharing options, etc.")).{
+                                style.{
+                                    fontSize = Length.pt(14.0);
+                                    fontColor = Color(150, 150, 150);
+                                };
+                            },
+
+                            Button(String("Close")).{
+                                style.{
+                                    padding = Length4.pt(10, 20, 10, 20);
+                                    background = Background(Color(220, 38, 38));
+                                    fontColor = Color(255, 255, 255);
+                                    borderRadius = Length4.pt(6);
+                                    borderWidth = Length4.pt(0);
+                                    cursor = Cursor.POINTER;
+                                };
+                                onClick.connect(closure (panelBottom: by_ref)&(widget: ref[Widget], payload: ref[Int]) {
+                                    panelBottom.close();
+                                });
+                            }
+                        });
+                    }
+                );
+            }
+        });
+    });
+
+    runEventLoop();
+}
+
+function startMyServer() {
+    Console.print("Starting server on port 8010...\nURL: http://localhost:8010/\n");
+    buildAndRunServer(Array[CharsPtr]({ "listening_ports", "8010", "static_file_max_age", "0" }));
+}
+
+startMyServer();

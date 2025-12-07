@@ -305,3 +305,134 @@ Box().{
 }
 ```
 
+
+### SlidingPanel
+
+The `SlidingPanel` component is a UI panel that slides in from the edge of the screen, overlaying the
+main content. It's commonly used for navigation menus, settings panels, filters, or additional
+content that should be accessible but not always visible.
+
+```
+class SlidingPanel {
+    @injection def component: Component;
+
+    // Properties
+    def isOpen: Bool;
+    def position: SlidingPanelPosition;
+    def panelSize: SrdRef[Length];
+    def animationDuration: Float;
+    def closeOnBackdropClick: Bool;
+
+    // Methods
+    handler this.setContent(child: SrdRef[Widget]);
+    handler this.open();
+    handler this.close();
+    handler this.toggle();
+}
+
+class SlidingPanelPosition {
+    def LEFT: String;    // Panel slides from left
+    def RIGHT: String;   // Panel slides from right
+    def TOP: String;     // Panel slides from top
+    def BOTTOM: String;  // Panel slides from bottom
+}
+```
+
+#### Properties
+
+- **isOpen**: `Bool` - Controls whether the panel is currently open or closed.
+
+- **position**: `SlidingPanelPosition` - Determines which edge of the screen the panel slides from.
+  Options: `LEFT`, `RIGHT`, `TOP`, or `BOTTOM`.
+
+- **panelSize**: `SrdRef[Length]` - The width (for left/right panels) or height (for top/bottom
+  panels) of the sliding panel. Defaults to 300pt if not specified.
+
+- **animationDuration**: `Float` - The duration of the slide animation in seconds. Default is 0.3
+  seconds.
+
+- **closeOnBackdropClick**: `Bool` - Whether clicking the backdrop (overlay) should close the
+  panel. Default is `true`.
+
+#### Methods
+
+- **setContent(child: SrdRef[Widget])** - Sets the content to be displayed inside the sliding panel.
+
+- **open()** - Opens the panel with a smooth slide animation.
+
+- **close()** - Closes the panel with a smooth slide animation.
+
+- **toggle()** - Toggles the panel between open and closed states.
+
+#### Usage Example
+
+```
+import "Apm";
+Apm.importFile("Alusus/WebPlatform");
+use WebPlatform;
+
+@uiEndpoint["/"]
+func main {
+    def myPanel: SrdRef[SlidingPanel];
+
+    Window.instance.setView(Box({}).{
+        addChildren({
+            // Button to open panel
+            Button(String("Open Menu")).{
+                onClick.connect(closure (myPanel: by_ref)&(w: ref[Widget], p: ref[Int]) {
+                    myPanel.open();
+                });
+            },
+
+            // Panel from left side
+            SlidingPanel().{
+                myPanel = this;
+                position = SlidingPanelPosition.LEFT;
+                panelSize = Length.pt(320);
+
+                setContent(
+                    Box({}).{
+                        style.{
+                            padding = Length4.pt(20);
+                        };
+                        addChildren({
+                            Text(String("Navigation Menu")),
+                            Button(String("Close")).{
+                                onClick.connect(closure (myPanel: by_ref)&(w: ref[Widget], p: ref[Int]) {
+                                    myPanel.close();
+                                });
+                            }
+                        });
+                    }
+                );
+            }
+        });
+    });
+
+    runEventLoop();
+}
+```
+
+#### Common Use Cases
+
+1. **Navigation Menu** - Left or right sliding panel containing navigation links
+2. **Settings Panel** - Right sliding panel with configuration options
+3. **Filters** - Side sliding panel with filter controls for lists or search results
+4. **Bottom Sheet** - Bottom sliding panel for mobile-style action menus
+5. **Notifications** - Top sliding panel for displaying announcements
+
+#### Features
+
+- Smooth slide-in/out animations
+- Backdrop overlay with customizable opacity
+- Automatic z-index management
+- Click outside to close (optional)
+- Customizable size and position
+- Shadow effects that appear when open
+
+#### Complete Examples
+
+See the complete working examples at:
+- [sliding_panel_example.alusus](../Examples/sliding_panel_example.alusus)
+- [مثال_مزلق.أسس](../Examples/مثال_مزلق.أسس) (Arabic version)
+
