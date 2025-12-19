@@ -578,6 +578,25 @@ function logToConsole (msg: ptr[Char]);
 Prints some message to the browser's console.
 
 
+## showAlertDialog
+
+```
+function showAlertDialog (msg: ptr[Char]);
+```
+
+Displays an alert dialog using the browser's native alert dialogs.
+
+
+## showConfirmDialog
+
+```
+function showConfirmDialog (msg: ptr[Char]): Bool;
+```
+
+Shows a confirm dialog using the browser's native confirm dialogs. Returns 1 (true) if the user clicks Ok, and 0 (false)
+if the user clicks Cancel.
+
+
 ### matchRegex
 
 ```

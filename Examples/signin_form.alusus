@@ -198,9 +198,12 @@ func main {
                             background = Background(Color(109, 40, 217)); // Even darker on click
                         };
                         onClick.connect(closure (widget: ref[Widget], payload: ref[Int]) {
-                            logToConsole("Sign in clicked!\n");
-                            logToConsole(String("Email: ") + emailInput.text + "\n");
-                            logToConsole(String("Password: ") + passwordInput.text + "\n");
+                            if (showConfirmDialog("Sign in clicked. Continue?\n")) {
+                                showAlertDialog(
+                                    String("Email: ") + emailInput.text + "\n" +
+                                    String("Password: ") + passwordInput.text + "\n"
+                                );
+                            }
                         });
                     }
                 });

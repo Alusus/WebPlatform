@@ -63,6 +63,8 @@
 
     عرف أعد_التوجيه: لقب httpRedirect؛
     عرف اكتب_في_الطرفية: لقب logToConsole؛
+    عرف أظهر_نافذة_إشعار: لقب showAlertDialog؛
+    عرف أظهر_نافذة_تأكيد: لقب showConfirmDialog؛
     عرف طابق_نمطا: لقب matchRegex؛
 
     عرف علق_سياق_الصوت: لقب suspendAudioContext؛
