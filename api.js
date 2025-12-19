@@ -804,7 +804,11 @@ wasmApi.logToConsole = (msg) => {
   console.log(toJsString(msg));
 }
 
-wasmApi.showAlert = (message) => {
+wasmApi.showAlertDialog = (message) => {
+    alert(toJsString(message));
+}
+
+wasmApi.showConfirmDialog = (message) => {
     let isExecuted = confirm(toJsString(message));
     return isExecuted;
 }
