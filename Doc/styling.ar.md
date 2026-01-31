@@ -2,7 +2,7 @@
 
 [[English]](styling.en.md)
 
-[[رجوع]](../readme.ar.md)
+[[رجوع]](../README.ar.md)
 
 ## الطرز (Styling)
 

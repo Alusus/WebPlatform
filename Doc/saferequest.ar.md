@@ -2,7 +2,7 @@
 
 [[English]](saferequest.en.md)
 
-[[رجوع]](../readme.ar.md)
+[[رجوع]](../README.ar.md)
 
 ### نـداء_آمن (SafeRequest)
 

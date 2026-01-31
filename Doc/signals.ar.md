@@ -2,7 +2,7 @@
 
 [[English]](signals.en.md)
 
-[[رجوع]](../readme.ar.md)
+[[رجوع]](../README.ar.md)
 
 ## الإشـارات (Signals)
 

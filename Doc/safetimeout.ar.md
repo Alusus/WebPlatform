@@ -2,7 +2,7 @@
 
 [[English]](safetimeout.en.md)
 
-[[رجوع]](../readme.ar.md)
+[[رجوع]](../README.ar.md)
 
 ### مـؤقت_آمن (SafeTimeout)
 

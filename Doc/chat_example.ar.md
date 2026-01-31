@@ -2,7 +2,7 @@
 
 [[English]](chat_example.en.md)
 
-[[رجوع]](../readme.ar.md)
+[[رجوع]](../README.ar.md)
 
 ## أمثلة
 

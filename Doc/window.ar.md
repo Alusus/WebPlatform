@@ -2,7 +2,7 @@
 
 [[English]](window.en.md)
 
-[[رجوع]](../readme.ar.md)
+[[رجوع]](../README.ar.md)
 
 ## نافذة (Window)
 

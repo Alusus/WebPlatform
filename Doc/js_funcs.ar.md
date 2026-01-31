@@ -2,7 +2,7 @@
 
 [[English]](js_funcs.en.md)
 
-[[رجوع]](../readme.ar.md)
+[[رجوع]](../README.ar.md)
 
 ## دوال ومتغيرات الجافاسكريبت
 

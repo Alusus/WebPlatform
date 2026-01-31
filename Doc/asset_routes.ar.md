@@ -2,7 +2,7 @@
 
 [[English]](asset_routes.en.md)
 
-[[رجوع]](../readme.ar.md)
+[[رجوع]](../README.ar.md)
 
 ## إنشاء مسارات الموارد في الخادم
 

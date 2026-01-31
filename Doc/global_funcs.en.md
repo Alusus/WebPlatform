@@ -2,7 +2,7 @@
 
 [[عربي]](global_funcs.ar.md)
 
-[[Back]](../readme.md)
+[[Back]](../README.md)
 
 ## Global Functions and Variables
 

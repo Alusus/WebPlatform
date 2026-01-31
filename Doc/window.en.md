@@ -2,7 +2,7 @@
 
 [[عربي]](window.ar.md)
 
-[[Back]](../readme.md)
+[[Back]](../README.md)
 
 ## Window
 

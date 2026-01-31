@@ -2,7 +2,7 @@
 
 [[English]](routing.en.md)
 
-[[رجوع]](../readme.ar.md)
+[[رجوع]](../README.ar.md)
 
 ## التوجيه في تطبيقات العميل الغني (Rich Client)
 

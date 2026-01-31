@@ -2,7 +2,7 @@
 
 [[English]](safetimer.en.md)
 
-[[رجوع]](../readme.ar.md)
+[[رجوع]](../README.ar.md)
 
 ### مـؤقت_متكرر_آمن (SafeTimer)
 

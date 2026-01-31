@@ -2,7 +2,7 @@
 
 [[English]](storage.en.md)
 
-[[رجوع]](../readme.ar.md)
+[[رجوع]](../README.ar.md)
 
 ## مـخزن (Storage)
 

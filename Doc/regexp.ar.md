@@ -2,7 +2,7 @@
 
 [[English]](regexp.en.md)
 
-[[رجوع]](../readme.ar.md)
+[[رجوع]](../README.ar.md)
 
 ### تـعبير_نمطي (RegExp)
 

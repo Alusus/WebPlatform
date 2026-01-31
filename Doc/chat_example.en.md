@@ -2,7 +2,7 @@
 
 [[عربي]](chat_example.ar.md)
 
-[[Back]](../readme.md)
+[[Back]](../README.md)
 
 ## Examples
 

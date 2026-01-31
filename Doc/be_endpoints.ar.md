@@ -2,7 +2,7 @@
 
 [[English]](be_endpoints.en.md)
 
-[[رجوع]](../readme.ar.md)
+[[رجوع]](../README.ar.md)
 
 ## إنشاء منافذ الخادم
 

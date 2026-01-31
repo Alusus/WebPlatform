@@ -2,7 +2,7 @@
 
 [[عربي]](widgets.ar.md)
 
-[[Back]](../readme.md)
+[[Back]](../README.md)
 
 ## Widgets
 

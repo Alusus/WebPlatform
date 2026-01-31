@@ -2,7 +2,7 @@
 
 [[English]](ui_endpoints.en.md)
 
-[[رجوع]](../readme.ar.md)
+[[رجوع]](../README.ar.md)
 
 <div dir=rtl>
 

@@ -2,7 +2,7 @@
 
 [[عربي]](resources.ar.md)
 
-[[Back]](../readme.md)
+[[Back]](../README.md)
 
 ## Resources
 

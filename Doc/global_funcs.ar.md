@@ -2,7 +2,7 @@
 
 [[English]](global_funcs.en.md)
 
-[[رجوع]](../readme.ar.md)
+[[رجوع]](../README.ar.md)
 
 ## الدوال والمتغيرات العمومية
 

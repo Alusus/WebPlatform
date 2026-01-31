@@ -2,7 +2,7 @@
 
 [[عربي]](components.ar.md)
 
-[[Back]](../readme.md)
+[[Back]](../README.md)
 
 ## Components
 

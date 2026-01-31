@@ -2,7 +2,7 @@
 
 [[English]](drawing.en.md)
 
-[[رجوع]](../readme.ar.md)
+[[رجوع]](../README.ar.md)
 
 <div dir=rtl>
 

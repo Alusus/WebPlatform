@@ -1,6 +1,6 @@
 # WebPlatform
 
-[[عربي]](readme.ar.md)
+[[عربي]](README.ar.md)
 
 A platform for web development.
 
@@ -37,4 +37,12 @@ Apm.importFile("Alusus/WebPlatform");
 * Examples
   * [[Chat Application]](Doc/chat_example.en.md)
   * [[Dealing with the Canvas]](Doc/canvas_example.en.md)
+
+---
+
+## License
+
+Copyright (C) 2026 Sarmad Abdullah
+
+This project is licensed under the GNU Lesser General Public License v3.0 (LGPL-3.0). See the `COPYING` and `COPYING.LESSER` files for details.
 

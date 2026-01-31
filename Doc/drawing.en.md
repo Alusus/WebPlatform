@@ -2,7 +2,7 @@
 
 [[عربي]](drawing.ar.md)
 
-[[Back]](../readme.md)
+[[Back]](../README.md)
 
 ## Drawing
 

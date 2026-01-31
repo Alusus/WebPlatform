@@ -2,7 +2,7 @@
 
 [[عربي]](styling.ar.md)
 
-[[Back]](../readme.md)
+[[Back]](../README.md)
 
 ## Styling
 

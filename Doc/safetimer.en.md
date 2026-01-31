@@ -2,7 +2,7 @@
 
 [[عربي]](safetimer.ar.md)
 
-[[Back]](../readme.md)
+[[Back]](../README.md)
 
 ### SafeTimer
 

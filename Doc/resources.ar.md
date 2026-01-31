@@ -2,7 +2,7 @@
 
 [[English]](resources.en.md)
 
-[[رجوع]](../readme.ar.md)
+[[رجوع]](../README.ar.md)
 
 ## الموارد (Resources)
 

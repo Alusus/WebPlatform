@@ -2,7 +2,7 @@
 
 [[عربي]](safetimeout.ar.md)
 
-[[Back]](../readme.md)
+[[Back]](../README.md)
 
 ### SafeTimeout
 

@@ -2,7 +2,7 @@
 
 [[عربي]](js_funcs.ar.md)
 
-[[Back]](../readme.md)
+[[Back]](../README.md)
 
 ## Javascript Functions and Variables
 
