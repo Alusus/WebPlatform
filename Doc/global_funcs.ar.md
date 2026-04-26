@@ -52,7 +52,7 @@ func getBuildDependencies(): Array[String];
 function createElement (type: ptr[Char], name: ptr[Char], parent: ptr[Char]);
 ```
 
-تنشئ عنصرًا في شجرة DOM المتصفح. تستخدم هذه الدالة من قبل الودجات لعرضها في المتصفح.
+تنشئ عنصرًا في شجرة DOM المتصفح. تستخدم هذه الدالة من قبل الضبيطات لعرضها في المتصفح.
 
 المعطيات:
 
@@ -77,7 +77,7 @@ function createElement (type: ptr[Char], name: ptr[Char], parent: ptr[Char]);
 function setElementAttribute (name: ptr[Char], prop: ptr[Char], value: ptr[Char])
 ```
 
-تحدد قيمة ميزة لعنصر من عناصر DOM. تستخدم من قبل الودجات للتحكم بخصائص العناصر في المتصفح.
+تحدد قيمة ميزة لعنصر من عناصر DOM. تستخدم من قبل الضبيطات للتحكم بخصائص العناصر في المتصفح.
 
 المعطيات:
 

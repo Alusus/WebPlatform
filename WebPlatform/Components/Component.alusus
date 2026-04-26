@@ -54,6 +54,7 @@
             return this._view.style;
         }
         handler (this: Widget).style = SrdRef[StyleSet] set_ptr {
+            this._view.style = value;
             return this._view.style;
         }
 

@@ -53,23 +53,30 @@ class MenuButton {
                 cursor = Cursor.POINTER;
                 transformTransition = Transition(0.3);
             };
-            style(">label").{
+            style(">>label").{
                 fontSize = Length.pt(14.0);
                 fontColor = Color("444");
             }
             style({ StateSelector.HOVER }).{
                 transform = Transform.scale(1.3);
             }
-            style({ StateSelector.HOVER, ">label" }).{
+            style({ StateSelector.HOVER, ">>label" }).{
                 fontSize = Length.pt(14.0);
                 fontColor = Color("000");
             }
-            onClick.connect(closure (widget: ref[Widget], payload: ref[Int]) {
-                Window.instance.pushLocation(link);
-            });
             addChildren({
-                Text(label).{
-                    className = String("label")
+                Hyperlink().{
+                    url = link;
+                    style.{
+                        textDecoration = TextDecoration.NONE;
+                    };
+                    setChild(Text(label).{
+                        className = String("label")
+                    });
+                    onClick.defaultPrevented = 1;
+                    onClick.connect(closure (ref[Widget], ref[Int]) {
+                        Window.instance.pushLocation(link);
+                    });
                 }
             });
         };

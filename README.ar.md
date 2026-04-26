@@ -26,7 +26,7 @@ Apm.importFile("Alusus/WebPlatform");
 * [[إنشاء المنافذ المرئية]](Doc/ui_endpoints.ar.md)
 * [[إنشاء منافذ الخادم]](Doc/be_endpoints.ar.md)
 * [[إنشاء مسارات الموارد في الخادم]](Doc/asset_routes.ar.md)
-* [[الـودجات (Widgets)]](Doc/widgets.ar.md)
+* [[الـضبيطات (Widgets)]](Doc/widgets.ar.md)
 * [[المركبات (Components)]](Doc/components.ar.md)
 * [[الطرز (Styling)]](Doc/styling.ar.md)
 * [[الإشـارات (Signals)]](Doc/signals.ar.md)
