@@ -124,7 +124,8 @@
         def binding: ref[Core.Basic.Binding](Core.Basic.getInterface[fn, Core.Basic.Binding]);
         binding.setMember("name", Core.Basic.TiStr("wasmStart"));
         def wasm: Build.Wasm(fn, uiEndpointsPath + "_intermediate.wasm");
-        wasm.addDependency(webPlatformPath + String("stdlib-min.wasm"));
+        wasm.addDependency(webPlatformPath + String("Tools/lib/crt1.o"));
+        wasm.addDependency(webPlatformPath + String("Tools/lib/libc.a"));
         wasm.addFlags({ String("--export=malloc"), String("--export=realloc") });
         wasm.generate();
         def fnName: String = Spp.astMgr.getDefinitionName(fn);

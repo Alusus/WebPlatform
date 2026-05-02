@@ -1105,14 +1105,32 @@ function toLocalISOString(date) {
 
 // Main Functions
 
+const wasiShim = {
+  proc_exit: (code) => console.log(`Process exited with code ${code}`),
+  fd_write: () => 0,
+  fd_close: () => 0,
+  fd_seek: () => 0,
+  fd_fdstat_get: () => 0,
+  args_get: () => 0,
+  args_sizes_get: () => 0,
+  environ_sizes_get: (outCount, outSize) => 0,
+  environ_get: (outPtr, outBuf) => 0,
+};
+
 async function loadWasm(filename, importTable) {
     let response = await fetch(filename);
     let binary = await response.arrayBuffer();
-    return WebAssembly.instantiate( binary, { "env": importTable } );
+    return WebAssembly.instantiate( binary, { "env": importTable, wasi_snapshot_preview1: wasiShim } );
 }
 
 async function start(moduleName) {
     program = await loadWasm(moduleName, wasmApi);
+
+    // Initialize wasi-libc
+    if (program.instance.exports._initialize) {
+        program.instance.exports._initialize();
+    }
+
     wasmMemory = program.instance.exports.memory;
 
     asyncifyDataPtr = program.instance.exports.malloc(STACK_SIZE + 8);
