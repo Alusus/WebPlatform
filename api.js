@@ -246,27 +246,115 @@ wasmApi.waitForEvent = () => {
     }
 }
 
-wasmApi.usleep = (ms) => {
-    const view = new Int32Array(wasmMemory.buffer, asyncifyDataPtr);
-    if (!sleeping) {
-        // We are called in order to start a sleep/unwind.
-        // Fill in the data structure with the start pos and end pos of the stack.
-        view[0] = asyncifyDataPtr + 8;
-        view[1] = asyncifyDataPtr + 8 + STACK_SIZE;
+const SUBSCRIPTION_SIZE = 48;
+const EVENT_SIZE = 32;
 
+wasmApi.poll_oneoff = (inPtr, outPtr, nsubscriptions, retPtr) => {
+    const view32 = new Int32Array(wasmMemory.buffer);
+    const viewData = new DataView(wasmMemory.buffer);
+    const asyncifyIdx = asyncifyDataPtr / 4;
+
+    if (!sleeping) {
+        let minTimeoutMs = Infinity;
+        let clockUserData = 0n;
+
+        // An array to hold all events requested in this call
+        let ioSubscriptions = [];
+
+        for (let i = 0; i < nsubscriptions; i++) {
+            const current_in = inPtr + (i * SUBSCRIPTION_SIZE);
+            const userdata = viewData.getBigUint64(current_in + 0, true);
+            const type = viewData.getUint8(current_in + 8);
+
+            if (type === 0) { // حدث مؤقت (Clock)
+                const timeout_ns = viewData.getBigUint64(current_in + 24, true);
+                const flags = viewData.getUint16(current_in + 40, true);
+                let timeout_ms = Number(timeout_ns) / 1_000_000;
+
+                if ((flags & 1) === 1) { // وقت مطلق
+                    timeout_ms = Math.max(0, timeout_ms - performance.now());
+                }
+                if (timeout_ms < minTimeoutMs) {
+                    minTimeoutMs = timeout_ms;
+                    clockUserData = userdata;
+                }
+            }
+            else if (type === 1 || type === 2) { // حدث قراءة (1) أو كتابة (2) لملف/مقبس
+                const fd = viewData.getUint32(current_in + 16, true);
+                ioSubscriptions.push({ userdata, type, fd });
+            }
+        }
+
+        // triggerWakeUp will be called whenever the code wakes up after an event
+        const triggerWakeUp = (triggeredEvents) => {
+            if (!sleeping) return;
+
+            const currentViewData = new DataView(wasmMemory.buffer);
+            let totalTriggered = 0;
+
+            // Write the data in the output buffer
+            triggeredEvents.forEach((ev) => {
+                const current_out = outPtr + (totalTriggered * EVENT_SIZE);
+                currentViewData.setBigUint64(current_out + 0, ev.userdata, true);
+                currentViewData.setUint16(current_out + 8, 0, true); // errno = 0
+                currentViewData.setUint8(current_out + 10, ev.type);
+                totalTriggered++;
+            });
+
+            currentViewData.setUint32(retPtr, totalTriggered, true);
+
+            // Rewind and re-enter the program
+            program.instance.exports.asyncify_start_rewind(asyncifyDataPtr);
+            program.instance.exports.wasmStart();
+        };
+
+        // Prepare the unwind
+        view32[asyncifyIdx] = asyncifyDataPtr + 8;
+        view32[asyncifyIdx + 1] = asyncifyDataPtr + 8 + STACK_SIZE;
         program.instance.exports.asyncify_start_unwind(asyncifyDataPtr);
         sleeping = true;
 
-        setTimeout(function() {
-            program.instance.exports.asyncify_start_rewind(asyncifyDataPtr);
-            // The code is now ready to rewind; re-enter the program from the
-            // same entry point to start the rewind process.
-            program.instance.exports.wasmStart();
-        }, ms/1000);
+        // Keep track of handles to cleanup after wakeup
+        let timeoutHandle = null;
+        let ioCleanups = [];
+
+        // Activate sleep timer (if any)
+        if (minTimeoutMs !== Infinity) {
+            timeoutHandle = setTimeout(() => {
+                cleanupAll();
+                triggerWakeUp([{ userdata: clockUserData, type: 0 }]);
+            }, minTimeoutMs);
+        }
+
+        // Activate IO events (if any)
+        ioSubscriptions.forEach((sub) => {
+            // TODO: Implement getSocketByFd
+            const socket = wasmApi.getSocketByFd(sub.fd);
+
+            if (socket && sub.type === 1) { // read request
+                const onDataReady = () => {
+                    cleanupAll();
+                    triggerWakeUp([{ userdata: sub.userdata, type: 1 }]);
+                };
+                socket.addEventListener('message', onDataReady);
+                ioCleanups.push(() => socket.removeEventListener('message', onDataReady));
+            }
+            // TODO: Address write requests (type === 2)
+        });
+
+        // Cleanup function to be called after wake-up
+        function cleanupAll() {
+            if (timeoutHandle) clearTimeout(timeoutHandle);
+            ioCleanups.forEach(clean => clean());
+        }
+
+        return 0;
+
     } else {
         // We are called as part of a resume/rewind. Stop sleeping.
         program.instance.exports.asyncify_stop_rewind();
         sleeping = false;
+        return 0;
     }
 }
 
@@ -955,6 +1043,38 @@ wasmApi.rand = () => {
 wasmApi.printf = ()=>{}
 wasmApi.exit = ()=>{}
 
+wasmApi.__muloti4 = (res_ptr, a_low, a_high, b_low, b_high, overflow_ptr) => {
+    const a = (BigInt(a_high) << 32n) | (BigInt(a_low) & 0xFFFFFFFFn);
+    const b = (BigInt(b_high) << 32n) | (BigInt(b_low) & 0xFFFFFFFFn);
+
+    const signedA = a >= 2n**63n ? a - 2n**64n : a;
+    const signedB = b >= 2n**63n ? b - 2n**64n : b;
+
+    const result = signedA * signedB;
+
+    const MIN_128 = -(2n ** 127n);
+    const MAX_128 = (2n ** 127n) - 1n;
+
+    let hasOverflow = 0;
+    if (result < MIN_128 || result > MAX_128) {
+        hasOverflow = 1;
+    }
+
+    const view32 = new Int32Array(wasmMemory.buffer);
+    view32[overflow_ptr / 4] = hasOverflow;
+
+    const unsignedResult = result < 0n ? (result + (2n ** 128n)) : result;
+
+    const res_low = unsignedResult & 0xFFFFFFFFFFFFFFFFn;
+    const res_high = unsignedResult >> 64n;
+
+    const viewData = new DataView(wasmMemory.buffer);
+    viewData.setBigUint64(res_ptr + 0, res_low, true);
+    viewData.setBigUint64(res_ptr + 8, res_high, true);
+
+    return 0;
+}
+
 // Helper Functions
 
 const eventPropMap = {
@@ -1115,6 +1235,8 @@ const wasiShim = {
   args_sizes_get: () => 0,
   environ_sizes_get: (outCount, outSize) => 0,
   environ_get: (outPtr, outBuf) => 0,
+  poll_oneoff: wasmApi.poll_oneoff,
+  __muloti4: wasmApi.__muloti4,
 };
 
 async function loadWasm(filename, importTable) {

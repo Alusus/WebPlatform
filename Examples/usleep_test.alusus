@@ -1,0 +1,110 @@
+import "Srl/Math";
+import "Apm";
+Apm.importPackage("Alusus/WebPlatform@0.9");
+use Srl;
+use WebPlatform;
+
+//==============================================================================
+// Backend
+
+@assetsRoute def assetsRoute: "Assets/";
+
+//==============================================================================
+// Frontend
+
+def PRIMARY_COLOR: Color("8e50ef");
+
+func createHeader (): SrdRef[Widget] {
+    return Box({}).{
+        style.{
+            width = Length.percent(100);
+            height = Length.pt(40);
+            padding = Length4.pt(5, 0);
+            background = Background(PRIMARY_COLOR);
+            borderColor = PRIMARY_COLOR;
+            borderWidth = Length4.pt(1.5);
+            borderStyle = BorderStyle.SOLID;
+            display = Display.FLEX;
+            layout = Layout.COLUMN;
+        };
+        addChildren({
+            Text(String("Alusus Web Platform Examples - Canvas")).{ style.{
+                fontColor = Color("fff");
+                fontSize = Length.pt(21.0);
+                width = Length.percent(100);
+                height = Length.percent(100);
+                background = Background(PRIMARY_COLOR);
+                margin = Length4.pt(5, 15);
+            } },
+        });
+    }~cast[SrdRef[Widget]];
+}
+
+class Position {
+    def x: Int;
+    def y: Int;
+}
+
+@uiEndpoint["/"]
+@title["WebPlatform Example - Canvas"]
+func main {
+    // Load assets from the server.
+    def img: ImageResource;
+    await(img.load("Assets/logo.svg"));
+
+    // Build the view
+    def canvas: SrdRef[Canvas];
+    Window.instance.style.{
+        padding = Length4.pt(0);
+        margin = Length4.pt(0);
+    };
+    Window.instance.setView(Box({}).{
+        style.{
+            align = Align.CENTER;
+            display = Display.FLEX;
+            layout = Layout.COLUMN;
+        };
+        addChildren({
+            createHeader(),
+            Canvas().{
+                canvas = this;
+                bitmapWidth = Length.px(1280);
+                bitmapHeight = Length.px(800);
+                style.{
+                    width = Length.percent(100);
+                    height = Length.percent(100);
+                    maxWidth = Length.px(1280);
+                    maxHeight = Length.px(800);
+                    borderWidth = Length4.pt(2);
+                    borderStyle = BorderStyle.SOLID;
+                    borderColor = Color(0, 0, 0);
+                    background = Background(Color(220, 220, 220));
+                };
+            }
+        });
+    });
+
+    // Animation loop.
+    def x: Int = -80;
+    while 1 {
+        canvas.clear();
+
+        def size: Int = Math.sin(3.14 * x / 320.0) * 40 + 100;
+        def y: Int = Math.sin(3.14 * x / 320.0) * 100 + 400 - size / 2;
+        def alpha: Float = Math.sin(3.14 * x / 80.0) / 4 + 0.75;
+        canvas.drawImage(img, x, y, size, size, alpha);
+
+        x += 2;
+        if x >= 1280 x = -80;
+
+        System.sleep(10000);
+        dispatchEvents();
+    }
+}
+
+function startMyServer() {
+    Console.print("Starting server on port 8010...\nURL: http://localhost:8010/\n");
+    buildAndRunServer(Array[CharsPtr]({ "listening_ports", "8010", "static_file_max_age", "0" }));
+}
+
+startMyServer();
