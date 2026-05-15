@@ -11,14 +11,14 @@
 
 ```
 اشمل "مـحا"؛
-مـحا.اشمل_ملف("Alusus/WebPlatform"، "مـنصة_ويب.أسس")؛
+مـحا.اشمل_حزمة("Alusus/WebPlatform@0.9"، "مـنصة_ويب.أسس")؛
 ```
 
 </div>
 
 ```
 import "Apm";
-Apm.importFile("Alusus/WebPlatform");
+Apm.importPackage("Alusus/WebPlatform@0.9");
 ```
 
 ## المحتويات

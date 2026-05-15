@@ -368,7 +368,7 @@ class SlidingPanelPosition {
 
 ```
 import "Apm";
-Apm.importFile("Alusus/WebPlatform");
+Apm.importPackage("Alusus/WebPlatform@0.9");
 use WebPlatform;
 
 @uiEndpoint["/"]

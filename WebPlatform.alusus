@@ -31,10 +31,10 @@ import "Spp/Ast";
 import "Build";
 import "Apm";
 import "closure";
-Apm.importFile("Alusus/Http");
-Apm.importFile("Alusus/Json");
-Apm.importFile("Alusus/MarkdownTranslator");
-Apm.importFile("Alusus/Promises");
+Apm.importPackage("Alusus/Http@0.3");
+Apm.importPackage("Alusus/Json@0.2");
+Apm.importPackage("Alusus/MarkdownTranslator@0.1");
+Apm.importPackage("Alusus/Promises@0.1");
 
 import "WebPlatform/server";
 import "WebPlatform/browser_api";

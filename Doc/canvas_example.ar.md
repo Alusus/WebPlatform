@@ -12,10 +12,10 @@
 
 ```
 اشمل "مـحا"؛
-مـحا.اشمل_ملف("Alusus/WebPlatform"، "مـنصة_ويب.أسس")؛
-مـحا.اشمل_ملف("Alusus/Http"، "بـننف.أسس")؛
-مـحا.اشمل_ملف("Alusus/Json"، "جـيسون.أسس")؛
-مـحا.اشمل_ملف("Alusus/Promises"، "مـؤجلات.أسس")؛
+مـحا.اشمل_حزمة("Alusus/WebPlatform@0.9"، "مـنصة_ويب.أسس")؛
+مـحا.اشمل_حزمة("Alusus/Http@0.3"، "بـننف.أسس")؛
+مـحا.اشمل_حزمة("Alusus/Json@0.2"، "جـيسون.أسس")؛
+مـحا.اشمل_حزمة("Alusus/Promises@0.1"، "مـؤجلات.أسس")؛
 اشمل "مـتم/سندات"؛
 اشمل "مـتم/مـصفوفة"؛
 اشمل "مـتم/نـص"؛
@@ -410,7 +410,7 @@
 ```
 import "Srl/Math";
 import "Apm";
-Apm.importFile("Alusus/WebPlatform");
+Apm.importPackage("Alusus/WebPlatform@0.9");
 use Srl;
 use WebPlatform;
 

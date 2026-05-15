@@ -11,7 +11,7 @@
 ```
 import "Srl/Math";
 import "Apm";
-Apm.importFile("Alusus/WebPlatform");
+Apm.importPackage("Alusus/WebPlatform@0.9");
 use Srl;
 use WebPlatform;
 
