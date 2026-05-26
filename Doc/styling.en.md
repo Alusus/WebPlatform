@@ -84,7 +84,7 @@ style type.
 * `flexWrap` Determines whether flex items wrap onto multiple lines.
 * `justify` The style used to specify how items are placed in a row.
 * `align` The style related to aligning an item inside its container.
-* `textAlign` The style related to aligning a text inside its container. 
+* `textAlign` The style related to aligning a text inside its container.
 * `textDecoration` The style of text decoration.
 * `textDecorationStyle` The style of text decoration shape.
 * `direction` Item direction.
@@ -340,10 +340,16 @@ class Animation {
 
 This class is used to create animation for a component.
 
-`set` a method to set the animation we want.
+#### set
 
-There are two versions for this method, one that accepts the styles as an array, the other as map
-where keys represent the time and the value being the style corresponding to that time.
+```
+handler this.set(totalDuration: Float, styles: Array[Style]);
+handler this.set(totalDuration: Float, styles: Map[Float, Style]);
+```
+
+a method to set the animation we want. There are two versions for this method, one that accepts
+the styles as an array, the other as map where keys represent the time and the value being the
+style corresponding to that time.
 
 
 ### Dimensions
@@ -357,9 +363,21 @@ class Dimensions {
 
 A class that holds dimensions information.
 
-`width` the width.
+#### width
 
-`height` the height.
+```
+def width: Int;
+```
+
+the width.
+
+#### height
+
+```
+def height: Int;
+```
+
+the height.
 
 
 ### Rectangle
@@ -389,13 +407,37 @@ class Color {
 
 A class that holds color information.
 
-`red` red channel value.
+#### red
 
-`green` green channel value.
+```
+def red: Int;
+```
 
-`blue` blue channel value.
+red channel value.
 
-`alpha` the transparency of the color.
+#### green
+
+```
+def green: Int;
+```
+
+green channel value.
+
+#### blue
+
+```
+def blue: Int;
+```
+
+blue channel value.
+
+#### alpha
+
+```
+def alpha: Int;
+```
+
+the transparency of the color.
 
 
 ### Length
@@ -501,13 +543,37 @@ class Transition {
 
 A class that holds transition information.
 
-`duration` transition duration.
+#### duration
 
-`fn` the name of the applied transition function.
+```
+def duration: Float = 0;
+```
 
-`delay` the delay in executing the transition.
+transition duration.
 
-`toString` a method to convert the class information to a string.
+#### fn
+
+```
+def fn: String;
+```
+
+the name of the applied transition function.
+
+#### delay
+
+```
+def delay: Float = 0;
+```
+
+the delay in executing the transition.
+
+#### toString
+
+```
+handler this.toString(): String;
+```
+
+a method to convert the class information to a string.
 
 
 ### Transform
@@ -533,20 +599,51 @@ module Transform {
 
 A class that holds transform information.
 
-`matrix` a method to define transform matrix.
+#### matrix
 
-There are two versions of this method, the first defines a 2D transform matrix, while the other defines 3D transform matrix.
+```
+func matrix(a: Float, b: Float, c: Float, d: Float, tx: Float, ty: Float): String;
+func matrix(
+        a1: Float, b1: Float, c1: Float, d1: Float,
+        a2: Float, b2: Float, c2: Float, d2: Float,
+        a3: Float, b3: Float, c3: Float, d3: Float,
+        a4: Float, b4: Float, c4: Float, d4: Float
+): String;
+```
 
-`rotate` a method to apply a rotation transform on a component.
+a method to define transform matrix. There are two versions of this method, the first defines a
+2D transform matrix, while the other defines 3D transform matrix.
 
-There are two versions of this method, the first do 2D rotation, while the other defines 3D rotation.
+#### rotate
 
-In the first method, we need only the angle, while in the second we need the axis vector we want to rotate around it
-by specifying its three coordinates.
+```
+func rotate(deg: Float): String;
+func rotate(x: Float, y: Float, z: Float, deg: Float): String;
+```
 
-`scale` a method to scale a shape, with two versions 2D and 3D.
+a method to apply a rotation transform on a component. There are two versions of this method,
+the first do 2D rotation, while the other defines 3D rotation. In the first method, we need only
+the angle, while in the second we need the axis vector we want to rotate around it by specifying
+its three coordinates.
 
-`translate` a method to translate a shape, with two versions 2D and 3D.
+#### scale
+
+```
+func scale(x: Float): String;
+func scale(x: Float, y: Float): String;
+func scale(x: Float, y: Float, z: Float): String;
+```
+
+a method to scale a shape, with two versions 2D and 3D.
+
+#### translate
+
+```
+func translate(x: ref[Length], y: ref[Length]): String;
+func translate(x: ref[Length], y: ref[Length], z: ref[Length]): String;
+```
+
+a method to translate a shape, with two versions 2D and 3D.
 
 
 ### Background
@@ -584,7 +681,13 @@ class Flex {
 
 A class that holds flex information.
 
-`toString` a method to convert the class information to a string.
+#### toString
+
+```
+handler this.toString(): String;
+```
+
+a method to convert the class information to a string.
 
 
 ### BoxShadow
@@ -614,7 +717,13 @@ class BoxShadow {
 
 A class that holds shadow information for a box.
 
-`toString` a method to convert the class information to a string.
+#### toString
+
+```
+handler this.toString(): String;
+```
+
+a method to convert the class information to a string.
 
 
 ### TextShadow
@@ -635,7 +744,13 @@ class TextShadow {
 
 A class that holds shadow information for a text.
 
-`toString` a method to convert the class information to a string.
+#### toString
+
+```
+handler this.toString(): String;
+```
+
+a method to convert the class information to a string.
 
 
 ### Position
@@ -829,11 +944,11 @@ An enum class that holds possible values for floating as enum.
 
 An enumeration to control the position of a background image when its dimensions do not match the
 dimension of the containing element. Possible values:
-* `CENTER` 
-* `RIGHT` 
-* `LEFT` 
-* `TOP` 
-* `BOTTOM` 
+* `CENTER`
+* `RIGHT`
+* `LEFT`
+* `TOP`
+* `BOTTOM`
 
 
 ### BackgroundSize
@@ -852,4 +967,3 @@ An enumeration for possible scaling algorithms. Possible values:
 * `HIGH_QUALITY`
 * `PIXELATED`
 * `CRISP_EDGES`
-

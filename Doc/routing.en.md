@@ -11,7 +11,7 @@ class:
 
 `location`: Gets the current route from the browser.
 
-`pushLocation`: Adds a route to a set of routes which emit the `onLocationChanged` signal. 
+`pushLocation`: Adds a route to a set of routes which emit the `onLocationChanged` signal.
 
 `onLocationChanged` we can listen to this signal to check for route changes and do what is needed.
 
@@ -40,11 +40,23 @@ class Router {
 This class allows you to define a set of routes with a callback for each that is called when
 transitioning to that route.
 
-`route`: Allows you to specify a regular expression for a route and define the desired callback
+#### route
+
+```
+handler this.route(r: String): ref[closure(String)];
+```
+
+Allows you to specify a regular expression for a route and define the desired callback
 to be executed when the current route matches the regular expression. The function returns a
 reference to the callback, allowing the user to set its value.
 
-`onUnknownRoute`: Specifies a callback that is called when reaching an unknown route.
+#### onUnknownRoute
+
+```
+def onUnknownRoute: closure(RoutePayload);
+```
+
+Specifies a callback that is called when reaching an unknown route.
 
 ### RoutePayload
 
@@ -58,11 +70,29 @@ class RoutePayload {
 
 A class that holds necessary information for route payload.
 
-`fullPath` the full path including that host path.
+#### fullPath
 
-`route` the relative path, which is the path within the host.
+```
+def fullPath: String;
+```
 
-`params` parameters in this payload.
+the full path including that host path.
+
+#### route
+
+```
+def route: String;
+```
+
+the relative path, which is the path within the host.
+
+#### params
+
+```
+def params: Array[String];
+```
+
+parameters in this payload.
 
 ### Example
 

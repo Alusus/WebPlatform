@@ -40,19 +40,47 @@ follows:
 closure (ref[Widget], ref[String]) { ... }
 ```
 
+#### connect
 
-#### Methods
+```
+handler this.connect(slot: closure (ref[ownerType], payload: ref[payloadType]));
+```
 
-`connect` a method to connect a closure to the signal, so that when the signal emitted the closure
+a method to connect a closure to the signal, so that when the signal emitted the closure
 called and payload passed to it.
 
-`disconnect` a method used to disconnect a closure connected by the previous method from the signal.
+#### disconnect
 
-`getConnectionCount` a method that retrieve the number of connections with the signal.
+```
+handler this.disconnect(slot: closure (ref[ownerType], payload: ref[payloadType]));
+handler this.disconnect(id: ArchInt);
+```
 
-`emit` emits the signal through all current connections.
+a method used to disconnect a closure connected by the previous method from the signal.
 
-`onConnectionsChanged` a closure to be called when connections change, whether by adding a new connection or removing
+#### getConnectionCount
+
+```
+handler this.getConnectionCount (): Int;
+```
+
+a method that retrieve the number of connections with the signal.
+
+#### emit
+
+```
+handler this.emit(owner: ref[ownerType], payload: ref[payloadType]);
+```
+
+emits the signal through all current connections.
+
+#### onConnectionsChanged
+
+```
+def onConnectionsChanged: closure (connectionCount: Int);
+```
+
+a closure to be called when connections change, whether by adding a new connection or removing
 an existing one.
 
 
@@ -66,5 +94,10 @@ class DomEventSignal [ownerType: type, payloadType: type] {
 
 This class is derived from `Signal` and is used for DOM events.
 
-`defaultPrevented` Specifies if the default action should be executed or skipped.
+#### defaultPrevented
 
+```
+def defaultPrevented: Bool = false;
+```
+
+Specifies if the default action should be executed or skipped.

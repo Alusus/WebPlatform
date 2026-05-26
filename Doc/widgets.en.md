@@ -188,10 +188,7 @@ handler this.addChildren (count: Int, children: ...temp_ref[SrdRef[Widget]]);
 
 A method to add a new child or more to this box.
 
-parameters:
-
 * `count` number of children we want to add.
-
 * `children` the children we want to add, which are widgets.
 
 ##### insertChild
@@ -202,10 +199,7 @@ handler this.insertChild (index: Int, child: SrdRef[Widget]);
 
 Inserts a child at the spefcified index.
 
-parameters:
-
 * `index` The index at which to insert the widget.
-
 * `child` the widget to be inserted.
 
 ##### removeChildren
@@ -216,10 +210,7 @@ handler this.removeChildren (count: Int, children: ...temp_ref[SrdRef[Widget]]);
 
 A method to remove children from this box.
 
-parameters:
-
 * `count` number of children we want to remove.
-
 * `children` the children we want to remove, which are widgets.
 
 ##### removeAllChildren
@@ -237,7 +228,7 @@ This represents an area to be used for free drawing.
 
 #### Variables
 
-* `resourceId`: `ArchInt`. a unique identifier to distinguish each canvas from the other. 
+* `resourceId`: `ArchInt`. a unique identifier to distinguish each canvas from the other.
 
 #### Mixins
 
@@ -247,7 +238,6 @@ This represents an area to be used for free drawing.
 #### Properties
 
 * `bitmapWidth`: `SrdRef[Length]`. The width of the drawing area.
-
 * `bitmapHeight`: `SrdRef[Length]`. The height of the drawing area.
 
 
@@ -311,8 +301,6 @@ handler this.setChild (child: temp_ref[SrdRef[Image]]);
 
 Sets the child component of this Picture.
 
-parameters:
-
 * `child` the Image we want displayed inside the Picture.
 
 
@@ -345,7 +333,6 @@ can specify a different tag, like `h1` for example.
 #### Properties
 
 * `text`: `String`. The text of this component.
-
 * `targetId`: `String`. The identifier of the object that is linked to this text, for example a text
   beside text input field that tell us that this text input is for username.
 
@@ -376,11 +363,8 @@ RadioButton(name: String, value: String, checked: Bool);
 #### Properties
 
 * `name`: `String`. The name attribute that groups radio buttons together. Only one radio button with the same name can be selected at a time.
-
 * `value`: `String`. The value of this radio button when selected.
-
 * `checked`: `Bool`. Whether this radio button is currently selected.
-
 * `disabled`: `Bool`. Whether this radio button is disabled.
 
 #### Events
@@ -434,7 +418,6 @@ A text entry box.
 #### Properties
 
 * `text`: `String`. The entered text.
-
 * `placeholder`: `String`. A value that appears before the user enters anything, to clarify what
   to enter.
 
@@ -473,11 +456,8 @@ A user input field.
 #### Properties
 
 * `text`: `String`. The entered value.
-
 * `inputType`: `String`. The type of input values.
-
 * `disabled`: `Bool`. Whether the input box is disabled.
-
 * `placeholder`: `String`. A value that appears before the user enters anything, to clarify what
   to enter.
 
@@ -552,9 +532,7 @@ A class that displays a hyperlink.
 #### Properties
 
 * `url`: `String`. The address of the target page.
-
 * `child`: `SrdRef[Widget]`. The widget contained in the hyperlink, like a text or an image.
-
 * `newTab`: `Bool`. Determins if the address will be opened in a new tab or the current one.
 
 #### Operations
@@ -566,8 +544,6 @@ handler this.setChild (child: temp_ref[SrdRef[Widget]]);
 ```
 
 Sets the child component of this hyperlink.
-
-parameters:
 
 * `child` the widget we want displayed inside the hyperlink.
 
@@ -641,13 +617,37 @@ class MouseMovePayload {
 
 A class that holds mouse move payload information.
 
-`posX` cursor x coordinate.
+#### posX
 
-`posY` cursor y coordinate.
+```
+def posX: Float;
+```
 
-`deltaX` the change in position on x axis.
+cursor x coordinate.
 
-`deltaY` the change in position on y axis.
+#### posY
+
+```
+def posY: Float;
+```
+
+cursor y coordinate.
+
+#### deltaX
+
+```
+def deltaX: Float;
+```
+
+the change in position on x axis.
+
+#### deltaY
+
+```
+def deltaY: Float;
+```
+
+the change in position on y axis.
 
 
 ### MouseButtonPayload
@@ -662,11 +662,29 @@ class MouseButtonPayload {
 
 A class that holds mouse button payload information.
 
-`button` the clicked button.
+#### button
 
-`posX` cursor x coordinate.
+```
+def button: Int;
+```
 
-`posY` cursor y coordinate.
+the clicked button.
+
+#### posX
+
+```
+def posX: Float;
+```
+
+cursor x coordinate.
+
+#### posY
+
+```
+def posY: Float;
+```
+
+cursor y coordinate.
 
 
 ### TouchPayload
@@ -691,36 +709,104 @@ class TouchPayload {
 This class carries information of a single touch in a touch event. A touch event has an array of
 this type representing all touches happening simultaneously.
 
-`identifier` A unique identifier to enable differentiating touchs from each other in consecutive
-touch events.
+#### identifier
 
-`screenX` The X coordinate of the touch relative to the screen.
+```
+def identifier: String;
+```
 
-`screenY` The Y coordinate of the touch relative to the screen.
+A unique identifier to enable differentiating touchs from each other in consecutive touch events.
 
-`clientX` The X coordinate of the touch relative to the browser.
+#### screenX
 
-`clientY` The Y coordinate of the touch relative to the browser.
+```
+def screenX: Float;
+```
 
-`pageX` The X coordinate of the touch relative to the document. This value takes into consideration
+The X coordinate of the touch relative to the screen.
+
+#### screenY
+
+```
+def screenY: Float;
+```
+
+The Y coordinate of the touch relative to the screen.
+
+#### clientX
+
+```
+def clientX: Float;
+```
+
+The X coordinate of the touch relative to the browser.
+
+#### clientY
+
+```
+def clientY: Float;
+```
+
+The Y coordinate of the touch relative to the browser.
+
+#### pageX
+
+```
+def pageX: Float;
+```
+
+The X coordinate of the touch relative to the document. This value takes into consideration
 the scroll status of the page and gives the coordinate as if the entire page is visible on the
 screen.
 
-`pageY` The Y coordinate of the touch relative to the document. This value takes into consideration
+#### pageY
+
+```
+def pageY: Float;
+```
+
+The Y coordinate of the touch relative to the document. This value takes into consideration
 the scroll status of the page and gives the coordinate as if the entire page is visible on the
 screen.
 
-`radiusX` The X radius of the ellipse that most closely circumscribes the area of contact with the
-screen.
+#### radiusX
 
-`radiusY` The Y radius of the ellipse that most closely circumscribes the area of contact with the
-screen.
+```
+def radiusX: Float;
+```
 
-`rotatoinAngle` The angle (in degrees) that the ellipse described by radiusX and radiusY must be
-rotated, clockwise, to most accurately cover the area of contact between the user and the surface.
+The X radius of the ellipse that most closely circumscribes the area of contact with the screen.
 
-`force` The amount of pressure being applied to the surface by the user, as a float between 0.0
+#### radiusY
+
+```
+def radiusY: Float;
+```
+
+The Y radius of the ellipse that most closely circumscribes the area of contact with the screen.
+
+#### rotationAngle
+
+```
+def rotationAngle: Float;
+```
+
+The angle (in degrees) that the ellipse described by radiusX and radiusY must be rotated, clockwise,
+to most accurately cover the area of contact between the user and the surface.
+
+#### force
+
+```
+def force: Float;
+```
+
+The amount of pressure being applied to the surface by the user, as a float between 0.0
 (no pressure) and 1.0 (maximum pressure).
 
-`changed` Specifies whether this touch has been changed or added in the current event.
+#### changed
 
+```
+def changed: Bool;
+```
+
+Specifies whether this touch has been changed or added in the current event.

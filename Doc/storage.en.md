@@ -47,7 +47,7 @@ handler this.removeItem(key: CharsPtr);
 ```
 
 Removes the item stored under the given key.
-ل.
+
 #### clear
 
 ```
@@ -55,4 +55,5 @@ handler this.clear();
 ```
 
 Removes all items from the storage.
+
 

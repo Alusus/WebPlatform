@@ -55,17 +55,15 @@ copied to the `Images/` folder within the build directory, i.e., the directory w
 will be built. During development, the files are used directly from their location within the library,
 while after building, WebPlatform looks for these files in a different path specific to the binary version.
 
-
 ### Function getAssetsRoutesFromModules
 
 ```
 func getAssetsRoutesFromModules (
     modulesRef: ref[Core.Basic.TiObject]
-): Array[StaticRoute];
+): Array[StaticRoute]
 ```
 
 Retrieves information about resource routes defined within the referenced modules.
-
 
 ### Class StaticRoute
 
@@ -79,13 +77,26 @@ class StaticRoute {
 
 This class contains information about a specific resources route.
 
-`uri` is the resource path on the HTTP server, i.e., the path through which resources can be
-accessed via an HTTP request.
+#### uri
 
-`srcPath` is the source path of these resources in the file system. This path is used when
-running the server directly without prior building. It typically points to the location of
-the resources within the source code.
+```
+def uri: String
+```
 
-`buildPath` is the path in the file system that will be used when creating a digital version
-of the project.
+The resource path on the HTTP server, i.e., the path through which resources can be accessed via an HTTP request.
 
+#### srcPath
+
+```
+def srcPath: String
+```
+
+The source path of these resources in the file system. This path is used when running the server directly without prior building. It typically points to the location of the resources within the source code.
+
+#### buildPath
+
+```
+def buildPath: String
+```
+
+The path in the file system that will be used when creating a digital version of the project.

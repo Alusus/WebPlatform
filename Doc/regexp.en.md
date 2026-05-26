@@ -20,14 +20,26 @@ regex on every operation.
 
 #### initialize
 
+```
+handler this.initialize(regStr: ptr[array[Char]]);
+```
+
 Initializes the object with the required pattern.
 
 #### release
+
+```
+handler this.release();
+```
 
 Releases the resource used for this object.
 
 #### match
 
+```
+handler this.match(str: ptr[array[Char]], lastIndex: ref[Int]): Array[String];
+handler this.match(str: ptr[array[Char]]): Array[String];
+```
 Match the expression against the given string.
 
 Parameters:
