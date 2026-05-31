@@ -32,14 +32,45 @@ class RegExp {
 
 #### هيئ (initialize)
 
+<div dir=rtl>
+
+```
+عرف هيئ(نص_نمط: مؤشر[مصفوفة[مـحرف]])؛
+```
+</div>
+
+```
+handler this.initialize(regStr: ptr[array[Char]]);
+```
 تستعمل لتهيئة غرض بالنمط المطلوب.
 
 #### حرر (release)
 
+<div dir=rtl>
+
+```
+عرف حرر(نص: مؤشر[مصفوفة[مـحرف]]، آخر_دليل: سند[صـحيح]): مـصفوفة[نـص]؛
+```
+</div>
+
+```
+handler this.release();
+```
 تستعمل لتحرير المورد المستعمل لهذا الغرض.
 
 #### طابق (match)
 
+<div dir=rtl>
+
+```
+عرف طابق(نص: مؤشر[مصفوفة[مـحرف]]): مـصفوفة[نـص]؛
+```
+</div>
+
+```
+handler this.match(str: ptr[array[Char]], lastIndex: ref[Int]): Array[String];
+handler this.match(str: ptr[array[Char]]): Array[String];
+```
 تنفيذ المطابقة.
 
 المعطيات:
