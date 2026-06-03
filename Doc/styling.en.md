@@ -153,7 +153,6 @@ handler [styleProp: ast] this.remove();
 
 Removes (unsets) a previously set style.
 
-
 ### StyleSet
 
 This class allows the user to define multiple styles for a widget in different states. It also
@@ -328,7 +327,6 @@ Notice that we determine tha direct child that has the class `icon` in the first
 
 Then we determine the state to be hovering with the cursor by passing `StateSelector.HOVER`.
 
-
 ### Animation
 
 ```
@@ -350,7 +348,6 @@ handler this.set(totalDuration: Float, styles: Map[Float, Style]);
 a method to set the animation we want. There are two versions for this method, one that accepts
 the styles as an array, the other as map where keys represent the time and the value being the
 style corresponding to that time.
-
 
 ### Dimensions
 
@@ -379,11 +376,10 @@ def height: Int;
 
 the height.
 
-
 ### Rectangle
 
 ```
-class Rectnagle {
+class Rectangle {
     def x: Int;
     def y: Int;
     def width: Int;
@@ -392,7 +388,6 @@ class Rectnagle {
 ```
 
 A class that holds a rectangle information.
-
 
 ### Color
 
@@ -439,34 +434,33 @@ def alpha: Int;
 
 the transparency of the color.
 
-
 ### Length
 
 A class that holds distance information.
 
 This class defines the following measuring units:
 
-`px` number of pixels.
+* `px` number of pixels.
 
-`pt` number of points.
+* `pt` number of points.
 
-`mm` distance in millimeters.
+* `mm` distance in millimeters.
 
-`vw` a relative distance, proportional to 1% of the browser window width.
+* `vw` a relative distance, proportional to 1% of the browser window width.
 
-`vh` a relative distance, proportional to 1% of the browser window height.
+* `vh` a relative distance, proportional to 1% of the browser window height.
 
-`vmin` a relative distance, proportional to 1% of the browser window minimum side length.
+* `vmin` a relative distance, proportional to 1% of the browser window minimum side length.
 
-`vmax` a relative distance, proportional to 1% of the browser window maximum side length.
+* `vmax` a relative distance, proportional to 1% of the browser window maximum side length.
 
-`em` a relative distance, proportional to text font size.
+* `em` a relative distance, proportional to text font size.
 
-`percent` a percentage of the container component.
+* `percent` a percentage of the container component.
 
-`auto` the auto value from CSS.
+* `auto` the auto value from CSS.
 
-`inherit` the inherit value from CSS.
+* `inherit` the inherit value from CSS.
 
 Each of these units is a function that creates an instance of type `Length` and gives it the
 value that was passed as an arg to the function. The return value is of type `SrdRef[Length]`.
@@ -478,35 +472,40 @@ Length.pt(50); // Creates an object with value of 50 points.
 
 Also, it contains the following method:
 
-`toString` a method to convery class information into a string.
+#### toString
 
+```
+handler this.toString(): String;
+```
+
+a method to convery class information into a string.
 
 ### Length4
 
 Similar to `Length` but with 4 values, one for each direction.
 This class defines the following measuring units:
 
-`px` number of pixels.
+* `px` number of pixels.
 
-`pt` number of points.
+* `pt` number of points.
 
-`mm` distance in millimeters.
+* `mm` distance in millimeters.
 
-`vw` a relative distance, proportional to 1% of the browser window width.
+* `vw` a relative distance, proportional to 1% of the browser window width.
 
-`vh` a relative distance, proportional to 1% of the browser window height.
+* `vh` a relative distance, proportional to 1% of the browser window height.
 
-`vmin` a relative distance, proportional to 1% of the browser window minimum side length.
+* `vmin` a relative distance, proportional to 1% of the browser window minimum side length.
 
-`vmax` a relative distance, proportional to 1% of the browser window maximum side length.
+* `vmax` a relative distance, proportional to 1% of the browser window maximum side length.
 
-`em` a relative distance, proportional to text font size.
+* `em` a relative distance, proportional to text font size.
 
-`percent` a percentage of the container component.
+* `percent` a percentage of the container component.
 
-`auto` the "auto" value from CSS.
+* `auto` the "auto" value from CSS.
 
-`inherit` the inherit value from CSS.
+* `inherit` the inherit value from CSS.
 
 Each of these units is a function that creates an instance of type `Length4` and gives it the
 values that were passed as args to the function. The return value is of type `SrdRef[Length4]`.
@@ -528,7 +527,6 @@ mentioned above:
 // and 30 pixels for horizontal values (left and right).
 SrdRef[Length4]().{ alloc()~init(Length.pt(50), Length.px(30)) }
 ```
-
 
 ### Transition
 
@@ -574,7 +572,6 @@ handler this.toString(): String;
 ```
 
 a method to convert the class information to a string.
-
 
 ### Transform
 
@@ -645,7 +642,6 @@ func translate(x: ref[Length], y: ref[Length], z: ref[Length]): String;
 
 a method to translate a shape, with two versions 2D and 3D.
 
-
 ### Background
 
 ```
@@ -670,7 +666,6 @@ Describes the properties of an element's background. It has three initializer fu
   of the total distance at which that color starts.
 * The fourth initializer creates a background that is initialized with a string value.
 
-
 ### Flex
 
 ```
@@ -688,7 +683,6 @@ handler this.toString(): String;
 ```
 
 a method to convert the class information to a string.
-
 
 ### BoxShadow
 
@@ -725,7 +719,6 @@ handler this.toString(): String;
 
 a method to convert the class information to a string.
 
-
 ### TextShadow
 
 ```
@@ -752,7 +745,6 @@ handler this.toString(): String;
 
 a method to convert the class information to a string.
 
-
 ### Position
 
 An enum class that holds possible values for position as enum.
@@ -761,7 +753,6 @@ An enum class that holds possible values for position as enum.
 * `FIXED`
 * `ABSOLUTE`
 * `STICKY`
-
 
 ### Overflow
 
@@ -772,13 +763,11 @@ An enum class that holds possible values for overflow properties.
 * `SCROLL`
 * `AUTO`
 
-
 ### TextOverflow
 
 An enum class that holds possible values for the textOverflow property.
 * `CLIP`
 * `ELLIPSIS`
-
 
 ### Display
 
@@ -790,7 +779,6 @@ An enum class that holds possible values for display as enum.
 * `GRID`
 * `NONE`
 
-
 ### Layout
 
 An enum class that holds possible values for layout as enum.
@@ -799,14 +787,12 @@ An enum class that holds possible values for layout as enum.
 * `COLUMN`
 * `COLUMN_REVERSE`
 
-
 ### FlexWrap
 
 An enum class that holds possible values for flex-wrap as enum.
 * `NOWRAP`
 * `WRAP`
 * `WRAP_REVERSE`
-
 
 ### Align
 
@@ -815,7 +801,6 @@ An enum class that holds possible values for align as enum.
 * `CENTER`
 * `END`
 * `STRETCH`
-
 
 ### Justify
 
@@ -827,7 +812,6 @@ An enum class that holds possible values for justify as enum.
 * `SPACE_BETWEEN`
 * `SPACE_AROUND`
 * `SPACE_EVENLY`
-
 
 ### Cursor
 
@@ -851,7 +835,6 @@ An enum class that holds possible values for cursor as enum.
 * `ZOOM_IN`
 * `ZOOM_OUT`
 
-
 ### BorderStyle
 
 An enum class that holds possible values for border style as enum.
@@ -864,7 +847,6 @@ An enum class that holds possible values for border style as enum.
 * `NONE`
 * `HIDDEN`
 
-
 ### WordBreak
 
 An enum class that holds possible values for word break as enum.
@@ -872,7 +854,6 @@ An enum class that holds possible values for word break as enum.
 * `BREAK_ALL`
 * `KEEP_ALL`
 * `BREAK_WORD`
-
 
 ### WhiteSpace
 
@@ -882,13 +863,11 @@ An enum class that holds possible values for the whiteSpace property.
 * `PRE_WRAP`
 * `PRE_LINE`
 
-
 ### Direction
 
 An enum class that holds possible values for direction as enum.
 * `LTR`
 * `RTL`
-
 
 ### TextDecoration
 
@@ -897,7 +876,6 @@ An enum class that holds possible values for text decoration as enum.
 * `UNDERLINE`
 * `OVERLINE`
 * `LINE_THROUGH`
-
 
 ### TextDecorationStyle
 
@@ -908,7 +886,6 @@ An enum class that holds possible values for text decoration style as enum.
 * `DASHED`
 * `WAVY`
 
-
 ### TextAlign
 
 An enum class that holds possible values for text align as enum.
@@ -916,7 +893,6 @@ An enum class that holds possible values for text align as enum.
 * `RIGHT`
 * `CENTER`
 * `JUSTIFY`
-
 
 ### FontWeight
 
@@ -931,14 +907,12 @@ An enum class that holds possible values for font weight.
 * `NORMAL`
 * `BOLD`
 
-
 ### Floating
 
 An enum class that holds possible values for floating as enum.
 * `NONE`
 * `LEFT`
 * `RIGHT`
-
 
 ### BackgroundPosition
 
@@ -949,7 +923,6 @@ dimension of the containing element. Possible values:
 * `LEFT`
 * `TOP`
 * `BOTTOM`
-
 
 ### BackgroundSize
 

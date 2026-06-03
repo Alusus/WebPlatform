@@ -51,7 +51,6 @@ handler this.getDimensions(): Dimensions;
 
 this method is used to get the resource's dimensions.
 
-
 ### CanvasResource
 
 ```
@@ -89,7 +88,6 @@ handler this.resize(w: Int, h: Int);
 ```
 
 a method used to change the size of the canvas to the given width and height.
-
 
 ### AudioResource
 

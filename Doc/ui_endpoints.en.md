@@ -86,4 +86,3 @@ are available:
 
 * `app_install_prompt`: Sent when an install prompt is available for the web app. The user can
   respond to this message by notifying the user and then calling `showAppInstallPrompt`.
-

@@ -24,8 +24,6 @@ handler this.drawPolygon(pointCount: Int, points: ref[array[Int]], filled: Bool)
 
 Draws a polygon.
 
-parameters:
-
 * `pointCount`: the number of polygon's points.
 * `points`: polygon's points.
 * `filled`: is the polygon filled or empty.
@@ -62,8 +60,6 @@ handler this.drawText(text: ptr[Char], font: ptr[Char], x: Int, y: Int, rtl: Boo
 ```
 
 Draws the provided text.
-
-parameters:
 
 * `text`: The text we want to draw.
 * `font`: The font of the text.
@@ -127,8 +123,6 @@ handler this.drawImage(
 Draws the given image, stretching it to fit the provided position and dimension. Applies the given
 alpha to the image. If the image has an alpha channel it will be blended with the provided alpha
 value. 
-
-parameters:
 
 * `img` a reference to the image we want to draw.
 

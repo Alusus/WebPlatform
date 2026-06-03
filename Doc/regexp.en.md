@@ -46,4 +46,3 @@ Parameters:
 
 * `str` The text we want to match.
 * `lastIndex` Returns the index that we should start next matching process from.
-

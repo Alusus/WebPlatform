@@ -24,11 +24,29 @@ handler this.style: SrdRef[StyleSet] as_ptr;
 handler this.style = SrdRef[StyleSet] as_ptr;
 ```
 
-* `id` a unique identifier to distinguish each widget from the other.
-* `className`: Class name of the widget, used for applying styles by class name.
-* `style`: This property allows updating the style of the widget. You can assign a StyleSet object to it, which
-  will be useful in sharing styles between multiple instances of a widget. If you try to update the styles
-  without setting a StyleSet upfront it will create a new StyleSet object for this widget and return it.
+##### id 
+
+```
+handler this.id: String as_ptr;
+```
+
+A unique identifier to distinguish each widget from the other.
+
+##### className 
+
+```
+handler this.id: String as_ptr;
+```
+
+Class name of the widget, used for applying styles by class name.
+
+##### style 
+
+```
+handler this.id: String as_ptr;
+```
+
+This property allows updating the style of the widget. You can assign a StyleSet object to it, which will be useful in sharing styles between multiple instances of a widget. If you try to update the styles without setting a StyleSet upfront it will create a new StyleSet object for this widget and return it.
 
 #### Abstract Events
 
@@ -159,16 +177,14 @@ handler this.scrollIntoView();
 
 Requets the browser to be scrolled to the element on which the method is called.
 
-
 ### BasicWidget
 
 The base class of all basic widgets. It implements the operations that are shared between all basic widgets.
 
-It also adds the following definitions:
+It also adds the following definition:
 
 * `hint`: `String`. A property for setting a string to be displayed as a tooltip when the cursor hovers over
   the element.
-
 
 ### Box
 
@@ -221,7 +237,6 @@ handler this.removeAllChildren ();
 
 Removes all children of this box.
 
-
 ### Canvas
 
 This represents an area to be used for free drawing.
@@ -240,7 +255,6 @@ This represents an area to be used for free drawing.
 * `bitmapWidth`: `SrdRef[Length]`. The width of the drawing area.
 * `bitmapHeight`: `SrdRef[Length]`. The height of the drawing area.
 
-
 ### Image
 
 A class that represents an image.
@@ -248,7 +262,6 @@ A class that represents an image.
 #### Properties
 
 * `url`: `String`. The URL of the image's source.
-
 
 ### Video
 
@@ -261,7 +274,6 @@ A class that represents a video.
 * `controls`: ` bool`. The video have controls button or not.
 * `autoplay`: ` bool`. The video will be auto played or not.
 
-
 ### VideoSource
 
 A class that represents a video source.
@@ -270,7 +282,6 @@ A class that represents a video source.
 
 * `src`: ` String`. The source of the video.
 * `videoType`: ` String`. The type of the video.
-
 
 ### VideoTrack
 
@@ -303,7 +314,6 @@ Sets the child component of this Picture.
 
 * `child` the Image we want displayed inside the Picture.
 
-
 ### ImageSource
 
 A class that represents a Picture source.
@@ -312,7 +322,6 @@ A class that represents a Picture source.
 
 * `src`: ` String`. The source of the Image.
 * `maxWidth`: ` String`. The max width of the Image.
-
 
 ### Text
 
@@ -336,7 +345,6 @@ can specify a different tag, like `h1` for example.
 * `targetId`: `String`. The identifier of the object that is linked to this text, for example a text
   beside text input field that tell us that this text input is for username.
 
-
 ### Button
 
 Displays a button.
@@ -344,7 +352,6 @@ Displays a button.
 #### Properties
 
 * `text`: `String`. The text we want to show on the button.
-
 
 ### RadioButton
 
@@ -376,7 +383,6 @@ def onChanged: DomEventSignal[RadioButton, Int];
 ```
 
 Gets fired when the radio button is selected or deselected. The event is triggered when the user clicks on the radio button or when the selection changes programmatically.
-
 
 ### CheckBox
 
@@ -410,7 +416,6 @@ def onChanged: DomEventSignal[CheckBox, Int];
 
 Gets fired when the checkbox is checked or unchecked. The event is triggered when the user clicks on the checkbox or when the state changes programmatically.
 
-
 ### TextInput
 
 A text entry box.
@@ -439,7 +444,6 @@ def onKeyPress: DomEventSignal[TextInput, String];
 
 Gets fired when a key is pressed.
 
-
 ##### onKeyUp
 
 ```
@@ -447,7 +451,6 @@ def onKeyUp: DomEventSignal[TextInput, String];
 ```
 
 Gets fired when we a keypress ends.
-
 
 ### Input
 
@@ -487,7 +490,6 @@ def onKeyUp: DomEventSignal[Input, String];
 
 Gets fired when we a keypress ends.
 
-
 ### Select
 
 A widget that displays a multi-choice input.
@@ -524,7 +526,6 @@ handler this.selectValue(newValue: String);
 
 Changes the current selection.
 
-
 ### Hyperlink
 
 A class that displays a hyperlink.
@@ -546,7 +547,6 @@ handler this.setChild (child: temp_ref[SrdRef[Widget]]);
 Sets the child component of this hyperlink.
 
 * `child` the widget we want displayed inside the hyperlink.
-
 
 ### DocView
 
@@ -582,7 +582,6 @@ handler this.setMarkdown(md: String, linksInNewTab: Bool);
 Sets a Markdown document as the scene. The second form allows specifying whether hyperlinks in the
 document opens in the same browser tab or a new one. The first form opens links in the same tab.
 
-
 ### Browser
 
 An area in which you can view another web page, i.e. an iframe.
@@ -600,7 +599,6 @@ handler this.postMessage(msgType: CharsPtr, msgBody: CharsPtr);
 ```
 
 Posts an arbitrary message to the window of the loaded site.
-
 
 ## Related Classes
 
@@ -685,7 +683,6 @@ def posY: Float;
 ```
 
 cursor y coordinate.
-
 
 ### TouchPayload
 

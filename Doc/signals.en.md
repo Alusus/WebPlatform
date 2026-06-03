@@ -46,8 +46,7 @@ closure (ref[Widget], ref[String]) { ... }
 handler this.connect(slot: closure (ref[ownerType], payload: ref[payloadType]));
 ```
 
-a method to connect a closure to the signal, so that when the signal emitted the closure
-called and payload passed to it.
+a method to connect a closure to the signal, so that when the signal is emitted the closure is called and the payload is passed to it.
 
 #### disconnect
 
@@ -64,7 +63,7 @@ a method used to disconnect a closure connected by the previous method from the 
 handler this.getConnectionCount (): Int;
 ```
 
-a method that retrieve the number of connections with the signal.
+a method that retrieves the number of connections with the signal.
 
 #### emit
 
@@ -82,7 +81,6 @@ def onConnectionsChanged: closure (connectionCount: Int);
 
 a closure to be called when connections change, whether by adding a new connection or removing
 an existing one.
-
 
 ### DomEventSignal
 

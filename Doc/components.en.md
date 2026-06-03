@@ -52,7 +52,6 @@ class Header {
 }
 ```
 
-
 ### Switcher
 
 This component provides a space where a view can be dynamically displayed and switched at any
@@ -107,7 +106,6 @@ In this case, even if you keep the widget in memory, the corresponding DOM eleme
 will be deleted from the browser, and as a result, the user will lose any changes made to that
 element in the browser.
 
-
 ### SwitcherTransition
 
 ```
@@ -150,7 +148,6 @@ def totalDuration: Int
 The total duration of the transition.
 
 Refer to the style guides for more information on defining animation effects.
-
 
 ### RoutingSwitcher
 
@@ -215,7 +212,6 @@ handler this.determineCurrentRouteIndex(rp: ref[RoutePayload]): Int
 Infers the sequence of the current route relative to the known routes in this switcher. The second
 form allows returning the data of the current path in addition to its sequence.
 
-
 ### Stack
 
 This components allows the user to stack many view in front of each other, with a given animation
@@ -255,7 +251,6 @@ Used to remove a view from the top of the stack. The first form removes the view
 any effects, while the second form allows specifying the desired transition to be applied. The name
 of the transition should match the name of one of the transitions added using the `setTransition`
 function.
-
 
 ### RoutingStack
 
@@ -305,7 +300,6 @@ handler this.setTransition(pushing: StackTransition, popping: StackTransition)
 
 This method is used to specify the transition for pushing and popping operations.
 
-
 ### EmbeddedSvg
 
 Used to embed an SVG image within the executalbe rather than being fetched after the program is
@@ -322,7 +316,6 @@ Box().{
     addChildren({ EmbeddedSvg["resources/icon.svg"] });
 }
 ```
-
 
 ### SlidingPanel
 

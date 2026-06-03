@@ -6,6 +6,17 @@
 
 ## Storage
 
+```
+class Storage {
+    handler this.getLength(): Int;
+    handler this.getKey(index: Int): String;
+    handler this.getItem(key: CharsPtr): String;
+    handler this.setItem(key: CharsPtr, value: CharsPtr);
+    handler this.removeItem(key: CharsPtr);
+    handler this.clear();
+}
+```
+
 A class used to store information to the session or to local storage in the browser.
 
 #### getLength
@@ -55,5 +66,3 @@ handler this.clear();
 ```
 
 Removes all items from the storage.
-
-

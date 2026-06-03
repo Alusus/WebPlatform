@@ -1,10 +1,10 @@
 # WebPlatform
 
+<div dir=rtl>
+
 [[English]](saferequest.en.md)
 
 [[رجوع]](../README.ar.md)
-
-<div dir=rtl>
 
 ### نـداء_آمن (SafeRequest)
 
