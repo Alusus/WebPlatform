@@ -1,5 +1,7 @@
 # WebPlatform
 
+<div dir=rtl>
+
 [[English]](README.md)
 
 هذه المكتبة لتمكين بناء تطبيقات ويب متكاملة (full stack)، أي تطبقات ويب تشمل الخادم وواجهة
@@ -7,19 +9,19 @@
 
 ## إضافة المكتبة للمشروع
 
-<div dir=rtl>
-
 ```
 اشمل "مـحا"؛
 مـحا.اشمل_حزمة("Alusus/WebPlatform@0.9"، "مـنصة_ويب.أسس")؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 import "Apm";
 Apm.importPackage("Alusus/WebPlatform@0.9");
 ```
+
+</div>
 
 ## المحتويات
 
@@ -53,3 +55,4 @@ Apm.importPackage("Alusus/WebPlatform@0.9");
 
 هذا المشروع مرخص بموجب رخصة غنو العمومية الصغرى الإصدار 3.0 (LGPL-3.0). راجع ملفات `COPYING` و `COPYING.LESSER` للحصول على التفاصيل.
 
+</div>

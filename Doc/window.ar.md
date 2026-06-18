@@ -1,5 +1,7 @@
 # WebPlatform
 
+<div dir=rtl>
+
 [[English]](window.en.md)
 
 [[رجوع]](../README.ar.md)
@@ -10,406 +12,406 @@
 
 #### النموذج (instance)
 
-<div dir=rtl>
-
 ```
-عرف النموذج: نـافذة(0~مثل[مؤشر])؛
+@مشترك عرف النموذج: نـافذة(0~مثل[مؤشر])؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 @shared def instance: Window(0~cast[ptr]);
 ```
 
+</div>
+
 الكائن الوحيد من هذا الصنف والذي يمثل نافذة التطبيق الرئيسية.
 
 #### الطراز (style)
-
-<div dir=rtl>
 
 ```
 عملية هذا.الطراز: سـندنا[طـقم_طرز]
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 handler this.style: SrdRef[StyleSet];
 ```
 
+</div>
+
 الحصول على طقم الطرز الخاص بالنافذة. ستنشئ الدالة طقم طرز للنافذة إن لم يكن منشأً مسبقًا.
 
 #### مخزن_الجلسة (sessionStorage)
-
-<div dir=rtl>
 
 ```
 عرف مخزن_الجلسة: مـخزن(0)؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 def sessionStorage: Storage(0);
 ```
 
+</div>
+
 المخزن المستعمل لحفظ معلومات الجلسة.
 
 #### المخزن_المحلي (localStorage)
-
-<div dir=rtl>
 
 ```
 عرف المخزن_المحلي: مـخزن(1)؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 def localStorage: Storage(1);
 ```
 
+</div>
+
 المخزن المستعمل لحفظ المعلومات المحلية الخاصة بالمستخدم على جهازه.
 
 #### حدد_المشهد (setView)
-
-<div dir=rtl>
 
 ```
 عملية هذا.حدد_المشهد(مشهد: سـندنا[ضـبيطة])؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 handler this.setView(v: SrdRef[Widget]);
 ```
 
+</div>
+
 دالة لتحديد المشهد الرئيسي الذي نريد عرضه في النافذة.
 
 #### أزل_المشهد (unsetView)
-
-<div dir=rtl>
 
 ```
 عملية هذا.أزل_المشهد()؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 handler this.unsetView();
 ```
 
+</div>
+
 دالة لإزالة المشهد المعروض حالياً.
 
 #### الموقع (location)
-
-<div dir=rtl>
 
 ```
 عملية هذا.الموقع: نـص؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 handler this.location: String;
 ```
 
+</div>
+
 العنوان الكامل الحالي كما هو في شريط العنوان في المتصفح. يشمل هذا البروتوكول والخادم والمسار والاستعلامات والوسم.
 
 #### بروتوكول_الموقع (locationProtocol)
-
-<div dir=rtl>
 
 ```
 عملية هذا.بروتوكول_الموقع: نـص؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 handler this.locationProtocol: String;
 ```
 
+</div>
+
 خصلة تستعيد البروتوكول (http أو https) من العنوان.
 
 #### خادم_الموقع (locationHost)
-
-<div dir=rtl>
 
 ```
 عملية هذا.خادم_الموقع: نـص؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 handler this.locationHost: String;
 ```
 
+</div>
+
 خصلة تستعيد عنوان الخادم فقط دون بقية عناصر العنوان. أي تستعيد فقط الـDNS.
 
 #### مسار_الموقع (locationPath)
-
-<div dir=rtl>
 
 ```
 عملية هذا.مسار_الموقع: نـص؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 handler this.locationPath: String;
 ```
 
+</div>
+
 خصلة تستعيد مسار الصفحة دون عنوان الخادم أو بقية عناصر العنوان.
 
 #### استعلام_الموقع (locationQuery)
-
-<div dir=rtl>
 
 ```
 عملية هذا.استعلام_الموقع: نـص؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 handler this.locationQuery: String;
 ```
 
+</div>
+
 تستعيد الجزء من العنوان الذي يلي علامة ؟.
 
 #### وسم_الموقع (locationHash)
-
-<div dir=rtl>
 
 ```
 عملية هذا.وسم_الموقع: نـص؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 handler this.locationHash: String;
 ```
 
+</div>
+
 خصلة تستعيد الجزء من العنوان الذي يلي علامة #.
 
 #### هات_متغير_استعلام (getQueryParam)
-
-<div dir=rtl>
 
 ```
 عملية هذا.هات_متغير_استعلام(اسم_المتغير: مـؤشر_محارف): نـص؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 handler this.getQueryParam(paramName: CharsPtr): String;
 ```
+
+</div>
 
 ترجع هذه الدالة قيمة واحد من متغيرات الاستعلام (query params) من العنوان. ترجع نصًا فارغًا إن لم يوجد متغير بالاسم
 المعطى.
 
 #### ادفع_مسارا (pushLocation)
 
-<div dir=rtl>
-
 ```
 عملية هذا.ادفع_مسارا(مسار: مؤشر[مصفوفة[مـحرف]])؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 handler this.pushLocation (url: ptr[array[Char]]);
 ```
 
+</div>
+
 دالة لإضافة مسار إلى تاريخ المتصفح. تسمح هذه الدالة بتغيير عنوان المتصفح دون إعادة تحميل الصفحة.
 
 #### مرئية (visible)
-
-<div dir=rtl>
 
 ```
 عملية هذا.مرئية: ثـنائي؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 handler this.visible: Bool;
 ```
+
+</div>
 
 ترجع 1 إن كانت الصفحة مرئية و 0 في حالة لم تكن مرئية (مثلًا عندما تكون نافذة المتصفح مصغرة إلى شريط
 التطبيقات أو أن المتصفح يعرض في الوقت الحالية صفحة أخرى في لسان منفصل).
 
 #### أرسل_رسالة (postMessage)
 
-<div dir=rtl>
-
 ```
 عملية هذا.أرسل_رسالة(نوع_الرسالة: مـؤشر_محارف، متن_الرسالة: مـؤشر_محارف)؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 handler this.postMessage (msgType: CharsPtr, msgBody: CharsPtr);
 ```
+
+</div>
 
 تُستخدم لإرسالة رسالة مخصصة للنافذة الحالية. تُرسل الرسالة بصيغة جيسون بعنصرين: type و body، وقيمتاهما
 من معطيات الدالة.
 
 #### ارسل_رسالة_للمالك (postMessageToParent)
 
-<div dir=rtl>
-
 ```
 عملية هذا.ارسل_رسالة_للمالك(نوع_الرسالة: مـؤشر_محارف، متن_الرسالة: مـؤشر_محارف)؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 handler this.postMessageToParent (msgType: CharsPtr, msgBody: CharsPtr);
 ```
+
+</div>
 
 مماثلة لدالة `أرسل_رسالة` (`postMessage`) لكنها ترسل الرسالة لمالك هذه النافذة وهذا ينطبق فقط في حالة
 كان الموقع مفتوحًا ضمن عنصر iframe لموقع آخر، فتكون الرسالة للموقع الذي يحتوي الiframe.
 
 #### عند_بدء_الكبسة (onKeyDown)
 
-<div dir=rtl>
-
 ```
 عرف عند_بدء_الكبسة: إشـارة_حدث_دوم[نـافذة، نـص]؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 def onKeyDown: DomEventSignal[Window, String];
 ```
 
+</div>
+
 حدث يُثار عند الضغط على زر في لوحة المفاتيح.
 
 #### عند_انتهاء_الكبسة (onKeyUp)
-
-<div dir=rtl>
 
 ```
 عرف عند_انتهاء_الكبسة: إشـارة_حدث_دوم[نـافذة، نـص]؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 def onKeyUp: DomEventSignal[Window, String];
 ```
 
+</div>
+
 حدث يُثار عند انتهاء الضغط على زر في لوحة المفاتيح.
 
 #### عند_تغير_احتكار_المؤشر (onPointerLockChange)
-
-<div dir=rtl>
 
 ```
 عرف عند_تغير_احتكار_المؤشر: إشـارة_حدث_دوم[نـافذة، ثـنائي]؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 def onPointerLockChange: DomEventSignal[Window, Bool];
 ```
 
+</div>
+
 حدث يُثار عند تغير احتكار المؤشر.
 
 #### عند_تغير_ملء_الشاشة (onFullScreenChange)
-
-<div dir=rtl>
 
 ```
 عرف عند_تغير_ملء_الشاشة: إشـارة_حدث_دوم[نـافذة، ثـنائي]؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 def onFullScreenChange: DomEventSignal[Window, Bool];
 ```
 
+</div>
+
 حدث يُثار عند تغير حالة ملء الشاشة.
 
 #### عند_ربط_مقبض (onGamepadConnected)
-
-<div dir=rtl>
 
 ```
 عرف عند_ربط_مقبض: إشـارة_حدث_دوم[نـافذة، نـص]؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 def onGamepadConnected: DomEventSignal[Window, String];
 ```
 
+</div>
+
 حدث يُثار عند ربط مقبض ألعاب.
 
 #### عند_فصل_مقبض (onGamepadDisconnected)
-
-<div dir=rtl>
 
 ```
 عرف عند_فصل_مقبض: إشـارة_حدث_دوم[نـافذة، نـص]؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 def onGamepadDisconnected: DomEventSignal[Window, String];
 ```
 
+</div>
+
 حدث يُثار عند فصل مقبض ألعاب.
 
 #### عند_تغير_المسار (onLocationChanged)
-
-<div dir=rtl>
 
 ```
 عرف عند_تغير_المسار: إشـارة_حدث_دوم[نـافذة، صـحيح]؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 def onLocationChanged: DomEventSignal[Window, Int];
 ```
+
+</div>
 
 حدث يُثار عند تغير المسار في المتصفح دون إعادة تحميل الصفحة. يُثار هذا الحدث عند استدعاء
 دالة `ادفع_مسارا` (`pushLocation`) أو عند كبس المستخدم على زر الرجوع أو التقدم في المتصفح.
 
 #### عند_تغير_المرئية (onVisibilityChanged)
 
-<div dir=rtl>
-
 ```
 عرف عند_تغير_المرئية: إشـارة_حدث_دوم[نـافذة، صـحيح]؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 def onVisibilityChanged: DomEventSignal[Window, Int];
 ```
+
+</div>
 
 حدث يُثار عند تغير حالة مرئية الصفحة في المتصفح. يُثار هذا الحدث عند تغير الحالة من
 مرئي إلى غير مرئي (مثلا تصغير نافذة المتصفح إلى شريط التطبيقات، أو قلب لسان المتصفح
@@ -417,17 +419,18 @@ def onVisibilityChanged: DomEventSignal[Window, Int];
 
 #### عند_استلام_رسالة (onMessage)
 
-<div dir=rtl>
-
 ```
 عرف عند_استلام_رسالة: إشـارة_حدث_دوم[نـافذة، جـيسون]؛
 ```
 
-</div>
+<div dir=ltr>
 
 ```
 def onMessage: DomEventSignal[Window, Json];
 ```
 
+</div>
+
 حدث يُثار عند وصول رسالة إلى هذه النافذة.
 
+</div>

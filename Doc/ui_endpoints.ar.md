@@ -1,10 +1,10 @@
 # WebPlatform
 
+<div dir=rtl>
+
 [[English]](ui_endpoints.en.md)
 
 [[رجوع]](../README.ar.md)
-
-<div dir=rtl>
 
 ## إنشاء المنافذ المرئية
 
@@ -121,4 +121,3 @@ func about {
   `اعرض_واجهة_تنصيب_التطبيق` (`showAppInstallPrompt`).
 
 </div>
-

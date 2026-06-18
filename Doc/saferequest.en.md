@@ -25,8 +25,28 @@ requests, which is similar in definition and parameters to the global `sendReque
 * If the class is removed from memory, the current request, if any, is canceled to ensure that no access is made to
   elements that have been removed from memory before the request is completed.
 
-The `send` function returns a value of `true` if the request is sent, regardless of the outcome of the request itself.
+#### send
 
-The `cancel` function cancels the current request, if any. If no request exists, it returns without performing any
-action. The `inProgress` property returns `true` if there is an ongoing request at the time.
+```
+handler this.send (
+    method: ptr[Char], uri: ptr[Char], headers: ptr[Char], body: ptr[Char], timeoutInMs: Int, cb: closure (Json)
+): Bool;
+```
 
+Returns a value of `true` if the request is sent, regardless of the outcome of the request itself.
+
+#### cancel
+
+```
+handler this.cancel();
+```
+
+Cancels the current request, if any. If no request exists, it returns without performing any action.
+
+#### inProgress
+
+```
+handler this.inProgress: Bool;
+```
+
+Returns `true` if there is an ongoing request at the time.

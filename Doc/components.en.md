@@ -52,7 +52,6 @@ class Header {
 }
 ```
 
-
 ### Switcher
 
 This component provides a space where a view can be dynamically displayed and switched at any
@@ -70,12 +69,10 @@ class Switcher {
 #### setTransition
 
 ```
-handler this.setTransition(name: String, transition: SwitcherTransition);
+handler this.setTransition(name: String, transition: SwitcherTransition)
 ```
 
 Adds transition effects for later use in the `switchTo` function.
-
-Args:
 
 * `name`: Any name that distinguishes this transition from others.
 * `transition`: The definition of the transition we want to apply.
@@ -83,8 +80,8 @@ Args:
 #### switchTo
 
 ```
-handler this.switchTo(child: SrdRef[Widget]);
-handler this.switchTo(child: SrdRef[Widget], transitionName: String);
+handler this.switchTo(child: SrdRef[Widget])
+handler this.switchTo(child: SrdRef[Widget], transitionName: String)
 ```
 
 Switching the current view to a new view. The first form switches the view without any transition
@@ -95,7 +92,7 @@ function.
 #### shouldPreserveChild
 
 ```
-def shouldPreserveChild: closure (child: ref[Widget]): Bool;
+def shouldPreserveChild: closure (child: ref[Widget]): Bool
 ```
 
 A callback that is called when a view exits the scene (i.e., after switching to another view) to
@@ -108,7 +105,6 @@ the view will be deleted from the browser and will be recreated when switchTo is
 In this case, even if you keep the widget in memory, the corresponding DOM element for that widget
 will be deleted from the browser, and as a result, the user will lose any changes made to that
 element in the browser.
-
 
 ### SwitcherTransition
 
@@ -123,18 +119,35 @@ class SwitcherTransition {
 This class carries the properties of transitions used in a switcher. The definition of a transition
 relies on styles and their properties for animation and effects.
 
-`currentViewStyle`: The style of the current view that will exit the display area. This style should
-contain the definition of animation effects for the view, such as specifying slide-out effects of
-the view from the display area.
+#### currentViewStyle
 
-`incomingViewStyle`: The style of the new view that will enter the display area. This style should
-contain the definition of animation effects for the view, such as specifying slide-in effects of the
-view from outside the display area to its center.
+```
+def currentViewStyle: Style
+```
 
-`totalDuration`: The total duration of the transition.
+The style of the current view that will exit the display area. This style should contain the
+definition of animation effects for the view, such as specifying slide-out effects of the view
+from the display area.
+
+#### incomingViewStyle
+
+```
+def incomingViewStyle: Style
+```
+
+The style of the new view that will enter the display area. This style should contain the
+definition of animation effects for the view, such as specifying slide-in effects of the view
+from outside the display area to its center.
+
+#### totalDuration
+
+```
+def totalDuration: Int
+```
+
+The total duration of the transition.
 
 Refer to the style guides for more information on defining animation effects.
-
 
 ### RoutingSwitcher
 
@@ -155,21 +168,25 @@ class RoutingSwitcher {
 #### onUnknownRoute
 
 ```
-def onUnknownRoute: closure(ref[RoutingSwitcher], RoutePayload);
+def onUnknownRoute: closure(ref[RoutingSwitcher], RoutePayload)
 ```
 
 A callback determine what we want to do when the route is unknown.
 
 #### currentRouteIndex
 
+```
+def currentRouteIndex: Int = -1
+```
+
 A integer representing the index of the current route.
 
 #### route
 
 ```
-handler this.route(r: String): ref[RouteCallback];
-handler this.route(r: CharsPtr): ref[RouteCallback];
-def RouteCallback: alias closure(RoutePayload): SrdRef[Widget];
+handler this.route(r: String): ref[RouteCallback]
+handler this.route(r: CharsPtr): ref[RouteCallback]
+def RouteCallback: alias closure(RoutePayload): SrdRef[Widget]
 ```
 
 Allows defining the callback function to be invoked when the route changes to the given route in
@@ -180,7 +197,7 @@ be displayed in the switcher. The input of the path function is a regular expres
 #### setTransition
 
 ```
-handler this.setTransition(forward: SwitcherTransition, backward: SwitcherTransition);
+handler this.setTransition(forward: SwitcherTransition, backward: SwitcherTransition)
 ```
 
 Specifies the desired transitions in the case of navigating to the previous or next route.
@@ -188,13 +205,12 @@ Specifies the desired transitions in the case of navigating to the previous or n
 #### determineCurrentRouteIndex
 
 ```
-handler this.determineCurrentRouteIndex(): Int;
-handler this.determineCurrentRouteIndex(rp: ref[RoutePayload]): Int;
+handler this.determineCurrentRouteIndex(): Int
+handler this.determineCurrentRouteIndex(rp: ref[RoutePayload]): Int
 ```
 
 Infers the sequence of the current route relative to the known routes in this switcher. The second
 form allows returning the data of the current path in addition to its sequence.
-
 
 ### Stack
 
@@ -204,12 +220,10 @@ on transition if required.
 #### setTransition
 
 ```
-handler this.setTransition(name: String, transition: StackTransition);
+handler this.setTransition(name: String, transition: StackTransition)
 ```
 
 Adds transition effects for later use in the `push` function.
-
-Args:
 
 * `name`: Any name that distinguishes this transition from others.
 * `transition`: The definition of the transition we want to apply.
@@ -217,8 +231,8 @@ Args:
 #### push
 
 ```
-handler this.push(child: SrdRef[Widget]);
-handler this.push(child: SrdRef[Widget], transitionName: String);
+handler this.push(child: SrdRef[Widget])
+handler this.push(child: SrdRef[Widget], transitionName: String)
 ```
 
 Used to add a view to the stack. The added view appears in front of the current views. The second
@@ -229,15 +243,14 @@ transition should match the name of one of the transitions added using the `setT
 #### pop
 
 ```
-handler this.pop();
-handler this.pop(transitionName: String);
+handler this.pop()
+handler this.pop(transitionName: String)
 ```
 
 Used to remove a view from the top of the stack. The first form removes the view instantly without
 any effects, while the second form allows specifying the desired transition to be applied. The name
 of the transition should match the name of one of the transitions added using the `setTransition`
 function.
-
 
 ### RoutingStack
 
@@ -246,7 +259,7 @@ A stack that relies on the current route to stack and automatically remove views
 #### onUnknownRoute
 
 ```
-def onUnknownRoute: closure(ref[RoutingStack], RoutePayload);
+def onUnknownRoute: closure(ref[RoutingStack], RoutePayload)
 ```
 
 A callback that gets called when the route is unknown to this stack.
@@ -254,9 +267,9 @@ A callback that gets called when the route is unknown to this stack.
 #### route
 
 ```
-handler this.route(r: String): ref[RouteCallback];
-handler this.route(r: CharsPtr): ref[RouteCallback];
-def RouteCallback: alias closure(RoutePayload): SrdRef[Widget];
+handler this.route(r: String): ref[RouteCallback]
+handler this.route(r: CharsPtr): ref[RouteCallback]
+def RouteCallback: alias closure(RoutePayload): SrdRef[Widget]
 ```
 
 Specifies the callback function to be called when the route changes to the given route in this
@@ -282,11 +295,10 @@ b, and c, not just c. If the user navigates from the route `/first/second/` to
 #### setTransition
 
 ```
-handler this.setTransition(pushing: StackTransition, popping: StackTransition);
+handler this.setTransition(pushing: StackTransition, popping: StackTransition)
 ```
 
 This method is used to specify the transition for pushing and popping operations.
-
 
 ### EmbeddedSvg
 
@@ -304,7 +316,6 @@ Box().{
     addChildren({ EmbeddedSvg["resources/icon.svg"] });
 }
 ```
-
 
 ### SlidingPanel
 
@@ -338,31 +349,77 @@ class SlidingPanelPosition {
 }
 ```
 
-#### Properties
+#### isOpen
 
-- **isOpen**: `Bool` - Controls whether the panel is currently open or closed.
+```
+def isOpen: Bool
+```
 
-- **position**: `SlidingPanelPosition` - Determines which edge of the screen the panel slides from.
-  Options: `LEFT`, `RIGHT`, `TOP`, or `BOTTOM`.
+Controls whether the panel is currently open or closed.
 
-- **panelSize**: `SrdRef[Length]` - The width (for left/right panels) or height (for top/bottom
-  panels) of the sliding panel. Defaults to 300pt if not specified.
+#### position
 
-- **animationDuration**: `Float` - The duration of the slide animation in seconds. Default is 0.3
-  seconds.
+```
+def position: SlidingPanelPosition
+```
 
-- **closeOnBackdropClick**: `Bool` - Whether clicking the backdrop (overlay) should close the
-  panel. Default is `true`.
+Determines which edge of the screen the panel slides from. Options: `LEFT`, `RIGHT`, `TOP`, or `BOTTOM`.
 
-#### Methods
+#### panelSize
 
-- **setContent(child: SrdRef[Widget])** - Sets the content to be displayed inside the sliding panel.
+```
+def panelSize: SrdRef[Length]
+```
 
-- **open()** - Opens the panel with a smooth slide animation.
+The width (for left/right panels) or height (for top/bottom panels) of the sliding panel. Defaults to 300pt if not specified.
 
-- **close()** - Closes the panel with a smooth slide animation.
+#### animationDuration
 
-- **toggle()** - Toggles the panel between open and closed states.
+```
+def animationDuration: Float
+```
+
+The duration of the slide animation in seconds. Default is 0.3 seconds.
+
+#### closeOnBackdropClick
+
+```
+def closeOnBackdropClick: Bool
+```
+
+Whether clicking the backdrop (overlay) should close the panel. Default is `true`.
+
+#### setContent
+
+```
+handler this.setContent(child: SrdRef[Widget])
+```
+
+Sets the content to be displayed inside the sliding panel.
+
+#### open
+
+```
+handler this.open()
+```
+
+Opens the panel with a smooth slide animation.
+
+#### close
+
+```
+handler this.close()
+```
+
+Closes the panel with a smooth slide animation.
+
+#### toggle
+
+```
+handler this.toggle()
+```
+
+Toggles the panel between open and closed states.
 
 #### Usage Example
 
@@ -423,16 +480,15 @@ func main {
 
 #### Features
 
-- Smooth slide-in/out animations
-- Backdrop overlay with customizable opacity
-- Automatic z-index management
-- Click outside to close (optional)
-- Customizable size and position
-- Shadow effects that appear when open
+* Smooth slide-in/out animations
+* Backdrop overlay with customizable opacity
+* Automatic z-index management
+* Click outside to close (optional)
+* Customizable size and position
+* Shadow effects that appear when open
 
 #### Complete Examples
 
 See the complete working examples at:
-- [sliding_panel_example.alusus](../Examples/sliding_panel_example.alusus)
-- [مثال_مزلق.أسس](../Examples/مثال_مزلق.أسس) (Arabic version)
-
+* [sliding_panel_example.alusus](../Examples/sliding_panel_example.alusus)
+* [مثال_مزلق.أسس](../Examples/مثال_مزلق.أسس) (Arabic version)

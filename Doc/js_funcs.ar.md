@@ -1,5 +1,7 @@
 # WebPlatform
 
+<div dir=rtl>
+
 [[English]](js_funcs.en.md)
 
 [[رجوع]](../README.ar.md)
@@ -11,10 +13,15 @@
 
 ### pushLocation
 
+<div dir=ltr>
+
 ```
 function pushLocation(url);
 ```
 
+</div>
+
 دالة لإضافة مسار إلى تاريخ المتصفح. تسمح هذه الدالة بتغيير عنوان المتصفح دون إعادة تحميل الصفحة. هذه
 الدالة مطابقة لدالة `Window.pushLocation` الخاصة بلغة الأسس.
 
+</div>

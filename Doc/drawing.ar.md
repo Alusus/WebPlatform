@@ -1,10 +1,10 @@
 # WebPlatform
 
+<div dir=rtl>
+
 [[English]](drawing.en.md)
 
 [[رجوع]](../README.ar.md)
-
-<div dir=rtl>
 
 ## رسـم (Drawing)
 
@@ -41,8 +41,6 @@ handler this.drawPolygon(pointCount: Int, points: ref[array[Int]], filled: Bool)
 </div>
 
 دالة لرسم مضلع.
-
-المعطيات:
 
 * `عدد_النقاط` (`pointCount`) عدد نقاط المضلع.
 
@@ -115,8 +113,6 @@ handler this.drawText(text: ptr[Char], font: ptr[Char], x: Int, y: Int, rtl: Boo
 </div>
 
 دالة لرسم نص.
-
-المعطيات:
 
 * `نص` (`text`) النص المراد رسمه.
 
@@ -225,6 +221,10 @@ handler this.setLineWidth(lw: Int);
 handler this.drawImage(img: ref[ImageResource], x: Int, y: Int, w: Int, h: Int, alpha: Float);
 ```
 
+</div>
+
+<div dir=ltr>
+
 ```
 handler this.drawImage(
     img: ref[ImageResource], x: Int, y: Int, w: Int, h: Int, alpha: Float, smoothing: Bool
@@ -235,8 +235,6 @@ handler this.drawImage(
 
 ترسم الصورة المعطاة، محجمة لتناسب الموضع والأبعاد المحددة. تطبق قيمة ألفا المعطاة على الصورة، فإن
 امتلكت الصورة قناة ألفا دُمجت مع قيمة ألفا المعطاة.
-
-المعطيات:
 
 * `صورة` (`img`) سند إلى مورد الصورة المراد رسمها.
 
@@ -265,4 +263,3 @@ handler this.clear();
 تفرغ مساحة الرسم الحالية بالكامل.
 
 </div>
-
