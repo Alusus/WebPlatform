@@ -208,6 +208,8 @@ def params: Array[String];
 }
 ```
 
+<div dir=ltr>
+
 ```
 class ArticleView {
     @injection def component: Component;
@@ -255,5 +257,7 @@ class ArticleView {
     }
 }
 ```
+
+</div>
 
 </div>

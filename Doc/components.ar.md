@@ -59,6 +59,8 @@
 
 ```
 
+<div dir=ltr>
+
 ```
 class Header {
     @injection def component: Component;
@@ -92,6 +94,8 @@ class Header {
     }
 }
 ```
+
+</div>
 
 ### مـبدال (Switcher)
 
