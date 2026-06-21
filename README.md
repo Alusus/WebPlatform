@@ -36,7 +36,7 @@ Apm.importPackage("Alusus/WebPlatform@0.9");
 * [[Javascript Functions and Variables]](Doc/js_funcs.en.md)
 * Examples
   * [[Chat Application]](Doc/chat_example.en.md)
-  * [[Dealing with the Canvas]](Doc/canvas_example.en.md)
+  * [[Using the Canvas]](Doc/canvas_example.en.md)
 
 ---
 

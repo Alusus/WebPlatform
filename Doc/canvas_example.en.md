@@ -6,7 +6,7 @@
 
 ## Examples
 
-### Dealing with the Canvas
+### Using the Canvas
 
 ```
 import "Srl/Math";
