@@ -40,18 +40,15 @@
 <div dir=ltr>
 
 ```
-// و له المسار المعطى GET منفذ بياني يقبل الطريقة
-// يستعمل هذا المنفذ لجلب الرسائل
+// Back-end endpoint accepting a GET method and the given route
+// Used to fetch the messages
 @beEndpoint["GET", "/messages"]
 func getMessages (conn: ptr[Http.Connection]) {
-    // ادمج الرسائل سويةً مع سطر فارغ بين كل رسالة و الأخرى
     def response: String = String.merge(messages, "<br>");
-    // نضع الترويسات اللازمة
     Http.print(conn, "HTTP/1.1 200 Ok\r\n");
     Http.print(conn, "Content-Type: text/plain\r\n");
     Http.print(conn, "Cache-Control: no-cache\r\n");
     Http.print(conn, "Content-Length: %d\r\n\r\n", response.getLength());
-    // نضع محتوى الصوان الذي يحمل الرسائل
     Http.print(conn, response.buf);
 }
 ```

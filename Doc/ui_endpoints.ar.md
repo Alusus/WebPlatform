@@ -32,7 +32,7 @@
 ### مثال
 
 ```
-// منفذ بياني لصفحة واجهة مستخدم تمثل صفحة حول
+// منفذ مرئي لصفحة واجهة مستخدم تمثل صفحة حول
 @منفذ_مرئي["/about"]
 @عنوان["مثال منصة ويب - الدردشة"]
 دالة عن_البرنامج {
@@ -65,16 +65,15 @@
 <div dir=ltr>
 
 ```
-// منفذ بياني لصفحة واجهة مستخدم تمثل صفحة حول
+// UI endpoint for an about  page
 @uiEndpoint["/about"]
 @title["WebPlatform Example - Chat"]
 func about {
-
     Window.instance.style.{
         padding = Length4.pt(0);
         margin = Length4.pt(0);
     };
-    // هنا نحدد المشهد الخاص بهذه الصفحة
+    // Here we specify the view of this page
     Window.instance.setView(Box({}).{
         style.{
             display = Display.FLEX;
