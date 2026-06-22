@@ -1,4 +1,4 @@
-# WebPlatform
+# مـنصة_ويب (WebPlatform)
 
 [[English]](chat_example.en.md)
 

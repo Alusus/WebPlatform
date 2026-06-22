@@ -1,4 +1,4 @@
-# WebPlatform
+# مـنصة_ويب (WebPlatform)
 
 [[English]](canvas_example.en.md)
 
