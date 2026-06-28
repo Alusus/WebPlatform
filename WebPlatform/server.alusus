@@ -276,6 +276,66 @@
         }
     }
 
+    func generateWebSockets(parent: ref[Core.Basic.TiObject]) {
+
+        // here we get all the classes with Ws modifier
+
+        def classelEments: Array[ref[Core.Basic.TiObject]] = Spp.astMgr.findElements(
+            ast { modifier == "wsEndpoint" || modifier == "منفذ_مقبس" },
+            parent,
+            Spp.SeekerFlags.SKIP_OWNERS | Spp.SeekerFlags.SKIP_USES | Spp.SeekerFlags.SKIP_CHILDREN
+        );
+
+        // here we will go inside each class to extract the callbacks
+
+        def i: Int;
+        for i = 0, i < classelEments.getLength(), ++i {
+
+            // here we extract the functions inside class
+            def handlerElements : Array[ref[Core.Basic.TiObject]] = Spp.astMgr.findElements (
+                ast { elementType == "function" },
+                classelEments(i),
+                Spp.SeekerFlags.SKIP_OWNERS | Spp.SeekerFlags.SKIP_USES | Spp.SeekerFlags.SKIP_CHILDREN
+            );
+
+            def onConnectElement: ref[Core.Basic.TiObject];
+            def onReadyElement: ref[Core.Basic.TiObject];
+            def onReceiveElement: ref[Core.Basic.TiObject];
+            def onCloseElement: ref[Core.Basic.TiObject];
+
+            def j: Int;
+            for j = 0, j < handlerElements.getLength(), ++j {
+                def name: String = Spp.astMgr.getDefinitionName(handlerElements(j));
+                Console.print("this is the name : %s\n" , name.buf );
+                if name == "onConnect" || name == "عندالأتصال" {
+                    onConnectElement~no_deref = handlerElements(j);
+                } else if name == "onReady" || name == "عندالأستعداد" {
+                    onReadyElement~no_deref = handlerElements(j);
+                } else if name == "onReceive" || name == "عند_الأستلام" {
+                    onReceiveElement~no_deref = handlerElements(j);
+                } else if name == "onClose" || name == "عند_الاغلاق" {
+                    onCloseElement~no_deref = handlerElements(j);
+                } else {
+                    System.fail(1, "Invalid WS handler function name");
+                }
+            }
+            if onConnectElement~ptr == 0 || onReadyElement~ptr == 0
+                || onReceiveElement~ptr == 0 || onCloseElement~ptr == 0 {
+                System.fail(1, "Missing one or more WS handler functions");
+            }
+
+            def modifier: ref[Core.Basic.TiObject](Spp.astMgr.findModifierForElement(classelEments(i), "wsEndpoint"));
+            if modifier~ptr == 0 modifier~no_deref = Spp.astMgr.findModifierForElement(classelEments(i), "منفذ_مقبس");
+            
+            // get Uri
+            def wsEndpointUris: Array[String];
+            if !Spp.astMgr.getModifierStringParams(modifier, wsEndpointUris)
+                || wsEndpointUris.getLength() != 1 {
+                System.fail(1, "Invalid WS endpoint param");
+            }
+        }
+
+    }
     // Querying Functions
 
     func getAssetsRoutesFromModules (modulesRef: ref[Core.Basic.TiObject]): Array[StaticRoute] {
@@ -346,6 +406,17 @@
             requestCallback[modulesRef]~ptr, requestCallbackContext.obj~ptr, options
         );
         if httpContext == 0 return 0;
+
+        preprocess {
+            def modules: Array[ref[Core.Basic.TiObject]] = getAllModules(modulesRef~ast);
+            if modules.getLength() == 0 {
+                Spp.buildMgr.raiseBuildNotice("SPPA1002", 1, modulesRef~ast);
+            }
+            def i: Int;
+            for i = 0, i < modules.getLength(), ++i generateWebSockets(modules(i));
+        };
+
+        
 
         def session: ptr[ServerSession] = Memory.alloc(ServerSession~size)~cast[ptr[ServerSession]];
         session~cnt~init();
