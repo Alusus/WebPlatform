@@ -1,0 +1,34 @@
+class wsConnection {
+    def _connection : ptr[Http.Connection];
+    def isDead : Bool;
+
+    handler this~init(connection: ptr[Http.Connection]) {
+        this._connection = connection;
+        this.isDead = 0;
+    }
+
+    handler this.dead () {
+        this._connection = 0;
+        this.isDead = 1;
+    }
+
+    handler this.sendText  (data: CharsPtr, dataLen: ArchWord) : Int {
+        if this.isDead return 0;
+        return Http.writeTextToWebSocket(this._connection, data, dataLen);
+    }
+
+    handler this.sendText  (data: CharsPtr) : Int {
+        if this.isDead return 0;
+        return Http.writeTextToWebSocket(this._connection, data);
+    }
+
+    handler this.sendBinary (data: CharsPtr, dataLen: ArchWord) : Int {
+        if this.isDead return 0;
+        return Http.writeBinaryToWebSocket(this._connection , data , dataLen);
+    }
+    
+    handler this.close () : Int {
+        if this.isDead return 0;
+        return Http.closeWebSocket(this._connection);
+    }
+}

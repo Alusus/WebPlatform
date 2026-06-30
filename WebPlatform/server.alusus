@@ -47,6 +47,7 @@
     class ServerSession {
         def requestCallbackContext: SrdRef[RequestCallbackContext];
         def httpContext: ptr[Http.Context];
+        def socketConnections: Map[ArchInt, SrdRef[wsConnection]];
     }
 
     def AstTemplateMap: alias Map[String, ref[Core.Basic.TiObject]];
@@ -232,7 +233,7 @@
 
     func generateBeEndpointsCalls (parent: ref[Core.Basic.TiObject]) {
         def elements: Array[ref[Core.Basic.TiObject]] = Spp.astMgr.findElements(
-            ast { modifier == "beEndpoint" || modifier == "منفذ_بياني" },
+            ast { modifier == "beEndpoint" || modifier == "منفذ_بياني"},
             parent,
             Spp.SeekerFlags.SKIP_OWNERS | Spp.SeekerFlags.SKIP_USES | Spp.SeekerFlags.SKIP_CHILDREN
         );
@@ -275,7 +276,113 @@
             );
         }
     }
+    func generateWebSocketEndpointChecks (parent: ref[Core.Basic.TiObject]) {
+        def classElements: Array[ref[Core.Basic.TiObject]] = Spp.astMgr.findElements(
+            ast { modifier == "wsEndpoint" || modifier == "منفذ_مقبس" },
+            parent,
+            Spp.SeekerFlags.SKIP_OWNERS | Spp.SeekerFlags.SKIP_USES | Spp.SeekerFlags.SKIP_CHILDREN
+        );
+        def i: Int;
+        for i = 0, i < classElements.getLength(), ++i {
+            def modifier: ref[Core.Basic.TiObject](Spp.astMgr.findModifierForElement(classElements(i), "wsEndpoint"));
+            if modifier~ptr == 0 modifier~no_deref = Spp.astMgr.findModifierForElement(classElements(i), "منفذ_مقبس");
 
+            def wsEndpointParam: Array[String];
+
+            if !Spp.astMgr.getModifierStringParams(modifier, wsEndpointParam)
+                || wsEndpointParam.getLength() != 1 {
+                System.fail(1, "Invalid WS endpoint params");
+            }
+
+            Spp.astMgr.insertAst(
+                ast {
+                    if String.isEqual(method, "GET") && String.isEqual(uri, "{{wsEndpointUri}}") {
+                        return 0;
+                    }
+                },
+                AstTemplateMap()
+                    .set(Srl.String("wsEndpointUri"), Core.Basic.TiStr(wsEndpointParam(0)))
+            );
+        }
+    }
+
+    func generateWebSockets(parent: ref[Core.Basic.TiObject]) {
+
+        // here we get all the classes with Ws modifier
+
+        def classelEments: Array[ref[Core.Basic.TiObject]] = Spp.astMgr.findElements(
+            ast { modifier == "wsEndpoint" || modifier == "منفذ_مقبس" },
+            parent,
+            Spp.SeekerFlags.SKIP_OWNERS | Spp.SeekerFlags.SKIP_USES | Spp.SeekerFlags.SKIP_CHILDREN
+        );
+
+        // here we will go inside each class to extract the callbacks
+
+        def i: Int;
+        for i = 0, i < classelEments.getLength(), ++i {
+
+            // here we extract the functions inside class
+            def handlerElements : Array[ref[Core.Basic.TiObject]] = Spp.astMgr.findElements (
+                ast { elementType == "function" },
+                classelEments(i),
+                Spp.SeekerFlags.SKIP_OWNERS | Spp.SeekerFlags.SKIP_USES | Spp.SeekerFlags.SKIP_CHILDREN
+            );
+
+            def onConnectElement: ref[Core.Basic.TiObject];
+            def onReadyElement: ref[Core.Basic.TiObject];
+            def onReceiveElement: ref[Core.Basic.TiObject];
+            def onCloseElement: ref[Core.Basic.TiObject];
+
+            def j: Int;
+            for j = 0, j < handlerElements.getLength(), ++j {
+                def name: String = Spp.astMgr.getDefinitionName(handlerElements(j));
+                if name == "onConnect" || name == "عندالأتصال" {
+                    onConnectElement~no_deref = handlerElements(j);
+                } else if name == "onReady" || name == "عندالأستعداد" {
+                    onReadyElement~no_deref = handlerElements(j);
+                } else if name == "onReceive" || name == "عند_الأستلام" {
+                    onReceiveElement~no_deref = handlerElements(j);
+                } else if name == "onClose" || name == "عند_الاغلاق" {
+                    onCloseElement~no_deref = handlerElements(j);
+                } else {
+                    System.fail(1, "Invalid WS handler function name");
+                }
+            }
+            if onConnectElement~ptr == 0 || onReadyElement~ptr == 0
+                || onReceiveElement~ptr == 0 || onCloseElement~ptr == 0 {
+                System.fail(1, "Missing one or more WS handler functions");
+            }
+
+            def modifier: ref[Core.Basic.TiObject](Spp.astMgr.findModifierForElement(classelEments(i), "wsEndpoint"));
+            if modifier~ptr == 0 modifier~no_deref = Spp.astMgr.findModifierForElement(classelEments(i), "منفذ_مقبس");
+            
+            def wsEndpointParam: Array[String];
+            if !Spp.astMgr.getModifierStringParams(modifier, wsEndpointParam)
+                || wsEndpointParam.getLength() != 1 {
+                System.fail(1, "Invalid WS endpoint param");
+            }
+
+            Spp.astMgr.insertAst(
+                ast {
+                Http.setWebSocketHandler(
+                    httpContext,
+                    "{{wsEndpointUri}}",
+                    connectHandler,
+                    readyHandler,
+                    dataHandler,
+                    closeHandler,
+                    session
+                )},
+                AstTemplateMap()
+                    .set(Srl.String("wsEndpointUri"),  Core.Basic.TiStr(wsEndpointParam(0)))
+                    .set(Srl.String("connectHandler"), firstChildOf(constructSocketConnectHandler(onConnectElement)))
+                    .set(Srl.String("readyHandler"),   firstChildOf(constructSocketReadyHandler(onReadyElement)))
+                    .set(Srl.String("dataHandler"),    firstChildOf(constructSocketDataHandler(onReceiveElement)))
+                    .set(Srl.String("closeHandler"),   firstChildOf(constructSocketCloseHandler(onCloseElement)))
+            );
+        }
+
+    }
     // Querying Functions
 
     func getAssetsRoutesFromModules (modulesRef: ref[Core.Basic.TiObject]): Array[StaticRoute] {
@@ -351,6 +458,16 @@
         session~cnt~init();
         session~cnt.requestCallbackContext = requestCallbackContext;
         session~cnt.httpContext = httpContext;
+
+        preprocess {
+            def modules: Array[ref[Core.Basic.TiObject]] = getAllModules(modulesRef~ast);
+            if modules.getLength() == 0 {
+                Spp.buildMgr.raiseBuildNotice("SPPA1002", 1, modulesRef~ast);
+            }
+            def i: Int;
+            for i = 0, i < modules.getLength(), ++i generateWebSockets(modules(i));
+        };
+
         return session;
     }
 
@@ -414,7 +531,10 @@
                 Spp.buildMgr.raiseBuildNotice("SPPA1002", 1, modulesRef~ast);
             }
             def i: Int;
-            for i = 0, i < modules.getLength(), ++i generateBeEndpointsCalls(modules(i));
+            for i = 0, i < modules.getLength(), ++i {
+                generateBeEndpointsCalls(modules(i));
+                generateWebSocketEndpointChecks(modules(i));
+            };
         };
 
         if String.isEqual(method, "GET") {
@@ -474,21 +594,20 @@
 
     // Helpers
 
+    // refer to element to an AST element using its pointer instead of referring to that element using an identifier
+    // makes generating generating code dynamically easier
     func constructElementFullReference (element: ref[Core.Basic.TiObject]): SrdRef[Core.Basic.TiObject] {
-        def node: ref[Core.Data.Node](castRef[element, Core.Data.Node]);
-        if node.owner~ptr == 0 return SrdRef[Core.Basic.TiObject]();
-        def name: String = Spp.astMgr.getDefinitionName(node);
-        def identifier: SrdRef[Core.Data.Ast.Identifier] = Core.Basic.newSrdObj[Core.Data.Ast.Identifier].{
-            value.value = name;
+        return Core.Basic.newSrdObj[Core.Data.Ast.Passage].{
+            Core.Basic.BindingOf[this].setMember("target", element);
         };
-        def ownerRef: SrdRef[Core.Basic.TiObject] = constructElementFullReference(node.owner.owner);
-        if ownerRef.isNull() return identifier
-        else return Core.Basic.newSrdObj[Core.Data.Ast.LinkOperator].{
-            Core.Basic.MapContainerOf[this].{
-                setElement("first", ownerRef);
-                setElement("second", identifier);
-            };
-        };
+    }
+
+    // return reference for the first node child inside Block node
+    func firstChildOf (result: ref[SrdRef[Core.Basic.TiObject]]): ref[Core.Basic.TiObject] {
+        def block: SrdRef[Spp.Ast.Block] = Core.Basic.dynCastSrdRef[result, Spp.Ast.Block];
+        def container: ref[Core.Basic.Containing];
+        container~no_deref = Core.Basic.ContainerOf[block];
+        return container.getElement(0);
     }
 
     func getModifierParams (element: ref[Core.Basic.TiObject], enKwd: CharsPtr, arKwd: CharsPtr): Array[String] {
@@ -576,4 +695,96 @@
             System.fail(1, String("Invalid asset route; path should end with /: ") + buildPath);
         }
     }
+
+    // return block element with the wrapper function element as its first child
+    func constructSocketConnectHandler (element: ref[Core.Basic.TiObject]): SrdRef[Core.Basic.TiObject] { 
+        return Spp.astMgr.buildAst(
+                ast {
+                    func (connection: ptr[Http.Connection], userData: ptr[Void]) : Int {
+                        def output : Int = providedHandlerFullRef(connection);
+                        return output;
+                    }
+                },
+                AstTemplateMap()
+                    .set(Srl.String("providedHandlerFullRef"), constructElementFullReference(element))
+            );
+    }
+    // return block element with the wrapper function element as its first child
+    func constructSocketReadyHandler (element: ref[Core.Basic.TiObject]): SrdRef[Core.Basic.TiObject] {
+        return Spp.astMgr.buildAst(
+                ast {
+                    func (connection: ptr[Http.Connection], userData: ptr[Void]) : Void {
+                        def connectionsMap: ref[Map[ArchInt, SrdRef[wsConnection]]];
+                        connectionsMap~no_deref = userData~cast[ptr[ServerSession]]~cnt.socketConnections; 
+
+                        def ws: SrdRef[wsConnection];
+                        ws.alloc();
+                        ws.obj~init(connection);
+                        connectionsMap.set(connection~cast[ArchInt], ws);
+
+                        providedHandlerFullRef(ws);
+                    }
+                },
+                AstTemplateMap()
+                    .set(Srl.String("providedHandlerFullRef"), constructElementFullReference(element))
+            )
+    }
+    // return block element with the wrapper function element as its first child
+    func constructSocketDataHandler(element: ref[Core.Basic.TiObject]): SrdRef[Core.Basic.TiObject] {
+        return Spp.astMgr.buildAst(
+                ast {
+                    func (connection: ptr[Http.Connection], opcode: Int, data: CharsPtr, dataLen: ArchWord, userData: ptr[Void]): Int {
+                        def connectionsMap: ref[Map[ArchInt, SrdRef[wsConnection]]];
+                        connectionsMap~no_deref = userData~cast[ptr[ServerSession]]~cnt.socketConnections; 
+
+                        def pos: ArchInt = connectionsMap.findPos(connection~cast[ArchInt]);
+
+                        if (pos == -1) {
+                            System.fail(1, "Data sent to already closed connection!");
+                        }
+
+                        def ws: SrdRef[wsConnection] = connectionsMap.valAt(pos);
+
+                        // opcode will be either 1 or 2
+                        // 1 for text data
+                        // 2 for binary data 
+
+                        def isBinary: Bool = opcode == 2;
+                        providedHandlerFullRef(ws, data, dataLen, isBinary);
+
+                        // keep connection alive
+                        // if the developer need to close the connection he can call the wsConnection.close()
+
+                        return 1;
+                    }
+                },
+                AstTemplateMap()
+                    .set(Srl.String("providedHandlerFullRef"), constructElementFullReference(element))
+            );
+    }
+    // return block element with the wrapper function element as its first child
+    func constructSocketCloseHandler(element: ref[Core.Basic.TiObject]): SrdRef[Core.Basic.TiObject] {
+        return Spp.astMgr.buildAst(
+            ast {
+                func (connection: ptr[Http.Connection], userData: ptr[Void]): Void {
+                    def connectionsMap: ref[Map[ArchInt, SrdRef[wsConnection]]];
+                    connectionsMap~no_deref = userData~cast[ptr[ServerSession]]~cnt.socketConnections; 
+                
+                    def pos: ArchInt = connectionsMap.findPos(connection~cast[ArchInt]);
+                    if pos == -1 {
+                        System.fail(1, "Tried to close an already closed connection!");
+                    }
+                    def ws: SrdRef[wsConnection] = connectionsMap.valAt(pos);
+                    ws.dead();
+
+                    providedHandlerFullRef(ws);
+
+                    connectionsMap.removeAt(pos);
+                }
+            },
+            AstTemplateMap()
+                .set(Srl.String("providedHandlerFullRef"), constructElementFullReference(element))
+        );
+    }
+
 }
