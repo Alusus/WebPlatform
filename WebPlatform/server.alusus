@@ -50,41 +50,6 @@
         def socketConnections: Map[ArchInt, SrdRef[wsConnection]];
     }
 
-    class wsConnection {
-
-        def _connection : ptr[Http.Connection];
-        def isDead : Bool;
-
-        handler this~init(connection: ptr[Http.Connection]) {
-            this._connection = connection;
-            this.isDead = 0;
-        }
-        handler this.dead () {
-            this._connection = 0;
-            this.isDead = 1;
-        }
-
-        handler this.sendText  (data: CharsPtr, dataLen: ArchWord) : Int {
-            if this.isDead return 0;
-            return Http.writeTextToWebSocket(this._connection, data, dataLen);
-        }
-
-        handler this.sendText  (data: CharsPtr) : Int {
-            if this.isDead return 0;
-            return Http.writeTextToWebSocket(this._connection, data);
-        }
-
-        handler this.sendBinary (data: CharsPtr, dataLen: ArchWord) : Int {
-            if this.isDead return 0;
-            return Http.writeBinaryToWebSocket(this._connection , data , dataLen);
-        }
-
-        handler this.close () : Int {
-            if this.isDead return 0;
-            return Http.closeWebSocket(this._connection);
-        }
-    }
-
     def AstTemplateMap: alias Map[String, ref[Core.Basic.TiObject]];
 
     // Build Functions
@@ -268,7 +233,7 @@
 
     func generateBeEndpointsCalls (parent: ref[Core.Basic.TiObject]) {
         def elements: Array[ref[Core.Basic.TiObject]] = Spp.astMgr.findElements(
-            ast { modifier == "beEndpoint" || modifier == "منفذ_بياني" },
+            ast { modifier == "beEndpoint" || modifier == "منفذ_بياني"},
             parent,
             Spp.SeekerFlags.SKIP_OWNERS | Spp.SeekerFlags.SKIP_USES | Spp.SeekerFlags.SKIP_CHILDREN
         );
@@ -308,6 +273,35 @@
                     .set(String("uri"), Core.Data.Ast.StringLiteral(assetRoutes(i).uri))
                     .set(String("srcPath"), Core.Data.Ast.StringLiteral(assetRoutes(i).srcPath))
                     .set(String("buildPath"), Core.Data.Ast.StringLiteral(assetRoutes(i).buildPath))
+            );
+        }
+    }
+    func generateWebSocketEndpointChecks (parent: ref[Core.Basic.TiObject]) {
+        def classElements: Array[ref[Core.Basic.TiObject]] = Spp.astMgr.findElements(
+            ast { modifier == "wsEndpoint" || modifier == "منفذ_مقبس" },
+            parent,
+            Spp.SeekerFlags.SKIP_OWNERS | Spp.SeekerFlags.SKIP_USES | Spp.SeekerFlags.SKIP_CHILDREN
+        );
+        def i: Int;
+        for i = 0, i < classElements.getLength(), ++i {
+            def modifier: ref[Core.Basic.TiObject](Spp.astMgr.findModifierForElement(classElements(i), "wsEndpoint"));
+            if modifier~ptr == 0 modifier~no_deref = Spp.astMgr.findModifierForElement(classElements(i), "منفذ_مقبس");
+
+            def wsEndpointParam: Array[String];
+
+            if !Spp.astMgr.getModifierStringParams(modifier, wsEndpointParam)
+                || wsEndpointParam.getLength() != 1 {
+                System.fail(1, "Invalid WS endpoint params");
+            }
+
+            Spp.astMgr.insertAst(
+                ast {
+                    if String.isEqual(method, "GET") && String.isEqual(uri, "{{wsEndpointUri}}") {
+                        return 0;
+                    }
+                },
+                AstTemplateMap()
+                    .set(Srl.String("wsEndpointUri"), Core.Basic.TiStr(wsEndpointParam(0)))
             );
         }
     }
@@ -537,17 +531,16 @@
                 Spp.buildMgr.raiseBuildNotice("SPPA1002", 1, modulesRef~ast);
             }
             def i: Int;
-            for i = 0, i < modules.getLength(), ++i generateBeEndpointsCalls(modules(i));
+            for i = 0, i < modules.getLength(), ++i {
+                generateBeEndpointsCalls(modules(i));
+                generateWebSocketEndpointChecks(modules(i));
+            };
         };
-    
+
         if String.isEqual(method, "GET") {
             if String.isEqual(uri, "/api.js") {
                 Http.sendFile(connection, context.mainAssetsPath + "api.js");
                 return 1;
-            }
-             
-            if String.isEqual(uri, "/chat") {
-                return 0;
             }
 
             if !String.isEqual(uri, "/") {
@@ -721,7 +714,9 @@
         return Spp.astMgr.buildAst(
                 ast {
                     func (connection: ptr[Http.Connection], userData: ptr[Void]) : Void {
-                        def connectionsMap: Map[ArchInt, SrdRef[wsConnection]] = userData~cast[ptr[ServerSession]]~cnt.socketConnections; 
+                        def connectionsMap: ref[Map[ArchInt, SrdRef[wsConnection]]];
+                        connectionsMap~no_deref = userData~cast[ptr[ServerSession]]~cnt.socketConnections; 
+
                         def ws: SrdRef[wsConnection];
                         ws.alloc();
                         ws.obj~init(connection);
@@ -739,7 +734,9 @@
         return Spp.astMgr.buildAst(
                 ast {
                     func (connection: ptr[Http.Connection], opcode: Int, data: CharsPtr, dataLen: ArchWord, userData: ptr[Void]): Int {
-                        def connectionsMap: Map[ArchInt, SrdRef[wsConnection]] = userData~cast[ptr[ServerSession]]~cnt.socketConnections;
+                        def connectionsMap: ref[Map[ArchInt, SrdRef[wsConnection]]];
+                        connectionsMap~no_deref = userData~cast[ptr[ServerSession]]~cnt.socketConnections; 
+
                         def pos: ArchInt = connectionsMap.findPos(connection~cast[ArchInt]);
 
                         if (pos == -1) {
@@ -770,7 +767,9 @@
         return Spp.astMgr.buildAst(
             ast {
                 func (connection: ptr[Http.Connection], userData: ptr[Void]): Void {
-                    def connectionsMap: Map[ArchInt, SrdRef[wsConnection]] = userData~cast[ptr[ServerSession]]~cnt.socketConnections;
+                    def connectionsMap: ref[Map[ArchInt, SrdRef[wsConnection]]];
+                    connectionsMap~no_deref = userData~cast[ptr[ServerSession]]~cnt.socketConnections; 
+                
                     def pos: ArchInt = connectionsMap.findPos(connection~cast[ArchInt]);
                     if pos == -1 {
                         System.fail(1, "Tried to close an already closed connection!");
