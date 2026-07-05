@@ -595,7 +595,7 @@
     // Helpers
 
     // refer to element to an AST element using its pointer instead of referring to that element using an identifier
-    // makes generating generating code dynamically easier
+    // makes generating code dynamically easier
     func constructElementFullReference (element: ref[Core.Basic.TiObject]): SrdRef[Core.Basic.TiObject] {
         return Core.Basic.newSrdObj[Core.Data.Ast.Passage].{
             Core.Basic.BindingOf[this].setMember("target", element);
@@ -714,13 +714,13 @@
         return Spp.astMgr.buildAst(
                 ast {
                     func (connection: ptr[Http.Connection], userData: ptr[Void]) : Void {
-                        def connectionsMap: ref[Map[ArchInt, SrdRef[wsConnection]]];
-                        connectionsMap~no_deref = userData~cast[ptr[ServerSession]]~cnt.socketConnections; 
-
                         def ws: SrdRef[wsConnection];
                         ws.alloc();
                         ws.obj~init(connection);
-                        connectionsMap.set(connection~cast[ArchInt], ws);
+
+                        ws.refCounter.count++;
+
+                        Http.setUserConnectionData(connection, ws.refCounter~ptr~cast[ptr[RefCounter]]);
 
                         providedHandlerFullRef(ws);
                     }
@@ -734,16 +734,8 @@
         return Spp.astMgr.buildAst(
                 ast {
                     func (connection: ptr[Http.Connection], opcode: Int, data: CharsPtr, dataLen: ArchWord, userData: ptr[Void]): Int {
-                        def connectionsMap: ref[Map[ArchInt, SrdRef[wsConnection]]];
-                        connectionsMap~no_deref = userData~cast[ptr[ServerSession]]~cnt.socketConnections; 
-
-                        def pos: ArchInt = connectionsMap.findPos(connection~cast[ArchInt]);
-
-                        if (pos == -1) {
-                            System.fail(1, "Data sent to already closed connection!");
-                        }
-
-                        def ws: SrdRef[wsConnection] = connectionsMap.valAt(pos);
+                        def rc: ptr[RefCounter] = Http.getUserConnectionData(connection)~cast[ptr[RefCounter]];
+                        def ws: SrdRef[wsConnection](rc~cnt, rc~cnt.managedObj~cast[ptr[wsConnection]]~cnt);
 
                         // opcode will be either 1 or 2
                         // 1 for text data
@@ -753,7 +745,6 @@
                         providedHandlerFullRef(ws, data, dataLen, isBinary);
 
                         // keep connection alive
-                        // if the developer need to close the connection he can call the wsConnection.close()
 
                         return 1;
                     }
@@ -767,19 +758,11 @@
         return Spp.astMgr.buildAst(
             ast {
                 func (connection: ptr[Http.Connection], userData: ptr[Void]): Void {
-                    def connectionsMap: ref[Map[ArchInt, SrdRef[wsConnection]]];
-                    connectionsMap~no_deref = userData~cast[ptr[ServerSession]]~cnt.socketConnections; 
-                
-                    def pos: ArchInt = connectionsMap.findPos(connection~cast[ArchInt]);
-                    if pos == -1 {
-                        System.fail(1, "Tried to close an already closed connection!");
-                    }
-                    def ws: SrdRef[wsConnection] = connectionsMap.valAt(pos);
+                    def rc: ptr[RefCounter] = Http.getUserConnectionData(connection)~cast[ptr[RefCounter]];
+                    def ws: SrdRef[wsConnection](rc~cnt, rc~cnt.managedObj~cast[ptr[wsConnection]]~cnt);
+                    ws.refCounter.count--;
                     ws.dead();
-
                     providedHandlerFullRef(ws);
-
-                    connectionsMap.removeAt(pos);
                 }
             },
             AstTemplateMap()
