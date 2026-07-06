@@ -47,7 +47,6 @@
     class ServerSession {
         def requestCallbackContext: SrdRef[RequestCallbackContext];
         def httpContext: ptr[Http.Context];
-        def socketConnections: Map[ArchInt, SrdRef[wsConnection]];
     }
 
     def AstTemplateMap: alias Map[String, ref[Core.Basic.TiObject]];
@@ -232,18 +231,12 @@
     }
 
     func generateBeEndpointsCalls (parent: ref[Core.Basic.TiObject]) {
-        def elements: Array[ref[Core.Basic.TiObject]] = Spp.astMgr.findElements(
-            ast { modifier == "beEndpoint" || modifier == "منفذ_بياني"},
-            parent,
-            Spp.SeekerFlags.SKIP_OWNERS | Spp.SeekerFlags.SKIP_USES | Spp.SeekerFlags.SKIP_CHILDREN
-        );
+        def elements : Array[ref[Core.Basic.TiObject]] = extractElementsWithGivenModifier(parent, "beEndpoint", "منفذ_بياني");
         def i: Int;
         for i = 0, i < elements.getLength(), ++i {
-            def modifier: ref[Core.Basic.TiObject](Spp.astMgr.findModifierForElement(elements(i), "beEndpoint"));
-            if modifier~ptr == 0 modifier~no_deref = Spp.astMgr.findModifierForElement(elements(i), "منفذ_بياني");
             def endpointParams: Array[String];
-            if !Spp.astMgr.getModifierStringParams(modifier, endpointParams)
-                || endpointParams.getLength() < 2 {
+            extractModifiersParam(elements(i), "beEndpoint", "منفذ_بياني" , endpointParams);
+            if endpointParams.getLength() < 2 {
                 System.fail(1, "Invalid BE endpoint params");
             }
             Spp.astMgr.insertAst(
@@ -306,82 +299,16 @@
         }
     }
 
-    func generateWebSockets(parent: ref[Core.Basic.TiObject]) {
+    function generateWebSockets(modulesRef: ref[Core.Basic.TiObject]) {
+        def webSocketHandlerElements : Array[ref[Core.Basic.TiObject]] = extractElementsWithGivenModifier(modulesRef, "wsEndpoint", "منفذ_مقبس");
 
-        // here we get all the classes with Ws modifier
+        def webSocketEndpointsMap : Map[String , Map[String , ref[Core.Basic.TiObject]]]();
+        classifyWebsocketHandlersWithEndpoint(webSocketHandlerElements , webSocketEndpointsMap);
 
-        def classelEments: Array[ref[Core.Basic.TiObject]] = Spp.astMgr.findElements(
-            ast { modifier == "wsEndpoint" || modifier == "منفذ_مقبس" },
-            parent,
-            Spp.SeekerFlags.SKIP_OWNERS | Spp.SeekerFlags.SKIP_USES | Spp.SeekerFlags.SKIP_CHILDREN
-        );
-
-        // here we will go inside each class to extract the callbacks
-
-        def i: Int;
-        for i = 0, i < classelEments.getLength(), ++i {
-
-            // here we extract the functions inside class
-            def handlerElements : Array[ref[Core.Basic.TiObject]] = Spp.astMgr.findElements (
-                ast { elementType == "function" },
-                classelEments(i),
-                Spp.SeekerFlags.SKIP_OWNERS | Spp.SeekerFlags.SKIP_USES | Spp.SeekerFlags.SKIP_CHILDREN
-            );
-
-            def onConnectElement: ref[Core.Basic.TiObject];
-            def onReadyElement: ref[Core.Basic.TiObject];
-            def onReceiveElement: ref[Core.Basic.TiObject];
-            def onCloseElement: ref[Core.Basic.TiObject];
-
-            def j: Int;
-            for j = 0, j < handlerElements.getLength(), ++j {
-                def name: String = Spp.astMgr.getDefinitionName(handlerElements(j));
-                if name == "onConnect" || name == "عندالأتصال" {
-                    onConnectElement~no_deref = handlerElements(j);
-                } else if name == "onReady" || name == "عندالأستعداد" {
-                    onReadyElement~no_deref = handlerElements(j);
-                } else if name == "onReceive" || name == "عند_الأستلام" {
-                    onReceiveElement~no_deref = handlerElements(j);
-                } else if name == "onClose" || name == "عند_الاغلاق" {
-                    onCloseElement~no_deref = handlerElements(j);
-                } else {
-                    System.fail(1, "Invalid WS handler function name");
-                }
-            }
-            if onConnectElement~ptr == 0 || onReadyElement~ptr == 0
-                || onReceiveElement~ptr == 0 || onCloseElement~ptr == 0 {
-                System.fail(1, "Missing one or more WS handler functions");
-            }
-
-            def modifier: ref[Core.Basic.TiObject](Spp.astMgr.findModifierForElement(classelEments(i), "wsEndpoint"));
-            if modifier~ptr == 0 modifier~no_deref = Spp.astMgr.findModifierForElement(classelEments(i), "منفذ_مقبس");
-            
-            def wsEndpointParam: Array[String];
-            if !Spp.astMgr.getModifierStringParams(modifier, wsEndpointParam)
-                || wsEndpointParam.getLength() != 1 {
-                System.fail(1, "Invalid WS endpoint param");
-            }
-
-            Spp.astMgr.insertAst(
-                ast {
-                Http.setWebSocketHandler(
-                    httpContext,
-                    "{{wsEndpointUri}}",
-                    connectHandler,
-                    readyHandler,
-                    dataHandler,
-                    closeHandler,
-                    session
-                )},
-                AstTemplateMap()
-                    .set(Srl.String("wsEndpointUri"),  Core.Basic.TiStr(wsEndpointParam(0)))
-                    .set(Srl.String("connectHandler"), firstChildOf(constructSocketConnectHandler(onConnectElement)))
-                    .set(Srl.String("readyHandler"),   firstChildOf(constructSocketReadyHandler(onReadyElement)))
-                    .set(Srl.String("dataHandler"),    firstChildOf(constructSocketDataHandler(onReceiveElement)))
-                    .set(Srl.String("closeHandler"),   firstChildOf(constructSocketCloseHandler(onCloseElement)))
-            );
+        def i : Int;
+        for i = 0 , i < webSocketEndpointsMap.getLength(), i++ {
+            insertWebSocketHandler(webSocketEndpointsMap.keyAt(i) , webSocketEndpointsMap.valAt(i))
         }
-
     }
     // Querying Functions
 
@@ -594,6 +521,22 @@
 
     // Helpers
 
+    function extractElementsWithGivenModifier (modulesRef: ref[Core.Basic.TiObject], enName : CharsPtr, arName : CharsPtr) : Array[ref[Core.Basic.TiObject]] {
+        return Spp.astMgr.findElements(
+            ast { modifier == enName || modifier == arName },
+            modulesRef,
+            Spp.SeekerFlags.SKIP_OWNERS | Spp.SeekerFlags.SKIP_USES | Spp.SeekerFlags.SKIP_CHILDREN
+        );
+    }
+
+    function extractModifiersParam (elementRef : ref[Core.Basic.TiObject], enName : CharsPtr, arName : CharsPtr, Params : Array[String]){
+
+        def modifier: ref[Core.Basic.TiObject](Spp.astMgr.findModifierForElement(elementRef, enName));
+        if modifier~ptr == 0 modifier~no_deref = Spp.astMgr.findModifierForElement(elementRef, arName);
+            
+        Spp.astMgr.getModifierStringParams(modifier, Params);
+    }
+
     // refer to element to an AST element using its pointer instead of referring to that element using an identifier
     // makes generating code dynamically easier
     func constructElementFullReference (element: ref[Core.Basic.TiObject]): SrdRef[Core.Basic.TiObject] {
@@ -767,6 +710,68 @@
             },
             AstTemplateMap()
                 .set(Srl.String("providedHandlerFullRef"), constructElementFullReference(element))
+        );
+    }
+    
+    function classifyWebsocketHandlersWithEndpoint (handlersRef : Array[ref[Core.Basic.TiObject]] , webSocketEndpointsMap : ref[Map[String , Map[String , ref[Core.Basic.TiObject]]]])   {
+        def index : Int;
+        for index = 0 , index < handlersRef.getLength() , index++ {
+            // extract modifiers
+            def modifierParam : Array[String];
+            extractModifiersParam(handlersRef(index), "wsEndpoint", "منفذ_مقبس", modifierParam);
+
+            if (modifierParam.getLength() == 0) {
+                System.fail(1, "Invalid params number for  Ws modifier");
+            }
+
+            // set url
+            def socketUrl: String = modifierParam(1);
+
+            def socketUrlHandlers: ref[Map[String, ref[Core.Basic.TiObject]]] = webSocketEndpointsMap(socketUrl);
+            
+            if socketUrlHandlers.getLength() == 0 {
+                socketUrlHandlers(String("onConnect"));
+                socketUrlHandlers(String("onReady"));
+                socketUrlHandlers(String("onData"));
+                socketUrlHandlers(String("onClose"));
+            }
+
+            // set handler
+            def handlerName: String = modifierParam(2);
+            
+            def hPos: ArchInt = socketUrlHandlers.findPos(handlerName);
+
+            if hPos != -1 {
+                socketUrlHandlers.setAt(hPos, handlersRef(index)~no_deref);
+            }
+
+        }
+    }
+
+    function insertWebSocketHandler (url : ref[String] , handlersElement : ref[Map[String , ref[Core.Basic.TiObject]]]) {
+
+        def connectHandlerAstBlock : SrdRef[Core.Basic.TiObject] = constructSocketConnectHandler(handlersElement(String("onConnect")));
+        def readyHandlerAstBlock : SrdRef[Core.Basic.TiObject] = constructSocketReadyHandler(handlersElement(String("onReady")));
+        def dataHandlerAstBlock : SrdRef[Core.Basic.TiObject] = constructSocketDataHandler(handlersElement(String("onData")));
+        def closeHandlerAstBlock : SrdRef[Core.Basic.TiObject] = constructSocketCloseHandler(handlersElement(String("onClose")));
+        
+        Spp.astMgr.insertAst(
+            ast {
+            Http.setWebSocketHandler(
+                httpContext,
+                "{{wsEndpointUrl}}",
+                connectHandler,
+                readyHandler,
+                dataHandler,
+                closeHandler,
+                session
+            )},
+            AstTemplateMap()
+                .set(Srl.String("wsEndpointUrl"),  Core.Basic.TiStr(url))
+                .set(Srl.String("connectHandler"), firstChildOf(connectHandlerAstBlock))
+                .set(Srl.String("readyHandler"),   firstChildOf(readyHandlerAstBlock))
+                .set(Srl.String("dataHandler"),    firstChildOf(dataHandlerAstBlock))
+                .set(Srl.String("closeHandler"),   firstChildOf(closeHandlerAstBlock))
         );
     }
 
