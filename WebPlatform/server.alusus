@@ -249,7 +249,7 @@
                 AstTemplateMap()
                     .set(Srl.String("endpointMethod"), Core.Basic.TiStr(endpointParams(0)))
                     .set(Srl.String("endpointUri"), Core.Basic.TiStr(endpointParams(1)))
-                    .set(Srl.String("fullref"), constructElementFullReference(elements(i)))
+                    .set(Srl.String("fullref"), constructElementFullReference(elements(i)~ptr))
             );
         }
     }
@@ -283,7 +283,7 @@
             def wsEndpointParam: Array[String];
 
             if !Spp.astMgr.getModifierStringParams(modifier, wsEndpointParam)
-                || wsEndpointParam.getLength() != 1 {
+                || wsEndpointParam.getLength() != 2 {
                 System.fail(1, "Invalid WS endpoint params");
             }
 
@@ -302,7 +302,7 @@
     function generateWebSockets(modulesRef: ref[Core.Basic.TiObject]) {
         def webSocketHandlerElements : Array[ref[Core.Basic.TiObject]] = extractElementsWithGivenModifier(modulesRef, "wsEndpoint", "منفذ_مقبس");
 
-        def webSocketEndpointsMap : Map[String , Map[String , ref[Core.Basic.TiObject]]]();
+        def webSocketEndpointsMap : Map[String , Map[String , ptr[Core.Basic.TiObject]]]();
         classifyWebsocketHandlersWithEndpoint(webSocketHandlerElements , webSocketEndpointsMap);
 
         def i : Int;
@@ -539,9 +539,11 @@
 
     // refer to element to an AST element using its pointer instead of referring to that element using an identifier
     // makes generating code dynamically easier
-    func constructElementFullReference (element: ref[Core.Basic.TiObject]): SrdRef[Core.Basic.TiObject] {
+    func constructElementFullReference (element: ptr[Core.Basic.TiObject]): SrdRef[Core.Basic.TiObject] {
+        def elementRef : ref[Core.Basic.TiObject];
+        elementRef~ptr = element;
         return Core.Basic.newSrdObj[Core.Data.Ast.Passage].{
-            Core.Basic.BindingOf[this].setMember("target", element);
+            Core.Basic.BindingOf[this].setMember("target", elementRef);
         };
     }
 
@@ -640,7 +642,7 @@
     }
 
     // return block element with the wrapper function element as its first child
-    func constructSocketConnectHandler (element: ref[Core.Basic.TiObject]): SrdRef[Core.Basic.TiObject] { 
+    func constructSocketConnectHandler (element: ptr[Core.Basic.TiObject]): SrdRef[Core.Basic.TiObject] { 
         return Spp.astMgr.buildAst(
                 ast {
                     func (connection: ptr[Http.Connection], userData: ptr[Void]) : Int {
@@ -653,7 +655,7 @@
             );
     }
     // return block element with the wrapper function element as its first child
-    func constructSocketReadyHandler (element: ref[Core.Basic.TiObject]): SrdRef[Core.Basic.TiObject] {
+    func constructSocketReadyHandler (element: ptr[Core.Basic.TiObject]): SrdRef[Core.Basic.TiObject] {
         return Spp.astMgr.buildAst(
                 ast {
                     func (connection: ptr[Http.Connection], userData: ptr[Void]) : Void {
@@ -673,7 +675,7 @@
             )
     }
     // return block element with the wrapper function element as its first child
-    func constructSocketDataHandler(element: ref[Core.Basic.TiObject]): SrdRef[Core.Basic.TiObject] {
+    func constructSocketDataHandler(element: ptr[Core.Basic.TiObject]): SrdRef[Core.Basic.TiObject] {
         return Spp.astMgr.buildAst(
                 ast {
                     func (connection: ptr[Http.Connection], opcode: Int, data: CharsPtr, dataLen: ArchWord, userData: ptr[Void]): Int {
@@ -697,7 +699,7 @@
             );
     }
     // return block element with the wrapper function element as its first child
-    func constructSocketCloseHandler(element: ref[Core.Basic.TiObject]): SrdRef[Core.Basic.TiObject] {
+    func constructSocketCloseHandler(element: ptr[Core.Basic.TiObject]): SrdRef[Core.Basic.TiObject] {
         return Spp.astMgr.buildAst(
             ast {
                 func (connection: ptr[Http.Connection], userData: ptr[Void]): Void {
@@ -713,7 +715,7 @@
         );
     }
     
-    function classifyWebsocketHandlersWithEndpoint (handlersRef : Array[ref[Core.Basic.TiObject]] , webSocketEndpointsMap : ref[Map[String , Map[String , ref[Core.Basic.TiObject]]]])   {
+    function classifyWebsocketHandlersWithEndpoint (handlersRef : Array[ref[Core.Basic.TiObject]] , webSocketEndpointsMap : ref[Map[String , Map[String , ptr[Core.Basic.TiObject]]]])   {
         def index : Int;
         for index = 0 , index < handlersRef.getLength() , index++ {
             // extract modifiers
@@ -726,8 +728,9 @@
 
             // set url
             def socketUrl: String = modifierParam(1);
-
-            def socketUrlHandlers: ref[Map[String, ref[Core.Basic.TiObject]]] = webSocketEndpointsMap(socketUrl);
+            Console.print("this is the url : %s" , socketUrl.buf);
+            def socketUrlHandlers: ref[Map[String, ptr[Core.Basic.TiObject]]];
+            socketUrlHandlers~ptr= webSocketEndpointsMap(socketUrl)~ptr;
             
             if socketUrlHandlers.getLength() == 0 {
                 socketUrlHandlers(String("onConnect"));
@@ -742,14 +745,15 @@
             def hPos: ArchInt = socketUrlHandlers.findPos(handlerName);
 
             if hPos != -1 {
-                socketUrlHandlers.setAt(hPos, handlersRef(index)~no_deref);
+                def element : ptr[Core.Basic.TiObject] = handlersRef(index)~ptr;
+
+                socketUrlHandlers.setAt(hPos, element);
             }
 
         }
     }
 
-    function insertWebSocketHandler (url : ref[String] , handlersElement : ref[Map[String , ref[Core.Basic.TiObject]]]) {
-
+    function insertWebSocketHandler (url : ref[String] , handlersElement : ref[Map[String , ptr[Core.Basic.TiObject]]]) {
         def connectHandlerAstBlock : SrdRef[Core.Basic.TiObject] = constructSocketConnectHandler(handlersElement(String("onConnect")));
         def readyHandlerAstBlock : SrdRef[Core.Basic.TiObject] = constructSocketReadyHandler(handlersElement(String("onReady")));
         def dataHandlerAstBlock : SrdRef[Core.Basic.TiObject] = constructSocketDataHandler(handlersElement(String("onData")));
