@@ -521,20 +521,26 @@
 
     // Helpers
 
-    function extractElementsWithGivenModifier (modulesRef: ref[Core.Basic.TiObject], enName : CharsPtr, arName : CharsPtr) : Array[ref[Core.Basic.TiObject]] {
+    function extractElementsWithGivenModifier(modulesRef: ref[Core.Basic.TiObject], enName: CharsPtr, arName: CharsPtr): Array[ref[Core.Basic.TiObject]] {
+        def translations: Map[String, String];
+        translations.set(String(arName), String(enName));
+
         return Spp.astMgr.findElements(
-            ast { modifier == enName || modifier == arName },
+            ast { elementType == "function" },
             modulesRef,
-            Spp.SeekerFlags.SKIP_OWNERS | Spp.SeekerFlags.SKIP_USES | Spp.SeekerFlags.SKIP_CHILDREN
+            Spp.SeekerFlags.SKIP_OWNERS | Spp.SeekerFlags.SKIP_USES | Spp.SeekerFlags.SKIP_CHILDREN,
+            enName,
+            translations
         );
     }
 
-    function extractModifiersParam (elementRef : ref[Core.Basic.TiObject], enName : CharsPtr, arName : CharsPtr, Params : Array[String]){
+    function extractModifiersParam (elementRef : ref[Core.Basic.TiObject], enName : CharsPtr, arName : CharsPtr, params : ref[Array[String]]){
 
-        def modifier: ref[Core.Basic.TiObject](Spp.astMgr.findModifierForElement(elementRef, enName));
-        if modifier~ptr == 0 modifier~no_deref = Spp.astMgr.findModifierForElement(elementRef, arName);
-            
-        Spp.astMgr.getModifierStringParams(modifier, Params);
+        def translations: Map[String, String];
+        translations.set(String(arName), String(enName));
+        
+        def modifier: ref[Core.Basic.TiObject](Spp.astMgr.findModifierForElement(elementRef, enName,translations));        
+        Spp.astMgr.getModifierStringParams(modifier, params);
     }
 
     // refer to element to an AST element using its pointer instead of referring to that element using an identifier
@@ -727,8 +733,8 @@
             }
 
             // set url
-            def socketUrl: String = modifierParam(1);
-            Console.print("this is the url : %s" , socketUrl.buf);
+            def socketUrl: String = modifierParam(0);
+
             def socketUrlHandlers: ref[Map[String, ptr[Core.Basic.TiObject]]];
             socketUrlHandlers~ptr= webSocketEndpointsMap(socketUrl)~ptr;
             
@@ -740,16 +746,16 @@
             }
 
             // set handler
-            def handlerName: String = modifierParam(2);
-            
+            def handlerName: String = modifierParam(1);
+
             def hPos: ArchInt = socketUrlHandlers.findPos(handlerName);
 
-            if hPos != -1 {
-                def element : ptr[Core.Basic.TiObject] = handlersRef(index)~ptr;
-
-                socketUrlHandlers.setAt(hPos, element);
+            if hPos == -1 {
+                System.fail(1, "Wrong param for wsEndpoint modifier");
             }
 
+            def element : ptr[Core.Basic.TiObject] = handlersRef(index)~ptr;
+            socketUrlHandlers.setAt(hPos, element);
         }
     }
 
