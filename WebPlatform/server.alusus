@@ -820,7 +820,7 @@
                 connectHandler,
                 readyHandler,
                 dataHandler,
-                closeHandler,
+                closeHandler
             )},
             AstTemplateMap()
                 .set(Srl.String("wsEndpointUrl"),  Core.Basic.TiStr(url))
