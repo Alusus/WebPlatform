@@ -1,10 +1,76 @@
+function copyHandshake(info: ptr[Http.RequestInfo]): ref[HandshakeInfo] {
+    def result: ref[HandshakeInfo];
+    result~ptr = Memory.alloc(HandshakeInfo~size)~cast[ptr[HandshakeInfo]];
+
+    result.requestMethod = String(info~cnt.requestMethod);
+
+    result.requestUri    = String(info~cnt.requestUri);
+    result.localUri      = String(info~cnt.localUri);
+    if (info~cnt.queryString != null)
+                            result.queryString =  String(info~cnt.queryString)
+                            else
+                            result.queryString = String("");
+
+    result.remoteAddr = String(info~cnt.remoteAddr~ptr);
+
+    result.remotePort = info~cnt.remotePort;
+    result.isSsl      = info~cnt.isSsl;
+
+    result.numberHeaders = info~cnt.numberHeaders;
+    result.headers.reserve(info~cnt.numberHeaders);
+
+    def i : Int;
+    def h: HandshakeHeader;
+    for i = 0 , i < info~cnt.numberHeaders , i++ { 
+        h.name = String(info~cnt.httpHeaders(i).name);
+        h.value = String(info~cnt.httpHeaders(i).value);
+        result.headers.add(h);
+    }
+
+    return result;
+}
+
+class HandshakeHeader {
+    def name: String;
+    def value: String;
+    handler this~init(){};
+    handler this~init(src: ref[HandshakeHeader]) {
+        this.name = src.name;
+        this.value = src.value;
+    };
+};
+
+class HandshakeInfo {
+    def requestMethod: String;
+    def requestUri: String;
+    def localUri: String;
+    def queryString: String;
+    def remoteAddr: String;
+    def remotePort: Int;
+    def isSsl: Int;
+    def headers: Array[HandshakeHeader];
+    def numberHeaders: Int;
+    
+    handler this.getHeader(name: String): String {
+        def i : Int;
+        for i = 0 , i < this.headers.getLength() , i++{
+            if (this.headers(i).name == name) {
+                return this.headers(i).value;
+            }
+        }
+        return String("");
+    }
+};
+
 class wsConnection {
     def _connection : ptr[Http.Connection];
+    def handshakeInfo : ref[HandshakeInfo];
     def isDead : Bool;
 
     handler this~init(connection: ptr[Http.Connection]) {
         this._connection = connection;
         this.isDead = 0;
+        this.handshakeInfo~ptr = copyHandshake(Http.getRequestInfo(connection))~ptr
     }
 
     handler this.dead () {
