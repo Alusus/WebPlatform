@@ -66,11 +66,26 @@ class wsConnection {
     def _connection : ptr[Http.Connection];
     def handshakeInfo : ref[HandshakeInfo];
     def isDead : Bool;
+    def _maxMessageSize : ArchInt = 1024; 
+    
+    // fragmentation state
+    def fragmentBuffer : StringBuilder();
+    def fragmentOpcode : Int;
+    def isFragmenting  : Bool;
 
     handler this~init(connection: ptr[Http.Connection]) {
         this._connection = connection;
         this.isDead = 0;
         this.handshakeInfo~ptr = copyHandshake(Http.getRequestInfo(connection))~ptr
+    }
+
+    handler this.setMaxMessageSize (size : ArchInt) {
+        _maxMessageSize = size;
+        fragmentBuffer.bufferGrowSize = (_maxMessageSize / 4)~cast[ArchInt];
+    }
+
+    handler this.getMaxMessageSize() : ArchInt{
+        return this._maxMessageSize;
     }
 
     handler this.dead () {
@@ -93,8 +108,46 @@ class wsConnection {
         return Http.writeBinaryToWebSocket(this._connection , data , dataLen);
     }
     
+    // close one with no status code and reason from user
+    // this will closed with status code 1000
     handler this.close () : Int {
+        return this.close(1000 , "");
+    }
+
+    handler this.close (statusCode : word[16] , reasonMessage : CharsPtr) : Int {
         if this.isDead return 0;
-        return Http.closeWebSocket(this._connection);
+
+        def reason_len : Int = String(reasonMessage).getLength();
+
+        def payload_len : Int = 2 + reason_len;
+
+        if (payload_len > 125) {
+            reason_len = 123;        // 125 - 2 bytes for the status code
+            payload_len = 125;
+        }
+
+        // close frame payload max is 125 bytes
+        def payload : array[Char, 125];
+
+        payload(0) = (statusCode >> 8) & 0xFF; // status code, high byte
+        payload(1) = statusCode & 0xFF;  // status code, low byte
+
+        if (reason_len > 0) {
+            Memory.copy(payload~ptr + 2, reasonMessage, reason_len);
+        }
+        //Console.print("this is the reasonMessage : %s\n" , String(reasonMessage).buf)
+        //Console.print("close: about to write, payload_len=%i\n", payload_len)
+
+        //Console.print("this is the message %i\n" , String(payload~ptr ,payload_len).getLength());
+
+        def result : Int = Http.writeToWebSocket(this._connection, 8, payload~ptr, payload_len);
+        
+        this.dead()
+
+        return result;
+    }
+
+    handler this.close_raw_echo (data : CharsPtr , dataLen : ArchWord) : Int {
+        return Http.writeToWebSocket(this._connection, 8, data, dataLen);
     }
 }

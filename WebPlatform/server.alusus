@@ -673,9 +673,8 @@
         }
         return Spp.astMgr.buildAst(
             ast {   
-                def rc: ptr[RefCounter] = Http.getUserConnectionData(connection)~cast[ptr[RefCounter]];
-                def ws: SrdRef[wsConnection](rc~cnt, rc~cnt.managedObj~cast[ptr[wsConnection]]~cnt);
-                providedHandlerFullRef(ws, data, dataLen, isBinary); },
+                providedHandlerFullRef(ws,ws.fragmentBuffer.string, isBinary);
+            },
             AstTemplateMap().set(Srl.String("providedHandlerFullRef"), constructElementFullReference(element))
         );
     }
@@ -732,13 +731,74 @@
         def block: SrdRef[Core.Basic.TiObject] = buildDataBlock(element);
         return Spp.astMgr.buildAst(
             ast {
-                func (connection: ptr[Http.Connection], opcode: Int, data: CharsPtr, dataLen: ArchWord, userData: ptr[Void]): Int {
-                    // opcode will be either 1 or 2
-                    // 1 for text data
-                    // 2 for binary data
-                    def isBinary: Bool = opcode == 2;
-                    block;
-                    // keep connection alive
+                func (connection: ptr[Http.Connection], bits: Int, data: CharsPtr, dataLen: ArchWord, userData: ptr[Void]): Int {
+                    def rc: ptr[RefCounter] = Http.getUserConnectionData(connection)~cast[ptr[RefCounter]];
+                    def ws: SrdRef[wsConnection](rc~cnt, rc~cnt.managedObj~cast[ptr[wsConnection]]~cnt);
+
+                    def opcode : Int = bits & 0x0F;
+                    def fin: Bool = (bits & 0x80) != 0;
+                    // if the frame is Text or Binary
+                    if opcode == 1 or opcode == 2 {
+                        Console.print("we recieve a data\n")
+                        if (ws.isFragmenting) {
+                            ws.close(1002, "unexpected new message mid-fragment");
+                            Console.print("data_handler: close() returned, about to return 0\n")
+                            return 0;
+                        }
+
+                        ws.fragmentOpcode = opcode;
+                        ws.fragmentBuffer.clear();
+
+                        if (dataLen~cast[ArchInt] > ws.getMaxMessageSize()) {
+                            ws.close(1009, "Message too big");
+                            return 0;
+                        }
+
+                        ws.fragmentBuffer.append(data, dataLen~cast[ArchInt]);
+                        Console.print("the data now is inside the buffer. the data is : %s\n" , ws.fragmentBuffer.string.buf)
+                        if (fin) {
+                            Console.print("we about to call the handler\n")
+                            def isBinary : Bool = ws.fragmentOpcode == 2;
+                            block;
+                            ws.fragmentBuffer.clear();
+                        } else {
+                            ws.isFragmenting = 1;
+                        }
+                    }
+
+                    if opcode == 0 {
+                        
+                        if (!ws.isFragmenting) {
+                            // Protocol violation: CONTINUATION with no preceding TEXT/BINARY
+                            ws.close(1002, "unexpected continuation frame");
+                            return 0;
+                        }
+
+                        if (ws.fragmentBuffer.getLength() + dataLen > ws.getMaxMessageSize()) {
+                            ws.close(1009, "Message too big");
+                            return 0;
+                        }
+
+                        ws.fragmentBuffer.append(data, dataLen);
+
+                        if (fin) {
+                            def isBinary : Bool = ws.fragmentOpcode == 2;
+                            block;
+                            ws.fragmentBuffer.clear();
+                            ws.isFragmenting = 0;
+                        }
+                    }
+
+                if opcode == 8 {
+                    // reply with a close frame before tearing down — completes the handshake properly
+                    if dataLen~cast[Int] >= 2 {
+                        ws.close_raw_echo(data, dataLen); // echo back client's code+reason
+                    } else {
+                        ws.close(1000, ""); // client sent no code, reply with normal closure
+                    }
+                    return 0;
+                }
+
                     return 1;
                 }
             },
