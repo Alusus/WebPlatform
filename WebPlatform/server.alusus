@@ -710,7 +710,7 @@
         return Spp.astMgr.buildAst(
                 ast {
                     func (connection: ptr[Http.Connection], userData: ptr[Void]) : Void {
-                        def ws: SrdRef[wsConnection];
+                        def ws: SrdRef[WsConnection];
                         ws.alloc();
                         ws.obj~init(connection);
 
@@ -733,7 +733,7 @@
             ast {
                 func (connection: ptr[Http.Connection], bits: Int, data: CharsPtr, dataLen: ArchWord, userData: ptr[Void]): Int {
                     def rc: ptr[RefCounter] = Http.getUserConnectionData(connection)~cast[ptr[RefCounter]];
-                    def ws: SrdRef[wsConnection](rc~cnt, rc~cnt.managedObj~cast[ptr[wsConnection]]~cnt);
+                    def ws: SrdRef[WsConnection](rc~cnt, rc~cnt.managedObj~cast[ptr[WsConnection]]~cnt);
 
                     def opcode : Int = bits & 0x0F;
                     def fin: Bool = (bits & 0x80) != 0;
@@ -812,7 +812,7 @@
             ast {
                 func (connection: ptr[Http.Connection], userData: ptr[Void]): Void {
                     def rc: ptr[RefCounter] = Http.getUserConnectionData(connection)~cast[ptr[RefCounter]];
-                    def ws: SrdRef[wsConnection](rc~cnt, rc~cnt.managedObj~cast[ptr[wsConnection]]~cnt);
+                    def ws: SrdRef[WsConnection](rc~cnt, rc~cnt.managedObj~cast[ptr[WsConnection]]~cnt);
                     ws.dead();
                     block;
                     ws.refCounter.count--;

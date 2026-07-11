@@ -62,7 +62,7 @@ class HandshakeInfo {
     }
 };
 
-class wsConnection {
+class WsConnection {
     def _connection : ptr[Http.Connection];
     def handshakeInfo : ref[HandshakeInfo];
     def isDead : Bool;
