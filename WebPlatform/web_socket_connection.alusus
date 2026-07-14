@@ -62,60 +62,54 @@ class HandshakeInfo {
     }
 };
 
+class WsState {
+    @shared def CONNECTING   : String("connecting");
+    @shared def OPENED       : String("opened");
+    @shared def CLOSING      : String("closing");
+    @shared def CLOSED       : String("closed");
+}
+
 class WsConnection {
     def _connection : ptr[Http.Connection];
     def handshakeInfo : ref[HandshakeInfo];
-    def isDead : Bool;
-    def _maxMessageSize : ArchInt = 1024; 
-    
-    // fragmentation state
-    def fragmentBuffer : StringBuilder();
-    def fragmentOpcode : Int;
-    def isFragmenting  : Bool;
+    def status : String;
 
-    handler this~init(connection: ptr[Http.Connection]) {
-        this._connection = connection;
-        this.isDead = 0;
-        this.handshakeInfo~ptr = copyHandshake(Http.getRequestInfo(connection))~ptr
-    }
-
-    handler this.setMaxMessageSize (size : ArchInt) {
-        _maxMessageSize = size;
-        fragmentBuffer.bufferGrowSize = (_maxMessageSize / 4)~cast[ArchInt];
-    }
-
-    handler this.getMaxMessageSize() : ArchInt{
-        return this._maxMessageSize;
-    }
-
-    handler this.dead () {
-        this._connection = 0;
-        this.isDead = 1;
+    handler this~init (conn : ptr[Http.Connection]) {
+        this._connection = conn;
+        this.status = WsState.CONNECTING;
     }
 
     handler this.sendText  (data: CharsPtr, dataLen: ArchWord) : Int {
-        if this.isDead return 0;
+        if this.status != WsState.OPENED return 0 ;
         return Http.writeTextToWebSocket(this._connection, data, dataLen);
     }
 
     handler this.sendText  (data: CharsPtr) : Int {
-        if this.isDead return 0;
+        if this.status != WsState.OPENED return 0 ;
         return Http.writeTextToWebSocket(this._connection, data);
     }
 
     handler this.sendBinary (data: CharsPtr, dataLen: ArchWord) : Int {
-        if this.isDead return 0;
+        if this.status != WsState.OPENED return 0 ;
         return Http.writeBinaryToWebSocket(this._connection , data , dataLen);
     }
-    
-    // close one with no status code and reason from user
-    // this will closed with status code 1000
+
     handler this.close () : Int {
         return this.close(1000 , "");
     }
 
+    // Called internally by the library to respond to a client-initiated
+    // close frame, completing the close handshake as stated in
+    // RFC 6455 §5.5.1 (a responder typically echoes the status code
+    // it received).
+    handler this.replyToClose (data : CharsPtr, dataLen : ArchWord) : Int {
+        if this.status != WsState.OPENED return 0 ;
+        def result : Int = Http.writeToWebSocket(this._connection, 8, data, dataLen);
+        return result;
+    }
+
     handler this.close (statusCode : word[16] , reasonMessage : CharsPtr) : Int {
-        if this.isDead return 0;
+        if this.status != WsState.OPENED return 0 ;
 
         def reason_len : Int = String(reasonMessage).getLength();
 
@@ -126,7 +120,7 @@ class WsConnection {
             payload_len = 125;
         }
 
-        // close frame payload max is 125 bytes
+        // close frame payload max is 125 bytes as stated in RFC 6455 §5.5.1
         def payload : array[Char, 125];
 
         payload(0) = (statusCode >> 8) & 0xFF; // status code, high byte
@@ -135,19 +129,143 @@ class WsConnection {
         if (reason_len > 0) {
             Memory.copy(payload~ptr + 2, reasonMessage, reason_len);
         }
-        //Console.print("this is the reasonMessage : %s\n" , String(reasonMessage).buf)
-        //Console.print("close: about to write, payload_len=%i\n", payload_len)
-
-        //Console.print("this is the message %i\n" , String(payload~ptr ,payload_len).getLength());
 
         def result : Int = Http.writeToWebSocket(this._connection, 8, payload~ptr, payload_len);
-        
-        this.dead()
 
         return result;
     }
+}
 
-    handler this.close_raw_echo (data : CharsPtr , dataLen : ArchWord) : Int {
-        return Http.writeToWebSocket(this._connection, 8, data, dataLen);
+class WsRoute {
+    def _maxMessageSize : ArchInt = 1024; 
+    
+    // fragmentation state
+    def fragmentBuffer : StringBuilder();
+    def fragmentOpcode : Int;
+    def isFragmenting  : Bool;
+
+    handler this.onConnectWrapper (connection: ptr[Http.Connection], userData: ptr[Void]) : Int {
+        def ws: SrdRef[WsConnection];
+        ws.alloc();
+        ws.obj~init(connection);
+
+        // we increment counter by one so we don't lose the object even if the user 
+        // does not reference it
+
+        ws.refCounter.count++;
+        Http.setUserConnectionData(connection, ws.refCounter~ptr~cast[ptr[RefCounter]]);
+
+        return this.onConnect(ws);
+    }
+    handler this.onReadyWrapper (connection: ptr[Http.Connection], userData: ptr[Void]) : Void {
+        def rc: ptr[RefCounter] = Http.getUserConnectionData(connection)~cast[ptr[RefCounter]];
+        def ws: SrdRef[WsConnection](rc~cnt, rc~cnt.managedObj~cast[ptr[WsConnection]]~cnt);
+
+        ws.status = WsState.OPENED;
+
+        this.onReady(ws);
+    }
+
+    handler this.onDataWrapper (connection: ptr[Http.Connection], bits: Int, data: CharsPtr, dataLen: ArchWord, userData: ptr[Void]) : Int {
+        def rc: ptr[RefCounter] = Http.getUserConnectionData(connection)~cast[ptr[RefCounter]];
+        def ws: SrdRef[WsConnection](rc~cnt, rc~cnt.managedObj~cast[ptr[WsConnection]]~cnt);
+
+        def opcode : Int = bits & 0x0F;
+        def fin: Bool = (bits & 0x80) != 0;
+
+        // Safe to cast: CivetWeb rejects any frame exceeding ~2 GiB (0x7FFF0000),
+        // which is within ArchInt's range, so this cast can't overflow or go negative.
+
+        def data_Len : ArchInt = dataLen~cast[ArchInt];
+
+        if opcode == 1 or opcode == 2 {
+            if (this.isFragmenting) {
+                ws.close(1002, "unexpected new message mid-fragment");
+                return 0;
+            }
+
+            this.fragmentOpcode = opcode;
+            this.fragmentBuffer.clear();
+
+            if (data_Len > this.getMaxMessageSize()) {
+                ws.close(1009, "Message too big");
+                return 0;
+            }
+
+            this.fragmentBuffer.append(data, data_Len);
+
+            if (fin) {
+                def isBinary : Bool = this.fragmentOpcode == 2;
+                this.onData(ws , this.fragmentBuffer.string ,isBinary);
+                this.fragmentBuffer.clear();
+            } else {
+                this.isFragmenting = 1;
+            }
+        }
+        
+        if opcode == 0 {
+                        
+            if (!this.isFragmenting) {
+                // Protocol violation: CONTINUATION with no preceding TEXT/BINARY
+                ws.close(1002, "unexpected continuation frame");
+                return 0;
+            }
+
+            if (this.fragmentBuffer.getLength() + data_Len > this.getMaxMessageSize()) {
+                ws.close(1009, "Message too big");
+                return 0;
+            }
+
+            this.fragmentBuffer.append(data, data_Len);
+
+            if (fin) {
+                def isBinary : Bool = this.fragmentOpcode == 2;
+                this.onData(ws , this.fragmentBuffer.string ,isBinary);
+                this.fragmentBuffer.clear();
+                this.isFragmenting = 0;
+            }
+        }
+        
+        if opcode == 8 {
+            // reply with a close frame before tearing down — completes the handshake properly
+            if data_Len~cast[Int] >= 2 {
+                ws.replyToClose(data, dataLen); // echo back client's code+reason
+            } else {
+                ws.close(1000, ""); // client sent no code, reply with normal closure
+            }
+            return 0;
+        }
+
+        return 1;
+    }
+
+    handler this.onCloseWrapper (connection: ptr[Http.Connection], userData: ptr[Void]) : Void {
+        def rc: ptr[RefCounter] = Http.getUserConnectionData(connection)~cast[ptr[RefCounter]];
+        def ws: SrdRef[WsConnection](rc~cnt, rc~cnt.managedObj~cast[ptr[WsConnection]]~cnt);
+        ws.status = WsState.CLOSED;
+
+        this.onClose(ws);
+
+        // reduce counter by one cause we was increment it by one when we initialize the reference to make sure that the object
+        // will not be released before we closing the connection
+        
+        ws.refCounter.count--;
+    }
+
+    handler this.onConnect(connecting: SrdRef[WsConnection]) : Int as_ptr {
+        return 0;
+    }
+
+    handler this.onReady(connecting: SrdRef[WsConnection]) : Void as_ptr {}
+    handler this.onData(connecting: SrdRef[WsConnection] , data : ref[String] , isBinary : Bool) : Void as_ptr {}
+    handler this.onClose(connecting: SrdRef[WsConnection]) : Void as_ptr {};
+
+    handler this.setMaxMessageSize (size : ArchInt) {
+        _maxMessageSize = size;
+        fragmentBuffer.bufferGrowSize = (_maxMessageSize / 2)~cast[ArchInt];
+    }
+
+    handler this.getMaxMessageSize() : ArchInt{
+        return this._maxMessageSize;
     }
 }

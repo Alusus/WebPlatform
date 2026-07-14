@@ -231,7 +231,7 @@
     }
 
     func generateBeEndpointsCalls (parent: ref[Core.Basic.TiObject]) {
-        def elements : Array[ref[Core.Basic.TiObject]] = extractElementsWithGivenModifier(parent, "beEndpoint", "منفذ_بياني");
+        def elements : Array[ref[Core.Basic.TiObject]] = extractFunctionElements(parent,  "beEndpoint", "منفذ_بياني");
         def i: Int;
         for i = 0, i < elements.getLength(), ++i {
             def endpointParams: Array[String];
@@ -283,10 +283,9 @@
             def wsEndpointParam: Array[String];
 
             if !Spp.astMgr.getModifierStringParams(modifier, wsEndpointParam)
-                || wsEndpointParam.getLength() != 2 {
+                || wsEndpointParam.getLength() != 1 {
                 System.fail(1, "Invalid WS endpoint params");
             }
-
             Spp.astMgr.insertAst(
                 ast {
                     if String.isEqual(method, "GET") && String.isEqual(uri, "{{wsEndpointUri}}") {
@@ -300,14 +299,62 @@
     }
 
     function generateWebSockets(modulesRef: ref[Core.Basic.TiObject]) {
-        def webSocketHandlerElements : Array[ref[Core.Basic.TiObject]] = extractElementsWithGivenModifier(modulesRef, "wsEndpoint", "منفذ_مقبس");
+        def webSocketClasses : Array[ref[Core.Basic.TiObject]] = extractTypeElements(modulesRef, "wsEndpoint", "منفذ_مقبس");
 
-        def webSocketEndpointsMap : Map[String , Map[String , ptr[Core.Basic.TiObject]]]();
-        classifyWebsocketHandlersWithEndpoint(webSocketHandlerElements , webSocketEndpointsMap);
+        // register a single set of free-function trampolines that forward each
+        // callback to the matching bound method on the instance stored in userData,
+        // since civetweb's C callbacks can't carry an instance pointer directly
+
+        if (webSocketClasses.getLength() > 0) {
+            Spp.astMgr.insertAst(
+                ast {
+                    func trampolineConnection (connection: ptr[Http.Connection], userData: ptr[Void]): Int {
+                        def instance: ptr[WsRoute] = userData~cast[ptr[WsRoute]];
+                        return instance~cnt.onConnectWrapper(connection, userData);
+                    }
+                    func trampolineReady (connection: ptr[Http.Connection], userData: ptr[Void]): Void {
+                        def instance: ptr[WsRoute] = userData~cast[ptr[WsRoute]];
+                        instance~cnt.onReadyWrapper(connection, userData);
+                    }
+                    func trampolineData (connection: ptr[Http.Connection], bits: Int, data: CharsPtr, dataLen: ArchWord, userData: ptr[Void]): Int {
+                        def instance: ptr[WsRoute] = userData~cast[ptr[WsRoute]];
+                        return instance~cnt.onDataWrapper(connection, bits, data, dataLen, userData);
+                    }
+                    func trampolineClose (connection: ptr[Http.Connection], userData: ptr[Void]): Void {
+                        def instance: ptr[WsRoute] = userData~cast[ptr[WsRoute]];
+                        instance~cnt.onCloseWrapper(connection, userData);
+                    }
+                },
+                AstTemplateMap()
+            );
+        }
 
         def i : Int;
-        for i = 0 , i < webSocketEndpointsMap.getLength(), i++ {
-            insertWebSocketHandler(webSocketEndpointsMap.keyAt(i) , webSocketEndpointsMap.valAt(i))
+        for i = 0 , i < webSocketClasses.getLength(), i++ {
+            def params : Array[String];
+            extractModifiersParam(webSocketClasses(i) , "wsEndpoint", "منفذ_مقبس" , params);
+
+            if (params.getLength() != 1) {
+                System.fail(1 , "where is the endpoint");
+            }
+
+            Spp.astMgr.insertAst(
+                ast {
+                def instance : webSocketClass;
+                instance.directTest()
+                Http.setWebSocketHandler(
+                    httpContext,
+                    "{{wsEndpointUri}}",
+                    trampolineConnection~ptr,
+                    trampolineReady~ptr,
+                    trampolineData~ptr,
+                    trampolineClose~ptr
+                )
+                },
+                AstTemplateMap()
+                    .set(Srl.String("wsEndpointUri"), Core.Basic.TiStr(params(0)))
+                    .set(Srl.String("webSocketClass"), webSocketClasses(i))
+            );
         }
     }
     // Querying Functions
@@ -385,7 +432,6 @@
         session~cnt~init();
         session~cnt.requestCallbackContext = requestCallbackContext;
         session~cnt.httpContext = httpContext;
-
         preprocess {
             def modules: Array[ref[Core.Basic.TiObject]] = getAllModules(modulesRef~ast);
             if modules.getLength() == 0 {
@@ -521,10 +567,9 @@
 
     // Helpers
 
-    function extractElementsWithGivenModifier(modulesRef: ref[Core.Basic.TiObject], enName: CharsPtr, arName: CharsPtr): Array[ref[Core.Basic.TiObject]] {
+    function extractFunctionElements (modulesRef: ref[Core.Basic.TiObject], enName: CharsPtr, arName: CharsPtr): Array[ref[Core.Basic.TiObject]] {
         def translations: Map[String, String];
         translations.set(String(arName), String(enName));
-
         return Spp.astMgr.findElements(
             ast { elementType == "function" },
             modulesRef,
@@ -534,6 +579,17 @@
         );
     }
 
+    function extractTypeElements (modulesRef: ref[Core.Basic.TiObject], enName: CharsPtr, arName: CharsPtr): Array[ref[Core.Basic.TiObject]] {
+        def translations: Map[String, String];
+        translations.set(String(arName), String(enName));
+        return Spp.astMgr.findElements(
+            ast { elementType == "type" },
+            modulesRef,
+            Spp.SeekerFlags.SKIP_OWNERS | Spp.SeekerFlags.SKIP_USES | Spp.SeekerFlags.SKIP_CHILDREN,
+            enName,
+            translations
+        );
+    }
     function extractModifiersParam (elementRef : ref[Core.Basic.TiObject], enName : CharsPtr, arName : CharsPtr, params : ref[Array[String]]){
 
         def translations: Map[String, String];
@@ -647,180 +703,7 @@
         }
     }
 
-    func buildConnectBlock (element: ptr[Core.Basic.TiObject]): SrdRef[Core.Basic.TiObject] {
-        if element == null {
-            return Spp.astMgr.buildAst(ast { }, AstTemplateMap());
-        }
-        return Spp.astMgr.buildAst(
-            ast { output = providedHandlerFullRef(connection); },
-            AstTemplateMap().set(Srl.String("providedHandlerFullRef"), constructElementFullReference(element))
-        );
-    }
-
-    func buildReadyBlock (element: ptr[Core.Basic.TiObject]): SrdRef[Core.Basic.TiObject] {
-        if element == null {
-            return Spp.astMgr.buildAst(ast { }, AstTemplateMap());
-        }
-        return Spp.astMgr.buildAst(
-            ast { providedHandlerFullRef(ws); },
-            AstTemplateMap().set(Srl.String("providedHandlerFullRef"), constructElementFullReference(element))
-        );
-    }
-
-    func buildDataBlock (element: ptr[Core.Basic.TiObject]): SrdRef[Core.Basic.TiObject] {
-        if element == null {
-            return Spp.astMgr.buildAst(ast { }, AstTemplateMap());
-        }
-        return Spp.astMgr.buildAst(
-            ast {   
-                providedHandlerFullRef(ws,ws.fragmentBuffer.string, isBinary);
-            },
-            AstTemplateMap().set(Srl.String("providedHandlerFullRef"), constructElementFullReference(element))
-        );
-    }
-
-    func buildCloseBlock (element: ptr[Core.Basic.TiObject]): SrdRef[Core.Basic.TiObject] {
-        if element == null {
-            return Spp.astMgr.buildAst(ast { }, AstTemplateMap());
-        }
-        return Spp.astMgr.buildAst(
-            ast { providedHandlerFullRef(ws); },
-            AstTemplateMap().set(Srl.String("providedHandlerFullRef"), constructElementFullReference(element))
-        );
-    }
-    
-    // return block element with the wrapper function element as its first child
-    func constructSocketConnectHandler (element: ptr[Core.Basic.TiObject]): SrdRef[Core.Basic.TiObject] {
-        def block: SrdRef[Core.Basic.TiObject] = buildConnectBlock(element);
-            return Spp.astMgr.buildAst(
-                ast {
-                    func (connection: ptr[Http.Connection], userData: ptr[Void]): Int {
-                        def output: Int = 0;
-                        block;
-                        return output;
-                    }
-                },
-                AstTemplateMap().set(Srl.String("block"), block)
-            );
-    }
-
-    // return block element with the wrapper function element as its first child
-    func constructSocketReadyHandler (element: ptr[Core.Basic.TiObject]): SrdRef[Core.Basic.TiObject] {
-        def block : SrdRef[Core.Basic.TiObject] = buildReadyBlock(element);
-        return Spp.astMgr.buildAst(
-                ast {
-                    func (connection: ptr[Http.Connection], userData: ptr[Void]) : Void {
-                        def ws: SrdRef[WsConnection];
-                        ws.alloc();
-                        ws.obj~init(connection);
-
-                        ws.refCounter.count++;
-
-                        Http.setUserConnectionData(connection, ws.refCounter~ptr~cast[ptr[RefCounter]]);
-
-                        block
-                    }
-                },
-                AstTemplateMap()
-                    .set(Srl.String("block"), block)
-            )
-    }
-
-    // return block element with the wrapper function element as its first child
-    func constructSocketDataHandler (element: ptr[Core.Basic.TiObject]): SrdRef[Core.Basic.TiObject] {
-        def block: SrdRef[Core.Basic.TiObject] = buildDataBlock(element);
-        return Spp.astMgr.buildAst(
-            ast {
-                func (connection: ptr[Http.Connection], bits: Int, data: CharsPtr, dataLen: ArchWord, userData: ptr[Void]): Int {
-                    def rc: ptr[RefCounter] = Http.getUserConnectionData(connection)~cast[ptr[RefCounter]];
-                    def ws: SrdRef[WsConnection](rc~cnt, rc~cnt.managedObj~cast[ptr[WsConnection]]~cnt);
-
-                    def opcode : Int = bits & 0x0F;
-                    def fin: Bool = (bits & 0x80) != 0;
-                    // if the frame is Text or Binary
-                    if opcode == 1 or opcode == 2 {
-                        Console.print("we recieve a data\n")
-                        if (ws.isFragmenting) {
-                            ws.close(1002, "unexpected new message mid-fragment");
-                            Console.print("data_handler: close() returned, about to return 0\n")
-                            return 0;
-                        }
-
-                        ws.fragmentOpcode = opcode;
-                        ws.fragmentBuffer.clear();
-
-                        if (dataLen~cast[ArchInt] > ws.getMaxMessageSize()) {
-                            ws.close(1009, "Message too big");
-                            return 0;
-                        }
-
-                        ws.fragmentBuffer.append(data, dataLen~cast[ArchInt]);
-                        Console.print("the data now is inside the buffer. the data is : %s\n" , ws.fragmentBuffer.string.buf)
-                        if (fin) {
-                            Console.print("we about to call the handler\n")
-                            def isBinary : Bool = ws.fragmentOpcode == 2;
-                            block;
-                            ws.fragmentBuffer.clear();
-                        } else {
-                            ws.isFragmenting = 1;
-                        }
-                    }
-
-                    if opcode == 0 {
-                        
-                        if (!ws.isFragmenting) {
-                            // Protocol violation: CONTINUATION with no preceding TEXT/BINARY
-                            ws.close(1002, "unexpected continuation frame");
-                            return 0;
-                        }
-
-                        if (ws.fragmentBuffer.getLength() + dataLen > ws.getMaxMessageSize()) {
-                            ws.close(1009, "Message too big");
-                            return 0;
-                        }
-
-                        ws.fragmentBuffer.append(data, dataLen);
-
-                        if (fin) {
-                            def isBinary : Bool = ws.fragmentOpcode == 2;
-                            block;
-                            ws.fragmentBuffer.clear();
-                            ws.isFragmenting = 0;
-                        }
-                    }
-
-                if opcode == 8 {
-                    // reply with a close frame before tearing down — completes the handshake properly
-                    if dataLen~cast[Int] >= 2 {
-                        ws.close_raw_echo(data, dataLen); // echo back client's code+reason
-                    } else {
-                        ws.close(1000, ""); // client sent no code, reply with normal closure
-                    }
-                    return 0;
-                }
-
-                    return 1;
-                }
-            },
-            AstTemplateMap().set(Srl.String("block"), block)
-        );
-    }
-    // return block element with the wrapper function element as its first child
-    func constructSocketCloseHandler (element: ptr[Core.Basic.TiObject]): SrdRef[Core.Basic.TiObject] {
-        def block: SrdRef[Core.Basic.TiObject] = buildCloseBlock(element);
-        return Spp.astMgr.buildAst(
-            ast {
-                func (connection: ptr[Http.Connection], userData: ptr[Void]): Void {
-                    def rc: ptr[RefCounter] = Http.getUserConnectionData(connection)~cast[ptr[RefCounter]];
-                    def ws: SrdRef[WsConnection](rc~cnt, rc~cnt.managedObj~cast[ptr[WsConnection]]~cnt);
-                    ws.dead();
-                    block;
-                    ws.refCounter.count--;
-                }
-            },
-            AstTemplateMap().set(Srl.String("block"), block)
-        );
-    }
+   
 
     function classifyWebsocketHandlersWithEndpoint (handlersRef : Array[ref[Core.Basic.TiObject]] , webSocketEndpointsMap : ref[Map[String , Map[String , ptr[Core.Basic.TiObject]]]])   {
         def handlerPossibleNames : Array[String]({ String("onConnect"), String("onReady") , String("onData") , String("onClose") });
@@ -853,42 +736,4 @@
             }
         }
     }
-
-    function insertWebSocketHandler (url : ref[String] , handlersElement : ref[Map[String , ptr[Core.Basic.TiObject]]]) {
-        def onConnect : ptr[Core.Basic.TiObject];
-        if (handlersElement.findPos(String("onConnect")) == -1) onConnect = null else onConnect = handlersElement(String("onConnect"));
-
-        def onReady : ptr[Core.Basic.TiObject];
-        if (handlersElement.findPos(String("onReady")) == -1) onReady = null else onReady = handlersElement(String("onReady"));
-
-        def onData : ptr[Core.Basic.TiObject];
-        if (handlersElement.findPos(String("onData")) == -1) onData = null else onData = handlersElement(String("onData"));
-
-        def onClose : ptr[Core.Basic.TiObject];
-        if (handlersElement.findPos(String("onClose")) == -1) onClose = null else onClose = handlersElement(String("onClose"));
-        
-        def connectHandlerAstBlock : SrdRef[Core.Basic.TiObject] = constructSocketConnectHandler(onConnect);
-        def readyHandlerAstBlock : SrdRef[Core.Basic.TiObject] = constructSocketReadyHandler(onReady);
-        def dataHandlerAstBlock : SrdRef[Core.Basic.TiObject] = constructSocketDataHandler(onData);
-        def closeHandlerAstBlock : SrdRef[Core.Basic.TiObject] = constructSocketCloseHandler(onClose);
-        
-        Spp.astMgr.insertAst(
-            ast {
-            Http.setWebSocketHandler(
-                httpContext,
-                "{{wsEndpointUrl}}",
-                connectHandler,
-                readyHandler,
-                dataHandler,
-                closeHandler
-            )},
-            AstTemplateMap()
-                .set(Srl.String("wsEndpointUrl"),  Core.Basic.TiStr(url))
-                .set(Srl.String("connectHandler"), firstChildOf(connectHandlerAstBlock))
-                .set(Srl.String("readyHandler"),   firstChildOf(readyHandlerAstBlock))
-                .set(Srl.String("dataHandler"),    firstChildOf(dataHandlerAstBlock))
-                .set(Srl.String("closeHandler"),   firstChildOf(closeHandlerAstBlock))
-        );
-    }
-
 }
