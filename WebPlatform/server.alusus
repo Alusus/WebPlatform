@@ -61,27 +61,33 @@
         );
         def i: Int;
         for i = 0, i < elements.getLength(), ++i {
-            def uriParams: Array[String] = getModifierParams(elements(i), "uiEndpoint", "منفذ_مرئي");
+            def uriParams: Array[String];
+            extractModifierParams(elements(i), "uiEndpoint", "منفذ_مرئي", uriParams);
             if uriParams.getLength() < 1 {
                 System.fail(1, "Invalid @uiEndpoint params");
             }
 
-            def titleParams: Array[String] = getModifierParams(elements(i), "title", "عنوان");
+            def titleParams: Array[String];
+            extractModifierParams(elements(i), "title", "عنوان", titleParams);
             def title: String;
             if titleParams.getLength() >= 1 title = titleParams(0) else title = "Alusus WebPlatform";
 
-            def iconParams: Array[String] = getModifierParams(elements(i), "icon", "أيقونة");
+            def iconParams: Array[String];
+            extractModifierParams(elements(i), "icon", "أيقونة", iconParams);
             def icon: String;
             if iconParams.getLength() >= 1 icon = iconParams(0);
 
-            def appParams: Array[String] = getModifierParams(elements(i), "webApp", "تطبيق_ويب");
+            def appParams: Array[String];
+            extractModifierParams(elements(i), "webApp", "تطبيق_ويب" , appParams);
             def appManifest: String;
             if appParams.getLength() > 0 appManifest = appParams(0);
             def appVersion: String;
             if appParams.getLength() > 1 appVersion = appParams(1) else appVersion = "v1";
 
-            def preCacheFilenames: Array[String] = getModifierParams(elements(i), "preCache", "خزن_مسبق");
-            def dynCacheFilenames: Array[String] = getModifierParams(elements(i), "dynCache", "خزن_تفاعلي");
+            def preCacheFilenames : Array[String];
+            extractModifierParams(elements(i), "preCache", "خزن_مسبق", preCacheFilenames);
+            def dynCacheFilenames: Array[String];
+            extractModifierParams(elements(i), "dynCache", "خزن_تفاعلي", dynCacheFilenames);
 
             generateUiEndpointFiles(
                 elements(i), uriParams(0), title, icon, appManifest, appVersion, preCacheFilenames, dynCacheFilenames,
@@ -215,7 +221,8 @@
             );
             def i: Int;
             for i = 0, i < elements.getLength(), ++i {
-                def uriParams: Array[String] = getModifierParams(elements(i), "uiEndpoint", "منفذ_مرئي");
+                def uriParams: Array[String];
+                extractModifierParams(elements(i), "uiEndpoint", "منفذ_مرئي" ,uriParams);
                 if uriParams.getLength() < 1 {
                     System.fail(1, "Invalid @uiEndpoint params");
                 }
@@ -235,7 +242,7 @@
         def i: Int;
         for i = 0, i < elements.getLength(), ++i {
             def endpointParams: Array[String];
-            extractModifiersParam(elements(i), "beEndpoint", "منفذ_بياني" , endpointParams);
+            extractModifierParams(elements(i), "beEndpoint", "منفذ_بياني" , endpointParams);
             if endpointParams.getLength() < 2 {
                 System.fail(1, "Invalid BE endpoint params");
             }
@@ -335,7 +342,7 @@
         def i : Int;
         for i = 0 , i < webSocketClasses.getLength(), i++ {
             def params : Array[String];
-            extractModifiersParam(webSocketClasses(i) , "wsEndpoint", "منفذ_مقبس" , params);
+            extractModifierParams(webSocketClasses(i) , "wsEndpoint", "منفذ_مقبس" , params);
 
             if (params.getLength() != 1) {
                 System.fail(1 , "where is the endpoint");
@@ -605,16 +612,17 @@
             translations
         );
     }
-    function extractModifiersParam (elementRef : ref[Core.Basic.TiObject], enName : CharsPtr, arName : CharsPtr, params : ref[Array[String]]){
+
+    function extractModifierParams (elementRef : ref[Core.Basic.TiObject], enKwd : CharsPtr, arKwd : CharsPtr, params : ref[Array[String]]){
 
         def translations: Map[String, String];
-        translations.set(String(arName), String(enName));
+        translations.set(String(arKwd), String(enKwd));
         
-        def modifier: ref[Core.Basic.TiObject](Spp.astMgr.findModifierForElement(elementRef, enName,translations));        
+        def modifier: ref[Core.Basic.TiObject](Spp.astMgr.findModifierForElement(elementRef, enKwd,translations));        
         Spp.astMgr.getModifierStringParams(modifier, params);
     }
 
-    // refer to element to an AST element using its pointer instead of referring to that element using an identifier
+    // refer to an AST element using its pointer instead of referring to that element using an identifier
     // makes generating code dynamically easier
     func constructElementFullReference (element: ref[Core.Basic.TiObject]): SrdRef[Core.Basic.TiObject] {
         return Core.Basic.newSrdObj[Core.Data.Ast.Passage].{
@@ -638,14 +646,6 @@
                 setElement("second", identifier);
             };
         };
-    }
-
-    func getModifierParams (element: ref[Core.Basic.TiObject], enKwd: CharsPtr, arKwd: CharsPtr): Array[String] {
-        def modifier: ref[Core.Basic.TiObject](Spp.astMgr.findModifierForElement(element, enKwd));
-        if modifier~ptr == 0 modifier~no_deref = Spp.astMgr.findModifierForElement(element, arKwd);
-        def endpointParams: Array[String];
-        Spp.astMgr.getModifierStringParams(modifier, endpointParams);
-        return endpointParams;
     }
 
     func getAllModules (astRef: ref[Core.Basic.TiObject]): Array[ref[Core.Basic.TiObject]] {
