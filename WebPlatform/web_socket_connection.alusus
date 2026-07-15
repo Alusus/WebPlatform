@@ -137,12 +137,14 @@ class WsConnection {
 }
 
 class WsRoute {
+    def wkThis: WkRef[this_type];
+    
     def _maxMessageSize : ArchInt = 1024; 
     
     // fragmentation state
     def fragmentBuffer : StringBuilder();
     def fragmentOpcode : Int;
-    def isFragmenting  : Bool;
+    def isFragmenting  : Bool = 0;
 
     handler this.onConnectWrapper (connection: ptr[Http.Connection], userData: ptr[Void]) : Int {
         def ws: SrdRef[WsConnection];
@@ -170,6 +172,8 @@ class WsRoute {
         def rc: ptr[RefCounter] = Http.getUserConnectionData(connection)~cast[ptr[RefCounter]];
         def ws: SrdRef[WsConnection](rc~cnt, rc~cnt.managedObj~cast[ptr[WsConnection]]~cnt);
 
+        def output : Int;
+
         def opcode : Int = bits & 0x0F;
         def fin: Bool = (bits & 0x80) != 0;
 
@@ -196,7 +200,7 @@ class WsRoute {
 
             if (fin) {
                 def isBinary : Bool = this.fragmentOpcode == 2;
-                this.onData(ws , this.fragmentBuffer.string ,isBinary);
+                output = this.onData(ws , this.fragmentBuffer.string ,isBinary);
                 this.fragmentBuffer.clear();
             } else {
                 this.isFragmenting = 1;
@@ -220,7 +224,7 @@ class WsRoute {
 
             if (fin) {
                 def isBinary : Bool = this.fragmentOpcode == 2;
-                this.onData(ws , this.fragmentBuffer.string ,isBinary);
+                output = this.onData(ws , this.fragmentBuffer.string ,isBinary);
                 this.fragmentBuffer.clear();
                 this.isFragmenting = 0;
             }
@@ -236,7 +240,7 @@ class WsRoute {
             return 0;
         }
 
-        return 1;
+        return output;
     }
 
     handler this.onCloseWrapper (connection: ptr[Http.Connection], userData: ptr[Void]) : Void {
@@ -257,7 +261,7 @@ class WsRoute {
     }
 
     handler this.onReady(connecting: SrdRef[WsConnection]) : Void as_ptr {}
-    handler this.onData(connecting: SrdRef[WsConnection] , data : ref[String] , isBinary : Bool) : Void as_ptr {}
+    handler this.onData(connecting: SrdRef[WsConnection] , data : ref[String] , isBinary : Bool) : Int as_ptr { return 1}
     handler this.onClose(connecting: SrdRef[WsConnection]) : Void as_ptr {};
 
     handler this.setMaxMessageSize (size : ArchInt) {
