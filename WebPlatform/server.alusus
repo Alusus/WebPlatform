@@ -415,6 +415,13 @@
     func startServer [modulesRef: ast_ref = Root] (
         mainAssetsPath: String, uiEndpointsPath: String, options: Array[CharsPtr], useSrcAssetsPath: Bool
     ): ptr[ServerSession] {
+        // Enables CivetWeb's built-in ping/pong handling for WebSocket
+        // connections: it auto-replies to client PING frames with PONG
+        // and filters PONG frames before they reach our data_handler,
+        // so we don't need to implement this ourselves.
+        options.add("enable_websocket_ping_pong");
+        options.add("yes");
+
         // Http library requires that the last options argument is a zero, to denote
         // the end of options.
         options.add(0);
