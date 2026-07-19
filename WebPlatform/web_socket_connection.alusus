@@ -71,8 +71,11 @@ class WsState {
 
 class WsConnection {
     def _connection : ptr[Http.Connection];
-    def handshakeInfo : ref[HandshakeInfo];
     def status : String;
+
+    def handshakeInfo : ref[HandshakeInfo];
+    def closeCode: word[16] = 1006;
+    def closeReason: String = String("");
 
     handler this~init (conn : ptr[Http.Connection]) {
         this._connection = conn;
@@ -99,12 +102,30 @@ class WsConnection {
     // it received).
     handler this.replyToClose (data : CharsPtr, dataLen : ArchWord) : Int {
         if this.status != WsState.OPENED return 0 ;
+        Console.print("this is the data len %i\n" , dataLen);
+        // Extract and store the close code/reason before replying,
+        // per RFC 6455 §5.5.1: first 2 bytes = status code, rest = reason.
+
+        if (dataLen~cast[Int] >= 2) {
+            this.closeCode = ((data~cnt(0)~cast[word[16]]) << 8) | data~cnt(1)~cast[word[16]];
+        if (dataLen~cast[Int] > 2) {
+            def reasonLen: Int = (dataLen~cast[Int] - 2);
+            this.closeReason = String(data + 2, reasonLen);
+        }} else {
+            // client sent a close frame with no code at all — valid per spec
+            this.closeCode = 1005; // "No Status Received"
+            this.closeReason = "";
+        }
+        
         def result : Int = Http.writeToWebSocket(this._connection, 8, data, dataLen);
         return result;
     }
 
     handler this.close (statusCode : word[16] , reasonMessage : CharsPtr) : Int {
         if this.status != WsState.OPENED return 0 ;
+
+        this.closeCode = statusCode;
+        this.closeReason = reasonMessage;
 
         def reason_len : Int = String(reasonMessage).getLength();
 
@@ -241,7 +262,7 @@ class WsRoute {
         def ws: SrdRef[WsConnection](rc~cnt, rc~cnt.managedObj~cast[ptr[WsConnection]]~cnt);
         ws.status = WsState.CLOSED;
 
-        this.onClose(ws);
+        this.onClose(ws , ws.closeCode , ws.closeReason);
 
         // reduce counter by one cause we was increment it by one when we initialize the reference to make sure that the object
         // will not be released before we closing the connection
@@ -255,7 +276,7 @@ class WsRoute {
 
     handler this.onReady(connecting: SrdRef[WsConnection]) : Void as_ptr {}
     handler this.onData(connecting: SrdRef[WsConnection] , data : ref[String] , isBinary : Bool) as_ptr {}
-    handler this.onClose(connecting: SrdRef[WsConnection]) : Void as_ptr {};
+    handler this.onClose(connecting: SrdRef[WsConnection] , closeCode : Word[16] , closeReason : String) : Void as_ptr {};
 
     handler this.setMaxMessageSize (size : ArchInt) {
         _maxMessageSize = size;
