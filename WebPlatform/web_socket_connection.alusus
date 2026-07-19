@@ -272,6 +272,11 @@ class WsRoute {
             return 0;
         }
 
+        if (opcode != 0 and opcode != 1 and opcode != 2 and opcode != 8) {
+            ws.close(1002, "unsupported opcode");
+            return 0;
+        }
+
         return 1;
     }
 
