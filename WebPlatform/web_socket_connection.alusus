@@ -82,6 +82,10 @@ class WsConnection {
         this.status = WsState.CONNECTING;
     }
 
+    handler this.getStatus(): String {
+        return this.status;
+    }
+
     handler this.sendText  (data: CharsPtr) {
         if this.status != WsState.OPENED return ;
 
@@ -107,6 +111,7 @@ class WsConnection {
     // it received).
     handler this.replyToClose (data : CharsPtr, dataLen : ArchWord) {
         if this.status != WsState.OPENED return;
+
         // Extract and store the close code/reason before replying,
         // per RFC 6455 §5.5.1: first 2 bytes = status code, rest = reason.
 
@@ -120,10 +125,13 @@ class WsConnection {
             this.closeCode = 1005; // "No Status Received"
             this.closeReason = "";
         }
+
+        this.status = WsState.CLOSING;
         
         if Http.writeToWebSocket(this._connection, 8, data, dataLen) <= 0 {
             this.status = WsState.CLOSED;
         }
+
         return result;
     }
 
@@ -151,6 +159,8 @@ class WsConnection {
         if (reason_len > 0) {
             Memory.copy(payload~ptr~cast[ptr[Char]] + 2, reasonMessage, reason_len~cast[ArchInt]);
         }
+
+        this.status = WsState.CLOSING;
 
         if Http.writeToWebSocket(this._connection, 8, payload~ptr, payload_len) <= {
             this.status = WsState.CLOSED;
