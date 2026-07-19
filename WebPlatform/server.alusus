@@ -422,6 +422,24 @@
     func startServer [modulesRef: ast_ref = Root] (
         mainAssetsPath: String, uiEndpointsPath: String, options: Array[CharsPtr], useSrcAssetsPath: Bool
     ): ptr[ServerSession] {
+
+        // Bounds how long a single write (over any TCP connection this
+        // server handles — HTTP or WebSocket) can block on an
+        // unresponsive/dead peer before giving up  — without this, a write can hang for a very long
+        // time (OS-level TCP timeout) if left unset.
+        if !(hasOption(options , "request_timeout_ms")) {
+            options.add("request_timeout_ms");
+            options.add("5000");
+        }
+
+        // How long the read loop waits for incoming data before sending a PING
+        // falls back to request_timeout_ms if unset. Used by CivetWeb to detect and
+        // close unresponsive connections.
+        if !(hasOption(options , "websocket_timeout_ms")) {
+            options.add("websocket_timeout_ms");
+            options.add("10000");
+        }   
+
         // Enables CivetWeb's built-in ping/pong handling for WebSocket
         // connections: it auto-replies to client PING frames with PONG
         // and filters PONG frames before they reach our data_handler,
@@ -588,6 +606,17 @@
     }
 
     // Helpers
+
+    func hasOption (options: ref[Array[CharsPtr]], key: CharsPtr): Bool {
+        def i: Int;
+        // options is a flat key/value list — check every even index (just the keys)
+        for i = 0, i < options.getLength(), i += 2 {
+            if String.isEqual(options(i), key){
+                return true;
+            }
+        }
+        return false;
+    }
 
     function extractFunctionElements (modulesRef: ref[Core.Basic.TiObject], enName: CharsPtr, arName: CharsPtr): Array[ref[Core.Basic.TiObject]] {
         def translations: Map[String, String];

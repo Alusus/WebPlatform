@@ -82,27 +82,31 @@ class WsConnection {
         this.status = WsState.CONNECTING;
     }
 
-    handler this.sendText  (data: CharsPtr) : Int {
-        if this.status != WsState.OPENED return 0 ;
-        return Http.writeTextToWebSocket(this._connection, data);
+    handler this.sendText  (data: CharsPtr) {
+        if this.status != WsState.OPENED return ;
+
+        if Http.writeTextToWebSocket(this._connection, data) <= 0 {
+            this.status = WsState.CLOSED;
+        }
     }
 
-    handler this.sendBinary (data: CharsPtr, dataLen: ArchWord) : Int {
-        if this.status != WsState.OPENED return 0 ;
-        return Http.writeBinaryToWebSocket(this._connection , data , dataLen);
+    handler this.sendBinary (data: CharsPtr, dataLen: ArchWord) {
+        if this.status != WsState.OPENED return ;
+        if Http.writeBinaryToWebSocket(this._connection , data , dataLen) <= 0 {
+            this.status = WsState.CLOSED;
+        }
     }
 
-    handler this.close () : Int {
-        return this.close(1000 , "");
+    handler this.close () {
+        this.close(1000 , "")
     }
 
     // Called internally by the library to respond to a client-initiated
     // close frame, completing the close handshake as stated in
     // RFC 6455 §5.5.1 (a responder typically echoes the status code
     // it received).
-    handler this.replyToClose (data : CharsPtr, dataLen : ArchWord) : Int {
-        if this.status != WsState.OPENED return 0 ;
-        Console.print("this is the data len %i\n" , dataLen);
+    handler this.replyToClose (data : CharsPtr, dataLen : ArchWord) {
+        if this.status != WsState.OPENED return;
         // Extract and store the close code/reason before replying,
         // per RFC 6455 §5.5.1: first 2 bytes = status code, rest = reason.
 
@@ -117,12 +121,14 @@ class WsConnection {
             this.closeReason = "";
         }
         
-        def result : Int = Http.writeToWebSocket(this._connection, 8, data, dataLen);
+        if Http.writeToWebSocket(this._connection, 8, data, dataLen) <= 0 {
+            this.status = WsState.CLOSED;
+        }
         return result;
     }
 
-    handler this.close (statusCode : word[16] , reasonMessage : CharsPtr) : Int {
-        if this.status != WsState.OPENED return 0 ;
+    handler this.close (statusCode : word[16] , reasonMessage : CharsPtr) {
+        if this.status != WsState.OPENED return;
 
         this.closeCode = statusCode;
         this.closeReason = reasonMessage;
@@ -146,7 +152,9 @@ class WsConnection {
             Memory.copy(payload~ptr~cast[ptr[Char]] + 2, reasonMessage, reason_len~cast[ArchInt]);
         }
 
-        def result : Int = Http.writeToWebSocket(this._connection, 8, payload~ptr, payload_len);
+        if Http.writeToWebSocket(this._connection, 8, payload~ptr, payload_len) <= {
+            this.status = WsState.CLOSED;
+        }
 
         return result;
     }
