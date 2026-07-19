@@ -127,7 +127,7 @@ class WsConnection {
         this.closeCode = statusCode;
         this.closeReason = reasonMessage;
 
-        def reason_len : Int = String(reasonMessage).getLength();
+        def reason_len : Int = String.getLength(reasonMessage);
 
         def payload_len : Int = 2 + reason_len;
 
@@ -139,11 +139,11 @@ class WsConnection {
         // close frame payload max is 125 bytes as stated in RFC 6455 §5.5.1
         def payload : array[Char, 125];
 
-        payload(0) = (statusCode >> 8) & 0xFF; // status code, high byte
+        payload(0) = (statusCode >> 8)[ptr[Char]]  & 0xFF; // status code, high byte
         payload(1) = statusCode & 0xFF;  // status code, low byte
 
         if (reason_len > 0) {
-            Memory.copy(payload~ptr + 2, reasonMessage, reason_len);
+            Memory.copy(payload~ptr~cast[ptr[Char]] + 2, reasonMessage, reason_len~cast[ArchInt]);
         }
 
         def result : Int = Http.writeToWebSocket(this._connection, 8, payload~ptr, payload_len);
