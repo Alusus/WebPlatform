@@ -31,12 +31,14 @@ import "Spp/Ast";
 import "Build";
 import "Apm";
 import "closure";
+Apm.importPackage("Alusus/Sle@0.2", "Srl/enums.alusus");
 Apm.importPackage("Alusus/Http@0.3");
 Apm.importPackage("Alusus/Json@0.2");
 Apm.importPackage("Alusus/MarkdownTranslator@0.1");
 Apm.importPackage("Alusus/Promises@0.1");
 
 import "WebPlatform/server";
+import "WebPlatform/WsConnection";
 import "WebPlatform/browser_api";
 import "WebPlatform/frontend_helpers";
 import "WebPlatform/Styling/Color";

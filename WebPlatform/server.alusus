@@ -61,33 +61,28 @@
         );
         def i: Int;
         for i = 0, i < elements.getLength(), ++i {
-            def uriParams: Array[String];
-            extractModifierParams(elements(i), "uiEndpoint", "منفذ_مرئي", uriParams);
+            def uriParams: Array[String] = getModifierParams(elements(i), "uiEndpoint", "منفذ_مرئي");
             if uriParams.getLength() < 1 {
+                // TODO: Raise build notice instead
                 System.fail(1, "Invalid @uiEndpoint params");
             }
 
-            def titleParams: Array[String];
-            extractModifierParams(elements(i), "title", "عنوان", titleParams);
+            def titleParams: Array[String] = getModifierParams(elements(i), "title", "عنوان");
             def title: String;
             if titleParams.getLength() >= 1 title = titleParams(0) else title = "Alusus WebPlatform";
 
-            def iconParams: Array[String];
-            extractModifierParams(elements(i), "icon", "أيقونة", iconParams);
+            def iconParams: Array[String] = getModifierParams(elements(i), "icon", "أيقونة");
             def icon: String;
             if iconParams.getLength() >= 1 icon = iconParams(0);
 
-            def appParams: Array[String];
-            extractModifierParams(elements(i), "webApp", "تطبيق_ويب" , appParams);
+            def appParams: Array[String] = getModifierParams(elements(i), "webApp", "تطبيق_ويب");
             def appManifest: String;
             if appParams.getLength() > 0 appManifest = appParams(0);
             def appVersion: String;
             if appParams.getLength() > 1 appVersion = appParams(1) else appVersion = "v1";
 
-            def preCacheFilenames : Array[String];
-            extractModifierParams(elements(i), "preCache", "خزن_مسبق", preCacheFilenames);
-            def dynCacheFilenames: Array[String];
-            extractModifierParams(elements(i), "dynCache", "خزن_تفاعلي", dynCacheFilenames);
+            def preCacheFilenames: Array[String] = getModifierParams(elements(i), "preCache", "خزن_مسبق");
+            def dynCacheFilenames: Array[String] = getModifierParams(elements(i), "dynCache", "خزن_تفاعلي");
 
             generateUiEndpointFiles(
                 elements(i), uriParams(0), title, icon, appManifest, appVersion, preCacheFilenames, dynCacheFilenames,
@@ -221,9 +216,9 @@
             );
             def i: Int;
             for i = 0, i < elements.getLength(), ++i {
-                def uriParams: Array[String];
-                extractModifierParams(elements(i), "uiEndpoint", "منفذ_مرئي" ,uriParams);
+                def uriParams: Array[String] = getModifierParams(elements(i), "uiEndpoint", "منفذ_مرئي");
                 if uriParams.getLength() < 1 {
+                    // TODO: Raise build notice instead
                     System.fail(1, "Invalid @uiEndpoint params");
                 }
                 def fnName: String = Spp.astMgr.getDefinitionName(elements(i));
@@ -238,12 +233,12 @@
     }
 
     func generateBeEndpointsCalls (parent: ref[Core.Basic.TiObject]) {
-        def elements : Array[ref[Core.Basic.TiObject]] = extractFunctionElements(parent,  "beEndpoint", "منفذ_بياني");
+        def elements : Array[ref[Core.Basic.TiObject]] = findFunctionElements(parent,  "beEndpoint", "منفذ_بياني");
         def i: Int;
         for i = 0, i < elements.getLength(), ++i {
-            def endpointParams: Array[String];
-            extractModifierParams(elements(i), "beEndpoint", "منفذ_بياني" , endpointParams);
+            def endpointParams: Array[String] = getModifierParams(elements(i), "beEndpoint", "منفذ_بياني");
             if endpointParams.getLength() < 2 {
+                // TODO: Raise build notice instead
                 System.fail(1, "Invalid BE endpoint params");
             }
             Spp.astMgr.insertAst(
@@ -276,6 +271,7 @@
             );
         }
     }
+
     func generateWebSocketEndpointChecks (parent: ref[Core.Basic.TiObject]) {
         def classElements: Array[ref[Core.Basic.TiObject]] = Spp.astMgr.findElements(
             ast { modifier == "wsEndpoint" || modifier == "منفذ_مقبس" },
@@ -290,7 +286,8 @@
             def wsEndpointParam: Array[String];
 
             if !Spp.astMgr.getModifierStringParams(modifier, wsEndpointParam)
-                || wsEndpointParam.getLength() != 1 {
+            or wsEndpointParam.getLength() != 1 {
+                // TODO: Raise build notice instead.
                 System.fail(1, "Invalid WS endpoint params");
             }
             Spp.astMgr.insertAst(
@@ -305,73 +302,37 @@
         }
     }
 
-    function generateWebSockets(modulesRef: ref[Core.Basic.TiObject]) {
-        def webSocketClasses : Array[ref[Core.Basic.TiObject]] = extractTypeElements(modulesRef, "wsEndpoint", "منفذ_مقبس");
-
-    if (webSocketClasses.getLength() > 0) {
-        // register a single set of free-function trampolines that forward each
-        // callback to the matching bound method on the instance stored in userData,
-        // since civetweb's C callbacks can't carry an instance pointer directly
-        Spp.astMgr.insertAst(
-            ast {
-                func trampolineConnection (connection: ptr[Http.Connection], userData: ptr[Void]): Int {
-                    def rc: ptr[RefCounter] = userData~cast[ptr[RefCounter]];
-                    def instance: SrdRef[WsRoute](rc~cnt, rc~cnt.managedObj~cast[ptr[WsRoute]]~cnt);
-                    return instance.onConnectWrapper(connection, userData);
-                }
-                func trampolineReady (connection: ptr[Http.Connection], userData: ptr[Void]): Void {
-                    def rc: ptr[RefCounter] = userData~cast[ptr[RefCounter]];
-                    def instance: SrdRef[WsRoute](rc~cnt, rc~cnt.managedObj~cast[ptr[WsRoute]]~cnt);
-                    instance.onReadyWrapper(connection, userData);
-                }
-                func trampolineData (connection: ptr[Http.Connection], bits: Int, data: CharsPtr, dataLen: ArchWord, userData: ptr[Void]): Int {
-                    def rc: ptr[RefCounter] = userData~cast[ptr[RefCounter]];
-                    def instance: SrdRef[WsRoute](rc~cnt, rc~cnt.managedObj~cast[ptr[WsRoute]]~cnt);
-                    return instance.onDataWrapper(connection, bits, data, dataLen, userData);
-                }
-                func trampolineClose (connection: ptr[Http.Connection], userData: ptr[Void]): Void {
-                    def rc: ptr[RefCounter] = userData~cast[ptr[RefCounter]];
-                    def instance: SrdRef[WsRoute](rc~cnt, rc~cnt.managedObj~cast[ptr[WsRoute]]~cnt);
-                    instance.onCloseWrapper(connection, userData);
-                }
-            },
-            AstTemplateMap()
-        );
-    }
+    function generateWebSocketRegistrations (modulesRef: ref[Core.Basic.TiObject]) {
+        def webSocketClasses: Array[ref[Core.Basic.TiObject]] =
+            findTypeElements(modulesRef, "wsEndpoint", "منفذ_مقبس");
 
         def i : Int;
-        for i = 0 , i < webSocketClasses.getLength(), i++ {
-            def params : Array[String];
-            extractModifierParams(webSocketClasses(i) , "wsEndpoint", "منفذ_مقبس" , params);
+        for i = 0, i < webSocketClasses.getLength(), i++ {
+            def params : Array[String] = getModifierParams(webSocketClasses(i) , "wsEndpoint", "منفذ_مقبس");
 
             if (params.getLength() != 1) {
                 System.fail(1 , "where is the endpoint");
             }
 
-
             Spp.astMgr.insertAst(
                 ast {
-                    def instance: SrdRef[webSocketClass] = SrdRef[webSocketClass].construct();
-                    instance.wkThis.assign(instance);
-
-                    // keep this route instance alive for the server's lifetime
-                    instance.refCounter.count++;
                     Http.setWebSocketHandler(
                         httpContext,
                         "{{wsEndpointUri}}",
-                        trampolineConnection~ptr,
-                        trampolineReady~ptr,
-                        trampolineData~ptr,
-                        trampolineClose~ptr,
-                        instance.refCounter~ptr~cast[ptr[Void]]
+                        wsConnectCallback[webSocketClass]~ptr,
+                        wsReadyCallback[webSocketClass]~ptr,
+                        wsDataCallback[webSocketClass]~ptr,
+                        wsCloseCallback[webSocketClass]~ptr,
+                        null
                     )
                 },
                 AstTemplateMap()
                     .set(Srl.String("wsEndpointUri"), Core.Basic.TiStr(params(0)))
-                    .set(Srl.String("webSocketClass"), constructElementFullReferenceByName(webSocketClasses(i)))
+                    .set(Srl.String("webSocketClass"), constructElementFullReference(webSocketClasses(i)))
             );
         }
     }
+
     // Querying Functions
 
     func getAssetsRoutesFromModules (modulesRef: ref[Core.Basic.TiObject]): Array[StaticRoute] {
@@ -422,7 +383,6 @@
     func startServer [modulesRef: ast_ref = Root] (
         mainAssetsPath: String, uiEndpointsPath: String, options: Array[CharsPtr], useSrcAssetsPath: Bool
     ): ptr[ServerSession] {
-
         // Bounds how long a single write (over any TCP connection this
         // server handles — HTTP or WebSocket) can block on an
         // unresponsive/dead peer before giving up  — without this, a write can hang for a very long
@@ -478,7 +438,7 @@
                 Spp.buildMgr.raiseBuildNotice("SPPA1002", 1, modulesRef~ast);
             }
             def i: Int;
-            for i = 0, i < modules.getLength(), ++i generateWebSockets(modules(i));
+            for i = 0, i < modules.getLength(), ++i generateWebSocketRegistrations(modules(i));
         };
 
         return session;
@@ -596,6 +556,45 @@
         return 1;
     }
 
+    func wsConnectCallback [WsConnClass: type] (connection: ptr[Http.Connection], userData: ptr[Void]): Int {
+        def ws: SrdRef[WsConnClass];
+        ws.alloc()~init(connection);
+        ws.wkThis = ws;
+
+        // we increment counter by one so we don't lose the object even if the user
+        // does not reference it
+        ws.refCounter.count++;
+        Http.setUserConnectionData(connection, ws.refCounter~ptr;
+
+        return ws.onConnect();
+    }
+
+    func wsReadyCallback [WsConnClass: type] (connection: ptr[Http.Connection], userData: ptr[Void]): Void {
+        def rc: ptr[RefCounter] = Http.getUserConnectionData(connection)~cast[ptr[RefCounter]];
+        def ws: SrdRef[WsConnClass](rc~cnt, castRef[rc~cnt.managedObj, WsConnClass]);
+        ws.status = WsStatus.OPENED;
+        ws.onReady();
+    }
+
+    func wsDataCallback [WsConnClass: type] (
+        connection: ptr[Http.Connection], bits: Int, data: CharsPtr, dataLen: ArchWord, userData: ptr[Void]
+    ): Int {
+        def rc: ptr[RefCounter] = Http.getUserConnectionData(connection)~cast[ptr[RefCounter]];
+        def ws: SrdRef[WsConnClass](rc~cnt, castRef[rc~cnt.managedObj, WsConnClass]);
+        return ws.onData(bits, data, dataLen);
+    }
+
+    func wsCloseCallback [WsConnClass: type] (connection: ptr[Http.Connection], userData: ptr[Void]): Void {
+        def rc: ptr[RefCounter] = Http.getUserConnectionData(connection)~cast[ptr[RefCounter]];
+        def ws: SrdRef[WsConnClass](rc~cnt, castRef[rc~cnt.managedObj, WsConnClass]);
+        ws.status = WsStatus.CLOSED;
+        ws.onClose();
+
+        // We no longer need this connection object, so decrease the reference counter which was manually
+        // incremented before being set on the Http.Connection instance.
+        ws.refCounter.count--;
+    }
+
     func return404(connection: ptr[Http.Connection], uri: CharsPtr) {
         def content: array[Char, 1024];
         String.assign(content~ptr, "<h1>404 - Not Found</h1><p> you are in \"%.512s\"", uri);
@@ -618,7 +617,24 @@
         return false;
     }
 
-    function extractFunctionElements (modulesRef: ref[Core.Basic.TiObject], enName: CharsPtr, arName: CharsPtr): Array[ref[Core.Basic.TiObject]] {
+    func constructElementFullReference (element: ref[Core.Basic.TiObject]): SrdRef[Core.Basic.TiObject] {
+        return Core.Basic.newSrdObj[Core.Data.Ast.Passage].{
+            Core.Basic.BindingOf[this].setMember("target", element);
+        };
+    }
+
+    func getModifierParams (element: ref[Core.Basic.TiObject], enKwd: CharsPtr, arKwd: CharsPtr): Array[String] {
+        def translations: Map[String, String];
+        translations.set(String(arKwd), String(enKwd));
+        def modifier: ref[Core.Basic.TiObject](Spp.astMgr.findModifierForElement(elementRef, enKwd, translations));
+        def endpointParams: Array[String];
+        Spp.astMgr.getModifierStringParams(modifier, endpointParams);
+        return endpointParams;
+    }
+
+    function findFunctionElements (
+        modulesRef: ref[Core.Basic.TiObject], enName: CharsPtr, arName: CharsPtr
+    ): Array[ref[Core.Basic.TiObject]] {
         def translations: Map[String, String];
         translations.set(String(arName), String(enName));
         return Spp.astMgr.findElements(
@@ -630,7 +646,9 @@
         );
     }
 
-    function extractTypeElements (modulesRef: ref[Core.Basic.TiObject], enName: CharsPtr, arName: CharsPtr): Array[ref[Core.Basic.TiObject]] {
+    function findTypeElements (
+        modulesRef: ref[Core.Basic.TiObject], enName: CharsPtr, arName: CharsPtr
+    ): Array[ref[Core.Basic.TiObject]] {
         def translations: Map[String, String];
         translations.set(String(arName), String(enName));
         return Spp.astMgr.findElements(
@@ -640,41 +658,6 @@
             enName,
             translations
         );
-    }
-
-    function extractModifierParams (elementRef : ref[Core.Basic.TiObject], enKwd : CharsPtr, arKwd : CharsPtr, params : ref[Array[String]]){
-
-        def translations: Map[String, String];
-        translations.set(String(arKwd), String(enKwd));
-        
-        def modifier: ref[Core.Basic.TiObject](Spp.astMgr.findModifierForElement(elementRef, enKwd,translations));        
-        Spp.astMgr.getModifierStringParams(modifier, params);
-    }
-
-    // refer to an AST element using its pointer instead of referring to that element using an identifier
-    // makes generating code dynamically easier
-    func constructElementFullReference (element: ref[Core.Basic.TiObject]): SrdRef[Core.Basic.TiObject] {
-        return Core.Basic.newSrdObj[Core.Data.Ast.Passage].{
-            Core.Basic.BindingOf[this].setMember("target", element);
-        };
-    }
-
-    func constructElementFullReferenceByName (element: ref[Core.Basic.TiObject]): SrdRef[Core.Basic.TiObject] {
-        def node: ref[Core.Data.Node](castRef[element, Core.Data.Node]);
-        if node.owner~ptr == 0 return SrdRef[Core.Basic.TiObject]();
-        def name: String = Spp.astMgr.getDefinitionName(node);
-        def identifier: SrdRef[Core.Data.Ast.Identifier] = Core.Basic.newSrdObj[Core.Data.Ast.Identifier].{
-            value.value = name;
-        };
-        def ownerRef: SrdRef[Core.Basic.TiObject] = constructElementFullReferenceByName(node.owner.owner);
-        if ownerRef.isNull() return identifier
-        else return Core.Basic.newSrdObj[Core.Data.Ast.LinkOperator].{
-            Core.Basic.BindingOf[this].setMember("type", Core.Basic.TiStr("."));
-            Core.Basic.MapContainerOf[this].{
-                setElement("first", ownerRef);
-                setElement("second", identifier);
-            };
-        };
     }
 
     func getAllModules (astRef: ref[Core.Basic.TiObject]): Array[ref[Core.Basic.TiObject]] {
@@ -754,5 +737,4 @@
             System.fail(1, String("Invalid asset route; path should end with /: ") + buildPath);
         }
     }
-
 }
