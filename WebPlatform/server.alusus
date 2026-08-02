@@ -568,7 +568,7 @@
         ws.refCounter.count++;
         Http.setUserConnectionData(connection, ws.refCounter~ptr~cast[ptr[RefCounter]]);
 
-        return ws.onConnect();
+        return ws.onConnect(ws.connection);
     }
 
     func wsReadyCallback [WsConnClass: type] (connection: ptr[Http.Connection], userData: ptr[Void]): Void {

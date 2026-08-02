@@ -115,7 +115,7 @@
             }
         }
 
-        handler this.onConnect(): Int as_ptr {
+        handler this.onConnect(connection : ptr[Http.Connection]): Int as_ptr {
             return 0;
         }
 
