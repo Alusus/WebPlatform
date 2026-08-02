@@ -558,20 +558,22 @@
 
     func wsConnectCallback [WsConnClass: type] (connection: ptr[Http.Connection], userData: ptr[Void]): Int {
         def ws: SrdRef[WsConnClass];
-        ws.alloc()~init(connection);
+        ws.alloc()~init();
+        ws.connection = connection;
+        ws.status = WsStatus.CONNECTING;
         ws.wkThis = ws;
 
         // we increment counter by one so we don't lose the object even if the user
         // does not reference it
         ws.refCounter.count++;
-        Http.setUserConnectionData(connection, ws.refCounter~ptr;
+        Http.setUserConnectionData(connection, ws.refCounter~ptr~cast[ptr[RefCounter]]);
 
         return ws.onConnect();
     }
 
     func wsReadyCallback [WsConnClass: type] (connection: ptr[Http.Connection], userData: ptr[Void]): Void {
         def rc: ptr[RefCounter] = Http.getUserConnectionData(connection)~cast[ptr[RefCounter]];
-        def ws: SrdRef[WsConnClass](rc~cnt, castRef[rc~cnt.managedObj, WsConnClass]);
+        def ws: SrdRef[WsConnClass](rc~cnt, rc~cnt.managedObj~cast[ptr[WsConnClass]]~cnt);
         ws.status = WsStatus.OPENED;
         ws.onReady();
     }
@@ -580,13 +582,13 @@
         connection: ptr[Http.Connection], bits: Int, data: CharsPtr, dataLen: ArchWord, userData: ptr[Void]
     ): Int {
         def rc: ptr[RefCounter] = Http.getUserConnectionData(connection)~cast[ptr[RefCounter]];
-        def ws: SrdRef[WsConnClass](rc~cnt, castRef[rc~cnt.managedObj, WsConnClass]);
-        return ws.onData(bits, data, dataLen);
+        def ws: SrdRef[WsConnClass](rc~cnt, rc~cnt.managedObj~cast[ptr[WsConnClass]]~cnt);
+        return ws.onFrame(bits, data, dataLen);
     }
 
     func wsCloseCallback [WsConnClass: type] (connection: ptr[Http.Connection], userData: ptr[Void]): Void {
         def rc: ptr[RefCounter] = Http.getUserConnectionData(connection)~cast[ptr[RefCounter]];
-        def ws: SrdRef[WsConnClass](rc~cnt, castRef[rc~cnt.managedObj, WsConnClass]);
+        def ws: SrdRef[WsConnClass](rc~cnt, rc~cnt.managedObj~cast[ptr[WsConnClass]]~cnt);
         ws.status = WsStatus.CLOSED;
         ws.onClose();
 
@@ -626,7 +628,7 @@
     func getModifierParams (element: ref[Core.Basic.TiObject], enKwd: CharsPtr, arKwd: CharsPtr): Array[String] {
         def translations: Map[String, String];
         translations.set(String(arKwd), String(enKwd));
-        def modifier: ref[Core.Basic.TiObject](Spp.astMgr.findModifierForElement(elementRef, enKwd, translations));
+        def modifier: ref[Core.Basic.TiObject](Spp.astMgr.findModifierForElement(element, enKwd, translations));
         def endpointParams: Array[String];
         Spp.astMgr.getModifierStringParams(modifier, endpointParams);
         return endpointParams;
