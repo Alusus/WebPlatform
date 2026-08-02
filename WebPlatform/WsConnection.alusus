@@ -29,7 +29,7 @@
 
         handler this.setMaxMessageSize(size: ArchInt) {
             this.maxMessageSize = size;
-            fragmentBuffer.bufferGrowSize = (maxMessageSize / 2)~cast[ArchInt];
+            this.fragmentBuffer.bufferGrowSize = (this.maxMessageSize / 2)~cast[ArchInt];
         }
 
         handler this.getMaxMessageSize(): ArchInt{
