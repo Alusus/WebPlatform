@@ -1,0 +1,182 @@
+/*
+ * Copyright (C) 2026 Sarmad Abdullah
+ *
+ * This file is part of Alusus WebPlatform library.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, see <https://www.gnu.org/licenses/>.
+ */
+
+@merge module WebPlatform {
+    class WsCloseInfo {
+        def code: Int;
+        def reason: String;
+        def wasClean: Bool;
+    }
+
+    class WsMessageInfo {
+        def data: String;
+        def isBinary: Bool;
+    }
+
+    class WebSocket {
+        def socketId: ArchInt(0);
+        def handlerId: ArchInt(0);
+        def onOpen: Signal[WebSocket, Int];
+        def onMessage: Signal[WebSocket, WsMessageInfo];
+        def onError: Signal[WebSocket, Int];
+        def onClose: Signal[WebSocket, WsCloseInfo];
+
+        // Closes the underlying socket (if any) and immediately removes our
+        // dispatch entry, without waiting for the real 'websocketClose' event
+        // to round-trip back. Used when `this` itself is about to stop being
+        // valid for the current connection — either because the whole object
+        // is being destroyed (~terminate) or because it's about to be reused
+        // for a brand new connection (connect). In both cases, letting the old
+        // connection's close event arrive later and fire against `this` would
+        // be wrong: in the ~terminate case `this` no longer exists, and in the
+        // reconnect case `this` now represents a different connection and that
+        // stale event would clobber its socketId/handlerId.
+        handler this._forceClose() {
+            if this.socketId != 0 _closeWebSocket(this.socketId, 1000, "");
+            def i: ArchInt = findEventHandlerIndex(this.handlerId);
+            if i != -1 eventHandlers.remove(i);
+            this.socketId = 0;
+            this.handlerId = 0;
+        }
+
+        handler this~terminate() {
+            this._forceClose();
+        }
+
+        handler this.connect(url: ptr[Char]): Bool {
+            return this.connect(url, "");
+        }
+
+        handler this.connect(url: ptr[Char], protocols: ptr[Char]): Bool {
+            this._forceClose();
+            def index: ArchInt = addEventHandler(closure (json: Json) {
+                def eventName: String = json("eventName");
+                def data: Json = json("eventData");
+                if eventName == "websocketOpen" {
+                    this.onOpen.emit(this, Int(0));
+                } else if eventName == "websocketMessage" {
+                    def info: WsMessageInfo;
+                    info.isBinary = data("isBinary");
+                    if info.isBinary {
+                        // The actual bytes live in a JS-side map, keyed by
+                        // dataId — they couldn't survive the JSON round-trip
+                        // fetchNextEvent uses, so we pull them into wasm memory
+                        // ourselves via copyWebSocketBinaryData, then let
+                        // String's copying (ptr, length) constructor take
+                        // ownership of a copy before freeing our temp buffer.
+                        def dataLen: ArchWord = data("dataLen");
+                        def dataId: ArchInt = data("dataId");
+                        def buffer: ptr[array[Char]] = Memory.alloc(dataLen)~cast[ptr[array[Char]]];
+                        copyWebSocketBinaryData(dataId, buffer~cast[ptr[Char]]);
+                        info.data = String(buffer, dataLen~cast[ArchInt]);
+                        Memory.free(buffer);
+                    } else {
+                        info.data = data("data");
+                    }
+                    this.onMessage.emit(this, info);
+                } else if eventName == "websocketError" {
+                    this.onError.emit(this, Int(0));
+                } else if eventName == "websocketClose" {
+                    def info: WsCloseInfo;
+                    info.code = data("code");
+                    info.reason = data("reason");
+                    info.wasClean = data("wasClean");
+                    this.onClose.emit(this, info);
+                    this.socketId = 0;
+                    this.handlerId = 0;
+                }
+            });
+            this.handlerId = eventHandlers(index).id;
+            this.socketId = _createWebSocket(url, protocols, this.handlerId);
+            if this.socketId == 0 {
+                // Synchronous construction failure (invalid URL, bad protocols,
+                // per the WebSocket constructor's SyntaxError cases) — a caller
+                // mistake, not a connection-level error. The native API doesn't
+                // fire its 'error' event for this case either (no object was
+                // ever created to fire an event on), so we don't emit onError
+                // here; the caller finds out from this return value instead.
+                def i: ArchInt = findEventHandlerIndex(this.handlerId);
+                if i != -1 eventHandlers.remove(i);
+                this.handlerId = 0;
+                return false;
+            }
+            return true;
+        }
+
+        handler this.send(data: ptr[Char]): Bool {
+            if this.socketId == 0 return false;
+            return _sendWebSocketMessage(this.socketId, data);
+        }
+
+        handler this.sendBinary(data: ptr[Char], dataLen: ArchWord): Bool {
+            if this.socketId == 0 return false;
+            return _sendWebSocketBinary(this.socketId, data, dataLen);
+        }
+
+        handler this.close(): Bool {
+            return this.close(1000, "");
+        }
+
+        handler this.close(code: Int): Bool {
+            return this.close(code, "");
+        }
+
+        handler this.close(code: Int, reason: ptr[Char]): Bool {
+            if this.socketId == 0 return false;
+            // Can fail synchronously here too (MDN: InvalidAccessError if code
+            // isn't 1000 or in 3000-4999, SyntaxError if reason exceeds 123
+            // UTF-8 bytes — the same caller-mistake-vs-connection-error split
+            // as connect(), so this reports through the return value, not
+            // onError).
+            if not _closeWebSocket(this.socketId, code, reason) return false;
+            // Unlike _forceClose, we deliberately don't touch eventHandlers or
+            // socketId/handlerId here: `this` is still a valid, still-current
+            // connection, and the real 'websocketClose' event will arrive
+            // asynchronously — it needs to still find its handler registered
+            // so onClose fires normally. That event's branch above already
+            // resets socketId/handlerId once it arrives.
+            return true;
+        }
+
+        handler this.getState(): Int {
+            if this.socketId == 0 return -1;
+            return getWebSocketState(this.socketId);
+        }
+
+        handler this.getUrl(): ptr[array[Char]] {
+            if this.socketId == 0 return 0;
+            return getWebSocketUrl(this.socketId);
+        }
+
+        handler this.getProtocol(): ptr[array[Char]] {
+            if this.socketId == 0 return 0;
+            return _getWebSocketProtocol(this.socketId);
+        }
+
+        handler this.getExtensions(): ptr[array[Char]] {
+            if this.socketId == 0 return 0;
+            return _getWebSocketExtensions(this.socketId);
+        }
+
+        handler this.getBufferedAmount(): ArchWord {
+            if this.socketId == 0 return 0;
+            return _getWebSocketBufferedAmount(this.socketId);
+        }
+    }
+}

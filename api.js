@@ -21,11 +21,15 @@ const STACK_SIZE = 8192;
 const wasmApi = {};
 const eventsQueue = [];
 const resources = {};
+const webSockets = {};
+const webSocketBinaryData = {};
 const requestControllers = {};
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 audioContext.resume();
 
 let resourceCounter = 0;
+let webSocketCounter = 0;
+let webSocketBinaryDataCounter = 0;
 let requestControllerCounter = 0;
 let program;
 let wasmMemory = null;
@@ -436,6 +440,133 @@ wasmApi.cancelTimeout = (id) => {
     clearTimeout(id);
 }
 
+// WebSocket APIs
+
+wasmApi.createWebSocket = (url , protocols , cbId) => {
+    const jsProtocols = toJsString(protocols);
+    let ws;
+    try {
+        ws = jsProtocols ? new WebSocket(toJsString(url), jsProtocols) : new WebSocket(toJsString(url));
+    } catch (err) {
+        console.error('WebSocket construction failed:', err);
+        return 0;
+    }
+    // Alusus has no concept of a JS Blob (wasm can only ever receive raw
+    // bytes/ids, never a live object reference), so binary messages always end
+    // up converted to raw bytes on our side regardless of binaryType. Default
+    // to 'arraybuffer' so that conversion is synchronous instead of paying for
+    // an extra Blob.arrayBuffer() microtask on every binary message; onmessage
+    // below still handles a Blob correctly if something sets it back later.
+    ws.binaryType = 'arraybuffer';
+    const socketId = ++webSocketCounter;
+    webSockets[socketId] = ws;
+
+    ws.onopen = () => {
+        onEvent(cbId, true, 'websocketOpen', {});
+    };
+
+    ws.onmessage = (event) => {
+        if (typeof event.data === 'string') {
+            onEvent(cbId, true, 'websocketMessage', { data: event.data, isBinary: false });
+            return;
+        }
+        // Binary message: ArrayBuffer (cause we will set the binaryType as 'arraybuffer').
+        // the raw bytes can't survive the JSON.stringify round-trip fetchNextEvent
+        // uses for every other event, so instead of embedding the data itself,
+        // we stash it here and hand Alusus back a small id + length; it then
+        // pulls the actual bytes into wasm memory via copyWebSocketBinaryData,
+        // the same "write into caller-provided memory" pattern used elsewhere
+        // (e.g. getElementDimensions).
+        
+        const bytes = new Uint8Array(event.data);
+        const dataId = ++webSocketBinaryDataCounter;
+        webSocketBinaryData[dataId] = bytes;
+        onEvent(cbId, true, 'websocketMessage', { isBinary: true, dataId, dataLen: bytes.length });
+    };
+
+    ws.onerror = () => {
+        onEvent(cbId, true, 'websocketError', {});
+    };
+
+    ws.onclose = (event) => {
+        onEvent(cbId, false, 'websocketClose', {
+            code: event.code,
+            reason: event.reason,
+            wasClean: event.wasClean
+        });
+        delete webSockets[socketId];
+    };
+
+    return socketId;
+}
+
+wasmApi.sendWebSocketMessage = (socketId, data) => {
+    const ws = webSockets[socketId];
+    if (!ws || ws.readyState !== WebSocket.OPEN) return false;
+    try {
+        ws.send(toJsString(data));
+        return true;
+    } catch (err) {
+        console.error('WebSocket send failed:', err);
+        return false;
+    }
+};
+
+wasmApi.sendWebSocketBinary = (socketId, dataPtr, dataLen) => {
+    const ws = webSockets[socketId];
+    if (!ws || ws.readyState !== WebSocket.OPEN) return false;
+    try {
+        ws.send(new Uint8Array(wasmMemory.buffer, dataPtr, dataLen));
+        return true;
+    } catch (err) {
+        console.error('WebSocket sendBinary failed:', err);
+        return false;
+    }
+};
+
+wasmApi.copyWebSocketBinaryData = (dataId, destPtr) => {
+    const bytes = webSocketBinaryData[dataId];
+    if (!bytes) return;
+    new Uint8Array(wasmMemory.buffer, destPtr, bytes.length).set(bytes);
+    delete webSocketBinaryData[dataId];
+};
+
+wasmApi.closeWebSocket = (socketId, code, reason) => {
+    const ws = webSockets[socketId];
+    if (!ws) return false;
+    try {
+        ws.close(code, toJsString(reason));
+        return true;
+    } catch (err) {
+        console.error('WebSocket close failed:', err);
+        return false;
+    }
+};
+
+wasmApi.getWebSocketState = (socketId) => {
+    const ws = webSockets[socketId];
+    return ws ? ws.readyState : -1;
+};
+
+wasmApi.getWebSocketUrl = (socketId) => {
+    const ws = webSockets[socketId];
+    return ws ? toWasmString(ws.url) : 0;
+};
+
+wasmApi.getWebSocketProtocol = (socketId) => {
+    const ws = webSockets[socketId];
+    return ws ? toWasmString(ws.protocol) : 0;
+};
+
+wasmApi.getWebSocketExtensions = (socketId) => {
+    const ws = webSockets[socketId];
+    return ws ? toWasmString(ws.extensions) : 0;
+};
+
+wasmApi.getWebSocketBufferedAmount = (socketId) => {
+    const ws = webSockets[socketId];
+    return ws ? ws.bufferedAmount : 0;
+};
 // Resource Management
 
 wasmApi.loadImage = (url, cbId) => {
@@ -1095,6 +1226,10 @@ const eventPropMap = {
     loadAudio: ['resourceId', 'success'],
     loadJsScript: ['success'],
     sendRequest: ['status', 'headers', 'body'],
+    websocketOpen: [],
+    websocketMessage: ['data', 'isBinary', 'dataId', 'dataLen'],
+    websocketError: [],
+    websocketClose: ['code', 'reason', 'wasClean'],
     timer: [],
     touchstart: pickNeededTouchEventData,
     touchend: pickNeededTouchEventData,
