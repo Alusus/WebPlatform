@@ -383,22 +383,25 @@
     func startServer [modulesRef: ast_ref = Root] (
         mainAssetsPath: String, uiEndpointsPath: String, options: Array[CharsPtr], useSrcAssetsPath: Bool
     ): ptr[ServerSession] {
-        // Bounds how long a single write (over any TCP connection this
-        // server handles — HTTP or WebSocket) can block on an
-        // unresponsive/dead peer before giving up  — without this, a write can hang for a very long
-        // time (OS-level TCP timeout) if left unset.
+        // Bounds how long a single network read or write operation (over any HTTP
+        // connection this server handles) can block on an unresponsive/dead peer
+        // before CivetWeb gives up and closes it — without this, a stuck read/write
+        // can tie up a worker thread for a very long time (OS-level TCP timeout) if
+        // left unset. Defaults to CivetWeb's own 30s if we don't set it.
         if !(hasOption(options , "request_timeout_ms")) {
             options.add("request_timeout_ms");
             options.add("5000");
         }
 
-        // How long the read loop waits for incoming data before sending a PING
-        // falls back to request_timeout_ms if unset. Used by CivetWeb to detect and
-        // close unresponsive connections.
+        // Same read/write timeout as request_timeout_ms above, but specifically for
+        // WebSocket connections — set separately because WebSocket connections are
+        // expected to sit idle between messages far longer than a normal HTTP
+        // request should take, so they need a more relaxed value. Falls back to
+        // request_timeout_ms if unset.
         if !(hasOption(options , "websocket_timeout_ms")) {
             options.add("websocket_timeout_ms");
             options.add("10000");
-        }   
+        }
 
         // Enables CivetWeb's built-in ping/pong handling for WebSocket
         // connections: it auto-replies to client PING frames with PONG

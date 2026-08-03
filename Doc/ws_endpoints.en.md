@@ -20,6 +20,23 @@ class Chatwebsocket {
 Now you have a websocket endpoint listening at `/chat`. A new instance of `Chatwebsocket` is created
 for every client connection and stays alive for the lifetime of that connection.
 
+## Timeouts
+
+When you start the server (`runServer`, `startServer`, `buildAndRunServer`, etc.), you can override
+`websocket_timeout_ms` through the `options: Array[CharsPtr]` argument. It controls how long a
+WebSocket connection can sit without a response before the server treats it as unresponsive and
+closes it. It defaults to `10000` (10 seconds) if you don't set it yourself.
+
+```
+runServer[serverModules](
+    mainAssetsPath, uiEndpointsPath,
+    Array[CharsPtr]({ "listening_ports", "8010", "websocket_timeout_ms", "30000" })
+);
+```
+
+Don't change this value casually — test it against your own expected load first before relying on a
+different value in production.
+
 ## Overriding Handlers
 
 `WsConnection` gives you four handlers you can override to react to the connection's lifecycle:
