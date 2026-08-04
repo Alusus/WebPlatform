@@ -68,15 +68,16 @@
     @expname[cancelTimeout] function _cancelTimeout (id: Word);
     // WebSockets
     @expname[createWebSocket] function _createWebSocket (url: ptr[Char], protocols: ptr[Char], cbId: ArchInt): ArchInt;
-    @expname[sendWebSocketMessage] function _sendWebSocketMessage (socketId: ArchInt, data: ptr[Char]): Bool;
-    @expname[sendWebSocketBinary] function _sendWebSocketBinary (socketId: ArchInt, data: ptr[Char], dataLen: ArchWord): Bool;
+    @expname[sendWebSocketMessage] function _sendWebSocketMessage (socketId: ArchInt, data: ptr[Char]): ptr[array[Char]];
+    @expname[sendWebSocketBinary] function _sendWebSocketBinary (socketId: ArchInt, data: ptr[Char], dataLen: ArchWord): ptr[array[Char]];
     @expname[copyWebSocketBinaryData] function copyWebSocketBinaryData (dataId: ArchInt, dest: ptr[Char]);
-    @expname[closeWebSocket] function _closeWebSocket (socketId: ArchInt, code: Int, reason: ptr[Char]): Bool;
+    @expname[closeWebSocket] function _closeWebSocket (socketId: ArchInt, code: Int, reason: ptr[Char]): ptr[array[Char]];
     @expname[getWebSocketState] function getWebSocketState (socketId: ArchInt): Int;
     @expname[getWebSocketUrl] function getWebSocketUrl (socketId: ArchInt): ptr[array[Char]];
     @expname[getWebSocketProtocol] function _getWebSocketProtocol (socketId: ArchInt): ptr[array[Char]];
     @expname[getWebSocketExtensions] function _getWebSocketExtensions (socketId: ArchInt): ptr[array[Char]];
     @expname[getWebSocketBufferedAmount] function _getWebSocketBufferedAmount (socketId: ArchInt): ArchWord;
+    @expname[deleteWebSocket] function deleteWebSocket (socketId: ArchInt);
     // Resource Management
     @expname[loadImage] function _loadImage (url: ptr[Char], cbId: ArchInt);
     @expname[getImageDimensions] function getImageDimensions (imgId: Int, result: ref[Dimensions]);

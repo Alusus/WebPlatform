@@ -458,6 +458,7 @@ wasmApi.createWebSocket = (url , protocols , cbId) => {
     // an extra Blob.arrayBuffer() microtask on every binary message; onmessage
     // below still handles a Blob correctly if something sets it back later.
     ws.binaryType = 'arraybuffer';
+    
     const socketId = ++webSocketCounter;
     webSockets[socketId] = ws;
 
@@ -470,14 +471,7 @@ wasmApi.createWebSocket = (url , protocols , cbId) => {
             onEvent(cbId, true, 'websocketMessage', { data: event.data, isBinary: false });
             return;
         }
-        // Binary message: ArrayBuffer (cause we will set the binaryType as 'arraybuffer').
-        // the raw bytes can't survive the JSON.stringify round-trip fetchNextEvent
-        // uses for every other event, so instead of embedding the data itself,
-        // we stash it here and hand Alusus back a small id + length; it then
-        // pulls the actual bytes into wasm memory via copyWebSocketBinaryData,
-        // the same "write into caller-provided memory" pattern used elsewhere
-        // (e.g. getElementDimensions).
-        
+              
         const bytes = new Uint8Array(event.data);
         const dataId = ++webSocketBinaryDataCounter;
         webSocketBinaryData[dataId] = bytes;
@@ -494,7 +488,6 @@ wasmApi.createWebSocket = (url , protocols , cbId) => {
             reason: event.reason,
             wasClean: event.wasClean
         });
-        delete webSockets[socketId];
     };
 
     return socketId;
@@ -502,71 +495,69 @@ wasmApi.createWebSocket = (url , protocols , cbId) => {
 
 wasmApi.sendWebSocketMessage = (socketId, data) => {
     const ws = webSockets[socketId];
-    if (!ws || ws.readyState !== WebSocket.OPEN) return false;
     try {
         ws.send(toJsString(data));
-        return true;
+        return 0;
     } catch (err) {
-        console.error('WebSocket send failed:', err);
-        return false;
+        return toWasmString(err.message);
     }
 };
 
 wasmApi.sendWebSocketBinary = (socketId, dataPtr, dataLen) => {
     const ws = webSockets[socketId];
-    if (!ws || ws.readyState !== WebSocket.OPEN) return false;
     try {
         ws.send(new Uint8Array(wasmMemory.buffer, dataPtr, dataLen));
-        return true;
+        return 0;
     } catch (err) {
-        console.error('WebSocket sendBinary failed:', err);
-        return false;
+        return toWasmString(err.message);
     }
 };
 
 wasmApi.copyWebSocketBinaryData = (dataId, destPtr) => {
     const bytes = webSocketBinaryData[dataId];
-    if (!bytes) return;
     new Uint8Array(wasmMemory.buffer, destPtr, bytes.length).set(bytes);
     delete webSocketBinaryData[dataId];
 };
 
 wasmApi.closeWebSocket = (socketId, code, reason) => {
     const ws = webSockets[socketId];
-    if (!ws) return false;
     try {
         ws.close(code, toJsString(reason));
-        return true;
+        return 0;
     } catch (err) {
-        console.error('WebSocket close failed:', err);
-        return false;
+        return toWasmString(err.message);
     }
 };
 
 wasmApi.getWebSocketState = (socketId) => {
     const ws = webSockets[socketId];
-    return ws ? ws.readyState : -1;
+    return ws.readyState;
 };
 
 wasmApi.getWebSocketUrl = (socketId) => {
     const ws = webSockets[socketId];
-    return ws ? toWasmString(ws.url) : 0;
+    return toWasmString(ws.url);
 };
 
 wasmApi.getWebSocketProtocol = (socketId) => {
     const ws = webSockets[socketId];
-    return ws ? toWasmString(ws.protocol) : 0;
+    return toWasmString(ws.protocol);
 };
 
 wasmApi.getWebSocketExtensions = (socketId) => {
     const ws = webSockets[socketId];
-    return ws ? toWasmString(ws.extensions) : 0;
+    return toWasmString(ws.extensions);
 };
 
 wasmApi.getWebSocketBufferedAmount = (socketId) => {
     const ws = webSockets[socketId];
-    return ws ? ws.bufferedAmount : 0;
+    return ws.bufferedAmount;
 };
+
+wasmApi.deleteWebSocket = (socketId) => {
+    delete webSockets[socketId];
+};
+
 // Resource Management
 
 wasmApi.loadImage = (url, cbId) => {
