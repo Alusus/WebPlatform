@@ -182,12 +182,27 @@ client; `onClose` fires once the close handshake completes.
   must be in the `4000`-`4999` range — see the
   [RFC 6455 spec on status codes](https://datatracker.ietf.org/doc/html/rfc6455#section-7.4.2).
 
-#### Message size limit
+#### closeCode and closeReason
 
-By default, a connection closes with code `1009` ("Message too big") if an incoming message —
-assembled across all its fragments — exceeds 1024 bytes. You can change this limit per connection,
-for example from `onConnect`:
+```
+def closeCode: word[16] = 1006;
+def closeReason: String;
+```
+
+Once the connection has closed, these hold the status code and reason it closed with — whichever
+side, client or server, initiated the close. Read them from `onClose`:
+
+```
+handler (this: WsConnection).onClose() : Void set_ptr {
+    Console.print("closed with code %i: %s\n", this.closeCode, this.closeReason.buf);
+}
+```
+
+#### Message size limit
 
 ```
 handler this.setMaxMessageSize(size: ArchInt);
 ```
+
+By default, a connection closes with code `1009` ("Message too big") if an incoming message —
+assembled across all its fragments — exceeds 1024 bytes. You can change this limit per connection.

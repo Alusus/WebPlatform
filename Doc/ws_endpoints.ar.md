@@ -292,6 +292,41 @@ handler this.close(statusCode: word[16], reasonMessage: CharsPtr);
   `4000` إلى `4999` — راجع
   [مواصفة RFC 6455 لرموز الحالة](https://datatracker.ietf.org/doc/html/rfc6455#section-7.4.2).
 
+#### رمز_الإغلاق وسبب_الإغلاق (closeCode / closeReason)
+
+```
+عرف رمز_الإغلاق: word[16] = 1006؛
+عرف سبب_الإغلاق: نـص؛
+```
+
+<div dir=ltr>
+
+```
+def closeCode: word[16] = 1006;
+def closeReason: String;
+```
+
+</div>
+
+بمجرد إغلاق الاتصال، تحمل هاتان القيمتان رمز الحالة وسبب الإغلاق اللذين أُغلق بهما — أيًّا كان
+الطرف الذي بدأ الإغلاق، العميل أو الخادم. اقرأهما من داخل `عند_الإغلاق`:
+
+```
+عملية (هذا: اتـصال_مقبس).عند_الإغلاق() : فـراغ حدد_مؤشر {
+    مـتم.طـرفية.اطبع("أُغلق برمز %i: %s\ج"، هذا.رمز_الإغلاق، هذا.سبب_الإغلاق.صوان)؛
+}
+```
+
+<div dir=ltr>
+
+```
+handler (this: WsConnection).onClose() : Void set_ptr {
+    Console.print("closed with code %i: %s\n", this.closeCode, this.closeReason.buf);
+}
+```
+
+</div>
+
 #### الحد الأقصى لحجم الرسالة (Message size limit)
 
 ```
@@ -307,6 +342,6 @@ handler this.setMaxMessageSize(size: ArchInt);
 </div>
 
 بشكل مبدئي، يُغلق الاتصال برمز `1009` ("Message too big") إذا تجاوزت رسالة واردة — مجمّعةً عبر كل
-أجزائها — 1024 بايت. يمكنك تغيير هذا الحد لكل اتصال، مثلًا من داخل `عند_الاتصال`
+أجزائها — 1024 بايت. يمكنك تغيير هذا الحد لكل اتصال.
 
 </div>
