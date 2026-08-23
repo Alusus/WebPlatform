@@ -35,6 +35,33 @@
         return p;
     }
 
+    function createWebSocket (
+        url: ptr[Char], protocols: ptr[Char], socketId: ref[ArchInt], cb: closure (Json)
+    ): ArchInt {
+        def index: ArchInt = addEventHandler(cb);
+        socketId = _createWebSocket(url, protocols, eventHandlers(index).id);
+        if socketId == 0 {
+            // Synchronous construction failure (invalid URL, bad protocols,
+            // per the WsClient constructor's SyntaxError cases) — a caller
+            // mistake, not a connection-level error. The native API doesn't
+            // fire its 'error' event for this case either (no object was
+            // ever created to fire an event on), so we don't emit onError
+            // here; the caller finds out from this return value instead.
+            eventHandlers.remove(index);
+            return 0;
+        }
+        eventHandlers(index).info = castSrdRef[SrdRef[ArchInt].construct().{ obj = socketId }, Void];
+        return eventHandlers(index).id;
+    }
+
+    function deleteWebSocket (id: ArchInt) {
+        def i: ArchInt = findEventHandlerIndex(id);
+        if i == -1 return;
+        def socketInfo: SrdRef[ArchInt] = castSrdRef[eventHandlers(i).info, ArchInt];
+        _deleteWebSocket(socketInfo.obj);
+        eventHandlers.remove(i);
+    }
+
     function startTimer (duration: Word, cb: closure (Json)): ArchInt {
         def index: ArchInt = addEventHandler(cb);
         def timerInfo: SrdRef[Word];

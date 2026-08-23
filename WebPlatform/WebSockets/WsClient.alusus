@@ -1,0 +1,178 @@
+/*
+ * Copyright (C) 2026 Sarmad Abdullah
+ *
+ * This file is part of Alusus WebPlatform library.
+ *
+ * This library is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU Lesser General Public
+ * License as published by the Free Software Foundation; either
+ * version 3 of the License, or (at your option) any later version.
+ *
+ * This library is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public
+ * License along with this library; if not, see <https://www.gnu.org/licenses/>.
+ */
+
+@merge module WebPlatform {
+    class WsMessageInfo {
+        def isBinary: Bool;
+        def binaryData: ptr[array[Word[8]]];
+        def binaryDataLength: ArchInt;
+        def strData: String;
+
+        handler this~init(data: ptr[array[Word[8]]], length: ArchInt) {
+            this.isBinary = true;
+            this.binaryData = data;
+            this.binaryDataLength = length;
+        }
+
+        handler this~init(str: String) {
+            this.isBinary = false;
+            this.binaryData = 0;
+            this.binaryDataLength = 0;
+            this.strData = str;
+        }
+
+        handler this~terminate() {
+            if this.isBinary and this.binaryData != 0 Memory.free(this.binaryData);
+        }
+    }
+
+    class WsCloseInfo {
+        def code: Int;
+        def reason: String;
+        def wasClean: Bool;
+    }
+
+    class WsClient {
+        def socketId: ArchInt(0);
+        def handlerId: ArchInt(0);
+        def connected: Bool = false;
+
+        def openCallback: closure();
+        def messageCallback: closure(ref[WsMessageInfo]);
+        def errorCallback: closure();
+        def closeCallback: closure(ref[WsCloseInfo]);
+
+        // Creation function that mirrors `new WebSocket(url)`,
+        // throwing and leaving you with no reference at all on construction
+        // failure. Returns an empty (isNull() == true) SrdRef if the
+        // underlying browser constructor rejects synchronously (bad URL,
+        // malformed protocols); a live, already-connecting instance otherwise.
+        func create(url: CharsPtr, protocols: CharsPtr): SrdRef[WsClient] {
+            def ws: SrdRef[WsClient];
+            ws.construct();
+            if not ws.connect(url, protocols) ws.release();
+            return ws;
+        }
+        func create(url: CharsPtr): SrdRef[WsClient] {
+            return WsClient.create(url, "");
+        }
+
+        handler this~terminate() {
+            deleteWebSocket(this.handlerId);
+        }
+
+        handler this.connect(url: CharsPtr): Bool {
+            return this.connect(url, "");
+        }
+
+        handler this.connect(url: CharsPtr, protocols: CharsPtr): Bool {
+            if this.connected return true;
+            this.handlerId = createWebSocket(url, protocols, this.socketId, closure (json: Json) {
+                def eventName: String = json("eventName");
+                def data: Json = json("eventData");
+                if eventName == "websocketOpen" {
+                    this.connected = true;
+                    this.onOpen();
+                } else if eventName == "websocketMessage" {
+                    if data("isBinary")~cast[Bool] {
+                        this.onMessage(WsMessageInfo(
+                            data("data")~cast[ArchInt]~cast[ptr[array[Word[8]]]],
+                            data("datLen")~cast[ArchInt]
+                        ));
+                    } else {
+                        this.onMessage(WsMessageInfo(data("data")~cast[String]));
+                    }
+                } else if eventName == "websocketError" {
+                    this.onError();
+                } else if eventName == "websocketClose" {
+                    def info: WsCloseInfo;
+                    info.code = data("code");
+                    info.reason = data("reason");
+                    info.wasClean = data("wasClean");
+                    deleteWebSocket(this.handlerId);
+                    this.handlerId = 0;
+                    this.socketId = 0;
+                    this.connected = false;
+                    this.onClose(info);
+                }
+            });
+            return this.handlerId != 0;
+        }
+
+        // Returns 0 (null) on success, or a pointer to an error message string
+        // describing what went wrong.
+        handler this.sendText(data: CharsPtr): CharsPtr {
+            return sendWebSocketMessage(this.socketId, data);
+        }
+
+        handler this.sendBinary(data: CharsPtr, dataLen: ArchWord): CharsPtr {
+            return sendWebSocketBinary(this.socketId, data, dataLen);
+        }
+
+        handler this.close(): CharsPtr {
+            return this.close(1000, "");
+        }
+
+        handler this.close(code: Int): CharsPtr {
+            return this.close(code, "");
+        }
+
+        handler this.close(code: Int, reason: CharsPtr): CharsPtr {
+            return closeWebSocket(this.socketId, code, reason);
+        }
+
+        handler this.getState(): Int {
+            return getWebSocketState(this.socketId);
+        }
+
+        handler this.getUrl(): CharsPtr {
+            return getWebSocketUrl(this.socketId);
+        }
+
+        handler this.getProtocol(): CharsPtr {
+            return getWebSocketProtocol(this.socketId);
+        }
+
+        handler this.getExtensions(): CharsPtr {
+            return getWebSocketExtensions(this.socketId);
+        }
+
+        handler this.getBufferedAmount(): ArchWord {
+            return getWebSocketBufferedAmount(this.socketId);
+        }
+
+        // Virtual Methods
+
+        handler this.onOpen() as_ptr {
+            if not this.openCallback.isNull() this.openCallback();
+        }
+
+        handler this.onMessage(info: ref[WsMessageInfo]) as_ptr {
+            if not this.messageCallback.isNull() this.messageCallback(info);
+        }
+
+        handler this.onError() as_ptr {
+            if not this.errorCallback.isNull() this.errorCallback();
+        }
+
+        handler this.onClose(info: ref[WsCloseInfo]) as_ptr {
+            if not this.closeCallback.isNull() this.closeCallback(info);
+        }
+    }
+}

@@ -22,14 +22,12 @@ const wasmApi = {};
 const eventsQueue = [];
 const resources = {};
 const webSockets = {};
-const webSocketBinaryData = {};
 const requestControllers = {};
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 audioContext.resume();
 
 let resourceCounter = 0;
 let webSocketCounter = 0;
-let webSocketBinaryDataCounter = 0;
 let requestControllerCounter = 0;
 let program;
 let wasmMemory = null;
@@ -440,7 +438,7 @@ wasmApi.cancelTimeout = (id) => {
     clearTimeout(id);
 }
 
-// WebSocket APIs
+// Web Socket APIs
 
 wasmApi.createWebSocket = (url , protocols , cbId) => {
     const jsProtocols = toJsString(protocols);
@@ -471,11 +469,10 @@ wasmApi.createWebSocket = (url , protocols , cbId) => {
             onEvent(cbId, true, 'websocketMessage', { data: event.data, isBinary: false });
             return;
         }
-              
         const bytes = new Uint8Array(event.data);
-        const dataId = ++webSocketBinaryDataCounter;
-        webSocketBinaryData[dataId] = bytes;
-        onEvent(cbId, true, 'websocketMessage', { isBinary: true, dataId, dataLen: bytes.length });
+        const destPtr = program.instance.exports.malloc(bytes.length);
+        new Uint8Array(wasmMemory.buffer, destPtr, bytes.length).set(bytes);
+        onEvent(cbId, true, 'websocketMessage', { data: destPtr, dataLen: bytes.length, isBinary: true });
     };
 
     ws.onerror = () => {
@@ -511,12 +508,6 @@ wasmApi.sendWebSocketBinary = (socketId, dataPtr, dataLen) => {
     } catch (err) {
         return toWasmString(err.message);
     }
-};
-
-wasmApi.copyWebSocketBinaryData = (dataId, destPtr) => {
-    const bytes = webSocketBinaryData[dataId];
-    new Uint8Array(wasmMemory.buffer, destPtr, bytes.length).set(bytes);
-    delete webSocketBinaryData[dataId];
 };
 
 wasmApi.closeWebSocket = (socketId, code, reason) => {
@@ -1218,7 +1209,7 @@ const eventPropMap = {
     loadJsScript: ['success'],
     sendRequest: ['status', 'headers', 'body'],
     websocketOpen: [],
-    websocketMessage: ['data', 'isBinary', 'dataId', 'dataLen'],
+    websocketMessage: ['data', 'dataLen', 'isBinary'],
     websocketError: [],
     websocketClose: ['code', 'reason', 'wasClean'],
     timer: [],

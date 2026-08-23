@@ -274,41 +274,41 @@
 
     func generateWebSocketEndpointChecks (parent: ref[Core.Basic.TiObject]) {
         def classElements: Array[ref[Core.Basic.TiObject]] = Spp.astMgr.findElements(
-            ast { modifier == "wsEndpoint" || modifier == "منفذ_مقبس" },
+            ast { modifier == "wsRoute" || modifier == "مسار_مقبس" },
             parent,
             Spp.SeekerFlags.SKIP_OWNERS | Spp.SeekerFlags.SKIP_USES | Spp.SeekerFlags.SKIP_CHILDREN
         );
         def i: Int;
         for i = 0, i < classElements.getLength(), ++i {
-            def modifier: ref[Core.Basic.TiObject](Spp.astMgr.findModifierForElement(classElements(i), "wsEndpoint"));
-            if modifier~ptr == 0 modifier~no_deref = Spp.astMgr.findModifierForElement(classElements(i), "منفذ_مقبس");
+            def modifier: ref[Core.Basic.TiObject](Spp.astMgr.findModifierForElement(classElements(i), "wsRoute"));
+            if modifier~ptr == 0 modifier~no_deref = Spp.astMgr.findModifierForElement(classElements(i), "مسار_مقبس");
 
-            def wsEndpointParam: Array[String];
+            def wsRouteParam: Array[String];
 
-            if !Spp.astMgr.getModifierStringParams(modifier, wsEndpointParam)
-            or wsEndpointParam.getLength() != 1 {
+            if !Spp.astMgr.getModifierStringParams(modifier, wsRouteParam)
+            or wsRouteParam.getLength() != 1 {
                 // TODO: Raise build notice instead.
                 System.fail(1, "Invalid WS endpoint params");
             }
             Spp.astMgr.insertAst(
                 ast {
-                    if String.isEqual(method, "GET") && String.isEqual(uri, "{{wsEndpointUri}}") {
+                    if String.isEqual(method, "GET") && String.isEqual(uri, "{{wsRouteUri}}") {
                         return 0;
                     }
                 },
                 AstTemplateMap()
-                    .set(Srl.String("wsEndpointUri"), Core.Basic.TiStr(wsEndpointParam(0)))
+                    .set(Srl.String("wsRouteUri"), Core.Basic.TiStr(wsRouteParam(0)))
             );
         }
     }
 
     function generateWebSocketRegistrations (modulesRef: ref[Core.Basic.TiObject]) {
         def webSocketClasses: Array[ref[Core.Basic.TiObject]] =
-            findTypeElements(modulesRef, "wsEndpoint", "منفذ_مقبس");
+            findTypeElements(modulesRef, "wsRoute", "مسار_مقبس");
 
         def i : Int;
         for i = 0, i < webSocketClasses.getLength(), i++ {
-            def params : Array[String] = getModifierParams(webSocketClasses(i) , "wsEndpoint", "منفذ_مقبس");
+            def params : Array[String] = getModifierParams(webSocketClasses(i) , "wsRoute", "مسار_مقبس");
 
             if (params.getLength() != 1) {
                 System.fail(1 , "where is the endpoint");
@@ -318,7 +318,7 @@
                 ast {
                     Http.setWebSocketHandler(
                         httpContext,
-                        "{{wsEndpointUri}}",
+                        "{{wsRouteUri}}",
                         wsConnectCallback[webSocketClass]~ptr,
                         wsReadyCallback[webSocketClass]~ptr,
                         wsDataCallback[webSocketClass]~ptr,
@@ -327,7 +327,7 @@
                     )
                 },
                 AstTemplateMap()
-                    .set(Srl.String("wsEndpointUri"), Core.Basic.TiStr(params(0)))
+                    .set(Srl.String("wsRouteUri"), Core.Basic.TiStr(params(0)))
                     .set(Srl.String("webSocketClass"), constructElementFullReference(webSocketClasses(i)))
             );
         }
@@ -394,7 +394,7 @@
         }
 
         // Same read/write timeout as request_timeout_ms above, but specifically for
-        // WebSocket connections — set separately because WebSocket connections are
+        // WsClient connections — set separately because WsClient connections are
         // expected to sit idle between messages far longer than a normal HTTP
         // request should take, so they need a more relaxed value. Falls back to
         // request_timeout_ms if unset.
@@ -403,7 +403,7 @@
             options.add("10000");
         }
 
-        // Enables CivetWeb's built-in ping/pong handling for WebSocket
+        // Enables CivetWeb's built-in ping/pong handling for WsClient
         // connections: it auto-replies to client PING frames with PONG
         // and filters PONG frames before they reach our data_handler,
         // so we don't need to implement this ourselves.
@@ -508,8 +508,8 @@
             }
             def i: Int;
             for i = 0, i < modules.getLength(), ++i {
-                generateBeEndpointsCalls(modules(i));
                 generateWebSocketEndpointChecks(modules(i));
+                generateBeEndpointsCalls(modules(i));
             };
         };
 
@@ -559,11 +559,11 @@
         return 1;
     }
 
-    func wsConnectCallback [WsConnClass: type] (connection: ptr[Http.Connection], userData: ptr[Void]): Int {
-        def ws: SrdRef[WsConnClass];
+    func wsConnectCallback [WsRouteClass: type] (connection: ptr[Http.Connection], userData: ptr[Void]): Int {
+        def ws: SrdRef[WsRouteClass];
         ws.alloc()~init();
         ws.connection = connection;
-        ws.status = WsStatus.CONNECTING;
+        ws.status = WsRouteStatus.CONNECTING;
         ws.wkThis = ws;
 
         // we increment counter by one so we don't lose the object even if the user
@@ -571,28 +571,28 @@
         ws.refCounter.count++;
         Http.setUserConnectionData(connection, ws.refCounter~ptr~cast[ptr[RefCounter]]);
 
-        return ws.onConnect(ws.connection);
+        return ws.onConnect();
     }
 
-    func wsReadyCallback [WsConnClass: type] (connection: ptr[Http.Connection], userData: ptr[Void]): Void {
+    func wsReadyCallback [WsRouteClass: type] (connection: ptr[Http.Connection], userData: ptr[Void]): Void {
         def rc: ptr[RefCounter] = Http.getUserConnectionData(connection)~cast[ptr[RefCounter]];
-        def ws: SrdRef[WsConnClass](rc~cnt, rc~cnt.managedObj~cast[ptr[WsConnClass]]~cnt);
-        ws.status = WsStatus.OPENED;
+        def ws: SrdRef[WsRouteClass](rc~cnt, rc~cnt.managedObj~cast[ptr[WsRouteClass]]~cnt);
+        ws.status = WsRouteStatus.OPENED;
         ws.onReady();
     }
 
-    func wsDataCallback [WsConnClass: type] (
+    func wsDataCallback [WsRouteClass: type] (
         connection: ptr[Http.Connection], bits: Int, data: CharsPtr, dataLen: ArchWord, userData: ptr[Void]
     ): Int {
         def rc: ptr[RefCounter] = Http.getUserConnectionData(connection)~cast[ptr[RefCounter]];
-        def ws: SrdRef[WsConnClass](rc~cnt, rc~cnt.managedObj~cast[ptr[WsConnClass]]~cnt);
+        def ws: SrdRef[WsRouteClass](rc~cnt, rc~cnt.managedObj~cast[ptr[WsRouteClass]]~cnt);
         return ws.onFrame(bits, data, dataLen);
     }
 
-    func wsCloseCallback [WsConnClass: type] (connection: ptr[Http.Connection], userData: ptr[Void]): Void {
+    func wsCloseCallback [WsRouteClass: type] (connection: ptr[Http.Connection], userData: ptr[Void]): Void {
         def rc: ptr[RefCounter] = Http.getUserConnectionData(connection)~cast[ptr[RefCounter]];
-        def ws: SrdRef[WsConnClass](rc~cnt, rc~cnt.managedObj~cast[ptr[WsConnClass]]~cnt);
-        ws.status = WsStatus.CLOSED;
+        def ws: SrdRef[WsRouteClass](rc~cnt, rc~cnt.managedObj~cast[ptr[WsRouteClass]]~cnt);
+        ws.status = WsRouteStatus.CLOSED;
         ws.onClose();
 
         // We no longer need this connection object, so decrease the reference counter which was manually

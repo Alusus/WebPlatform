@@ -38,7 +38,6 @@ Apm.importPackage("Alusus/MarkdownTranslator@0.1");
 Apm.importPackage("Alusus/Promises@0.1");
 
 import "WebPlatform/server";
-import "WebPlatform/WsConnection";
 import "WebPlatform/browser_api";
 import "WebPlatform/frontend_helpers";
 import "WebPlatform/Styling/Color";
@@ -94,6 +93,8 @@ import "WebPlatform/EventHandling/event_handlers";
 import "WebPlatform/EventHandling/dom_events";
 import "WebPlatform/EventHandling/dom_event_signals";
 import "WebPlatform/EventHandling/event_loop";
+import "WebPlatform/WebSockets/WsRoute";
+import "WebPlatform/WebSockets/WsClient";
 import "WebPlatform/Drawing";
 import "WebPlatform/Window";
 import "WebPlatform/Storage";
