@@ -111,7 +111,7 @@
         }
 
         handler this.updatePanelPosition() {
-            if this._position.toString() == "left" {
+            if this._position == SlidingPanelPosition.LEFT {
                 this.panelBox.style~use_in(self) {
                     left = Length.pt(0);
                     top = Length.pt(0);
@@ -122,7 +122,7 @@
                     if this._isOpen transform = "translateX(0pt)"
                     else transform = "translateX(-100%)";
                 };
-            } else if this._position.toString() == "right" {
+            } else if this._position == SlidingPanelPosition.RIGHT {
                 this.panelBox.style~use_in(self) {
                     right = Length.pt(0);
                     top = Length.pt(0);
@@ -133,7 +133,7 @@
                     if this._isOpen transform = "translateX(0pt)"
                     else transform = "translateX(100%)";
                 };
-            } else if this._position.toString() == "top" {
+            } else if this._position == SlidingPanelPosition.TOP {
                 this.panelBox.style~use_in(self) {
                     left = Length.pt(0);
                     top = Length.pt(0);
@@ -144,7 +144,7 @@
                     if this._isOpen transform = "translateY(0pt)"
                     else transform = "translateY(-100%)";
                 };
-            } else if this._position.toString() == "bottom" {
+            } else if this._position == SlidingPanelPosition.BOTTOM {
                 this.panelBox.style~use_in(self) {
                     left = Length.pt(0);
                     bottom = Length.pt(0);
