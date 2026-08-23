@@ -63,8 +63,8 @@
         for i = 0, i < elements.getLength(), ++i {
             def uriParams: Array[String] = getModifierParams(elements(i), "uiEndpoint", "منفذ_مرئي");
             if uriParams.getLength() < 1 {
-                // TODO: Raise build notice instead
-                System.fail(1, "Invalid @uiEndpoint params");
+                Spp.buildMgr.raiseBuildNotice("SPPG1023", 1, elements(i));
+                continue;
             }
 
             def titleParams: Array[String] = getModifierParams(elements(i), "title", "عنوان");
@@ -218,8 +218,8 @@
             for i = 0, i < elements.getLength(), ++i {
                 def uriParams: Array[String] = getModifierParams(elements(i), "uiEndpoint", "منفذ_مرئي");
                 if uriParams.getLength() < 1 {
-                    // TODO: Raise build notice instead
-                    System.fail(1, "Invalid @uiEndpoint params");
+                    Spp.buildMgr.raiseBuildNotice("SPPG1023", 1, elements(i));
+                    continue;
                 }
                 def fnName: String = Spp.astMgr.getDefinitionName(elements(i));
                 Spp.astMgr.insertAst(
@@ -238,8 +238,8 @@
         for i = 0, i < elements.getLength(), ++i {
             def endpointParams: Array[String] = getModifierParams(elements(i), "beEndpoint", "منفذ_بياني");
             if endpointParams.getLength() < 2 {
-                // TODO: Raise build notice instead
-                System.fail(1, "Invalid BE endpoint params");
+                Spp.buildMgr.raiseBuildNotice("SPPG1023", 1, elements(i));
+                continue;
             }
             Spp.astMgr.insertAst(
                 ast {
@@ -287,8 +287,8 @@
 
             if !Spp.astMgr.getModifierStringParams(modifier, wsRouteParam)
             or wsRouteParam.getLength() != 1 {
-                // TODO: Raise build notice instead.
-                System.fail(1, "Invalid WS endpoint params");
+                Spp.buildMgr.raiseBuildNotice("SPPG1023", 1, modifier);
+                continue;
             }
             Spp.astMgr.insertAst(
                 ast {
@@ -311,7 +311,8 @@
             def params : Array[String] = getModifierParams(webSocketClasses(i) , "wsRoute", "مسار_مقبس");
 
             if (params.getLength() != 1) {
-                System.fail(1 , "where is the endpoint");
+                Spp.buildMgr.raiseBuildNotice("SPPG1023", 1, webSocketClasses(i));
+                continue;
             }
 
             Spp.astMgr.insertAst(
