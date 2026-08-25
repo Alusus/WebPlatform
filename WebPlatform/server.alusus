@@ -561,23 +561,15 @@
     }
 
     func wsConnectCallback [WsRouteClass: type] (connection: ptr[Http.Connection], userData: ptr[Void]): Int {
-        def ws: SrdRef[WsRouteClass];
-        ws.alloc()~init();
+        def ws: ref[WsRouteClass](newObj[WsRouteClass]);
         ws.connection = connection;
         ws.status = WsRouteStatus.CONNECTING;
-        ws.wkThis = ws;
-
-        // we increment counter by one so we don't lose the object even if the user
-        // does not reference it
-        ws.refCounter.count++;
-        Http.setUserConnectionData(connection, ws.refCounter~ptr~cast[ptr[RefCounter]]);
-
+        Http.setUserConnectionData(connection, ws~ptr);
         return ws.onConnect();
     }
 
     func wsReadyCallback [WsRouteClass: type] (connection: ptr[Http.Connection], userData: ptr[Void]): Void {
-        def rc: ptr[RefCounter] = Http.getUserConnectionData(connection)~cast[ptr[RefCounter]];
-        def ws: SrdRef[WsRouteClass](rc~cnt, rc~cnt.managedObj~cast[ptr[WsRouteClass]]~cnt);
+        def ws: ref[WsRouteClass](Http.getUserConnectionData(connection)~cast[ptr[WsRouteClass]]~cnt);
         ws.status = WsRouteStatus.OPENED;
         ws.onReady();
     }
@@ -585,20 +577,15 @@
     func wsDataCallback [WsRouteClass: type] (
         connection: ptr[Http.Connection], bits: Int, data: CharsPtr, dataLen: ArchWord, userData: ptr[Void]
     ): Int {
-        def rc: ptr[RefCounter] = Http.getUserConnectionData(connection)~cast[ptr[RefCounter]];
-        def ws: SrdRef[WsRouteClass](rc~cnt, rc~cnt.managedObj~cast[ptr[WsRouteClass]]~cnt);
+        def ws: ref[WsRouteClass](Http.getUserConnectionData(connection)~cast[ptr[WsRouteClass]]~cnt);
         return ws.onFrame(bits, data, dataLen);
     }
 
     func wsCloseCallback [WsRouteClass: type] (connection: ptr[Http.Connection], userData: ptr[Void]): Void {
-        def rc: ptr[RefCounter] = Http.getUserConnectionData(connection)~cast[ptr[RefCounter]];
-        def ws: SrdRef[WsRouteClass](rc~cnt, rc~cnt.managedObj~cast[ptr[WsRouteClass]]~cnt);
+        def ws: ref[WsRouteClass](Http.getUserConnectionData(connection)~cast[ptr[WsRouteClass]]~cnt);
         ws.status = WsRouteStatus.CLOSED;
         ws.onClose();
-
-        // We no longer need this connection object, so decrease the reference counter which was manually
-        // incremented before being set on the Http.Connection instance.
-        ws.refCounter.count--;
+        freeObj[ws];
     }
 
     func return404(connection: ptr[Http.Connection], uri: CharsPtr) {

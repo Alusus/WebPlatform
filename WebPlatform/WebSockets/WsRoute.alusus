@@ -27,7 +27,6 @@
     }
 
     class WsRoute {
-        def wkThis: WkRef[this_type];
         def connection: ptr[Http.Connection];
 
         def status: WsRouteStatus;
