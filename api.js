@@ -21,11 +21,13 @@ const STACK_SIZE = 8192;
 const wasmApi = {};
 const eventsQueue = [];
 const resources = {};
+const webSockets = {};
 const requestControllers = {};
 const audioContext = new (window.AudioContext || window.webkitAudioContext)();
 audioContext.resume();
 
 let resourceCounter = 0;
+let webSocketCounter = 0;
 let requestControllerCounter = 0;
 let program;
 let wasmMemory = null;
@@ -435,6 +437,117 @@ wasmApi.setTimeout = (duration, cbId) => {
 wasmApi.cancelTimeout = (id) => {
     clearTimeout(id);
 }
+
+// Web Socket APIs
+
+wasmApi.createWebSocket = (url , protocols , cbId) => {
+    const jsProtocols = toJsString(protocols);
+    let ws;
+    try {
+        ws = jsProtocols ? new WebSocket(toJsString(url), jsProtocols) : new WebSocket(toJsString(url));
+    } catch (err) {
+        console.error('WebSocket construction failed:', err);
+        return 0;
+    }
+    // Alusus has no concept of a JS Blob (wasm can only ever receive raw
+    // bytes/ids, never a live object reference), so binary messages always end
+    // up converted to raw bytes on our side regardless of binaryType. Default
+    // to 'arraybuffer' so that conversion is synchronous instead of paying for
+    // an extra Blob.arrayBuffer() microtask on every binary message; onmessage
+    // below still handles a Blob correctly if something sets it back later.
+    ws.binaryType = 'arraybuffer';
+    
+    const socketId = ++webSocketCounter;
+    webSockets[socketId] = ws;
+
+    ws.onopen = () => {
+        onEvent(cbId, true, 'websocketOpen', {});
+    };
+
+    ws.onmessage = (event) => {
+        if (typeof event.data === 'string') {
+            onEvent(cbId, true, 'websocketMessage', { data: event.data, isBinary: false });
+            return;
+        }
+        const bytes = new Uint8Array(event.data);
+        const destPtr = program.instance.exports.malloc(bytes.length);
+        new Uint8Array(wasmMemory.buffer, destPtr, bytes.length).set(bytes);
+        onEvent(cbId, true, 'websocketMessage', { data: destPtr, dataLen: bytes.length, isBinary: true });
+    };
+
+    ws.onerror = () => {
+        onEvent(cbId, true, 'websocketError', {});
+    };
+
+    ws.onclose = (event) => {
+        onEvent(cbId, false, 'websocketClose', {
+            code: event.code,
+            reason: event.reason,
+            wasClean: event.wasClean
+        });
+    };
+
+    return socketId;
+}
+
+wasmApi.sendWebSocketMessage = (socketId, data) => {
+    const ws = webSockets[socketId];
+    try {
+        ws.send(toJsString(data));
+        return 0;
+    } catch (err) {
+        return toWasmString(err.message);
+    }
+};
+
+wasmApi.sendWebSocketBinary = (socketId, dataPtr, dataLen) => {
+    const ws = webSockets[socketId];
+    try {
+        ws.send(new Uint8Array(wasmMemory.buffer, dataPtr, dataLen));
+        return 0;
+    } catch (err) {
+        return toWasmString(err.message);
+    }
+};
+
+wasmApi.closeWebSocket = (socketId, code, reason) => {
+    const ws = webSockets[socketId];
+    try {
+        ws.close(code, toJsString(reason));
+        return 0;
+    } catch (err) {
+        return toWasmString(err.message);
+    }
+};
+
+wasmApi.getWebSocketState = (socketId) => {
+    const ws = webSockets[socketId];
+    return ws.readyState;
+};
+
+wasmApi.getWebSocketUrl = (socketId) => {
+    const ws = webSockets[socketId];
+    return toWasmString(ws.url);
+};
+
+wasmApi.getWebSocketProtocol = (socketId) => {
+    const ws = webSockets[socketId];
+    return toWasmString(ws.protocol);
+};
+
+wasmApi.getWebSocketExtensions = (socketId) => {
+    const ws = webSockets[socketId];
+    return toWasmString(ws.extensions);
+};
+
+wasmApi.getWebSocketBufferedAmount = (socketId) => {
+    const ws = webSockets[socketId];
+    return ws.bufferedAmount;
+};
+
+wasmApi.deleteWebSocket = (socketId) => {
+    delete webSockets[socketId];
+};
 
 // Resource Management
 
@@ -1095,6 +1208,10 @@ const eventPropMap = {
     loadAudio: ['resourceId', 'success'],
     loadJsScript: ['success'],
     sendRequest: ['status', 'headers', 'body'],
+    websocketOpen: [],
+    websocketMessage: ['data', 'dataLen', 'isBinary'],
+    websocketError: [],
+    websocketClose: ['code', 'reason', 'wasClean'],
     timer: [],
     touchstart: pickNeededTouchEventData,
     touchend: pickNeededTouchEventData,

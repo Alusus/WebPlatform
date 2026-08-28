@@ -18,21 +18,13 @@
  */
 
 @merge module WebPlatform {
-    macro setupStringEnum {
-        def val: String;
-        handler this~init() { }
-        handler this~init(v: CharsPtr) { this.val = String(1, v); }
-        handler this~init(v: ref[this_type]) { this.val = v.val; }
-        handler this = ref[this_type] { this.val = value.val; }
+    macro setupStyleStringEnum {
+        setupStringEnum[];
         handler this.toString(): String { return this.val; }
     }
 
-    macro enumStringValue[name, val] {
-        @shared def name: this_type(val);
-    }
-
     class Position {
-        setupStringEnum[];
+        setupStyleStringEnum[];
         enumStringValue[STATIC, "static"];
         enumStringValue[RELATIVE, "relative"];
         enumStringValue[FIXED, "fixed"];
@@ -41,7 +33,7 @@
     }
 
     class Overflow {
-        setupStringEnum[];
+        setupStyleStringEnum[];
         enumStringValue[VISIBLE, "visible"];
         enumStringValue[HIDDEN, "hidden"];
         enumStringValue[CLIP, "clip"];
@@ -50,13 +42,13 @@
     }
 
     class TextOverflow {
-        setupStringEnum[];
+        setupStyleStringEnum[];
         enumStringValue[CLIP, "clip"];
         enumStringValue[ELLIPSIS, "ellipsis"];
     }
 
     class Display {
-        setupStringEnum[];
+        setupStyleStringEnum[];
         enumStringValue[INLINE, "inline"];
         enumStringValue[BLOCK, "block"];
         enumStringValue[INLINE_BLOCK, "inline-block"];
@@ -66,7 +58,7 @@
     }
 
     class Layout {
-        setupStringEnum[];
+        setupStyleStringEnum[];
         enumStringValue[ROW, "row"];
         enumStringValue[ROW_REVERSE, "row-reverse"];
         enumStringValue[COLUMN, "column"];
@@ -74,14 +66,14 @@
     }
 
     class FlexWrap {
-        setupStringEnum[];
+        setupStyleStringEnum[];
         enumStringValue[NOWRAP, "nowrap"];
         enumStringValue[WRAP, "wrap"];
         enumStringValue[WRAP_REVERSE, "wrap-reverse"];
     }
 
     class Align {
-        setupStringEnum[];
+        setupStyleStringEnum[];
         enumStringValue[START, "start"];
         enumStringValue[CENTER, "center"];
         enumStringValue[END, "end"];
@@ -89,7 +81,7 @@
     }
 
     class Justify {
-        setupStringEnum[];
+        setupStyleStringEnum[];
         enumStringValue[START, "start"];
         enumStringValue[CENTER, "center"];
         enumStringValue[END, "end"];
@@ -100,7 +92,7 @@
     }
 
     class Cursor {
-        setupStringEnum[];
+        setupStyleStringEnum[];
         enumStringValue[AUTO, "auto"];
         enumStringValue[DEFAULT, "default"];
         enumStringValue[HELP, "help"];
@@ -122,7 +114,7 @@
     }
 
     class BorderStyle {
-        setupStringEnum[];
+        setupStyleStringEnum[];
         enumStringValue[DOTTED, "dotted"];
         enumStringValue[DASHED, "dashed"];
         enumStringValue[SOLID, "solid"];
@@ -134,7 +126,7 @@
     }
 
     class WordBreak {
-        setupStringEnum[];
+        setupStyleStringEnum[];
         enumStringValue[NORMAL, "normal"];
         enumStringValue[BREAK_ALL, "break-all"];
         enumStringValue[KEEP_ALL, "keep-all"];
@@ -142,7 +134,7 @@
     }
 
     class WhiteSpace {
-        setupStringEnum[];
+        setupStyleStringEnum[];
         enumStringValue[NORMAL, "normal"];
         enumStringValue[PRE, "pre"];
         enumStringValue[PRE_WRAP, "pre-wrap"];
@@ -150,13 +142,13 @@
     }
 
     class Direction {
-        setupStringEnum[];
+        setupStyleStringEnum[];
         enumStringValue[LTR, "ltr"];
         enumStringValue[RTL, "rtl"];
     }
 
     class TextDecoration {
-        setupStringEnum[];
+        setupStyleStringEnum[];
         enumStringValue[NONE, "none"];
         enumStringValue[UNDERLINE, "underline"];
         enumStringValue[OVERLINE, "overline"];
@@ -164,7 +156,7 @@
     }
 
     class TextDecorationStyle {
-        setupStringEnum[];
+        setupStyleStringEnum[];
         enumStringValue[SOLID, "solid"];
         enumStringValue[DOUBLE, "double"];
         enumStringValue[DOTTED, "dotted"];
@@ -173,7 +165,7 @@
     }
 
     class TextAlign {
-        setupStringEnum[];
+        setupStyleStringEnum[];
         enumStringValue[LEFT, "left"];
         enumStringValue[RIGHT, "right"];
         enumStringValue[CENTER, "center"];
@@ -186,14 +178,14 @@
     }
 
     class Floating {
-        setupStringEnum[];
+        setupStyleStringEnum[];
         enumStringValue[NONE, "none"];
         enumStringValue[LEFT, "left"];
         enumStringValue[RIGHT, "right"];
     }
 
     class BackgroundPosition {
-        setupStringEnum[];
+        setupStyleStringEnum[];
         enumStringValue[CENTER, "center"];
         enumStringValue[LEFT, "left"];
         enumStringValue[RIGHT, "right"];
@@ -202,13 +194,13 @@
     }
 
     class BackgroundSize {
-        setupStringEnum[];
+        setupStyleStringEnum[];
         enumStringValue[CONTAIN, "contain"];
         enumStringValue[COVER, "cover"];
     }
 
     class ScalingAlgorithm {
-        setupStringEnum[];
+        setupStyleStringEnum[];
         enumStringValue[AUTO, "auto"];
         enumStringValue[SMOOTH, "smooth"];
         enumStringValue[HIGH_QUALITY, "high-quality"];

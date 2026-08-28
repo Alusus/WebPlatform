@@ -1,0 +1,336 @@
+import "Srl/Math";
+import "Apm";
+Apm.importPackage("Alusus/WebPlatform@0.9");
+use Srl;
+use WebPlatform;
+
+module Backend {
+    def slotA: ptr[WsRoute](0);
+    def slotB: ptr[WsRoute](0);
+
+    @wsRoute["/chat"]
+    class ChatSocket {
+        @injection def wsRoute: WsRoute;
+
+        handler (this: WsRoute).onReady() set_ptr {
+            if slotA == 0 {
+                slotA = this~ptr;
+            } else if slotB == 0 {
+                slotB = this~ptr;
+                (slotA~cnt).sendText("A new participant has joined the chat.");
+            } else {
+                this.close(4000, "chat room is full (2 max)");
+            }
+        }
+
+        handler (this: WsRoute).onData(data: ref[Array[Char]], isBinary: Bool) set_ptr {
+            if isBinary return;
+            if this~ptr != slotA and this~ptr != slotB return;
+            def other: ptr[WsRoute];
+            if this~ptr == slotA {
+                other = slotB;
+            } else {
+                other = slotA;
+            }
+            if other != 0 {
+                (other~cnt).sendText(data.buf~ptr);
+            }
+        }
+
+        handler (this: WsRoute).onClose() : Void set_ptr {
+            if this~ptr == slotA slotA = 0;
+            if this~ptr == slotB slotB = 0;
+        }
+    }
+
+    @assetsRoute["/assets/"] def assetsRoute: "Assets/";
+}
+
+module Frontend {
+    def PRIMARY_COLOR: Color("8e50ef");
+    def LIGHT_COLOR: Color("c380ff");
+
+    class Header {
+        @injection def component: Component;
+
+        handler this~init() {
+            this.view = Box({}).{
+                style.{
+                    width = Length.percent(100) - Length.pt(3);
+                    height = Length.pt(60);
+                    padding = Length4.pt(4, 0, 0, 0);
+                    background = Background(PRIMARY_COLOR);
+                    borderWidth = Length4.pt(1.5);
+                    borderStyle = BorderStyle.SOLID;
+                    borderColor = PRIMARY_COLOR;
+                    display = Display.FLEX;
+                    layout = Layout.ROW;
+                    justify = Justify.SPACE_BETWEEN;
+                    align = Align.CENTER;
+                };
+                addChildren({
+                    Text(String("Alusus Web Platform Examples - WS Chat")).{ style.{
+                        fontColor = Color("fff");
+                        fontSize = Length.pt(18.0);
+                        padding = Length4.pt(0, 10);
+                    } },
+                    Image().{
+                        url = String("/assets/wblogo.svg");
+                        style.{
+                            height = Length.pt(50);
+                            padding = Length4.pt(0, 10);
+                        };
+                    }
+                });
+            };
+        }
+
+        handler this_type(): SrdRef[Header] {
+            return SrdRef[Header].construct();
+        }
+    }
+
+    class MessageEntry {
+        @injection def component: Component;
+
+        def onSend: closure (String);
+        def textInput: SrdRef[TextInput];
+
+        handler this.width = SrdRef[Length] {
+            this.view.style.width = value;
+            return value;
+        }
+
+        handler this.height = SrdRef[Length] {
+            this.view.style.height = value;
+            return value;
+        }
+
+        handler this~init() {
+            def self: ref[this_type](this);
+
+            this.view = Box({}).{
+                style.{
+                    display = Display.FLEX;
+                    layout = Layout.ROW;
+                    justify = Justify.SPACE_BETWEEN;
+                    borderWidth = Length4.pt(1.5);
+                    borderStyle = BorderStyle.SOLID;
+                    borderColor = PRIMARY_COLOR;
+                    background = Background(PRIMARY_COLOR);
+                };
+                addChildren({
+                    TextInput().{
+                        self.textInput = this;
+                        style.{
+                            width = Length.percent(100);
+                            height = Length.percent(100);
+                            background = Background(Color("fff"));
+                            fontSize = Length.pt(12.0);
+                        };
+                        onKeyUp.connect(closure (widget: ref[TextInput], payload: ref[String]) {
+                            if payload == "Enter" {
+                                def newData: String = widget.getText().trim();
+                                if newData.getLength() == 0 return;
+                                widget.setText(String());
+                                if not self.onSend.isNull() self.onSend(newData);
+                            }
+                        });
+                    },
+                    Button(String("Send")).{
+                        style.{
+                            height = Length.percent(100);
+                            width = Length.pt(50);
+                            setRaw[background](String("lightblue"));
+                            fontSize = Length.pt(16.0);
+                            justify = Justify.CENTER;
+                        };
+                        onClick.connect(closure (widget: ref[Widget], payload: ref[Int]) {
+                            def newData: String = self.textInput.getText().trim();
+                            if newData.getLength() == 0 return;
+                            self.textInput.setText(String());
+                            if not self.onSend.isNull() self.onSend(newData);
+                        });
+                    }
+                });
+            };
+        }
+
+        handler this_type(): SrdRef[MessageEntry] {
+            return SrdRef[MessageEntry].construct();
+        }
+    }
+
+    //==============================================================================
+    // Frontend Pages
+
+    @uiEndpoint["/"]
+    @title["WebPlatform Example - WS Chat"]
+    func chatPage {
+        Window.instance.style.{
+            padding = Length4.pt(0);
+            margin = Length4.pt(0);
+        };
+
+        def statusText: SrdRef[Text];
+        def logBox: SrdRef[Box];
+        def msgEntry: SrdRef[MessageEntry];
+
+        Window.instance.setView(Box({}).{
+            style.{
+                height = Length.percent(100);
+                justify = Justify.SPACE_BETWEEN;
+                display = Display.FLEX;
+                layout = Layout.COLUMN;
+            };
+            addChildren({
+                Header(),
+                Box({}).{
+                    style.{
+                        width = Length.percent(100) - Length.pt(10);
+                        padding = Length4.pt(5);
+                        display = Display.FLEX;
+                        layout = Layout.COLUMN;
+                        flex = Flex(1);
+                    };
+                    addChildren({
+                        Text(String("connecting...")).{
+                            statusText = this;
+                            style.{
+                                width = Length.percent(100);
+                                height = Length.pt(20);
+                                fontColor = Color(200, 50, 50);
+                                fontSize = Length.pt(10.0);
+                            };
+                        },
+                        Box({}).{
+                            logBox = this;
+                            style.{
+                                width = Length.percent(100);
+                                height = Length.percent(100);
+                                display = Display.FLEX;
+                                layout = Layout.COLUMN;
+                                overflowY = Overflow.SCROLL;
+                            };
+                        }
+                    });
+                },
+                MessageEntry().{
+                    msgEntry = this;
+                    width = Length.percent(100) - Length.pt(3);
+                    height = Length.pt(50);
+                }
+            })
+        });
+
+        def addMessage: closure (text: String, mine: Bool) = closure (text: String, mine: Bool) {
+            def rowJustify: Justify;
+            def bubbleColor: Color;
+            def textColor: Color;
+            if mine {
+                rowJustify = Justify.START;
+                bubbleColor = LIGHT_COLOR;
+                textColor = Color("fff");
+            } else {
+                rowJustify = Justify.END;
+                bubbleColor = Color("e5e5e5");
+                textColor = Color("000");
+            }
+            logBox.addChildren({
+                Box({}).{
+                    style.{
+                        width = Length.percent(100);
+                        display = Display.FLEX;
+                        layout = Layout.ROW;
+                        justify = rowJustify;
+                    };
+                    addChildren({
+                        Text(text).{
+                            style.{
+                                background = Background(bubbleColor);
+                                fontColor = textColor;
+                                padding = Length4.pt(6, 10);
+                                margin = Length4.pt(8);
+                                borderRadius = Length4.pt(10);
+                                maxWidth = Length.percent(70);
+                            };
+                        }
+                    });
+                }
+            });
+        };
+
+        // Implement WebSockets-based communication with automatic reconnection. Re-connection
+        // attempts use incremental delays.
+
+        // Reconnect tuning: exponential backoff capped at maxReconnectDelayMs,
+        // with a random jitter so multiple tabs/clients don't all retry in lockstep
+        // right when the server comes back up.
+        def baseReconnectDelayMs: Word(500);
+        def maxReconnectDelayMs: Word(15000);
+        def reconnectJitterMs: Word(500);
+
+        def reconnectAttempt: Int(0);
+        def connectWs: closure();
+        def scheduleReconnect: closure();
+
+        def ws: WsClient;
+        ws.openCallback = closure () {
+            reconnectAttempt = 0;
+            statusText.setText(String("status: connected"));
+        };
+        ws.messageCallback = closure (info: ref[WsMessageInfo]) {
+            addMessage(info.strData, false);
+        };
+        ws.closeCallback = closure (scheduleReconnect: by_ref)&(info: ref[WsCloseInfo]) {
+            if info.wasClean {
+                // Server (or we) closed the connection deliberately - don't retry.
+                statusText.setText(String("status: disconnected - ") + info.reason);
+                return;
+            }
+            // Abnormal closure (e.g. server restart) - retry with backoff.
+            statusText.setText(String("status: connection lost, reconnecting..."));
+            scheduleReconnect();
+        };
+
+        connectWs = closure (ws: by_ref, scheduleReconnect: by_ref)&() {
+            if not ws.connect("ws://localhost:8070/chat") {
+                statusText.setText(String("status: connection failed, retrying..."));
+                scheduleReconnect();
+            }
+        };
+
+        scheduleReconnect = closure() {
+            def delay: Word = baseReconnectDelayMs;
+            def i: Int = 0;
+            while i < reconnectAttempt {
+                if delay >= maxReconnectDelayMs {
+                    delay = maxReconnectDelayMs;
+                    break;
+                }
+                delay *= 2;
+                i += 1;
+            }
+            delay += Math.random()~cast[Word] % reconnectJitterMs;
+            reconnectAttempt += 1;
+            setTimeout(delay, closure (json: Json) {
+                connectWs();
+            });
+        };
+
+        connectWs();
+
+        msgEntry.onSend = closure (ws: by_ref)&(newData: String) {
+            if not ws.connected return;
+            ws.sendText(newData.buf);
+            addMessage(newData, true);
+        };
+
+        runEventLoop();
+    }
+}
+
+def serverModules: { Backend, Frontend };
+
+Console.print("Starting ws_chat on port 8070...\nURL: http://localhost:8070/\n");
+buildAndRunServer[serverModules](Array[CharsPtr]({ "listening_ports", "8070" }));
