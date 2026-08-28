@@ -1,6 +1,6 @@
 # WebPlatform
 
-[[عربي]](web_sockets.ar.md)
+[[عربي]](websockets.ar.md)
 
 [[Back]](../README.md)
 

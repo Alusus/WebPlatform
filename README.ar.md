@@ -42,6 +42,7 @@ Apm.importPackage("Alusus/WebPlatform@0.9");
 * [[نـداء_آمن (SafeRequest)]](Doc/saferequest.ar.md)
 * [[مـؤقت_متكرر_آمن (SafeTimer)]](Doc/safetimer.ar.md)
 * [[مـؤقت_آمن (SafeTimeout)]](Doc/safetimeout.ar.md)
+* [[مقابس الويب]](Doc/websockets.ar.md)
 * [[دالات والمتغيرات جافاسكريبت]](Doc/js_funcs.ar.md)
 * أمثلة
   * [[تطبيق دردشة]](Doc/chat_example.ar.md)

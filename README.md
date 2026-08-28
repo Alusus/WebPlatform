@@ -33,6 +33,7 @@ Apm.importPackage("Alusus/WebPlatform@0.9");
 * [[SafeRequest]](Doc/saferequest.en.md)
 * [[SafeTimer]](Doc/safetimer.en.md)
 * [[SafeTimeout]](Doc/safetimeout.en.md)
+* [[WebSockets]](Doc/websockets.en.md)
 * [[Javascript Functions and Variables]](Doc/js_funcs.en.md)
 * Examples
   * [[Chat Application]](Doc/chat_example.en.md)
