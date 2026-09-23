@@ -1201,6 +1201,7 @@ const eventPropMap = {
     keyup: ['code', 'shiftKey', 'ctrlKey', 'altKey'],
     keypress: ['code', 'shiftKey', 'ctrlKey', 'altKey'],
     change: [],
+    input: [],
     click: [],
     createImageResourceFromCanvasResource: ['resourceId', 'success'],
     loadImage: ['resourceId', 'success'],

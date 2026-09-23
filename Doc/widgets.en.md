@@ -474,6 +474,16 @@ def onChanged: DomEventSignal[Input, Int];
 
 Gets fired when the entered value changes.
 
+##### onInput
+
+```
+def onInput: DomEventSignal[Input, Int];
+```
+
+Gets fired on every value change, including typing, pasting, and dropped text, right after the value has been
+updated. Unlike `onChanged`, which only fires once the value is committed (on blur), this is the earliest point
+at which a listener can read what was just entered.
+
 ##### onKeyPress
 
 ```
