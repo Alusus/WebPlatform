@@ -373,6 +373,19 @@ Returns the date as a string.
 * `type`: The requested format for the returned string. It can be `iso`, `local_iso`, `locale`, or an empty string.
 * `timestamp`: The timestamp for which we want the date string. If this is -1 the current timestamp will be used.
 
+### parseDate
+
+```
+function parseDate(dateStr: CharsPtr): Int[64];
+```
+
+Parses a date/time string, such as one produced by `getDate`, into a timestamp in milliseconds.
+The reverse of `getDate`.
+
+* `dateStr`: The string to parse. Any format the browser's `Date.parse` accepts is supported, including RFC 3339.
+
+Returns -1 if the string can't be parsed.
+
 ### exitPointerLock
 
 ```
