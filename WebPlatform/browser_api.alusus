@@ -136,6 +136,7 @@
     // Misc
     @expname[getTimestamp] function getTimestamp (): Int[64];
     @expname[getDate] function getDate (type: ptr[array[Char]], timestamp: Int[64]): ptr[array[Char]];
+    @expname[parseDate] function parseDate (dateStr: ptr[Char]): Int[64];
     @expname[requestPointerLock] function requestPointerLock (elementName: ptr[Char]);
     @expname[exitPointerLock] function exitPointerLock();
     @expname[requestFullScreen] function requestFullScreen (elementName: ptr[Char]);
