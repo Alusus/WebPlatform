@@ -66,6 +66,7 @@
 
     عرف هات_الختم_الزمني: لقب getTimestamp؛
     عرف هات_التاريخ: لقب getDate؛
+    عرف اقرأ_التاريخ: لقب parseDate؛
     عرف ألغ_احتكار_المؤشر: لقب exitPointerLock؛
     عرف ألغ_ملء_الشاشة: لقب exitFullScreen؛
     عرف التمس_يقظة_الشاشة: لقب requestWakeLock؛
