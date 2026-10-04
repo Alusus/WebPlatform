@@ -57,6 +57,8 @@
 
         def onChanged: DomEventSignal[Input, Int];
         def onChangedId: ArchInt = -1;
+        def onInput: DomEventSignal[Input, Int];
+        def onInputId: ArchInt = -1;
         def onKeyPress: DomEventSignal[Input, String];
         def onKeyPressId: ArchInt = -1;
         def onKeyUp: DomEventSignal[Input, String];
@@ -82,6 +84,15 @@
             this.onChanged.onConnectionsChanged = closure (connectionCount: Int) {
                 handleSignalConnectionChanged[this.id, onChanged, "change", {
                     this.onChanged.emit(this, Int(0));
+                }];
+            };
+
+            // Unlike onChanged (fired on blur, via the DOM "change" event), onInput fires on every value change,
+            // including typing, pasting and dropped text, right after the browser has updated the element's value.
+            // It's the earliest point at which a listener can read (and correct) what the user just entered.
+            this.onInput.onConnectionsChanged = closure (connectionCount: Int) {
+                handleSignalConnectionChanged[this.id, onInput, "input", {
+                    this.onInput.emit(this, Int(0));
                 }];
             };
 
@@ -118,6 +129,7 @@
             this.buildCommon();
             this.update();
             this.onChanged.onConnectionsChanged(this.onChanged.getConnectionCount());
+            this.onInput.onConnectionsChanged(this.onInput.getConnectionCount());
             this.onKeyPress.onConnectionsChanged(this.onKeyPress.getConnectionCount());
             this.onKeyUp.onConnectionsChanged(this.onKeyUp.getConnectionCount());
         }
@@ -125,6 +137,9 @@
         handler (this:Widget).unbuild() set_ptr {
             if this.onChangedId != -1 unregisterElementEventHandler(this.onChangedId);
             this.onChangedId = -1;
+
+            if this.onInputId != -1 unregisterElementEventHandler(this.onInputId);
+            this.onInputId = -1;
 
             if this.onKeyPressId != -1 unregisterElementEventHandler(this.onKeyPressId);
             this.onKeyPressId = -1;
