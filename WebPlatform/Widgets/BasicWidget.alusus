@@ -26,7 +26,7 @@
 
         handler this~init() {
             this.onResizeObj.onConnectionsChanged = closure (connectionCount: Int) {
-                if connectionCount > 0 and this.onResizeId == -1 and this.id != "" {
+                if connectionCount > 0 and this.onResizeId == -1 and this.id != DomHandle.NONE {
                     this.onResizeId = observeResize(
                         this.id,
                         closure (json: Json) {
@@ -137,11 +137,11 @@
         // Abstract Functions
 
         // id
-        def _id: String;
-        handler (this: Widget).id: String set_ptr {
+        def _id: ArchInt = DomHandle.NONE;
+        handler (this: Widget).id: ArchInt set_ptr {
             return this._id;
         }
-        handler this.id = String {
+        handler this.id = ArchInt {
             this._id = value;
             return this._id;
         }
@@ -155,9 +155,9 @@
             if this._style.isNull() {
                 this._style = StyleSet();
                 this._style.enableInline(closure(css: String) {
-                    if this.id != "" setElementAttribute(this.id, "style", css);
+                    if this.id != DomHandle.NONE setElementAttribute(this.id, "style", css);
                 });
-                if this.id != "" {
+                if this.id != DomHandle.NONE {
                     this._style.build();
                     this.updateCommon();
                 }
@@ -165,11 +165,11 @@
             return this._style;
         }
         handler (this: Widget).style = SrdRef[StyleSet] set_ptr {
-            if this.id != "" and not this._style.isNull() {
+            if this.id != DomHandle.NONE and not this._style.isNull() {
                 this._style.unbuild();
             }
             this._style = value;
-            if this.id != "" and not this._style.isNull() {
+            if this.id != DomHandle.NONE and not this._style.isNull() {
                 this._style.build();
             }
             this.updateCommon();
@@ -282,8 +282,8 @@
         }
 
         handler this.updateCommon() {
-            if this.id != "" {
-                if this._style.isNull() setElementAttribute(this.id, "class", this.className)
+            if this.id != DomHandle.NONE {
+                if this._style.isNull() or this._style.isInlined() setElementAttribute(this.id, "class", this.className)
                 else setElementAttribute(this.id, "class", this.className + " " + this._style.id);
                 setElementAttribute(this.id, "title", this.hint);
             }

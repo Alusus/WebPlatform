@@ -48,29 +48,86 @@ const resizeObserver = new ResizeObserver(entries => {
     }
 });
 
+// DOM Handle Table
+// DOM objects are handed to the wasm side as indexes within `domTable`, which is a
+// `WebAssembly.Table` of external references. The wasm side never sees the objects themselves, it
+// only keeps the index it received when the element was created and passes it back on every call
+// that manipulates that element. The first few indexes are reserved for the objects that already
+// exist when the program starts and are therefore never allocated nor released.
+
+const DOM_HANDLE_NONE = 0;
+const DOM_HANDLE_WINDOW = 1;
+const DOM_HANDLE_DOCUMENT = 2;
+const DOM_HANDLE_BODY = 3;
+const DOM_HANDLE_HEAD = 4;
+const DOM_HANDLE_PARENT_WINDOW = 5;
+const DOM_HANDLE_RESERVED_COUNT = 6;
+const DOM_TABLE_INITIAL_SIZE = 256;
+
+const domTable = new WebAssembly.Table({ initial: DOM_TABLE_INITIAL_SIZE, element: 'externref' });
+const freeDomHandles = [];
+let domHandleCounter = DOM_HANDLE_RESERVED_COUNT;
+
+function initDomTable() {
+    domTable.set(DOM_HANDLE_NONE, null);
+    domTable.set(DOM_HANDLE_WINDOW, window);
+    domTable.set(DOM_HANDLE_DOCUMENT, document);
+    domTable.set(DOM_HANDLE_BODY, document.body);
+    domTable.set(DOM_HANDLE_HEAD, document.head);
+    domTable.set(DOM_HANDLE_PARENT_WINDOW, window.parent);
+}
+
+function getDomObject(handle) {
+    if (!handle || handle >= domTable.length) return null;
+    return domTable.get(handle);
+}
+
+function allocDomHandle(obj) {
+    let handle;
+    if (freeDomHandles.length > 0) {
+        handle = freeDomHandles.pop();
+    } else {
+        handle = domHandleCounter++;
+        if (handle >= domTable.length) domTable.grow(domTable.length);
+    }
+    domTable.set(handle, obj);
+    return handle;
+}
+
+function releaseDomHandle(handle) {
+    if (!handle || handle < DOM_HANDLE_RESERVED_COUNT || handle >= domTable.length) return;
+    if (domTable.get(handle) === null) return;
+    domTable.set(handle, null);
+    freeDomHandles.push(handle);
+}
+
 // Element Management APIs
 
-wasmApi.createElement = (elementType, elementName, parentName, nextSiblingName) => {
-    const parent = document.getElementById(toJsString(parentName));
+wasmApi.createElement = (elementType, parentHandle, nextSiblingHandle) => {
+    const parent = getDomObject(parentHandle);
+    if (!parent) return DOM_HANDLE_NONE;
     const element = document.createElement(toJsString(elementType));
-    if (nextSiblingName === 0) {
-      parent.appendChild(element);
-    } else {
-      const nextSibling = document.getElementById(toJsString(nextSiblingName));
-      parent.insertBefore(element, nextSibling);
-    }
-    element.setAttribute('id', toJsString(elementName));
+    const handle = allocDomHandle(element);
+    // The id attribute isn't used to reach the element anymore, but it's still assigned so that
+    // attributes referencing other elements (`for`, `aria-labelledby`, ...) remain usable.
+    // TODO: Set the ID manually from the WASM side when needed.
+    //element.setAttribute('id', `wp${handle}`);
+    const nextSibling = getDomObject(nextSiblingHandle);
+    if (nextSibling) parent.insertBefore(element, nextSibling);
+    else parent.appendChild(element);
+    return handle;
 }
 
-wasmApi.deleteElement = (elementName) => {
-    const element = document.getElementById(toJsString(elementName));
+wasmApi.deleteElement = (elementHandle) => {
+    const element = getDomObject(elementHandle);
+    releaseDomHandle(elementHandle);
     if (!element) return;
     if (element.dataset.resizeObserverCbId) resizeObserver.unobserve(element);
-    if (element) element.remove();
+    element.remove();
 }
 
-wasmApi.setStyleRule = (elementName, styleSelector, styleCss) => {
-    const element = document.getElementById(toJsString(elementName));
+wasmApi.setStyleRule = (elementHandle, styleSelector, styleCss) => {
+    const element = getDomObject(elementHandle);
     if (!element || !element.sheet) return;
     const selectorText = toJsString(styleSelector);
     const cssText = toJsString(styleCss);
@@ -83,8 +140,8 @@ wasmApi.setStyleRule = (elementName, styleSelector, styleCss) => {
     element.sheet.insertRule(`${selectorText} { ${cssText} }`);
 }
 
-wasmApi.removeStyleRule = (elementName, styleSelector) => {
-    const element = document.getElementById(toJsString(elementName));
+wasmApi.removeStyleRule = (elementHandle, styleSelector) => {
+    const element = getDomObject(elementHandle);
     if (!element || !element.sheet) return;
     const selectorText = toJsString(styleSelector);
     for (var i = 0; i < element.sheet.rules.length; ++i) {
@@ -97,37 +154,57 @@ wasmApi.removeStyleRule = (elementName, styleSelector) => {
 
 const nonAttributeProps = ['innerHTML', 'value', 'innerText', 'textContent', 'checked'];
 
-wasmApi.setElementAttribute = (elementName, propName, value) => {
-    const prop = toJsString(propName);
-    if (nonAttributeProps.includes(prop)) {
-        document.getElementById(toJsString(elementName))[prop] = toJsString(value);
+wasmApi.setElementAttribute = (elementHandle, propName, value) => {
+    const element = getDomObject(elementHandle);
+    if (!element) return;
+    const jsPropName = toJsString(propName);
+    const jsValue = toJsString(value);
+    if (nonAttributeProps.includes(jsPropName)) {
+        element[jsPropName] = jsValue;
     } else {
-        document.getElementById(toJsString(elementName)).setAttribute(prop, toJsString(value));
+        if (jsValue == "") {
+          element.removeAttribute(jsPropName);
+        } else {
+          element.setAttribute(jsPropName, jsValue);
+        }
     }
 }
 
-wasmApi.getElementAttribute = (elementName, propName) => {
+wasmApi.getElementAttribute = (elementHandle, propName) => {
+    const element = getDomObject(elementHandle);
+    if (!element) return 0;
     const prop = toJsString(propName);
     let result;
-    if (nonAttributeProps.includes(prop)) result = document.getElementById(toJsString(elementName))[prop];
-    else result = document.getElementById(toJsString(elementName)).getAttribute(prop);
+    if (nonAttributeProps.includes(prop)) result = element[prop];
+    else result = element.getAttribute(prop);
     return toWasmString(result);
 }
 
-wasmApi.removeElementAttribute = (elementName, propName) => {
-    document.getElementById(toJsString(elementName)).removeAttribute(toJsString(propName));
+wasmApi.removeElementAttribute = (elementHandle, propName) => {
+    const element = getDomObject(elementHandle);
+    if (!element) return;
+    element.removeAttribute(toJsString(propName));
 }
 
-wasmApi.getElementDimensions = (elementName, pResult) => {
-    const element = document.getElementById(toJsString(elementName));
+wasmApi.getElementDimensions = (elementHandle, pResult) => {
+    const element = getDomObject(elementHandle);
     const resultArray = new Int32Array(wasmMemory.buffer, pResult, 2);
+    if (!element) {
+        resultArray[0] = 0;
+        resultArray[1] = 0;
+        return;
+    }
     resultArray[0] = element.clientWidth;
     resultArray[1] = element.clientHeight;
 }
 
-wasmApi.getElementBoundingRect = (elementName, pResult) => {
-    const element = document.getElementById(toJsString(elementName));
+wasmApi.getElementBoundingRect = (elementHandle, pResult) => {
+    const element = getDomObject(elementHandle);
     const resultArray = new Int32Array(wasmMemory.buffer, pResult, 4);
+    if (!element) {
+        resultArray.fill(0);
+        return;
+    }
     const rect = element.getBoundingClientRect();
     resultArray[0] = rect.x;
     resultArray[1] = rect.y;
@@ -137,18 +214,19 @@ wasmApi.getElementBoundingRect = (elementName, pResult) => {
 
 // Element Interaction
 
-wasmApi.selectItem = (elementName, value) => {
-    document.getElementById(toJsString(elementName)).value = toJsString(value);
+wasmApi.selectItem = (elementHandle, value) => {
+    const element = getDomObject(elementHandle);
+    if (element) element.value = toJsString(value);
 }
 
-wasmApi.getSelectedItemValue = (selectId) => {
-    var select = document.getElementById(toJsString(selectId));
-    var value = select.options[select.selectedIndex].value;
-    return toWasmString(value);
+wasmApi.getSelectedItemValue = (elementHandle) => {
+    const select = getDomObject(elementHandle);
+    if (!select || select.selectedIndex < 0) return 0;
+    return toWasmString(select.options[select.selectedIndex].value);
 }
 
-wasmApi.scrollElementIntoView = (elementName) => {
-    const element = document.getElementById(toJsString(elementName));
+wasmApi.scrollElementIntoView = (elementHandle) => {
+    const element = getDomObject(elementHandle);
     if (element) element.scrollIntoView();
 }
 
@@ -161,71 +239,42 @@ wasmApi.fetchNextEvent = () => {
     return toWasmString(JSON.stringify(result));
 }
 
-wasmApi.registerElementEventHandler = (elementName, eventName, preventDefault, cbId) => {
-    const jsElementName = toJsString(elementName);
+wasmApi.registerElementEventHandler = (elementHandle, eventName, preventDefault, cbId) => {
+    const element = getDomObject(elementHandle);
+    if (!element) return;
     const jsEventName = toJsString(eventName);
-    if (jsElementName === 'window') {
-        window[`on${jsEventName}`] = (event) => {
-            if (preventDefault) event.preventDefault();
-            onEvent(cbId, true, jsEventName, event);
-        };
-    } else if (jsElementName === 'document') {
-        document[`on${jsEventName}`] = (event) => {
-            if (preventDefault) event.preventDefault();
-            onEvent(cbId, true, jsEventName, event);
-        };
-    } else {
-        document.getElementById(jsElementName)[`on${jsEventName}`] = (event) => {
-            if (preventDefault) event.preventDefault();
-            onEvent(cbId, true, jsEventName, event);
-        };
-    }
+    element[`on${jsEventName}`] = (event) => {
+        if (preventDefault) event.preventDefault();
+        onEvent(cbId, true, jsEventName, event);
+    };
 }
 
-wasmApi.registerElementKeyEventHandler = (elementName, eventName, keysToSwallow, cbId) => {
+wasmApi.registerElementKeyEventHandler = (elementHandle, eventName, keysToSwallow, cbId) => {
+    const element = getDomObject(elementHandle);
+    if (!element) return;
     const toSwallow = toJsString(keysToSwallow).split(',');
-    const jsElementName = toJsString(elementName);
     const jsEventName = toJsString(eventName);
-    if (jsElementName === 'window') {
-        window[`on${jsEventName}`] = (event) => {
-            if (toSwallow.includes(event.code)) event.preventDefault();
-            onEvent(cbId, true, jsEventName, event);
-        };
-    } else if (jsElementName === 'document') {
-        document[`on${jsEventName}`] = (event) => {
-            if (toSwallow.includes(event.code)) event.preventDefault();
-            onEvent(cbId, true, jsEventName, event);
-        };
-    } else {
-        document.getElementById(jsElementName)[`on${jsEventName}`] = (event) => {
-            if (toSwallow.includes(event.code)) event.preventDefault();
-            onEvent(cbId, true, jsEventName, event);
-        };
-    }
+    element[`on${jsEventName}`] = (event) => {
+        if (toSwallow.includes(event.code)) event.preventDefault();
+        onEvent(cbId, true, jsEventName, event);
+    };
 }
 
-wasmApi.unregisterElementEventHandler = (elementName, eventName) => {
-    const jsElementName = toJsString(elementName);
-    const jsEventName = toJsString(eventName);
-    if (jsElementName === 'window') {
-        window[`on${jsEventName}`] = null;
-    } else if (jsElementName === 'document') {
-        document[`on${jsEventName}`] = null;
-    } else {
-        const element = document.getElementById(jsElementName)
-        if (!element) return;
-        element[`on${jsEventName}`] = null;
-    }
+wasmApi.unregisterElementEventHandler = (elementHandle, eventName) => {
+    const element = getDomObject(elementHandle);
+    if (!element) return;
+    element[`on${toJsString(eventName)}`] = null;
 }
 
-wasmApi.observeResize = (elementName, cbId) => {
-    const element = document.getElementById(toJsString(elementName))
+wasmApi.observeResize = (elementHandle, cbId) => {
+    const element = getDomObject(elementHandle);
+    if (!element) return;
     element.dataset.resizeObserverCbId = cbId;
     resizeObserver.observe(element);
 }
 
-wasmApi.unobserveResize = (elementName) => {
-    const element = document.getElementById(toJsString(elementName))
+wasmApi.unobserveResize = (elementHandle) => {
+    const element = getDomObject(elementHandle);
     if (!element) return;
     element.dataset.resizeObserverCbId = null;
     resizeObserver.unobserve(element);
@@ -600,8 +649,9 @@ wasmApi.createImageResourceFromCanvasResource = (canvasId, cbId) => {
     });
 }
 
-wasmApi.registerElementAsResource = (elementName) => {
-    const element = document.getElementById(toJsString(elementName));
+wasmApi.registerElementAsResource = (elementHandle) => {
+    const element = getDomObject(elementHandle);
+    if (!element) return 0;
     const resourceId = ++resourceCounter;
     resources[resourceId] = element;
     return resourceId;
@@ -898,9 +948,10 @@ wasmApi.getDate = (type, timestamp) => {
     }
 }
 
-wasmApi.requestPointerLock = (elementName) => {
-    const jsElementName = toJsString(elementName);
-    document.getElementById(jsElementName).requestPointerLock();
+wasmApi.requestPointerLock = (elementHandle) => {
+    const element = getDomObject(elementHandle);
+    if (!element) return;
+    element.requestPointerLock();
     if (!document.onpointerlockchange) {
         document.onpointerlockchange = () => {
             if (window.onpointerlockchange) {
@@ -914,8 +965,9 @@ wasmApi.exitPointerLock = () => {
     document.exitPointerLock();
 }
 
-wasmApi.requestFullScreen = (elementName) => {
-    const element = document.getElementById(toJsString(elementName));
+wasmApi.requestFullScreen = (elementHandle) => {
+    const element = getDomObject(elementHandle);
+    if (!element) return;
     if (element.requestFullscreen) element.requestFullscreen();
     if (!document.onfullscreenchange) {
         document.onfullscreenchange = () => {
@@ -1033,18 +1085,16 @@ wasmApi.showConfirmDialog = (message) => {
     return isExecuted;
 }
 
-wasmApi.postMessage = (wasmTarget, wasmMessageType, wasmMessageBody) => {
-    const target = toJsString(wasmTarget);
-    const messageType = toJsString(wasmMessageType);
-    const messageBody = toJsString(wasmMessageBody);
-    if (target === "window") {
-        window.postMessage({ type: messageType, body: messageBody }, '*');
-    } else if (target === "parent") {
-        window.parent.postMessage({ type: messageType, body: messageBody }, '*');
-    } else {
-        const element = document.getElementById(target);
-        if (element) element.contentWindow.postMessage({ type: messageType, body: messageBody }, '*');
-    }
+wasmApi.postMessage = (targetHandle, wasmMessageType, wasmMessageBody) => {
+    const target = getDomObject(targetHandle);
+    if (!target) return;
+    // The target is either a window (the page's own window or its parent) or an embedding element
+    // such as an iframe, in which case the message goes to the window it holds.
+    const targetWindow = target.contentWindow || target;
+    if (!targetWindow.postMessage) return;
+    targetWindow.postMessage(
+        { type: toJsString(wasmMessageType), body: toJsString(wasmMessageBody) }, '*'
+    );
 }
 
 wasmApi.callCustomJsFn = (fnName, arg) => {
@@ -1362,8 +1412,18 @@ async function loadWasm(filename, importTable) {
     return WebAssembly.instantiate( binary, { "env": importTable, wasi_snapshot_preview1: wasiShim } );
 }
 
+function waitForDom() {
+    if (document.readyState !== 'loading') return Promise.resolve();
+    return new Promise((resolve) => document.addEventListener('DOMContentLoaded', resolve, { once: true }));
+}
+
 async function start(moduleName) {
     program = await loadWasm(moduleName, wasmApi);
+
+    // The reserved handles refer to `document.body` and `document.head`, so the document has to be
+    // parsed before the table can be initialized.
+    await waitForDom();
+    initDomTable();
 
     // Initialize wasi-libc
     if (program.instance.exports._initialize) {

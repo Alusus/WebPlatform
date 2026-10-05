@@ -18,44 +18,56 @@
  */
 
 @merge module WebPlatform {
+    //==========================================================================
+    // DomHandle
+    // DOM objects are referenced by their index within the JS side's element table rather than by
+    // an id attached to the element. `createElement` returns the index of the newly created element
+    // and that index is then passed back on every call manipulating that element. The indexes below
+    // are reserved for the objects that already exist before the program starts.
+    def DomHandle: {
+        def NONE: 0;
+        def WINDOW: 1;
+        def DOCUMENT: 2;
+        def BODY: 3;
+        def HEAD: 4;
+        def PARENT_WINDOW: 5;
+    }
+
     // Element Management
     @expname[createElement] function _createElement (
-        elementType: ptr[Char], name: ptr[Char], parent: ptr[Char], nextSibling: ptr[Char]
-    );
-    function createElement (
-        elementType: ptr[Char], name: ptr[Char], parent: ptr[Char], nextSibling: ptr[Char]
-    ) {
-        if nextSibling~cnt == 0 nextSibling = 0;
-        _createElement(elementType, name, parent, nextSibling);
+        elementType: ptr[Char], parent: ArchInt, nextSibling: ArchInt
+    ): ArchInt;
+    function createElement (elementType: ptr[Char], parent: ArchInt, nextSibling: ArchInt): ArchInt {
+        return _createElement(elementType, parent, nextSibling);
     }
-    function createElement (elementType: ptr[Char], name: ptr[Char], parent: ptr[Char]) {
-        _createElement(elementType, name, parent, 0);
+    function createElement (elementType: ptr[Char], parent: ArchInt): ArchInt {
+        return _createElement(elementType, parent, DomHandle.NONE);
     }
-    @expname[deleteElement] function deleteElement (name: ptr[Char]);
-    @expname[setStyleRule] function setStyleRule (name: ptr[Char], selector: ptr[Char], css: ptr[Char]);
-    @expname[removeStyleRule] function removeStyleRule (name: ptr[Char], selector: ptr[Char]);
-    @expname[setElementAttribute] function setElementAttribute (name: ptr[Char], prop: ptr[Char], value: ptr[Char]);
-    @expname[getElementAttribute] function getElementAttribute (name: ptr[Char], prop: ptr[Char]): ptr[array[Char]];
-    @expname[removeElementAttribute] function removeElementAttribute (name: ptr[Char], prop: ptr[Char]);
-    @expname[getElementDimensions] function getElementDimensions (name: ptr[Char], result: ref[Dimensions]);
-    @expname[getElementBoundingRect] function getElementBoundingRect (name: ptr[Char], result: ref[Rectangle]);
+    @expname[deleteElement] function deleteElement (element: ArchInt);
+    @expname[setStyleRule] function setStyleRule (element: ArchInt, selector: ptr[Char], css: ptr[Char]);
+    @expname[removeStyleRule] function removeStyleRule (element: ArchInt, selector: ptr[Char]);
+    @expname[setElementAttribute] function setElementAttribute (element: ArchInt, prop: ptr[Char], value: ptr[Char]);
+    @expname[getElementAttribute] function getElementAttribute (element: ArchInt, prop: ptr[Char]): ptr[array[Char]];
+    @expname[removeElementAttribute] function removeElementAttribute (element: ArchInt, prop: ptr[Char]);
+    @expname[getElementDimensions] function getElementDimensions (element: ArchInt, result: ref[Dimensions]);
+    @expname[getElementBoundingRect] function getElementBoundingRect (element: ArchInt, result: ref[Rectangle]);
     // Element Interaction
-    @expname[selectItem] function selectItem (selectId: ptr[Char], selectedValue: ptr[Char]);
-    @expname[getSelectedItemValue] function getSelectedItemValue (selectId: ptr[Char]): ptr[array[Char]];
-    @expname[scrollElementIntoView] function scrollElementIntoView (name: ptr[Char]);
+    @expname[selectItem] function selectItem (select: ArchInt, selectedValue: ptr[Char]);
+    @expname[getSelectedItemValue] function getSelectedItemValue (select: ArchInt): ptr[array[Char]];
+    @expname[scrollElementIntoView] function scrollElementIntoView (element: ArchInt);
     // Event Loop
     @expname[fetchNextEvent] function fetchNextEvent (): ptr[array[Char]];
     @expname[registerElementEventHandler] function _registerElementEventHandler (
-      elementName: ptr[Char], eventName: ptr[Char], preventDefault: Bool, cbId: ArchInt
+      element: ArchInt, eventName: ptr[Char], preventDefault: Bool, cbId: ArchInt
     );
     @expname[registerElementKeyEventHandler] function _registerElementKeyEventHandler (
-      elementName: ptr[Char], eventName: ptr[Char], keysToSwallow: ptr[Char], cbId: ArchInt
+      element: ArchInt, eventName: ptr[Char], keysToSwallow: ptr[Char], cbId: ArchInt
     );
     @expname[unregisterElementEventHandler] function _unregisterElementEventHandler (
-        elementName: ptr[Char], eventName: ptr[Char]
+        element: ArchInt, eventName: ptr[Char]
     );
-    @expname[observeResize] function _observeResize (elementName: ptr[Char], cbId: ArchInt);
-    @expname[unobserveResize] function _unobserveResize (elementName: ptr[Char]);
+    @expname[observeResize] function _observeResize (element: ArchInt, cbId: ArchInt);
+    @expname[unobserveResize] function _unobserveResize (element: ArchInt);
     @expname[waitForEvent] function waitForEvent;
     // Async Operations
     @expname[sendRequest] function _sendRequest (
@@ -85,7 +97,7 @@
     @expname[createImageResourceFromCanvasResource] function _createImageResourceFromCanvasResource (
         canvasId: ArchInt, cbId: ArchInt
     );
-    @expname[registerElementAsResource] function registerElementAsResource (id: ptr[Char]): ArchInt;
+    @expname[registerElementAsResource] function registerElementAsResource (element: ArchInt): ArchInt;
     @expname[loadAudio] function _loadAudio (url: ptr[Char], cbId: ArchInt);
     @expname[releaseResource] function releaseResource (resourceId: ArchInt);
     @expname[loadFont] function _loadFont (fontName: ptr[Char], url: ptr[Char], cbId: ArchInt);
@@ -136,9 +148,9 @@
     // Misc
     @expname[getTimestamp] function getTimestamp (): Int[64];
     @expname[getDate] function getDate (type: ptr[array[Char]], timestamp: Int[64]): ptr[array[Char]];
-    @expname[requestPointerLock] function requestPointerLock (elementName: ptr[Char]);
+    @expname[requestPointerLock] function requestPointerLock (element: ArchInt);
     @expname[exitPointerLock] function exitPointerLock();
-    @expname[requestFullScreen] function requestFullScreen (elementName: ptr[Char]);
+    @expname[requestFullScreen] function requestFullScreen (element: ArchInt);
     @expname[exitFullScreen] function exitFullScreen();
     @expname[requestWakeLock] function _requestWakeLock(cbId: ArchInt);
     @expname[exitWakeLock] function _exitWakeLock(cbId: ArchInt);
@@ -159,7 +171,7 @@
     @expname[logToConsole] function logToConsole (msg: ptr[Char]);
     @expname[showAlertDialog] function showAlertDialog (message: ptr[Char]);
     @expname[showConfirmDialog] function showConfirmDialog (message: ptr[Char]): Bool;
-    @expname[postMessage] function postMessage (target: ptr[Char], msgType: ptr[Char], msgBody: ptr[Char]);
+    @expname[postMessage] function postMessage (target: ArchInt, msgType: ptr[Char], msgBody: ptr[Char]);
     @expname[callCustomJsFn] function callCustomJsFn (fnName: ptr[Char], arg: ptr[Char]): ptr[Char];
     @expname[callCustomAsyncJsFn] function _callCustomAsyncJsFn (fnName: ptr[Char], arg: ptr[Char], cbId: ArchInt);
     @expname[getUserLanguages] function _getUserLanguages (): ptr[Char];

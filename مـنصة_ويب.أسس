@@ -27,7 +27,17 @@
     عرف مسار_منصة_ويب: لقب webPlatformPath؛
     عرف هات_اعتماديات_البناء: لقب getBuildDependencies؛
 
+    عرف مـقبض_دوم: {
+        عرف _لاشيء_: لقب DomHandle.NONE؛
+        عرف _النافذة_: لقب DomHandle.WINDOW؛
+        عرف _الوثيقة_: لقب DomHandle.DOCUMENT؛
+        عرف _الجسم_: لقب DomHandle.BODY؛
+        عرف _الرأس_: لقب DomHandle.HEAD؛
+        عرف _النافذة_الأم_: لقب DomHandle.PARENT_WINDOW؛
+    }
+
     عرف أنشئ_عنصر: لقب createElement؛
+    عرف احذف_عنصرا: لقب deleteElement؛
     عرف حدد_ميزة_عنصر: لقب setElementAttribute؛
     عرف هات_ميزة_عنصر: لقب getElementAttribute؛
     عرف أزل_ميزة_عنصر: لقب removeElementAttribute؛
@@ -646,6 +656,7 @@
     @دمج صنف ضـبيطة {
         عرف الطراز: لقب style؛
         عرف معرف: لقب id؛
+        عرف معرف_دوم: لقب domId؛
         عرب_خصلة[اسم_الفئة، _اسم_الفئة، className, ClassName]؛
         عرف عند_تغير_الأبعاد: لقب onResize؛
         عرف عند_دخول_المؤشر: لقب onMouseEnter؛

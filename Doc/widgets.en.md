@@ -15,7 +15,7 @@ The base class for all widgets.
 The following are the abstract properties declared in this class that must be implemented in child classes.
 
 ```
-handler this.id: String as_ptr;
+handler this.id: ArchInt as_ptr;
 
 handler this.className: ref[String] as_ptr;
 handler this.className = temp_ref[String] as ptr;
@@ -27,10 +27,12 @@ handler this.style = SrdRef[StyleSet] as_ptr;
 ##### id 
 
 ```
-handler this.id: String as_ptr;
+handler this.id: ArchInt as_ptr;
 ```
 
-A unique identifier to distinguish each widget from the other.
+The handle of the DOM element backing this widget, which is the element's index within the table of
+DOM objects maintained by the JS side. It's `DomHandle.NONE` as long as the widget isn't built, so
+it doubles as the way to tell whether the widget is currently built.
 
 ##### className 
 
@@ -133,6 +135,15 @@ def onClick: ref[DomEventSignal[Widget, Int]] as_ptr;
 Signals that a mouse click occurred.
 
 #### Methods
+
+##### domId
+
+```
+handler this.domId(): String;
+```
+
+The `id` attribute the JS side gave the widget's DOM element, or an empty string if the widget isn't
+built. Needed by attributes that reference other elements, like a label's `for` attribute.
 
 ##### getDimensions
 

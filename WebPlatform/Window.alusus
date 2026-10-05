@@ -29,7 +29,7 @@
         }
 
         def _style: SrdRef[StyleSet];
-        def id: ptr[array[Char]] = "window";
+        def id: ArchInt = DomHandle.WINDOW;
         def view: SrdRef[Widget];
         def keysToSwallow: String;
         def sessionStorage: Storage(0);
@@ -37,55 +37,55 @@
 
         handler this~init(dummy: ptr) {
             this.onKeyDown.onConnectionsChanged = closure (connectionCount: Int) {
-                handleSignalConnectionChanged["window", onKeyDown, "keydown", this.keysToSwallow, {
+                handleSignalConnectionChanged[DomHandle.WINDOW, onKeyDown, "keydown", this.keysToSwallow, {
                     this.onKeyDown.emit(this, data("code"));
                 }];
             };
 
             this.onKeyUp.onConnectionsChanged = closure (connectionCount: Int) {
-                handleSignalConnectionChanged["window", onKeyUp, "keyup", this.keysToSwallow, {
+                handleSignalConnectionChanged[DomHandle.WINDOW, onKeyUp, "keyup", this.keysToSwallow, {
                     this.onKeyUp.emit(this, data("code"));
                 }];
             };
 
             this.onPointerLockChange.onConnectionsChanged = closure (connectionCount: Int) {
-                handleSignalConnectionChanged["window", onPointerLockChange, "pointerlockchange", {
+                handleSignalConnectionChanged[DomHandle.WINDOW, onPointerLockChange, "pointerlockchange", {
                     this.onPointerLockChange.emit(this, Bool().{ this = data("enabled") });
                 }];
             };
 
             this.onFullScreenChange.onConnectionsChanged = closure (connectionCount: Int) {
-                handleSignalConnectionChanged["window", onFullScreenChange, "fullscreenchange", {
+                handleSignalConnectionChanged[DomHandle.WINDOW, onFullScreenChange, "fullscreenchange", {
                     this.onFullScreenChange.emit(this, Bool().{ this = data("enabled") });
                 }];
             };
 
             this.onGamepadConnected.onConnectionsChanged = closure (connectionCount: Int) {
-                handleSignalConnectionChanged["window", onGamepadConnected, "gamepadconnected", {
+                handleSignalConnectionChanged[DomHandle.WINDOW, onGamepadConnected, "gamepadconnected", {
                     this.onGamepadConnected.emit(this, data("gamepad")("id"));
                 }];
             };
 
             this.onGamepadDisconnected.onConnectionsChanged = closure (connectionCount: Int) {
-                handleSignalConnectionChanged["window", onGamepadDisconnected, "gamepaddisconnected", {
+                handleSignalConnectionChanged[DomHandle.WINDOW, onGamepadDisconnected, "gamepaddisconnected", {
                     this.onGamepadDisconnected.emit(this, data("gamepad")("id"));
                 }];
             };
 
             this.onLocationChanged.onConnectionsChanged = closure (connectionCount: Int) {
-                handleSignalConnectionChanged["window", onLocationChanged, "popstate", {
+                handleSignalConnectionChanged[DomHandle.WINDOW, onLocationChanged, "popstate", {
                     this.onLocationChanged.emit(this, Int(0));
                 }];
             };
 
             this.onVisibilityChanged.onConnectionsChanged = closure (connectionCount: Int) {
-                handleSignalConnectionChanged["document", onVisibilityChanged, "visibilitychange", {
+                handleSignalConnectionChanged[DomHandle.DOCUMENT, onVisibilityChanged, "visibilitychange", {
                     this.onVisibilityChanged.emit(this, Int(0));
                 }];
             };
 
             this.onMessage.onConnectionsChanged = closure (connectionCount: Int) {
-                handleSignalConnectionChanged["window", onMessage, "message", {
+                handleSignalConnectionChanged[DomHandle.WINDOW, onMessage, "message", {
                     this.onMessage.emit(this, data("data"));
                 }];
             };
@@ -121,7 +121,7 @@
                 this._style = StyleSet();
                 this._style.selector = "body";
                 this._style.enableInline(closure(css: String) {
-                    setElementAttribute("body", "style", css);
+                    setElementAttribute(DomHandle.BODY, "style", css);
                 });
                 this._style.build();
             }
@@ -131,7 +131,7 @@
         handler this.setView(v: SrdRef[Widget]) {
             this.unsetView();
             this.view = v;
-            this.view.build(String("body"), String());
+            this.view.build(DomHandle.BODY, DomHandle.NONE);
         }
 
         handler this.unsetView() {
@@ -182,11 +182,11 @@
         }
 
         handler this.postMessage(msgType: CharsPtr, msgBody: CharsPtr) {
-            WebPlatform.postMessage("window", msgType, msgBody);
+            WebPlatform.postMessage(DomHandle.WINDOW, msgType, msgBody);
         }
 
         handler this.postMessageToParent(msgType: CharsPtr, msgBody: CharsPtr) {
-            WebPlatform.postMessage("parent", msgType, msgBody);
+            WebPlatform.postMessage(DomHandle.PARENT_WINDOW, msgType, msgBody);
         }
     }
 }

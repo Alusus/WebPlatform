@@ -41,31 +41,30 @@
         handler this.setChild (child: temp_ref[SrdRef[Image]]) {
             if this.child.obj~ptr != 0 this.child.unbuild();
             this.child = child;
-            if this.child.obj~ptr != 0 && this.id.getLength() > 0 this.child.build(this.id, String());
+            if this.child.obj~ptr != 0 && this.id != DomHandle.NONE this.child.build(this.id, DomHandle.NONE);
         }
 
-        handler (this:Widget).build (ownerId: String, nextSiblingId: String) set_ptr {
-            this.id = getNewId();
-            createElement("picture", this.id, ownerId, nextSiblingId);
+        handler (this:Widget).build (ownerId: ArchInt, nextSiblingId: ArchInt) set_ptr {
+            this.id = createElement("picture", ownerId, nextSiblingId);
             this.buildCommon();
             this.update();
 
-            if this.child.obj~ptr != 0 this.child.build(this.id, String());
+            if this.child.obj~ptr != 0 this.child.build(this.id, DomHandle.NONE);
         }
 
         handler (this:Widget).unbuild() set_ptr {
-            if this.id.getLength() > 0 {
+            if this.id != DomHandle.NONE {
                 deleteElement(this.id);
                 this.unbuildCommon();
 
                 if this.child.obj~ptr != 0 this.child.unbuild();
 
-                this.id = String();
+                this.id = DomHandle.NONE;
             }
         }
 
         handler (this:Widget).update() set_ptr {
-            if this.id.getLength() > 0 {
+            if this.id != DomHandle.NONE {
                 this.updateCommon();
                 def i: Int = 0;
                 def htmlVal: String="";

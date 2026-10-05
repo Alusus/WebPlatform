@@ -28,7 +28,8 @@
         //--------------------
         // Abstract Properties
 
-        handler this.id: String as_ptr;
+        // The handle of the DOM element backing this widget, or `DomHandle.NONE` if not built yet.
+        handler this.id: ArchInt as_ptr;
         defineAbstractProperty[className, ClassName, String];
         handler this.style: SrdRef[StyleSet] as_ptr;
         handler this.style = SrdRef[StyleSet] as_ptr;
@@ -50,39 +51,46 @@
         //-----------------
         // Abstract Methods
 
-        handler this.build(ownerId: String, nextSiblingId: String) as_ptr;
+        handler this.build(ownerId: ArchInt, nextSiblingId: ArchInt) as_ptr;
         handler this.unbuild() as_ptr;
         handler this.update() as_ptr;
 
         //--------
         // Methods
 
+        // The id attribute given to the DOM element by the JS side. It's needed by attributes that
+        // reference other elements, like a label's `for` attribute.
+        handler this.domId(): String {
+            if this.id == DomHandle.NONE return String();
+            return String("wp") + this.id;
+        }
+
         handler this.getDimensions(): Dimensions {
-            if this.id == "" return Dimensions(0, 0);
+            if this.id == DomHandle.NONE return Dimensions(0, 0);
             def d: Dimensions;
             getElementDimensions(this.id, d);
             return d;
         }
 
         handler this.getBoundingRect(): Rectangle {
-            if this.id == "" return Rectangle(0, 0, 0, 0);
+            if this.id == DomHandle.NONE return Rectangle(0, 0, 0, 0);
             def r: Rectangle;
             getElementBoundingRect(this.id, r);
             return r;
         }
 
         handler this.requestPointerLock() {
-            if this.id == "" return;
+            if this.id == DomHandle.NONE return;
             WebPlatform.requestPointerLock(this.id);
         }
 
         handler this.requestFullScreen() {
-            if this.id == "" return;
+            if this.id == DomHandle.NONE return;
             WebPlatform.requestFullScreen(this.id);
         }
 
         handler this.scrollIntoView() {
-            if this.id == "" return;
+            if this.id == DomHandle.NONE return;
             WebPlatform.scrollElementIntoView(this.id);
         }
     }

@@ -33,13 +33,13 @@
         def _checked: Bool;
         handler this.setChecked (c: Bool) {
             this._checked = c;
-            if this.id.getLength() > 0 {
+            if this.id != DomHandle.NONE {
                 if c setElementAttribute(this.id, "checked", "true")
                 else setElementAttribute(this.id, "checked", "false");
             }
         }
         handler this.getChecked (): Bool {
-            if this.id.getLength() == 0 return this._checked
+            if this.id == DomHandle.NONE return this._checked
             else return String.isEqual(getElementAttribute(this.id, "checked"), "true");
         }
         handler this.checked = (val: Bool) {
@@ -94,9 +94,8 @@
         //-------------------
         // Function Overrides
 
-        handler (this:Widget).build (ownerId: String, nextSiblingId: String) set_ptr {
-            this.id = getNewId();
-            createElement("input", this.id, ownerId, nextSiblingId);
+        handler (this:Widget).build (ownerId: ArchInt, nextSiblingId: ArchInt) set_ptr {
+            this.id = createElement("input", ownerId, nextSiblingId);
             this.buildCommon();
             this.update();
             this.onChanged.onConnectionsChanged(this.onChanged.getConnectionCount());
@@ -108,11 +107,11 @@
 
             deleteElement(this.id);
             this.unbuildCommon();
-            this.id = String();
+            this.id = DomHandle.NONE;
         }
 
         handler (this:Widget).update() set_ptr {
-            if this.id.getLength() > 0 {
+            if this.id != DomHandle.NONE {
                 this.updateCommon();
                 setElementAttribute(this.id, "type", "radio");
                 setElementAttribute(this.id, "value", this.value);

@@ -35,7 +35,7 @@
             while count-- > 0 {
                 def child: ref[SrdRef[Widget]](children~next_arg[ref[SrdRef[Widget]]]);
                 this.children.add(child);
-                if this.id != "" child.build(this.id, String());
+                if this.id != DomHandle.NONE child.build(this.id, DomHandle.NONE);
             }
         }
 
@@ -46,7 +46,7 @@
                 return;
             }
             this.children.insert(index, child);
-            if this.id != "" child.build(this.id, this.children(index + 1).id);
+            if this.id != DomHandle.NONE child.build(this.id, this.children(index + 1).id);
         }
 
         handler this.removeChildren (count: Int, children: ...temp_ref[SrdRef[Widget]]) {
@@ -74,19 +74,18 @@
         //-------------------
         // Function Overrides
 
-        handler (this:Widget).build (ownerId: String, nextSiblingId: String) set_ptr {
-            this.id = getNewId();
-            createElement("div", this.id, ownerId, nextSiblingId);
+        handler (this:Widget).build (ownerId: ArchInt, nextSiblingId: ArchInt) set_ptr {
+            this.id = createElement("div", ownerId, nextSiblingId);
             this.buildCommon();
             this.update();
             def i: Int;
             for i = 0, i < this.children.getLength(), ++i {
-                this.children(i).build(this.id, String());
+                this.children(i).build(this.id, DomHandle.NONE);
             }
         }
 
         handler (this:Widget).unbuild() set_ptr {
-            if this.id.getLength() > 0 {
+            if this.id != DomHandle.NONE {
                 deleteElement(this.id);
                 this.unbuildCommon();
 
@@ -95,7 +94,7 @@
                     this.children(i).unbuild();
                 }
 
-                this.id = String();
+                this.id = DomHandle.NONE;
             }
         }
 
