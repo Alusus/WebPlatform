@@ -25,7 +25,6 @@ import "Srl/System";
 import "Srl/Fs";
 import "Srl/refs";
 import "Srl/errors";
-import "Core/Data";
 import "Spp";
 import "Spp/Ast";
 import "Build";

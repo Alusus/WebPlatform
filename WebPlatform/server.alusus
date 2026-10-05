@@ -49,40 +49,60 @@
         def httpContext: ptr[Http.Context];
     }
 
-    def AstTemplateMap: alias Map[String, ref[Core.Basic.TiObject]];
+    def AstTemplateMap: alias Map[String, ref[Core.Ast.Node]];
+
+    // Modifier Handlers
+    // Each modifier handler stores the modifier's params as metadata, under the English name of the modifier,
+    // on the definition the modifier is attached to. The Arabic aliases are defined in the Arabic wrapper.
+
+    // Modifiers without params are stored as an empty block, so that they are still detectable by name.
+    func setModifierMetadata (node: ref[Core.Ast.Node], name: CharsPtr, params: ref[Core.Ast.Node]) {
+        if params~ptr == 0 node.setMetadata(name, Spp.astMgr.cloneAst(ast { }, node))
+        else node.setMetadata(name, Spp.astMgr.cloneAst(params, params));
+    }
+
+    func uiEndpoint (node: ref[Core.Ast.Node], params: ref[Core.Ast.Node]) { setModifierMetadata(node, "uiEndpoint", params) }
+    func title (node: ref[Core.Ast.Node], params: ref[Core.Ast.Node]) { setModifierMetadata(node, "title", params) }
+    func icon (node: ref[Core.Ast.Node], params: ref[Core.Ast.Node]) { setModifierMetadata(node, "icon", params) }
+    func webApp (node: ref[Core.Ast.Node], params: ref[Core.Ast.Node]) { setModifierMetadata(node, "webApp", params) }
+    func preCache (node: ref[Core.Ast.Node], params: ref[Core.Ast.Node]) { setModifierMetadata(node, "preCache", params) }
+    func dynCache (node: ref[Core.Ast.Node], params: ref[Core.Ast.Node]) { setModifierMetadata(node, "dynCache", params) }
+    func beEndpoint (node: ref[Core.Ast.Node], params: ref[Core.Ast.Node]) { setModifierMetadata(node, "beEndpoint", params) }
+    func wsRoute (node: ref[Core.Ast.Node], params: ref[Core.Ast.Node]) { setModifierMetadata(node, "wsRoute", params) }
+    func assetsRoute (node: ref[Core.Ast.Node], params: ref[Core.Ast.Node]) { setModifierMetadata(node, "assetsRoute", params) }
 
     // Build Functions
 
-    func generateUiEndpointsFiles (parent: ref[Core.Basic.TiObject], uiEndpointsPath: String) {
-        def elements: Array[ref[Core.Basic.TiObject]] = Spp.astMgr.findElements(
-            ast { modifier == "uiEndpoint" || modifier == "منفذ_مرئي" },
+    func generateUiEndpointsFiles (parent: ref[Core.Ast.Node], uiEndpointsPath: String) {
+        def elements: Array[ref[Core.Ast.Node]] = Spp.astMgr.findElements(
+            ast { metadata == "uiEndpoint" },
             parent,
             Spp.SeekerFlags.SKIP_OWNERS | Spp.SeekerFlags.SKIP_USES | Spp.SeekerFlags.SKIP_CHILDREN
         );
         def i: Int;
         for i = 0, i < elements.getLength(), ++i {
-            def uriParams: Array[String] = getModifierParams(elements(i), "uiEndpoint", "منفذ_مرئي");
+            def uriParams: Array[String] = getMetadataParams(elements(i), "uiEndpoint");
             if uriParams.getLength() < 1 {
                 Spp.buildMgr.raiseBuildNotice("SPPG1023", 1, elements(i));
                 continue;
             }
 
-            def titleParams: Array[String] = getModifierParams(elements(i), "title", "عنوان");
+            def titleParams: Array[String] = getMetadataParams(elements(i), "title");
             def title: String;
             if titleParams.getLength() >= 1 title = titleParams(0) else title = "Alusus WebPlatform";
 
-            def iconParams: Array[String] = getModifierParams(elements(i), "icon", "أيقونة");
+            def iconParams: Array[String] = getMetadataParams(elements(i), "icon");
             def icon: String;
             if iconParams.getLength() >= 1 icon = iconParams(0);
 
-            def appParams: Array[String] = getModifierParams(elements(i), "webApp", "تطبيق_ويب");
+            def appParams: Array[String] = getMetadataParams(elements(i), "webApp");
             def appManifest: String;
             if appParams.getLength() > 0 appManifest = appParams(0);
             def appVersion: String;
             if appParams.getLength() > 1 appVersion = appParams(1) else appVersion = "v1";
 
-            def preCacheFilenames: Array[String] = getModifierParams(elements(i), "preCache", "خزن_مسبق");
-            def dynCacheFilenames: Array[String] = getModifierParams(elements(i), "dynCache", "خزن_تفاعلي");
+            def preCacheFilenames: Array[String] = getMetadataParams(elements(i), "preCache");
+            def dynCacheFilenames: Array[String] = getMetadataParams(elements(i), "dynCache");
 
             generateUiEndpointFiles(
                 elements(i), uriParams(0), title, icon, appManifest, appVersion, preCacheFilenames, dynCacheFilenames,
@@ -92,7 +112,7 @@
     }
 
     func generateUiEndpointFiles (
-        fn: ref[Core.Basic.TiObject], uri: String, title: String, iconFilename: String, manifestFilename: String,
+        fn: ref[Core.Ast.Node], uri: String, title: String, iconFilename: String, manifestFilename: String,
         version: String, preCacheFilenames: Array[String], dynCacheFilenames: Array[String], uiEndpointsPath: String
     ) {
         def fnName: String = generateWasm(fn, uiEndpointsPath);
@@ -121,7 +141,7 @@
         generateHtml(fnName, title, iconFilename, manifestFilename != "", uiEndpointsPath);
     }
 
-    func generateWasm(fn: ref[Core.Basic.TiObject], uiEndpointsPath: String): String {
+    func generateWasm(fn: ref[Core.Ast.Node], uiEndpointsPath: String): String {
         def binding: ref[Core.Basic.Binding](Core.Basic.getInterface[fn, Core.Basic.Binding]);
         binding.setMember("name", Core.Basic.TiStr("wasmStart"));
         def wasm: Build.Wasm(fn, uiEndpointsPath + "_intermediate.wasm");
@@ -190,9 +210,9 @@
         System.exec(String.format("cp %s/api.js \"%s/api.js\"", webPlatformPath.buf, mainAssetsPath.buf));
     }
 
-    func buildUiEndpoints(modulesRef: ref[Core.Basic.TiObject], mainAssetsPath: String, uiEndpointsPath: String) {
+    func buildUiEndpoints(modulesRef: ref[Core.Ast.Node], mainAssetsPath: String, uiEndpointsPath: String) {
         prepareMainAssets(mainAssetsPath);
-        def modules: Array[ref[Core.Basic.TiObject]] = getAllModules(modulesRef);
+        def modules: Array[ref[Core.Ast.Node]] = getAllModules(modulesRef);
         if modules.getLength() == 0 {
             System.fail(1, "Invalid module argument for buildUiEndpoints.");
         }
@@ -202,21 +222,21 @@
 
     // Code Generation
 
-    func generateUiEndpointsInitialization (modulesRef: ref[Core.Basic.TiObject]) {
-        def modules: Array[ref[Core.Basic.TiObject]] = getAllModules(modulesRef);
+    func generateUiEndpointsInitialization (modulesRef: ref[Core.Ast.Node]) {
+        def modules: Array[ref[Core.Ast.Node]] = getAllModules(modulesRef);
         if modules.getLength() == 0 {
             Spp.buildMgr.raiseBuildNotice("SPPA1002", 1, modulesRef);
         }
         def j: Int;
         for j = 0, j < modules.getLength(), ++j {
-            def elements: Array[ref[Core.Basic.TiObject]] = Spp.astMgr.findElements(
-                ast { modifier == "uiEndpoint" || modifier == "منفذ_مرئي" },
+            def elements: Array[ref[Core.Ast.Node]] = Spp.astMgr.findElements(
+                ast { metadata == "uiEndpoint" },
                 modules(j),
                 Spp.SeekerFlags.SKIP_OWNERS | Spp.SeekerFlags.SKIP_USES | Spp.SeekerFlags.SKIP_CHILDREN
             );
             def i: Int;
             for i = 0, i < elements.getLength(), ++i {
-                def uriParams: Array[String] = getModifierParams(elements(i), "uiEndpoint", "منفذ_مرئي");
+                def uriParams: Array[String] = getMetadataParams(elements(i), "uiEndpoint");
                 if uriParams.getLength() < 1 {
                     Spp.buildMgr.raiseBuildNotice("SPPG1023", 1, elements(i));
                     continue;
@@ -225,18 +245,18 @@
                 Spp.astMgr.insertAst(
                     (ast requestCallbackContext.uiEndpoints.add(StaticRoute(String(uri), String(path)))),
                     AstTemplateMap()
-                        .set(String("uri"), Core.Data.Ast.StringLiteral(uriParams(0)))
-                        .set(String("path"), Core.Data.Ast.StringLiteral(fnName + ".html"))
+                        .set(String("uri"), Core.Ast.StringLiteral(uriParams(0)))
+                        .set(String("path"), Core.Ast.StringLiteral(fnName + ".html"))
                 );
             }
         }
     }
 
-    func generateBeEndpointsCalls (parent: ref[Core.Basic.TiObject]) {
-        def elements : Array[ref[Core.Basic.TiObject]] = findFunctionElements(parent,  "beEndpoint", "منفذ_بياني");
+    func generateBeEndpointsCalls (parent: ref[Core.Ast.Node]) {
+        def elements : Array[ref[Core.Ast.Node]] = findBeEndpointFunctions(parent);
         def i: Int;
         for i = 0, i < elements.getLength(), ++i {
-            def endpointParams: Array[String] = getModifierParams(elements(i), "beEndpoint", "منفذ_بياني");
+            def endpointParams: Array[String] = getMetadataParams(elements(i), "beEndpoint");
             if endpointParams.getLength() < 2 {
                 Spp.buildMgr.raiseBuildNotice("SPPG1023", 1, elements(i));
                 continue;
@@ -249,14 +269,14 @@
                     }
                 },
                 AstTemplateMap()
-                    .set(Srl.String("endpointMethod"), Core.Basic.TiStr(endpointParams(0)))
-                    .set(Srl.String("endpointUri"), Core.Basic.TiStr(endpointParams(1)))
+                    .set(Srl.String("endpointMethod"), Core.Ast.StringLiteral(endpointParams(0)))
+                    .set(Srl.String("endpointUri"), Core.Ast.StringLiteral(endpointParams(1)))
                     .set(Srl.String("fullref"), constructElementFullReference(elements(i)))
             );
         }
     }
 
-    func generateAssetRoutesInitialization (modulesRef: ref[Core.Basic.TiObject]) {
+    func generateAssetRoutesInitialization (modulesRef: ref[Core.Ast.Node]) {
         def assetRoutes: Array[StaticRoute] = getAssetsRoutesFromModules(modulesRef);
         def i: Int;
         for i = 0, i < assetRoutes.getLength(), ++i {
@@ -264,30 +284,25 @@
                 (ast requestCallbackContext.assetRoutes.add(
                     StaticRoute(String(uri), String(srcPath), String(buildPath))
                 )),
-                Map[String, ref[Core.Basic.TiObject]]()
-                    .set(String("uri"), Core.Data.Ast.StringLiteral(assetRoutes(i).uri))
-                    .set(String("srcPath"), Core.Data.Ast.StringLiteral(assetRoutes(i).srcPath))
-                    .set(String("buildPath"), Core.Data.Ast.StringLiteral(assetRoutes(i).buildPath))
+                Map[String, ref[Core.Ast.Node]]()
+                    .set(String("uri"), Core.Ast.StringLiteral(assetRoutes(i).uri))
+                    .set(String("srcPath"), Core.Ast.StringLiteral(assetRoutes(i).srcPath))
+                    .set(String("buildPath"), Core.Ast.StringLiteral(assetRoutes(i).buildPath))
             );
         }
     }
 
-    func generateWebSocketEndpointChecks (parent: ref[Core.Basic.TiObject]) {
-        def classElements: Array[ref[Core.Basic.TiObject]] = Spp.astMgr.findElements(
-            ast { modifier == "wsRoute" || modifier == "مسار_مقبس" },
+    func generateWebSocketEndpointChecks (parent: ref[Core.Ast.Node]) {
+        def classElements: Array[ref[Core.Ast.Node]] = Spp.astMgr.findElements(
+            ast { metadata == "wsRoute" },
             parent,
             Spp.SeekerFlags.SKIP_OWNERS | Spp.SeekerFlags.SKIP_USES | Spp.SeekerFlags.SKIP_CHILDREN
         );
         def i: Int;
         for i = 0, i < classElements.getLength(), ++i {
-            def modifier: ref[Core.Basic.TiObject](Spp.astMgr.findModifierForElement(classElements(i), "wsRoute"));
-            if modifier~ptr == 0 modifier~no_deref = Spp.astMgr.findModifierForElement(classElements(i), "مسار_مقبس");
-
-            def wsRouteParam: Array[String];
-
-            if !Spp.astMgr.getModifierStringParams(modifier, wsRouteParam)
-            or wsRouteParam.getLength() != 1 {
-                Spp.buildMgr.raiseBuildNotice("SPPG1023", 1, modifier);
+            def wsRouteParam: Array[String] = getMetadataParams(classElements(i), "wsRoute");
+            if wsRouteParam.getLength() != 1 {
+                Spp.buildMgr.raiseBuildNotice("SPPG1023", 1, classElements(i));
                 continue;
             }
             Spp.astMgr.insertAst(
@@ -297,18 +312,18 @@
                     }
                 },
                 AstTemplateMap()
-                    .set(Srl.String("wsRouteUri"), Core.Basic.TiStr(wsRouteParam(0)))
+                    .set(Srl.String("wsRouteUri"), Core.Ast.StringLiteral(wsRouteParam(0)))
             );
         }
     }
 
-    function generateWebSocketRegistrations (modulesRef: ref[Core.Basic.TiObject]) {
-        def webSocketClasses: Array[ref[Core.Basic.TiObject]] =
-            findTypeElements(modulesRef, "wsRoute", "مسار_مقبس");
+    function generateWebSocketRegistrations (modulesRef: ref[Core.Ast.Node]) {
+        def webSocketClasses: Array[ref[Core.Ast.Node]] =
+            findWsRouteTypes(modulesRef);
 
         def i : Int;
         for i = 0, i < webSocketClasses.getLength(), i++ {
-            def params : Array[String] = getModifierParams(webSocketClasses(i) , "wsRoute", "مسار_مقبس");
+            def params : Array[String] = getMetadataParams(webSocketClasses(i) , "wsRoute");
 
             if (params.getLength() != 1) {
                 Spp.buildMgr.raiseBuildNotice("SPPG1023", 1, webSocketClasses(i));
@@ -328,7 +343,7 @@
                     )
                 },
                 AstTemplateMap()
-                    .set(Srl.String("wsRouteUri"), Core.Basic.TiStr(params(0)))
+                    .set(Srl.String("wsRouteUri"), Core.Ast.StringLiteral(params(0)))
                     .set(Srl.String("webSocketClass"), constructElementFullReference(webSocketClasses(i)))
             );
         }
@@ -336,16 +351,16 @@
 
     // Querying Functions
 
-    func getAssetsRoutesFromModules (modulesRef: ref[Core.Basic.TiObject]): Array[StaticRoute] {
+    func getAssetsRoutesFromModules (modulesRef: ref[Core.Ast.Node]): Array[StaticRoute] {
         def result: Array[StaticRoute];
-        def modules: Array[ref[Core.Basic.TiObject]] = getAllModules(modulesRef);
+        def modules: Array[ref[Core.Ast.Node]] = getAllModules(modulesRef);
         if modules.getLength() == 0 {
             Spp.buildMgr.raiseBuildNotice("SPPA1002", 1, modulesRef);
         }
         def j: Int;
         for j = 0, j < modules.getLength(), ++j {
-            def elements: Array[ref[Core.Basic.TiObject]] = Spp.astMgr.findElements(
-                ast { modifier == "assetsRoute" || modifier == "مسار_موارد" },
+            def elements: Array[ref[Core.Ast.Node]] = Spp.astMgr.findElements(
+                ast { metadata == "assetsRoute" },
                 modules(j),
                 Spp.SeekerFlags.SKIP_OWNERS | Spp.SeekerFlags.SKIP_USES | Spp.SeekerFlags.SKIP_CHILDREN
             );
@@ -356,11 +371,9 @@
                 extractAssetRoutePaths(elements(i), srcPath, buildPath);
                 if srcPath == "" continue;
 
-                def modifier: ref[Core.Basic.TiObject](Spp.astMgr.findModifierForElement(elements(i), "assetsRoute"));
-                if modifier~ptr == 0 modifier~no_deref = Spp.astMgr.findModifierForElement(elements(i), "مسار_موارد");
                 def uri: String;
-                def params: Array[String];
-                if Spp.astMgr.getModifierStringParams(modifier, params) && params.getLength() == 1 {
+                def params: Array[String] = getMetadataParams(elements(i), "assetsRoute");
+                if params.getLength() == 1 {
                     uri = params(0);
                 } else {
                     if buildPath(0) == '/' or buildPath(0) == '.' {
@@ -437,7 +450,7 @@
         session~cnt.requestCallbackContext = requestCallbackContext;
         session~cnt.httpContext = httpContext;
         preprocess {
-            def modules: Array[ref[Core.Basic.TiObject]] = getAllModules(modulesRef~ast);
+            def modules: Array[ref[Core.Ast.Node]] = getAllModules(modulesRef~ast);
             if modules.getLength() == 0 {
                 Spp.buildMgr.raiseBuildNotice("SPPA1002", 1, modulesRef~ast);
             }
@@ -503,7 +516,7 @@
         if uri == 0 return 0;
 
         preprocess {
-            def modules: Array[ref[Core.Basic.TiObject]] = getAllModules(modulesRef~ast);
+            def modules: Array[ref[Core.Ast.Node]] = getAllModules(modulesRef~ast);
             if modules.getLength() == 0 {
                 Spp.buildMgr.raiseBuildNotice("SPPA1002", 1, modulesRef~ast);
             }
@@ -610,62 +623,48 @@
         return false;
     }
 
-    func constructElementFullReference (element: ref[Core.Basic.TiObject]): SrdRef[Core.Basic.TiObject] {
-        return Core.Basic.newSrdObj[Core.Data.Ast.Passage].{
+    func constructElementFullReference (element: ref[Core.Ast.Node]): SrdRef[Core.Ast.Node] {
+        return Core.Basic.newSrdObj[Core.Ast.Passage].{
             Core.Basic.BindingOf[this].setMember("target", element);
-        };
+        }~cast[SrdRef[Core.Ast.Node]];
     }
 
-    func getModifierParams (element: ref[Core.Basic.TiObject], enKwd: CharsPtr, arKwd: CharsPtr): Array[String] {
-        def translations: Map[String, String];
-        translations.set(String(arKwd), String(enKwd));
-        def modifier: ref[Core.Basic.TiObject](Spp.astMgr.findModifierForElement(element, enKwd, translations));
-        def endpointParams: Array[String];
-        Spp.astMgr.getModifierStringParams(modifier, endpointParams);
-        return endpointParams;
+    func getMetadataParams (element: ref[Core.Ast.Node], name: CharsPtr): Array[String] {
+        def result: Array[String];
+        def meta: ref[Core.Ast.Node](element.owner.getMetadata(name));
+        if meta~ptr != 0 Spp.astMgr.getStringsFromStringParams(meta, result);
+        return result;
     }
 
-    function findFunctionElements (
-        modulesRef: ref[Core.Basic.TiObject], enName: CharsPtr, arName: CharsPtr
-    ): Array[ref[Core.Basic.TiObject]] {
-        def translations: Map[String, String];
-        translations.set(String(arName), String(enName));
+    function findBeEndpointFunctions (modulesRef: ref[Core.Ast.Node]): Array[ref[Core.Ast.Node]] {
         return Spp.astMgr.findElements(
-            ast { elementType == "function" },
+            ast { elementType == "function" && metadata == "beEndpoint" },
             modulesRef,
-            Spp.SeekerFlags.SKIP_OWNERS | Spp.SeekerFlags.SKIP_USES | Spp.SeekerFlags.SKIP_CHILDREN,
-            enName,
-            translations
+            Spp.SeekerFlags.SKIP_OWNERS | Spp.SeekerFlags.SKIP_USES | Spp.SeekerFlags.SKIP_CHILDREN
         );
     }
 
-    function findTypeElements (
-        modulesRef: ref[Core.Basic.TiObject], enName: CharsPtr, arName: CharsPtr
-    ): Array[ref[Core.Basic.TiObject]] {
-        def translations: Map[String, String];
-        translations.set(String(arName), String(enName));
+    function findWsRouteTypes (modulesRef: ref[Core.Ast.Node]): Array[ref[Core.Ast.Node]] {
         return Spp.astMgr.findElements(
-            ast { elementType == "type" },
+            ast { elementType == "type" && metadata == "wsRoute" },
             modulesRef,
-            Spp.SeekerFlags.SKIP_OWNERS | Spp.SeekerFlags.SKIP_USES | Spp.SeekerFlags.SKIP_CHILDREN,
-            enName,
-            translations
+            Spp.SeekerFlags.SKIP_OWNERS | Spp.SeekerFlags.SKIP_USES | Spp.SeekerFlags.SKIP_CHILDREN
         );
     }
 
-    func getAllModules (astRef: ref[Core.Basic.TiObject]): Array[ref[Core.Basic.TiObject]] {
-        def result: Array[ref[Core.Basic.TiObject]];
+    func getAllModules (astRef: ref[Core.Ast.Node]): Array[ref[Core.Ast.Node]] {
+        def result: Array[ref[Core.Ast.Node]];
         if astRef~ptr == Root~ast~ptr or Core.Basic.isDerivedFrom[astRef, Spp.Ast.Module] {
             result.add(astRef);
-        } else if Core.Basic.isDerivedFrom[astRef, Core.Data.Ast.List] {
-            def container: Core.Basic.ContainerOf[astRef];
+        } else if Core.Basic.isDerivedFrom[astRef, Core.Ast.List] {
+            def container: Core.Basic.ContainerOf[astRef, Core.Ast.Node];
             def i: Word;
             for i = 0, i < container.getElementCount(), ++i {
                 result.add(getAllModules(container.getElement(i)));
             }
         } else {
-            def node: ref[Core.Data.Node](castRef[astRef, Core.Data.Node]);
-            def elements: Array[ref[Core.Basic.TiObject]] = Spp.astMgr.findElements(
+            def node: ref[Core.Ast.Node](castRef[astRef, Core.Ast.Node]);
+            def elements: Array[ref[Core.Ast.Node]] = Spp.astMgr.findElements(
                 node, node.owner, Spp.SeekerFlags.SKIP_CHILDREN
             );
             def j: Int;
@@ -676,16 +675,16 @@
         return result;
     }
 
-    func extractAssetRoutePaths (element: ref[Core.Basic.TiObject], srcPath: ref[String], buildPath: ref[String]) {
+    func extractAssetRoutePaths (element: ref[Core.Ast.Node], srcPath: ref[String], buildPath: ref[String]) {
         use Core.Basic;
-        use Core.Data.Ast;
+        use Core.Ast;
         def strLiteral: ref[StringLiteral](Core.Basic.dynCastRef[element, StringLiteral]);
         if strLiteral~ptr != 0 {
             srcPath = buildPath = strLiteral.value.value;
             return;
         }
         if isDerivedFrom[element, Bracket] {
-            def list: ContainerOf[ContainerOf[element].getElement(0)];
+            def list: ContainerOf[ContainerOf[element, Node].getElement(0), Node];
             if list~ptr != 0 {
                 if list.getElementCount() == 1u {
                     def strLiteral: ref[StringLiteral](Core.Basic.dynCastRef[list.getElement(0), StringLiteral]);
