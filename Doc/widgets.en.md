@@ -136,15 +136,6 @@ Signals that a mouse click occurred.
 
 #### Methods
 
-##### domId
-
-```
-handler this.domId(): String;
-```
-
-The `id` attribute the JS side gave the widget's DOM element, or an empty string if the widget isn't
-built. Needed by attributes that reference other elements, like a label's `for` attribute.
-
 ##### getDimensions
 
 ```
@@ -192,7 +183,11 @@ Requets the browser to be scrolled to the element on which the method is called.
 
 The base class of all basic widgets. It implements the operations that are shared between all basic widgets.
 
-It also adds the following definition:
+It also adds the following definitions:
+
+* `domId`: `String`. A property for setting an identifier on the DOM to be used for integration with 3rd
+  party libraries, or for HTML features that depend on the identifier to reference other elements, like a
+  label's `for` attribute.
 
 * `hint`: `String`. A property for setting a string to be displayed as a tooltip when the cursor hovers over
   the element.

@@ -177,6 +177,7 @@
         }
 
         // hint
+        defineProperty[domId, DomId, String];
         defineProperty[hint, Hint, String];
 
         //----------------
@@ -285,6 +286,10 @@
             if this.id != DomHandle.NONE {
                 if this._style.isNull() or this._style.isInlined() setElementAttribute(this.id, "class", this.className)
                 else setElementAttribute(this.id, "class", this.className + " " + this._style.id);
+
+                if this.domId != "" setElementAttribute(this.id, "id", this.domId)
+                else removeElementAttribute(this.id, "id");
+
                 setElementAttribute(this.id, "title", this.hint);
             }
         }

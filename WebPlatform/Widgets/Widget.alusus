@@ -58,13 +58,6 @@
         //--------
         // Methods
 
-        // The id attribute given to the DOM element by the JS side. It's needed by attributes that
-        // reference other elements, like a label's `for` attribute.
-        handler this.domId(): String {
-            if this.id == DomHandle.NONE return String();
-            return String("wp") + this.id;
-        }
-
         handler this.getDimensions(): Dimensions {
             if this.id == DomHandle.NONE return Dimensions(0, 0);
             def d: Dimensions;
