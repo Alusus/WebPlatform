@@ -363,9 +363,10 @@ func start (argCount: Int، args: ptr[array[CharsPtr]]): Int {
 func buildChat {
     System.exec("mkdir -p Build/");
     System.exec("cp -r Assets Build/");
-    buildUiEndpoints(serverModules~ast, String("Build/Assets/"), String("Build/UiEndpoints/"));
+    buildUiEndpoints(serverModules~ast, String("Build/Assets/"), String("Build/UiEndpoints/"), true);
     def exe: Build.Exe(start~ast، "Build/chat");
     exe.addDependencies(WebPlatform.getBuildDependencies());
+    exe.optimize = 1;
     if exe.generate() {
         Console.print("Build complete.\n");
     } else {

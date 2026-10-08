@@ -73,7 +73,7 @@
 
     // Build Functions
 
-    func generateUiEndpointsFiles (parent: ref[Core.Ast.Node], uiEndpointsPath: String) {
+    func generateUiEndpointsFiles (parent: ref[Core.Ast.Node], uiEndpointsPath: String, optimize: Bool) {
         def elements: Array[ref[Core.Ast.Node]] = Spp.astMgr.findElements(
             ast { metadata == "uiEndpoint" },
             parent,
@@ -106,16 +106,17 @@
 
             generateUiEndpointFiles(
                 elements(i), uriParams(0), title, icon, appManifest, appVersion, preCacheFilenames, dynCacheFilenames,
-                uiEndpointsPath
+                uiEndpointsPath, optimize
             );
         }
     }
 
     func generateUiEndpointFiles (
         fn: ref[Core.Ast.Node], uri: String, title: String, iconFilename: String, manifestFilename: String,
-        version: String, preCacheFilenames: Array[String], dynCacheFilenames: Array[String], uiEndpointsPath: String
+        version: String, preCacheFilenames: Array[String], dynCacheFilenames: Array[String], uiEndpointsPath: String,
+        optimize: Bool
     ) {
-        def fnName: String = generateWasm(fn, uiEndpointsPath);
+        def fnName: String = generateWasm(fn, uiEndpointsPath, optimize);
         if iconFilename != "" {
             def icon: String;
             iconFilename.split("/").{ icon = this(this.getLength() - 1) };
@@ -141,13 +142,14 @@
         generateHtml(fnName, title, iconFilename, manifestFilename != "", uiEndpointsPath);
     }
 
-    func generateWasm(fn: ref[Core.Ast.Node], uiEndpointsPath: String): String {
+    func generateWasm(fn: ref[Core.Ast.Node], uiEndpointsPath: String, optimize: Bool): String {
         def binding: ref[Core.Basic.Binding](Core.Basic.getInterface[fn, Core.Basic.Binding]);
         binding.setMember("name", Core.Basic.TiStr("wasmStart"));
         def wasm: Build.Wasm(fn, uiEndpointsPath + "_intermediate.wasm");
         wasm.addDependency(webPlatformPath + String("Tools/lib/crt1.o"));
         wasm.addDependency(webPlatformPath + String("Tools/lib/libc.a"));
         wasm.addFlags({ String("--export=malloc"), String("--export=realloc") });
+        wasm.optimize = optimize;
         wasm.generate();
         def fnName: String = Spp.astMgr.getDefinitionName(fn);
         if System.exec(
@@ -210,14 +212,16 @@
         System.exec(String.format("cp %s/api.js \"%s/api.js\"", webPlatformPath.buf, mainAssetsPath.buf));
     }
 
-    func buildUiEndpoints(modulesRef: ref[Core.Ast.Node], mainAssetsPath: String, uiEndpointsPath: String) {
+    func buildUiEndpoints(
+        modulesRef: ref[Core.Ast.Node], mainAssetsPath: String, uiEndpointsPath: String, optimize: Bool
+    ) {
         prepareMainAssets(mainAssetsPath);
         def modules: Array[ref[Core.Ast.Node]] = getAllModules(modulesRef);
         if modules.getLength() == 0 {
             System.fail(1, "Invalid module argument for buildUiEndpoints.");
         }
         def i: Int;
-        for i = 0, i < modules.getLength(), ++i generateUiEndpointsFiles(modules(i), uiEndpointsPath);
+        for i = 0, i < modules.getLength(), ++i generateUiEndpointsFiles(modules(i), uiEndpointsPath, optimize);
     }
 
     // Code Generation
@@ -494,12 +498,12 @@
     }
 
     func buildAndStartServer [modulesRef: ast_ref = Root] (options: Array[CharsPtr]): ptr[ServerSession] {
-        buildUiEndpoints(modulesRef~ast, webPlatformPath, String(TEMP_UI_ENDPOINTS_PATH));
+        buildUiEndpoints(modulesRef~ast, webPlatformPath, String(TEMP_UI_ENDPOINTS_PATH), false);
         return startServer[modulesRef](webPlatformPath, String(TEMP_UI_ENDPOINTS_PATH), options, true);
     }
 
     func buildAndRunServer [modulesRef: ast_ref = Root] (options: Array[CharsPtr]) {
-        buildUiEndpoints(modulesRef~ast, webPlatformPath, String(TEMP_UI_ENDPOINTS_PATH));
+        buildUiEndpoints(modulesRef~ast, webPlatformPath, String(TEMP_UI_ENDPOINTS_PATH), false);
         runServer[modulesRef](webPlatformPath, String(TEMP_UI_ENDPOINTS_PATH), options, true);
     }
 
