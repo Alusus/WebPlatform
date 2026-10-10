@@ -11,7 +11,7 @@
 ```
 import "Build";
 import "Apm";
-Apm.importPackage("Alusus/WebPlatform@0.9");
+Apm.importPackage("Alusus/WebPlatform@0.11");
 use Srl;
 use WebPlatform;
 
