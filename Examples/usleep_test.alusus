@@ -97,7 +97,7 @@ func main {
         x += 2;
         if x >= 1280 x = -80;
 
-        System.sleep(10000);
+        System.usleep(10000);
         dispatchEvents();
     }
 }

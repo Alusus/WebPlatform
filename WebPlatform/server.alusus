@@ -488,7 +488,7 @@
             System.fail(1, "Failed to start HTTP server.");
         }
         Console.print("Server started.\nPress Ctrl+C to exit.\n");
-        while 1 System.sleep(100000);
+        while 1 System.sleep(1);
     }
 
     func runServer [modulesRef: ast_ref = Root] (
