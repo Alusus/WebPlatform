@@ -89,7 +89,10 @@
         //-----------------
         // Member Functions
 
-        handler this.onPropUpdated() this.update();
+        handler this.onPropUpdated() {
+            this._checked = this.getChecked();
+            this.update();
+        }
 
         //-------------------
         // Function Overrides
@@ -119,7 +122,7 @@
                 if this._checked {
                     setElementAttribute(this.id, "checked", "true");
                 } else {
-                    removeElementAttribute(this.id, "checked");
+                    setElementAttribute(this.id, "checked", "false");
                 }
                 if this.disabled == true {
                     setElementAttribute(this.id, "disabled", "true");

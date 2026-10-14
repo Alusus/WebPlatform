@@ -153,13 +153,16 @@ wasmApi.removeStyleRule = (elementHandle, styleSelector) => {
 }
 
 const nonAttributeProps = ['innerHTML', 'value', 'innerText', 'textContent', 'checked'];
+const booleanProps = ['checked'];
 
 wasmApi.setElementAttribute = (elementHandle, propName, value) => {
     const element = getDomObject(elementHandle);
     if (!element) return;
     const jsPropName = toJsString(propName);
     const jsValue = toJsString(value);
-    if (nonAttributeProps.includes(jsPropName)) {
+    if (booleanProps.includes(jsPropName)) {
+        element[jsPropName] = jsValue === "true";     // real true/false
+    } else if (nonAttributeProps.includes(jsPropName)) {
         element[jsPropName] = jsValue;
     } else {
         if (jsValue == "") {
