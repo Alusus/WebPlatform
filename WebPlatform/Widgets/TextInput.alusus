@@ -32,10 +32,10 @@
         def _text: String;
         handler this.setText (t: String) {
             this._text = t;
-            if this.id.getLength() > 0 setElementAttribute(this.id, "value", t);
+            if this.id != DomHandle.NONE setElementAttribute(this.id, "value", t);
         }
         handler this.getText (): ref[String] {
-            if this.id.getLength() == 0 this._text = String()
+            if this.id == DomHandle.NONE this._text = String()
             else this._text = String(getElementAttribute(this.id, "value"));
             return this._text;
         }
@@ -86,9 +86,8 @@
         //-------------------
         // Function Overrides
 
-        handler (this:Widget).build (ownerId: String, nextSiblingId: String) set_ptr {
-            this.id = getNewId();
-            createElement("textarea", this.id, ownerId, nextSiblingId);
+        handler (this:Widget).build (ownerId: ArchInt, nextSiblingId: ArchInt) set_ptr {
+            this.id = createElement("textarea", ownerId, nextSiblingId);
             this.buildCommon();
             this.update();
             this.onChanged.onConnectionsChanged(this.onChanged.getConnectionCount());
@@ -108,11 +107,11 @@
 
             deleteElement(this.id);
             this.unbuildCommon();
-            this.id = String();
+            this.id = DomHandle.NONE;
         }
 
         handler (this:Widget).update() set_ptr {
-            if this.id.getLength() > 0 {
+            if this.id != DomHandle.NONE {
                 this.updateCommon();
                 setElementAttribute(this.id, "value", this._text);
                 setElementAttribute(this.id, "placeholder", this.placeholder);

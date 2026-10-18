@@ -763,7 +763,7 @@ handler this.toggle()
 
 ```
 اشمل "مـحا"؛
-مـحا.اشمل_حزمة("Alusus/WebPlatform@0.9"، "مـنصة_ويب.أسس")؛
+مـحا.اشمل_حزمة("Alusus/WebPlatform@0.11"، "مـنصة_ويب.أسس")؛
 استخدم مـنصة_ويب؛
 
 @منفذ_مرئي["/"]
@@ -812,7 +812,7 @@ handler this.toggle()
 
 ```
 import "Apm";
-Apm.importPackage("Alusus/WebPlatform@0.9");
+Apm.importPackage("Alusus/WebPlatform@0.11");
 use WebPlatform;
 
 @uiEndpoint["/"]

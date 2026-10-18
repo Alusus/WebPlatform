@@ -15,7 +15,7 @@ The base class for all widgets.
 The following are the abstract properties declared in this class that must be implemented in child classes.
 
 ```
-handler this.id: String as_ptr;
+handler this.id: ArchInt as_ptr;
 
 handler this.className: ref[String] as_ptr;
 handler this.className = temp_ref[String] as ptr;
@@ -27,10 +27,12 @@ handler this.style = SrdRef[StyleSet] as_ptr;
 ##### id 
 
 ```
-handler this.id: String as_ptr;
+handler this.id: ArchInt as_ptr;
 ```
 
-A unique identifier to distinguish each widget from the other.
+The handle of the DOM element backing this widget, which is the element's index within the table of
+DOM objects maintained by the JS side. It's `DomHandle.NONE` as long as the widget isn't built, so
+it doubles as the way to tell whether the widget is currently built.
 
 ##### className 
 
@@ -181,7 +183,11 @@ Requets the browser to be scrolled to the element on which the method is called.
 
 The base class of all basic widgets. It implements the operations that are shared between all basic widgets.
 
-It also adds the following definition:
+It also adds the following definitions:
+
+* `domId`: `String`. A property for setting an identifier on the DOM to be used for integration with 3rd
+  party libraries, or for HTML features that depend on the identifier to reference other elements, like a
+  label's `for` attribute.
 
 * `hint`: `String`. A property for setting a string to be displayed as a tooltip when the cursor hovers over
   the element.
@@ -473,6 +479,16 @@ def onChanged: DomEventSignal[Input, Int];
 ```
 
 Gets fired when the entered value changes.
+
+##### onInput
+
+```
+def onInput: DomEventSignal[Input, Int];
+```
+
+Gets fired on every value change, including typing, pasting, and dropped text, right after the value has been
+updated. Unlike `onChanged`, which only fires once the value is committed (on blur), this is the earliest point
+at which a listener can read what was just entered.
 
 ##### onKeyPress
 

@@ -18,6 +18,11 @@
  */
 
 @merge module WebPlatform {
+    // Modifier handler for @style[cssName], which tags a style property with its CSS name.
+    func style (node: ref[Core.Ast.Node], params: ref[Core.Ast.Node]) {
+        node.setMetadata("style", Spp.astMgr.cloneAst(params, params));
+    }
+
     //==========================================================================
     // Styles
     // Holds styling properties for widgets.
@@ -155,10 +160,10 @@
             this.onPropUpdated();
         }
 
-        func generatePropNameLiteral(prop: ref[Core.Basic.TiObject]) {
+        func generatePropNameLiteral(prop: ref[Core.Ast.Node]) {
             use Core.Basic;
-            use Core.Data.Ast;
-            def elements: Array[ref[Core.Basic.TiObject]] = Spp.astMgr.findElements(
+            use Core.Ast;
+            def elements: Array[ref[Core.Ast.Node]] = Spp.astMgr.findElements(
                 prop,
                 this_type~ast,
                 Spp.SeekerFlags.SKIP_OWNERS | Spp.SeekerFlags.SKIP_USES | Spp.SeekerFlags.SKIP_CHILDREN
@@ -169,14 +174,14 @@
             }
             def i: Int;
             for i = 0, i < elements.getLength(), ++i {
-                def mod: ref[TiObject](Spp.astMgr.findModifierForElement(elements(i), "style"));
+                def mod: ref[Node](elements(i).owner.getMetadata("style"));
                 if mod~ptr == 0 continue;
                 def params: Array[String];
-                Spp.astMgr.getModifierStringParams(mod, params);
+                Spp.astMgr.getStringsFromStringParams(mod, params);
                 if params.getLength() == 0 continue;
                 Spp.astMgr.insertAst(
                     (ast strLiteral),
-                    Srl.Map[String, ref[TiObject]]().set(String("strLiteral"), StringLiteral(params(0)))
+                    Srl.Map[String, ref[Node]]().set(String("strLiteral"), StringLiteral(params(0)))
                 );
                 break;
             }

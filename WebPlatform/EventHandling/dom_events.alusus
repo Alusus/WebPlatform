@@ -19,31 +19,31 @@
 
 @merge module WebPlatform {
     class ElementEventIdentification {
-        def elementName: String;
+        def element: ArchInt;
         def eventName: String;
     }
 
     function registerElementEventHandler (
-        elementName: ptr[array[Char]], eventName: ptr[array[Char]], preventDefault: Bool, cb: closure (Json)
+        element: ArchInt, eventName: ptr[array[Char]], preventDefault: Bool, cb: closure (Json)
     ): ArchInt {
         def index: ArchInt = addEventHandler(cb);
-        _registerElementEventHandler(elementName, eventName, preventDefault, eventHandlers(index).id);
+        _registerElementEventHandler(element, eventName, preventDefault, eventHandlers(index).id);
         def eventIdentification: SrdRef[ElementEventIdentification];
         eventIdentification.construct();
-        eventIdentification.elementName = elementName;
+        eventIdentification.element = element;
         eventIdentification.eventName = eventName;
         eventHandlers(index).info = castSrdRef[eventIdentification, Void];
         return eventHandlers(index).id;
     }
 
     function registerElementKeyEventHandler (
-        elementName: ptr[array[Char]], eventName: ptr[array[Char]], keysToSwallow: ptr[array[Char]], cb: closure (Json)
+        element: ArchInt, eventName: ptr[array[Char]], keysToSwallow: ptr[array[Char]], cb: closure (Json)
     ): ArchInt {
         def index: ArchInt = addEventHandler(cb);
-        _registerElementKeyEventHandler(elementName, eventName, keysToSwallow, eventHandlers(index).id);
+        _registerElementKeyEventHandler(element, eventName, keysToSwallow, eventHandlers(index).id);
         def eventIdentification: SrdRef[ElementEventIdentification];
         eventIdentification.construct();
-        eventIdentification.elementName = elementName;
+        eventIdentification.element = element;
         eventIdentification.eventName = eventName;
         eventHandlers(index).info = castSrdRef[eventIdentification, Void];
         return eventHandlers(index).id;
@@ -54,16 +54,16 @@
         if i == -1 return;
         def eventIdentification: SrdRef[ElementEventIdentification] =
             castSrdRef[eventHandlers(i).info, ElementEventIdentification];
-        _unregisterElementEventHandler(eventIdentification.elementName, eventIdentification.eventName);
+        _unregisterElementEventHandler(eventIdentification.element, eventIdentification.eventName);
         eventHandlers.remove(i);
     }
 
-    function observeResize (elementName: ptr[array[Char]], cb: closure (Json)): ArchInt {
+    function observeResize (element: ArchInt, cb: closure (Json)): ArchInt {
         def index: ArchInt = addEventHandler(cb);
-        _observeResize(elementName, eventHandlers(index).id);
+        _observeResize(element, eventHandlers(index).id);
         def eventIdentification: SrdRef[ElementEventIdentification];
         eventIdentification.construct();
-        eventIdentification.elementName = elementName;
+        eventIdentification.element = element;
         eventIdentification.eventName = "observeResize";
         eventHandlers(index).info = castSrdRef[eventIdentification, Void];
         return eventHandlers(index).id;
@@ -74,7 +74,7 @@
         if i == -1 return;
         def eventIdentification: SrdRef[ElementEventIdentification] =
             castSrdRef[eventHandlers(i).info, ElementEventIdentification];
-        _unobserveResize(eventIdentification.elementName);
+        _unobserveResize(eventIdentification.element);
         eventHandlers.remove(i);
     }
 }

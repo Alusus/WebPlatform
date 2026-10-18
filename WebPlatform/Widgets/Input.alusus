@@ -35,7 +35,7 @@
         def _textModified: Bool(false);
         handler this.setText (t: String) {
             this._text = t;
-            if this.id.getLength() > 0 {
+            if this.id != DomHandle.NONE {
                 setElementAttribute(this.id, "value", t);
                 this._textModified = false;
             } else {
@@ -43,7 +43,7 @@
             }
         }
         handler this.getText (): String {
-            if this.id.getLength() == 0 this._text = String()
+            if this.id == DomHandle.NONE this._text = String()
             else this._text = String(getElementAttribute(this.id, "value"));
             return this._text;
         }
@@ -57,6 +57,8 @@
 
         def onChanged: DomEventSignal[Input, Int];
         def onChangedId: ArchInt = -1;
+        def onInput: DomEventSignal[Input, Int];
+        def onInputId: ArchInt = -1;
         def onKeyPress: DomEventSignal[Input, String];
         def onKeyPressId: ArchInt = -1;
         def onKeyUp: DomEventSignal[Input, String];
@@ -82,6 +84,15 @@
             this.onChanged.onConnectionsChanged = closure (connectionCount: Int) {
                 handleSignalConnectionChanged[this.id, onChanged, "change", {
                     this.onChanged.emit(this, Int(0));
+                }];
+            };
+
+            // Unlike onChanged (fired on blur, via the DOM "change" event), onInput fires on every value change,
+            // including typing, pasting and dropped text, right after the browser has updated the element's value.
+            // It's the earliest point at which a listener can read (and correct) what the user just entered.
+            this.onInput.onConnectionsChanged = closure (connectionCount: Int) {
+                handleSignalConnectionChanged[this.id, onInput, "input", {
+                    this.onInput.emit(this, Int(0));
                 }];
             };
 
@@ -112,12 +123,12 @@
         //-------------------
         // Function Overrides
 
-        handler (this:Widget).build (ownerId: String, nextSiblingId: String) set_ptr {
-            this.id = getNewId();
-            createElement("input", this.id, ownerId, nextSiblingId);
+        handler (this:Widget).build (ownerId: ArchInt, nextSiblingId: ArchInt) set_ptr {
+            this.id = createElement("input", ownerId, nextSiblingId);
             this.buildCommon();
             this.update();
             this.onChanged.onConnectionsChanged(this.onChanged.getConnectionCount());
+            this.onInput.onConnectionsChanged(this.onInput.getConnectionCount());
             this.onKeyPress.onConnectionsChanged(this.onKeyPress.getConnectionCount());
             this.onKeyUp.onConnectionsChanged(this.onKeyUp.getConnectionCount());
         }
@@ -125,6 +136,9 @@
         handler (this:Widget).unbuild() set_ptr {
             if this.onChangedId != -1 unregisterElementEventHandler(this.onChangedId);
             this.onChangedId = -1;
+
+            if this.onInputId != -1 unregisterElementEventHandler(this.onInputId);
+            this.onInputId = -1;
 
             if this.onKeyPressId != -1 unregisterElementEventHandler(this.onKeyPressId);
             this.onKeyPressId = -1;
@@ -134,11 +148,11 @@
 
             deleteElement(this.id);
             this.unbuildCommon();
-            this.id = String();
+            this.id = DomHandle.NONE;
         }
 
         handler (this:Widget).update() set_ptr {
-            if this.id.getLength() > 0 {
+            if this.id != DomHandle.NONE {
                 this.updateCommon();
                 if this._textModified {
                     setElementAttribute(this.id, "value", this._text);

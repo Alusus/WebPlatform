@@ -41,9 +41,8 @@
         //-------------------
         // Function Overrides
 
-        handler (this:Widget).build (ownerId: String, nextSiblingId: String) set_ptr {
-            this.id = getNewId();
-            createElement("video", this.id, ownerId, nextSiblingId);
+        handler (this:Widget).build (ownerId: ArchInt, nextSiblingId: ArchInt) set_ptr {
+            this.id = createElement("video", ownerId, nextSiblingId);
             this.buildCommon();
             this.update();
 
@@ -51,15 +50,15 @@
         }
 
         handler (this:Widget).unbuild() set_ptr {
-            if this.id.getLength() > 0 {
+            if this.id != DomHandle.NONE {
                 deleteElement(this.id);
                 this.unbuildCommon();
-                this.id = String();
+                this.id = DomHandle.NONE;
             }
         }
 
         handler (this:Widget).update() set_ptr {
-            if this.id.getLength() > 0 {
+            if this.id != DomHandle.NONE {
                 this.updateCommon();
                 if this.controls == true setElementAttribute(this.id, "controls", "controls");
                 if this.autoplay == true { setElementAttribute(this.id, "autoplay", "autoplay"); setElementAttribute(this.id, "muted", "muted"); }

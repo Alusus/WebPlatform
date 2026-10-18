@@ -22,7 +22,10 @@
     // Animation
     // class to deal with keyframes and animation
     class Animation {
+        // The name of the css keyframes rule holding this animation.
         def name : String = getNewId();
+        // The handle of the `style` element holding the keyframes rule.
+        def styleElement: ArchInt = DomHandle.NONE;
         def buildCounter: Int = 0;
         def styles: Map[Float, Style];
         def totalDuration: Float;
@@ -58,7 +61,7 @@
         handler this.build() {
             if this.buildCounter++ > 0 return;
 
-            createElement("style", this.name, "head");
+            this.styleElement = createElement("style", DomHandle.HEAD);
             this.update();
         }
 
@@ -66,7 +69,8 @@
             if this.buildCounter == 0 return;
             if --this.buildCounter > 0 return;
 
-            deleteElement(this.name);
+            deleteElement(this.styleElement);
+            this.styleElement = DomHandle.NONE;
         }
 
         handler this.update() {
@@ -84,7 +88,7 @@
                 cssString += "}";
             }
             cssString += "}";
-            setElementAttribute(this.name, "innerHTML", cssString);
+            setElementAttribute(this.styleElement, "innerHTML", cssString);
         }
 
         handler this_type(): SrdRef[Animation] {

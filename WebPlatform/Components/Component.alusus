@@ -23,8 +23,8 @@
     class Component {
         @injection def widget: Widget;
         def _view: SrdRef[Widget];
-        def ownerId: String;
-        def nextSiblingId: String;
+        def ownerId: ArchInt = DomHandle.NONE;
+        def nextSiblingId: ArchInt = DomHandle.NONE;
 
         //---------
         // Handlers
@@ -32,9 +32,9 @@
         handler this~init() {}
 
         handler this.view = SrdRef[Widget] {
-            if this.id != "" this.unbuild();
+            if this.id != DomHandle.NONE this.unbuild();
             this._view = value;
-            if this.ownerId != "" this.build(this.ownerId, this.nextSiblingId);
+            if this.ownerId != DomHandle.NONE this.build(this.ownerId, this.nextSiblingId);
             return this._view;
         }
 
@@ -45,8 +45,8 @@
         //--------------------
         // Abstract Properties
 
-        handler (this: Widget).id: String set_ptr {
-            if this._view.isNull() return String()
+        handler (this: Widget).id: ArchInt set_ptr {
+            if this._view.isNull() return DomHandle.NONE
             else return this._view.id;
         }
 
@@ -126,7 +126,7 @@
         //-------------------
         // Function Overrides
 
-        handler (this:Widget).build (ownerId: String, nextSiblingId: String) set_ptr {
+        handler (this:Widget).build (ownerId: ArchInt, nextSiblingId: ArchInt) set_ptr {
             this.beforeBuild();
             if this._view.obj~ptr != 0 this._view.build(ownerId, nextSiblingId);
             this.ownerId = ownerId;

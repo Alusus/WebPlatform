@@ -52,9 +52,8 @@
         //-------------------
         // Function Overrides
 
-        handler (this:Widget).build (ownerId: String, nextSiblingId: String) set_ptr {
-            this.id = getNewId();
-            createElement("select", this.id, ownerId, nextSiblingId);
+        handler (this:Widget).build (ownerId: ArchInt, nextSiblingId: ArchInt) set_ptr {
+            this.id = createElement("select", ownerId, nextSiblingId);
             this.buildCommon();
             this.update();
             this.onChanged.onConnectionsChanged(this.onChanged.getConnectionCount());
@@ -65,11 +64,11 @@
             this.onChangedId = -1;
             deleteElement(this.id);
             this.unbuildCommon();
-            this.id = String();
+            this.id = DomHandle.NONE;
         }
 
         handler (this:Widget).update() set_ptr {
-            if this.id.getLength() > 0 {
+            if this.id != DomHandle.NONE {
                 this.updateCommon();
                 //setElementAttribute(this.id, "value", this._text);
                 def i: Int = 0;

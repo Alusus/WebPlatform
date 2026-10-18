@@ -23,63 +23,95 @@ func getBuildDependencies(): Array[String];
 A function that return an array of libraries and packages required to build a binary version of the
 application.
 
+### DomHandle
+
+```
+def DomHandle: {
+    def NONE: 0;
+    def WINDOW: 1;
+    def DOCUMENT: 2;
+    def BODY: 3;
+    def HEAD: 4;
+    def PARENT_WINDOW: 5;
+}
+```
+
+DOM objects are referenced from the Alusus side by an integer handle, which is the object's index
+within a `WebAssembly.Table` maintained by the JS side. `createElement` returns the handle of the
+element it created, and that handle is then passed to every function manipulating that element. The
+handles above are reserved for the objects that already exist before the program starts, so they are
+available without creating anything. `DomHandle.NONE` stands for "no element".
+
 ### createElement
 
 ```
-function createElement (type: ptr[Char], name: ptr[Char], parent: ptr[Char]);
+function createElement (type: ptr[Char], parent: ArchInt): ArchInt;
+function createElement (type: ptr[Char], parent: ArchInt, nextSibling: ArchInt): ArchInt;
 ```
 
-Creates an element in the DOM of the browser. This is what widgets use to display themselves in the
-browser.
+Creates an element in the DOM of the browser and returns its handle. This is what widgets use to
+display themselves in the browser.
 
 * `type` the type of the component we want to create.
-* `name` the name of the component we want to create.
-* `parent` the component we want to add the created component to it.
+* `parent` the handle of the component we want to add the created component to it.
+* `nextSibling` the handle of the sibling to insert the new element before, or `DomHandle.NONE` to
+  append it at the end of the parent's children.
+
+### deleteElement
+
+```
+function deleteElement (element: ArchInt);
+```
+
+Removes the given element from the DOM and releases its handle, which makes the handle available for
+later elements. The handle must not be used after this call.
+
+* `element` the handle of the element we want to remove.
 
 ### setElementAttribute
 
 ```
-function setElementAttribute (name: ptr[Char], prop: ptr[Char], value: ptr[Char])
+function setElementAttribute (element: ArchInt, prop: ptr[Char], value: ptr[Char])
 ```
 
 Sets an attribute for a given DOM element. Used by the widgets to set the attributes of
 corresponding DOM elements.
 
-* `name` component's name.
+* `element` the handle of the component.
 * `prop` the name of the attribute we want to set its value.
 * `value` the value of the attribute we want to set.
 
 ### getElementAttribute
 
 ```
-function getElementAttribute (name: ptr[Char], prop: ptr[Char]): CharsPtr;
+function getElementAttribute (element: ArchInt, prop: ptr[Char]): CharsPtr;
 ```
 
 Gets an attribute for a given DOM element.
 
-* `name` component's name.
+* `element` the handle of the component.
 * `prop` the name of the attribute we want to retrieve.
 
 ### removeElementAttribute
 
 ```
-function removeElementAttribute (name: ptr[Char], prop: ptr[Char]);
+function removeElementAttribute (element: ArchInt, prop: ptr[Char]);
 ```
 
 Removes an attribute from a given DOM element.
 
-* `name` component's name.
+* `element` the handle of the component.
 * `prop` the name of the attribute we want to remove.
 
 ### setStyleRule
 
 ```
-function setStyleRule (name: ptr[Char], selector: ptr[Char], css: ptr[Char])
+function setStyleRule (element: ArchInt, selector: ptr[Char], css: ptr[Char])
 ```
 
 Sets the body of a style in the browser. Used by styling classes to apply the styles in the browser.
 
-* `name` the name of the rule we want to add.
+* `element` the handle of the `style` element we want to add the rule to.
 * `selector` the selector responsible for selecting the components to apply the style on them.
 * `css` the styles of the rule.
 

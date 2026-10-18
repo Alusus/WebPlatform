@@ -30,7 +30,7 @@
     // handleSignalConnectionChanged
     // A helper macro for handling signal connection changes in widgets.
     macro handleSignalConnectionChanged [elementId, signalName, eventHtmlIentifier, emitSignal] {
-        if connectionCount > 0 and this.__signalName__Id == -1 and not String.isEqual(elementId, "") {
+        if connectionCount > 0 and this.__signalName__Id == -1 and elementId != DomHandle.NONE {
             this.__signalName__Id = registerElementEventHandler(
                 elementId,
                 eventHtmlIentifier,
@@ -52,7 +52,7 @@
     // A helper macro for handling key events signal connection changes in
     // widgets.
     macro handleSignalConnectionChanged [elementId, signalName, eventHtmlIentifier, keysToSwallow, emitSignal] {
-        if connectionCount > 0 and this.__signalName__Id == -1 and not String.isEqual(elementId, "") {
+        if connectionCount > 0 and this.__signalName__Id == -1 and elementId != DomHandle.NONE {
             this.__signalName__Id = registerElementKeyEventHandler(
                 elementId,
                 eventHtmlIentifier,

@@ -425,7 +425,7 @@ Toggles the panel between open and closed states.
 
 ```
 import "Apm";
-Apm.importPackage("Alusus/WebPlatform@0.9");
+Apm.importPackage("Alusus/WebPlatform@0.11");
 use WebPlatform;
 
 @uiEndpoint["/"]

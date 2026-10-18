@@ -11,7 +11,7 @@ both the backend and the frontend, using Alusus programming language.
 
 ```
 import "Apm";
-Apm.importPackage("Alusus/WebPlatform@0.9");
+Apm.importPackage("Alusus/WebPlatform@0.11");
 ```
 
 ## Contents

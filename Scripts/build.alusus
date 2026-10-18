@@ -23,7 +23,6 @@ import "Srl/Net";
 import "Srl/String";
 import "Srl/Regex";
 import "Srl/Fs";
-import "Core/Data";
 import "Spp";
 import "Zip";
 
