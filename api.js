@@ -948,6 +948,11 @@ wasmApi.getDate = (type, timestamp) => {
     }
 }
 
+wasmApi.parseDate = (dateStr) => {
+    const ms = Date.parse(toJsString(dateStr));
+    return isNaN(ms) ? -1n : BigInt(ms);
+}
+
 wasmApi.requestPointerLock = (elementHandle) => {
     const element = getDomObject(elementHandle);
     if (!element) return;
