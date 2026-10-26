@@ -31,11 +31,15 @@
         defineProperty[disabled, Disabled, bool];
 
         def _checked: Bool;
+        def _checkedModified: Bool(false);
         handler this.setChecked (c: Bool) {
             this._checked = c;
             if this.id != DomHandle.NONE {
                 if c setElementAttribute(this.id, "checked", "true")
                 else setElementAttribute(this.id, "checked", "false");
+                this._checkedModified = false;
+            } else {
+                this._checkedModified = true;
             }
         }
         handler this.getChecked (): Bool {
@@ -76,6 +80,7 @@
             this.value = v;
             this.disabled = false;
             this._checked = c;
+            this._checkedModified = true;
         }
 
         handler this.initSignals() {
@@ -89,10 +94,7 @@
         //-----------------
         // Member Functions
 
-        handler this.onPropUpdated() {
-            this._checked = this.getChecked();
-            this.update();
-        }
+        handler this.onPropUpdated() this.update();
 
         //-------------------
         // Function Overrides
@@ -119,10 +121,10 @@
                 setElementAttribute(this.id, "type", "radio");
                 setElementAttribute(this.id, "value", this.value);
                 setElementAttribute(this.id, "name", this.name);
-                if this._checked {
-                    setElementAttribute(this.id, "checked", "true");
-                } else {
-                    setElementAttribute(this.id, "checked", "false");
+                if this._checkedModified {
+                    if this._checked setElementAttribute(this.id, "checked", "true")
+                    else setElementAttribute(this.id, "checked", "false");
+                    this._checkedModified = false;
                 }
                 if this.disabled == true {
                     setElementAttribute(this.id, "disabled", "true");

@@ -30,9 +30,15 @@
         defineProperty[placeholder, Placeholder, String];
 
         def _text: String;
+        def _textModified: Bool(false);
         handler this.setText (t: String) {
             this._text = t;
-            if this.id != DomHandle.NONE setElementAttribute(this.id, "value", t);
+            if this.id != DomHandle.NONE {
+                setElementAttribute(this.id, "value", t);
+                this._textModified = false;
+            } else {
+                this._textModified = true;
+            }
         }
         handler this.getText (): ref[String] {
             if this.id == DomHandle.NONE this._text = String()
@@ -113,7 +119,10 @@
         handler (this:Widget).update() set_ptr {
             if this.id != DomHandle.NONE {
                 this.updateCommon();
-                setElementAttribute(this.id, "value", this._text);
+                if this._textModified {
+                    setElementAttribute(this.id, "value", this._text);
+                    this._textModified = false;
+                }
                 setElementAttribute(this.id, "placeholder", this.placeholder);
             }
         }
