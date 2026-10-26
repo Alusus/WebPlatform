@@ -41,8 +41,7 @@
             }
         }
         handler this.getText (): ref[String] {
-            if this.id == DomHandle.NONE this._text = String()
-            else this._text = String(getElementAttribute(this.id, "value"));
+            if this.id != DomHandle.NONE this._text = String(getElementAttribute(this.id, "value"));
             return this._text;
         }
         handler this.text = (val: temp_ref[String]) {
