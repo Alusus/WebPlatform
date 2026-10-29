@@ -16,6 +16,7 @@ use WebPlatform;
 @title["WebPlatform Example - CheckBox"]
 func main {
     def statusText: SrdRef[Text];
+    def uncheckTestBox: SrdRef[CheckBox];
 
     // Build the view
     Window.instance.style.{
@@ -113,6 +114,26 @@ func main {
                                 });
                             },
                             Text(String("Enable notifications"));
+                        });
+                    },
+
+                    Box({}).{
+                        style.{
+                            display = Display.FLEX;
+                            layout = Layout.ROW;
+                            gap = Length.pt(8);
+                            align = Align.CENTER;
+                        };
+                        addChildren({
+                            CheckBox(String("uncheck_test")).{
+                                uncheckTestBox = this;
+                            },
+                            Text(String("Click here to uncheck the box with setChecked(false)")).{
+                                style.cursor = Cursor.POINTER;
+                                onClick.connect(closure (uncheckTestBox: by_ref)&(widget: ref[Widget], payload: ref[Int]) {
+                                    uncheckTestBox.setChecked(false);
+                                });
+                            };
                         });
                     }
                 });

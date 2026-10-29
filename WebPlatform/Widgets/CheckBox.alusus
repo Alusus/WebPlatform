@@ -30,11 +30,15 @@
         defineProperty[disabled, Disabled, bool];
 
         def _checked: Bool;
+        def _checkedModified: Bool(false);
         handler this.setChecked (c: Bool) {
             this._checked = c;
             if this.id != DomHandle.NONE {
                 if c setElementAttribute(this.id, "checked", "true")
                 else setElementAttribute(this.id, "checked", "false");
+                this._checkedModified = false;
+            } else {
+                this._checkedModified = true;
             }
         }
         handler this.getChecked (): Bool {
@@ -73,6 +77,7 @@
             this.value = v;
             this.disabled = false;
             this._checked = c;
+            this._checkedModified = true;
         }
 
         handler this.initSignals() {
@@ -112,10 +117,10 @@
                 this.updateCommon();
                 setElementAttribute(this.id, "type", "checkbox");
                 setElementAttribute(this.id, "value", this.value);
-                if this._checked {
-                    setElementAttribute(this.id, "checked", "true");
-                } else {
-                    removeElementAttribute(this.id, "checked");
+                if this._checkedModified {
+                    if this._checked setElementAttribute(this.id, "checked", "true")
+                    else setElementAttribute(this.id, "checked", "false");
+                    this._checkedModified = false;
                 }
                 if this.disabled == true {
                     setElementAttribute(this.id, "disabled", "true");
